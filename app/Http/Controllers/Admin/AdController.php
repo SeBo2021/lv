@@ -13,7 +13,7 @@ class AdController extends BaseCurlController
 {
     use PHPRedisTrait;
 
-    public $pageName = '广告';
+    public string $pageName = '广告';
 
     public function setModel()
     {

@@ -17,7 +17,7 @@ use App\Exceptions\ErrorException;
 trait BladeTrait
 {
     public $bladeView;//视图文件
-    public $pageName;
+    public string $pageName;
     public $module;//模块
     public $bladeTheme;//主题模板
     public $bladePrefix = '';//视图前缀文件
