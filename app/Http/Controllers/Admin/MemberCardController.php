@@ -57,6 +57,12 @@ class MemberCardController extends BaseCurlController
                 'align' => 'center'
             ],
             [
+                'field' => 'name_day',
+                'minWidth' => 100,
+                'title' => '天数解释',
+                'align' => 'center'
+            ],
+            [
                 'field' => 'remark',
                 'minWidth' => 150,
                 'title' => '卡信息描述',
@@ -93,6 +99,13 @@ class MemberCardController extends BaseCurlController
                 'field' => 'name',
                 'type' => 'text',
                 'name' => '会员卡名称',
+                'must' => 1,
+                'verify' => 'rq',
+            ],
+            [
+                'field' => 'name_day',
+                'type' => 'text',
+                'name' => '天数解释',
                 'must' => 1,
                 'verify' => 'rq',
             ],

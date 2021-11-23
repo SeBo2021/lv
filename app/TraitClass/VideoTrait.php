@@ -334,7 +334,7 @@ trait VideoTrait
             $domainSync = VideoTrait::getDomain($list['sync']);
             $list['cover_img'] = $domainSync.$list['cover_img'];
             $list['gold'] = $list['gold']/$this->goldUnit;
-            $list['views'] = $list['views']>0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5,9));
+            $list['views'] = $list['views']>0 ? $this->generateRandViews($list['views'],false) : $this->generateRandViews(rand(5,9));
             $list['hls_url'] = $domainSync . $list['hls_url'];
             $list['preview_hls_url'] = $this->getPreviewPlayUrl($list['hls_url']);
             $list['dash_url'] = $domainSync . $list['dash_url'];
@@ -347,9 +347,12 @@ trait VideoTrait
         return $lists;
     }
 
-    public function generateRandViews($views): string
+    public function generateRandViews($views,$rand = true): string
     {
-        return ($views*10) * round(rand(1,9)/10,1).'万';
+        if ($rand) {
+            return ($views*10) * round(rand(1,9)/10,1).'万';
+        }
+        return ($views*10) * round(1/10,1).'万';
     }
 
     public function getPreviewPlayUrl($url,$type='hls'): array|string
