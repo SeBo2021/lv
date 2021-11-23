@@ -56,20 +56,21 @@ class VideoController extends Controller
             if (!empty($one)) {
                 $one = $this->handleVideoItems([$one], true)[0];
                 $one['limit'] = 0;
+                // 任何类型都有 是否点赞 is_collect 并增加观看记录
+                ProcessViewVideo::dispatchAfterResponse($user, $one);
+
+                $viewRecord = ViewRecord::query()->where('uid', $user->id)->where('vid', $id)->first(['id', 'is_love', 'is_collect']);
+                //是否点赞
+                $one['is_love'] = $viewRecord['is_love'] ?? 0;
+                //是否收藏
+                $one['is_collect'] = $viewRecord['is_collect'] ?? 0;
+
                 if ($one['restricted'] != 0) {
-
-                    ProcessViewVideo::dispatchAfterResponse($user, $one);
-
-                    $viewRecord = ViewRecord::query()->where('uid', $user->id)->where('vid', $id)->first(['id', 'is_love', 'is_collect']);
-                    //是否点赞
-                    $one['is_love'] = $viewRecord['is_love'] ?? 0;
-                    //是否收藏
-                    $one['is_collect'] = $viewRecord['is_collect'] ?? 0;
                     //是否有观看次数
                     if ($viewLongVideoTimes <= 0) {
                         $one['restricted'] += 0;
                         if ($user->phone_number > 0 || true) {
-                            unset($one['preview_hls_url'], $one['preview_dash_url']);
+                            // unset($one['preview_hls_url'], $one['preview_dash_url']);
                             $one = $this->vipOrGold($one, $user);
                             if ($useGold && $one['limit'] == 2) {
                                 // 如果金币则尝试购买
@@ -81,8 +82,8 @@ class VideoController extends Controller
                                 'data' => $one
                             ]);
                         } else {
-                            unset($one['hls_url']);
-                            unset($one['dash_url']);
+                            // unset($one['hls_url']);
+                            // unset($one['dash_url']);
                             return response()->json([
                                 'state' => -1,
                                 'data' => $one,
@@ -179,6 +180,13 @@ class VideoController extends Controller
             Validator::make($params, $rules)->validate();
             $id = $params['id'];
             $is_collect = $params['collect'];
+            $card = explode(',',($user->member_card_type??[]));
+            if (!array_intersect([4,5,6,7,8],$card)){
+                return response()->json([
+                    'state' => -2,
+                    'msg' => "权限不足",
+                ]);
+            }
             try {
                 Video::query()->where('id', $id)->increment('likes');
                 $attributes = ['uid' => $user->id, 'vid' => $id];
