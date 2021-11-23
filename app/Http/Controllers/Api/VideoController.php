@@ -70,7 +70,7 @@ class VideoController extends Controller
                     if ($viewLongVideoTimes <= 0) {
                         $one['restricted'] += 0;
                         if ($user->phone_number > 0 || true) {
-                            unset($one['preview_hls_url'], $one['preview_dash_url']);
+                            // unset($one['preview_hls_url'], $one['preview_dash_url']);
                             $one = $this->vipOrGold($one, $user);
                             if ($useGold && $one['limit'] == 2) {
                                 // 如果金币则尝试购买
@@ -82,8 +82,8 @@ class VideoController extends Controller
                                 'data' => $one
                             ]);
                         } else {
-                            unset($one['hls_url']);
-                            unset($one['dash_url']);
+                            // unset($one['hls_url']);
+                            // unset($one['dash_url']);
                             return response()->json([
                                 'state' => -1,
                                 'data' => $one,
