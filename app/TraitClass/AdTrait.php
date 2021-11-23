@@ -84,6 +84,7 @@ trait AdTrait
             $position = $position[0];
         }
         $counter = 0;
+        unset($k,$v);
         foreach ($res as $k=>$v){
             $cur = ($page-1) * $perPage + $k+1;
             if ($position != 0) {
