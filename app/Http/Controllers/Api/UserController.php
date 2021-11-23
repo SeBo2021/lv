@@ -89,7 +89,7 @@ class UserController extends Controller
                 if (in_array(8,$types)) {
                     $vipDay = -1;
                 } else {
-                    $vipDay = floor((($calc>0)?$calc:0)/(24*60*60));
+                    $vipDay = ceil((($calc>0)?$calc:0)/(24*60*60));
                 }
                 $member_card = [
                     'name' => $memberCardInfo->name,
