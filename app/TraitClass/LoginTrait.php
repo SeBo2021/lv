@@ -5,7 +5,7 @@ namespace App\TraitClass;
 trait LoginTrait
 {
 
-    public $loginUserFields = ['id','account','channel_id','nickname','device_system','phone_number','promotion_code','avatar','sex','gold','balance','long_vedio_times'];
+    public $loginUserFields = ['id','account','channel_id','nickname','device_system','phone_number','promotion_code','avatar','sex','gold','balance','long_vedio_times','area_number'];
 
     public $loginRules = [
         'type' => 'required|integer|between:1,2',
