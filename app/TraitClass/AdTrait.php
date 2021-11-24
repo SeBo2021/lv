@@ -88,7 +88,7 @@ trait AdTrait
         foreach ($res as $k=>$v){
             $cur = ($page-1) * $perPage + $k + 1;
             if ($position != 0) {
-                if (($cur % $position == 0) && ($k+1 >= $position)) {
+                if (($cur % $position == 0) && ($cur != 0)) {
                     $adsKey = $counter%$adCount;
                     $counter++;
                     $res[$k]['ad_list'] = [];
