@@ -31,7 +31,7 @@ class VipController extends \App\Http\Controllers\Controller
         $memberCard = DB::table('member_card')
             ->where('status',1)
             ->orderBy('sort')
-            ->get(['id','name','sort','bg_img','remark','value','rights','hours','real_value','status'])
+            ->get(['id','name','sort','bg_img','remark','value','rights','hours','real_value','status','name_day'])
             ->toArray();
         foreach ($memberCard as &$item)
         {
@@ -51,6 +51,9 @@ class VipController extends \App\Http\Controllers\Controller
                         $item['real_value'] = 0;
                     }
                 }
+            }
+            if ($item['name_day'] && ($rights_list[0]['id'] == 1)) {
+                $rights_list[0]['name'] = $item['name_day'];
             }
             $item['rights_list'] = $rights_list;
             unset($item['rights']);

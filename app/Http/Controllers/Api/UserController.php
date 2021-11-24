@@ -86,11 +86,17 @@ class UserController extends Controller
                 if ($calc >= 0) {
                     $isVip = 1;
                 }
+                if (in_array(8,$types)) {
+                    $vipDay = -1;
+                } else {
+                    $vipDay = ceil((($calc>0)?$calc:0)/(24*60*60));
+                }
                 $member_card = [
                     'name' => $memberCardInfo->name,
                     'expired_time' => $expired_time,
                     'is_vip' => $isVip,
                     'vip_expired' => date('Y-m-d',time() + $calc),
+                    'vip_day' => $vipDay,
                 ];
             }
 

@@ -259,7 +259,7 @@ class SearchController extends Controller
                     $order = 'likes';
                     break;
                 default:
-                    $order = 'id';
+                    $order = '';
             }
             return $order;
         }

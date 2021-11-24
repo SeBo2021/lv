@@ -73,7 +73,7 @@ trait AdTrait
             }
             return $res;
         } else {
-            $ads = self::get($flag,true);
+            $ads = self::get($flag,false);
         }
         $position = explode(':',$rawPos);
         $adCount = count($ads);
@@ -84,13 +84,18 @@ trait AdTrait
             $position = $position[0];
         }
         $counter = 0;
+        unset($k,$v);
         foreach ($res as $k=>$v){
-            $cur = ($page-1) * $perPage + $k;
+            $cur = ($page-1) * $perPage + $k + 1;
             if ($position != 0) {
-                if (($cur % $position == 0) && ($k != 0)) {
+                if (($cur % $position == 0) && ($cur != 0)) {
                     $adsKey = $counter%$adCount;
                     $counter++;
-                    $res[$k]['ad_list'] = [$ads[$adsKey]];
+                    $res[$k]['ad_list'] = [];
+                    $tmpAd = $ads[$adsKey]??[];
+                    if ($tmpAd) {
+                        $res[$k]['ad_list'] = [$tmpAd];
+                    }
                 } else {
                     $res[$k]['ad_list'] = [];
                 }
