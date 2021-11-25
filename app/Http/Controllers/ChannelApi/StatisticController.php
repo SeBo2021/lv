@@ -47,26 +47,26 @@ class StatisticController extends \App\Http\Controllers\Controller
                         ->where('at_time','<=',strtotime($endDate));
                 }
                 $queryBuild = $queryBuild->groupBy(['channel_id','device_system']);
-                $totalData = $queryBuild->orderByDesc('at_time')->limit(200)->get();
+                $totalData = $queryBuild->orderByDesc('at_time')->limit(200)->get()->toArray();
 
                 $totalArr = [];
                 foreach ($totalData as $item){
-                    $totalArr[] = [
+                    $totalArr[$item->device_system] = [
                         'access' => round($item->total_access/100),
                         'hits' => round($item->total_hits/100),
                         'install' => round($item->total_install/100),
                         'register' => round($item->total_register/100)
                     ];
                 }
-                //Log::debug('test-statistic======',$totalArr);
+                Log::debug('test-statistic======',$totalArr);
                 if( $deviceSystem>0 ){
                     $json = $totalArr[$deviceSystem];
                 }else{
                     $json = !empty($totalArr) ? [
-                        'access' => $totalArr[0]['access']??0 + $totalArr[1]['access']??0,
-                        'hits' => $totalArr[0]['hits']??0 + $totalArr[1]['hits']??0,
-                        'install' => $totalArr[0]['install']??0 + $totalArr[1]['install']??0,
-                        'register' => $totalArr[0]['register']??0 + $totalArr[1]['register']??0
+                        'access' => $totalArr[1]['access']??0 + $totalArr[2]['access']??0,
+                        'hits' => $totalArr[1]['hits']??0 + $totalArr[2]['hits']??0,
+                        'install' => $totalArr[1]['install']??0 + $totalArr[2]['install']??0,
+                        'register' => $totalArr[1]['register']??0 + $totalArr[2]['register']??0
                     ] : [
                         'access' => 0,
                         'hits' => 0,
