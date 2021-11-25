@@ -62,6 +62,7 @@ class MemberCardController extends BaseCurlController
                 'title' => '天数解释',
                 'align' => 'center'
             ],
+
             [
                 'field' => 'remark',
                 'minWidth' => 150,
