@@ -61,12 +61,11 @@ class StatisticController extends \App\Http\Controllers\Controller
                 if( $deviceSystem>0 ){
                     $json = $totalArr[$deviceSystem];
                 }else{
-
                     $json = !empty($totalArr) ? [
-                        'access' => $totalArr[1]['access'] + $totalArr[2]['access'],
-                        'hits' => $totalArr[1]['hits'] + $totalArr[2]['hits'],
-                        'install' => $totalArr[1]['install'] + $totalArr[2]['install'],
-                        'register' => $totalArr[1]['register'] + $totalArr[2]['register']
+                        'access' => $totalArr[1]['access']??0 + $totalArr[2]['access']??0,
+                        'hits' => $totalArr[1]['hits']??0 + $totalArr[2]['hits']??0,
+                        'install' => $totalArr[1]['install']??0 + $totalArr[2]['install']??0,
+                        'register' => $totalArr[1]['register']??0 + $totalArr[2]['register']??0
                     ] : [
                         'access' => 0,
                         'hits' => 0,
