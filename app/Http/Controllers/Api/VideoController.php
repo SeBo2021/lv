@@ -51,16 +51,15 @@ class VideoController extends Controller
             ])->validated();
             $id = $validated['id'];
             $useGold = $validated['use_gold'] ?? "1";
-            $videoField = ['id', 'name', 'cid', 'cat', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'hls_url', 'dash_url', 'type', 'cover_img', 'views', 'likes', 'updated_at'];
+            $videoField = ['id', 'name', 'cid', 'cat', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'hls_url', 'dash_url', 'type', 'cover_img', 'views', 'likes', 'comments','updated_at'];
             $one = Video::query()->find($id, $videoField)?->toArray();
             if (!empty($one)) {
                 $one = $this->handleVideoItems([$one], true)[0];
                 $one['limit'] = 0;
                 // 任何类型都有 是否点赞 is_collect 并增加观看记录
                 ProcessViewVideo::dispatchAfterResponse($user, $one);
-
-                $viewRecord = ViewRecord::query()->where('uid', $user->id)->where('vid', $id)->first(['id', 'is_love', 'is_collect']);
                 //是否点赞
+                $viewRecord = $this->isLoveOrCollect($user->id,$id);
                 $one['is_love'] = $viewRecord['is_love'] ?? 0;
                 //是否收藏
                 $one['is_collect'] = $viewRecord['is_collect'] ?? 0;

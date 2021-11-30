@@ -47,7 +47,7 @@ class StatisticController extends \App\Http\Controllers\Controller
                         ->where('at_time','<=',strtotime($endDate));
                 }
                 $queryBuild = $queryBuild->groupBy(['channel_id','device_system']);
-                $totalData = $queryBuild->orderByDesc('at_time')->limit(200)->get();
+                $totalData = $queryBuild->orderByDesc('at_time')->limit(200)->get()->toArray();
 
                 $totalArr = [];
                 foreach ($totalData as $item){
@@ -58,15 +58,23 @@ class StatisticController extends \App\Http\Controllers\Controller
                         'register' => round($item->total_register/100)
                     ];
                 }
+                //Log::debug('test-statistic======',$totalArr);
                 if( $deviceSystem>0 ){
                     $json = $totalArr[$deviceSystem];
                 }else{
-
+                    $iosAccess = $totalArr[1]['access'] ?? 0;
+                    $androidAccess = $totalArr[2]['access'] ?? 0;
+                    $iosHits = $totalArr[1]['hits'] ?? 0;
+                    $androidHits = $totalArr[2]['hits'] ?? 0;
+                    $iosInstall = $totalArr[1]['install'] ?? 0;
+                    $androidInstall = $totalArr[2]['install'] ?? 0;
+                    $iosRegister = $totalArr[1]['register'] ?? 0;
+                    $androidRegister = $totalArr[2]['register'] ?? 0;
                     $json = !empty($totalArr) ? [
-                        'access' => $totalArr[1]['access'] + $totalArr[2]['access'],
-                        'hits' => $totalArr[1]['hits'] + $totalArr[2]['hits'],
-                        'install' => $totalArr[1]['install'] + $totalArr[2]['install'],
-                        'register' => $totalArr[1]['register'] + $totalArr[2]['register']
+                        'access' => $iosAccess + $androidAccess,
+                        'hits' => $iosHits + $androidHits,
+                        'install' => $iosInstall + $androidInstall,
+                        'register' => $iosRegister + $androidRegister
                     ] : [
                         'access' => 0,
                         'hits' => 0,
