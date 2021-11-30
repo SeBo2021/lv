@@ -173,6 +173,7 @@ class AuthController extends Controller
         $login_info['token_type'] = 'Bearer';
         $login_info['expires_at'] = Carbon::parse($tokenResult->token->expires_at)->toDateTimeString();
         $login_info['expires_at_timestamp'] = strtotime($login_info['expires_at']);
+        $login_info['phone_number'] = strval($login_info['phone_number']);
         //生成用户专有的客服链接
         $login_info = $this->generateChatUrl($login_info);
 
