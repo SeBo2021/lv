@@ -108,7 +108,7 @@ class HomeController extends Controller
                 $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
                 $videoList = $queryBuild->limit($limit)->get($this->videoFields)->toArray();
 
-                $videoList = $this->handleVideoItems($videoList);
+                $videoList = $this->handleVideoItems($videoList,false,$request->user()->id);
                 $item['small_video_list'] = $videoList;
 
                 if(!empty($item['bg_img'])){
