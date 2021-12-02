@@ -180,7 +180,7 @@ class VideoController extends Controller
             $id = $params['id'];
             $is_collect = $params['collect'];
             $card = explode(',',($user->member_card_type??[]));
-            if (!array_intersect([4,5,6,7,8],$card)){
+            if (!array_intersect([3,4,5,6,7,8],$card)){
                 return response()->json([
                     'state' => -2,
                     'msg' => "权限不足",
