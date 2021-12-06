@@ -68,7 +68,7 @@ class VideoController extends Controller
                     //是否有观看次数
                     if ($viewLongVideoTimes <= 0) {
                         $one['restricted'] += 0;
-                        if ($user->phone_number > 0) {
+                        /*if ($user->phone_number > 0) {*/
                             // unset($one['preview_hls_url'], $one['preview_dash_url']);
                             $one = $this->vipOrGold($one, $user);
                             if ($useGold && $one['limit'] == 2) {
@@ -80,7 +80,7 @@ class VideoController extends Controller
                                 'state' => 0,
                                 'data' => $one
                             ]);
-                        } else {
+                        /*} else {
                             // unset($one['hls_url']);
                             // unset($one['dash_url']);
                             return response()->json([
@@ -88,7 +88,7 @@ class VideoController extends Controller
                                 'data' => $one,
                                 'msg' => "绑定手机可全站免费观看",
                             ]);
-                        }
+                        }*/
 
 
                     }

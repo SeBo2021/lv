@@ -220,25 +220,33 @@ trait VideoTrait
     {
         DB::beginTransaction();
         try {
-            $Video = DB::table('video')->get(['id','tag']);
-            DB::table('tid_vid')->where('tid','>',0)->delete();
-            $insertArr = [];
-            foreach ($Video as $item)
-            {
-                $catArr = $item->tag ? @json_decode($item->tag) : [];
-                if(!empty($catArr)){
-                    foreach ($catArr as $tid){
-                        $insertArr[$tid.'-'.$item->id] = ['tid'=>$tid, 'vid'=>$item->id];
-                    }
+            $this->syncMiddleTagProcess(1, 100);
+        } catch (Exception $e) {
+            Log::error('syncMiddleTagTable===' . $e->getMessage());
+            DB::rollBack();
+        }
+    }
+
+    private function syncMiddleTagProcess($page, $limit)
+    {
+        $Video = DB::table('video')->offset(($page - 1) * $limit)->limit($limit)->get(['id', 'tag']);
+        DB::table('tid_vid')->where('tid', '>', 0)->delete();
+        $insertArr = [];
+        foreach ($Video as $item) {
+            $catArr = $item->tag ? @json_decode($item->tag) : [];
+            if (!empty($catArr)) {
+                foreach ($catArr as $tid) {
+                    $insertArr[$tid . '-' . $item->id] = ['tid' => $tid, 'vid' => $item->id];
                 }
             }
-            //dump('标签中间表执行:'.count($insertArr).'条');
-            if(!empty($insertArr)){
-                DB::table('tid_vid')->insertOrIgnore($insertArr);
-            }
-        }catch (Exception $e){
-            Log::error('syncMiddleTagTable==='.$e->getMessage());
-            DB::rollBack();
+        }
+        $page++;
+        //dump('标签中间表执行:'.count($insertArr).'条');
+        if (!empty($insertArr)) {
+            DB::table('tid_vid')->insertOrIgnore($insertArr);
+        }
+        if (count($insertArr) == $limit) {
+            $this->syncMiddleTagProcess($page, $limit);
         }
     }
 
