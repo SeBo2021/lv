@@ -392,7 +392,7 @@ class VideoController extends BaseCurlController
                 Log::error($e->getMessage());
             }
         }
-        ProcessSyncMiddleTable::dispatchAfterResponse('video');
+        //ProcessSyncMiddleTable::dispatchAfterResponse('video');
         return $model;
     }
 
