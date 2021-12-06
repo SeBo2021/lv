@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Video;
 use App\TraitClass\ApiParamsTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,13 +28,26 @@ class CommentController extends Controller
                 'content' => $content,
                 'reply_at' => date('Y-m-d H:i:s'),
             ];
-            $commentId = DB::table('comments')->insertGetId($insertData);
-            if($commentId >0){
-                return response()->json([
-                    'state'=>0,
-                    'msg'=>'评论成功'
-                ]);
+            DB::beginTransaction();
+            try {   //先偿试队列
+                $commentId = DB::table('comments')->insertGetId($insertData);
+                Video::where('id',$vid)->increment('comments');
+                DB::commit();
+                if($commentId >0){
+                    return response()->json([
+                        'state'=>0,
+                        'msg'=>'评论成功'
+                    ]);
+                }
+            }catch (\Exception $e){
+                DB::rollBack();
+                Log::error('createUser===' . $e->getMessage());
             }
+            return response()->json([
+                'state'=>-1,
+                'msg'=>'评论失败'
+            ]);
+
         }
         return [];
     }

@@ -80,7 +80,7 @@ class SearchController extends Controller
             $paginatorArr = $paginator->toArray()['data'];
 
             //$client = ClientBuilder::create()->build();
-            $res['list'] = $this->handleVideoItems($paginatorArr);
+            $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
             $res['hasMorePages'] = $paginator->hasMorePages();
             if ($words) {
                 UpdateKeyWords::dispatchAfterResponse($validated['words']);
@@ -111,7 +111,7 @@ class SearchController extends Controller
                 ->simplePaginate($perPage,$this->videoFields,'tag',$page);
             $paginatorArr = $paginator->toArray();
             $res['list'] = $paginatorArr['data'];
-            $res['list'] = $this->handleVideoItems($res['list']);
+            $res['list'] = $this->handleVideoItems($res['list'],false,$request->user()->id);
             $res['hasMorePages'] = $paginator->hasMorePages();
             DB::table('tag')->where('id',$id)->increment('hits');
             //$this->redis()->del($this->apiRedisKey['hot_tags']);
@@ -145,7 +145,7 @@ class SearchController extends Controller
             $paginatorArr = $paginator->toArray();
             if(!empty($paginatorArr)){
                 $res['list'] = $paginatorArr['data'];
-                $res['list'] = $this->handleVideoItems($res['list']);
+                $res['list'] = $this->handleVideoItems($res['list'],false,$request->user()->id);
                 //广告
                 $res['list'] = AdTrait::insertAds($res['list'],'more_page',true, $page, $perPage);
                 $res['hasMorePages'] = $paginator->hasMorePages();
@@ -183,7 +183,7 @@ class SearchController extends Controller
                     ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
                 $paginatorArr = $paginator->toArray()['data'];
                 if(!empty($paginatorArr)){
-                    $res['list'] = $this->handleVideoItems($paginatorArr);
+                    $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
                     //广告
                     $res['list'] = AdTrait::insertAds($res['list'],'recommend',1);
                     $res['hasMorePages'] = $paginator->hasMorePages();

@@ -3,6 +3,7 @@
 namespace App\TraitClass;
 
 use AetherUpload\Util;
+use App\Models\ViewRecord;
 use Exception;
 use FFMpeg\FFMpeg;
 use FFMpeg\Format\Video\X264;
@@ -327,7 +328,7 @@ trait VideoTrait
         return $h*3600 + $i*60 + $s;
     }
 
-    public function handleVideoItems($lists,$display_url=false)
+    public function handleVideoItems($lists,$display_url=false,$uid = 0)
     {
         foreach ($lists as &$list){
             $list = (array)$list;
@@ -343,6 +344,12 @@ trait VideoTrait
                 unset($list['hls_url']);
                 unset($list['dash_url']);
             }
+
+            //是否点赞
+            $viewRecord = $this->isLoveOrCollect($uid,$list['id']);
+            $list['is_love'] = $viewRecord['is_love'] ?? 0;
+            //是否收藏
+            $list['is_collect'] = $viewRecord['is_collect'] ?? 0;
         }
         return $lists;
     }
@@ -360,6 +367,29 @@ trait VideoTrait
             'dash' => '.mpd'
         ];
         return str_replace($name,'preview' . ($typeArr[$type]),$url);
+    }
+
+    /**
+     * 判断是否收藏或喜欢
+     * @param int $uid
+     * @param $vid
+     * @return int[]
+     */
+    public function isLoveOrCollect($uid = 0,$vid = 0): array
+    {
+        $one = [
+            'is_love'=>0,
+            'is_collect'=>0,
+        ];
+        if (!$uid) {
+            return $one;
+        }
+        $viewRecord = ViewRecord::query()->where('uid', $uid)->where('vid', $vid)->first(['id', 'is_love', 'is_collect']);
+        //是否点赞
+        $one['is_love'] = $viewRecord['is_love'] ?? 0;
+        //是否收藏
+        $one['is_collect'] = $viewRecord['is_collect'] ?? 0;
+        return $one;
     }
 
 }
