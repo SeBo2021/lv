@@ -119,10 +119,10 @@ class DBSController extends Controller implements Pay
                 $jsonResp['sign'],
             );
 
-            if (!$signPass) {
+            /*if (!$signPass) {
                 // 签名验证不通过
                 throw new Exception('签名验证不通过', -1);
-            }
+            }*/
             // 记录支付信息
             DB::beginTransaction();
             $this->orderUpdate($jsonResp['tradeNo'],$jsonResp);

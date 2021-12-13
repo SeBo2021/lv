@@ -84,4 +84,21 @@ Route::group([
     Route::post('oderCreate', 'OrderController@create');  //订单创建接口
     Route::get('orderQuery', 'OrderController@query');  //订单查询接口
     Route::post('orderPay', 'OrderController@orderPay');  //订单支付接口
+
+    /// 社区模块
+    Route::get('commCate', 'CommCateController@info');  //板块分类
+    Route::get('commCity', 'CommMiscController@city');  //地区列表
+    Route::get('commList', 'CommContentController@lists');  //内容列表
+    Route::get('commDetail', 'CommContentController@detail');  //内容列表
+    Route::post('commFocus', 'CommOperationController@foucs');  //关注用户
+    Route::post('commLike', 'CommOperationController@like');  //点赞用户
+    Route::get('commComment', 'CommCommentController@lists');  //帖子评论
+    Route::post('commCommentPost', 'CommCommentController@post');  //发表评论
+    Route::post('commReward', 'CommRewardController@action');  //打赏
+    Route::get('commMessage', 'CommMessageController@list');  //消息列表
+    Route::get('commHome', 'CommHomeController@info');  //个人详情
+    Route::get('commChat', 'CommChatController@lists');  //私聊-消息列表
+    Route::post('commChatPost', 'CommChatController@post');  //私聊-发送消息
+    Route::post('commRes', 'CommMiscController@res');  //发送资源
+    Route::post('commBbs', 'CommContentController@post');  //发贴
 });
