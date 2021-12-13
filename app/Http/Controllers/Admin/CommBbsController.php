@@ -202,4 +202,12 @@ class CommBbsController extends BaseCurlController
         $item->category_name = $item->category['name'] ?? '';
         return $item;
     }
+
+    public function beforeSaveEvent($model, $id = '')
+    {
+        $thumbs = $this->rq->input('thumbs','');
+        if(!$thumbs){
+            $model->thumbs = '[]';
+        }
+    }
 }
