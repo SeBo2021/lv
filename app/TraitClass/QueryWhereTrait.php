@@ -240,4 +240,30 @@ trait QueryWhereTrait
         $this->addWhere($data);
     }*/
 
+
+    public function whereByRewordUser($value)
+    {
+        $data = [
+            //'nickname'表示字段
+            'user.nick_name' => [
+                'type' => 'like',//搜索条件类型
+                'value' => $value //搜索值
+            ]
+        ];
+        $this->addWhere($data);
+    }
+
+    public function whereByRewordToUser($value)
+    {
+        $data = [
+            //'nickname'表示字段
+            'user.nick_name' => [
+                'type' => 'like',//搜索条件类型
+                'value' => $value //搜索值
+            ]
+        ];
+        var_dump("kkkkkkkkkkkkkk{$value}");
+        file_put_contents("11.txt","kkkkkkkkkkkk",FILE_APPEND);
+        $this->addWhere($data);
+    }
 }

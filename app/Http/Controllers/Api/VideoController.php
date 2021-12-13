@@ -119,7 +119,11 @@ class VideoController extends Controller
             $id = $params['id'];
             $is_love = $params['like'];
             try {
-                Video::query()->where('id', $id)->increment('likes');
+                if ($is_love) {
+                    Video::query()->where('id', $id)->increment('likes');
+                } else {
+                    Video::query()->where('id', $id)->decrement('likes');
+                }
                 $attributes = ['uid' => $user->id, 'vid' => $id];
                 $values = ['is_love' => $is_love];
                 ViewRecord::query()->updateOrInsert($attributes, $values);
