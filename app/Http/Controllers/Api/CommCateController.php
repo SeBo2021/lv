@@ -16,10 +16,18 @@ class CommCateController extends Controller
 
     public function info(Request $request): JsonResponse
     {
-        $data = $this->redis()->get('common_cate');
+        $raw = $this->redis()->get('common_cate');
+        $data = json_decode($raw, true);
+        foreach ($data as $k => $datum) {
+            if ($datum['id'] >= 1) {
+                $data[$k]['have_new'] = 1;
+            } else {
+                $data[$k]['have_new'] = 0;
+            }
+        }
         return response()->json([
             'state' => 0,
-            'data' => json_decode($data, true)
+            'data' => $data
         ]);
     }
 }

@@ -133,7 +133,7 @@ class CommCateController extends BaseCurlController
 
     private function processCache() {
         $data = [];
-        $raw = CommCate::orderBy('order', 'desc')->select('id','name','parent_id','mark','is_allow_post')->get();
+        $raw = CommCate::orderBy('order', 'desc')->select('id','name','parent_id','mark','is_allow_post','can_select_city')->get();
         array_map(function ($datum) use (&$data) {
             $this->redis()->hSet('common_cate_help', "c_{$datum['id']}", $datum['mark']);
             if ($datum['parent_id'] == 0) {
