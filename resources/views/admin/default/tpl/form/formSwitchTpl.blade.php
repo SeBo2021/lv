@@ -39,6 +39,8 @@
                     @break
                     @case('userVideo')
                     @include('admin.default.tpl.form.userVideo',['form_item'=>$form_tpl_item])
+                    @case('simpleVideo')
+                    @include('admin.default.tpl.form.simpleVideo',['form_item'=>$form_tpl_item])
                     @break
                     @case('img')
                     @include('admin.default.tpl.form.img',['form_item'=>$form_tpl_item])
