@@ -40,10 +40,20 @@ class CommMiscController extends Controller
     {
         try {
             $r = $this->upFile($request);
+            $isSingle = $r['path'] ?? false;
+
+            if ($isSingle) {
+                $data = env('RESOURCE_DOMAIN') . $r['path'];
+            } else {
+                $data = [];
+                foreach ($r as $item) {
+                    $data[] = env('RESOURCE_DOMAIN') . $item['path'];
+                }
+            }
             return response()->json([
                 'state' => 0,
                 'data' => [
-                    'path' => env('RESOURCE_DOMAIN') . $r['path']
+                    'path' => $data,
                 ]
             ]);
         } catch (Exception $e) {

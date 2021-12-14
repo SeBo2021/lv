@@ -154,8 +154,14 @@ class CommBbsController extends BaseCurlController
                 'verify' => '',
             ],
             [
+                'field' => 'video',
+                'type' => 'simpleVideo',
+                'name' => '视频',
+                'sync' =>  0,
+            ],
+            [
                 'field' => 'content',
-                'type' => 'editor',
+                'type' => 'textarea',
                 'name' => '内容',
                 'verify' => 'rq',
                 'must' => 1

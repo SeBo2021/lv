@@ -13,6 +13,25 @@ trait UploadTrait
         $group_id = $request->input('group_id', '0');
         $method = $request->input('method', 'upload');
         $oss_type = $request->input('oss_type', config('filesystems.default'));
-        return UploadFile::upload($files, $file_type, $method, $group_id, [], $oss_type, admin('id'));
+
+        $preCheck = $_FILES[$files];
+        if (is_array($preCheck['name'] ?? '')) {
+            $result = [];
+            foreach ($preCheck['name'] as $k => $item) {
+                $data = [
+                    'name' => $preCheck['name'][$k],
+                    'type' => $preCheck['type'][$k],
+                    'tmp_name' => $preCheck['tmp_name'][$k],
+                    'error' => $preCheck['error'][$k],
+                    'size' => $preCheck['size'][$k],
+                ];
+                $result[] = UploadFile::upload($files, $file_type, $method, $group_id, [], $oss_type, admin('id'),'admin',$data);
+            }
+        } else {
+            $result = UploadFile::upload($files, $file_type, $method, $group_id, [], $oss_type, admin('id'));
+        }
+
+        return $result;
+
     }
 }

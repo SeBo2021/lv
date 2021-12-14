@@ -112,7 +112,7 @@ class UploadFile
     }
 
     public static function upload($form_file_name = "file", $config_type = 'image', $upload_method = 'image',
-                                  $group_id = 0, $thumbs = [], $oss_type = "local", $create_id = '0', $create_type = 'admin')
+                                  $group_id = 0, $thumbs = [], $oss_type = "local", $create_id = '0', $create_type = 'admin',$data = [])
     {
         if ($create_id == 0 && $config_type == 'admin') {
             $create_id = admin('id') ?: 0;
@@ -123,7 +123,7 @@ class UploadFile
             $config['thumbs'] = $thumbs;
         }
 
-        AnyUpload::config($form_file_name, $config, $upload_method);
+        AnyUpload::config($form_file_name, $config, $upload_method,$data);
         $result = AnyUpload::getFileInfo();
         $result['view_src'] = $result['path'];
         if ($result['type'] != 'image') {
@@ -180,7 +180,6 @@ class UploadFile
             $result['group_id'] = $group_id;
             self::addFileDb($result, $create_id, $create_type);//入库
         }
-
         return $result;
     }
 
