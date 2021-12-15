@@ -68,9 +68,9 @@ class CommChatController extends Controller
         if (isset($request->params)) {
             $params = ApiParamsTrait::parse($request->params);
             Validator::make($params, [
-                'to_user_id' => 'required|string',
-                'start_id' => 'string',
-                'start_time' => 'string',
+                'to_user_id' => 'nullable',
+                'start_id' => 'nullable',
+                'start_time' => 'nullable',
                 'page' => 'required|integer',
             ])->validate();
             $toUserId = $params['to_user_id'] ?? 0;
@@ -80,10 +80,12 @@ class CommChatController extends Controller
             $perPage = 8;
             $queryBuild = CommChat::query()
                 ->leftJoin('users', 'community_chat.to_user_id', '=', 'users.id')
-                ->select('community_chat.id','user_id','to_user_id','content','community_chat.created_at','users.nickname as to_user_nickname')
-                ->where('to_user_id', $toUserId);
+                ->select('community_chat.id','user_id','to_user_id','content','community_chat.created_at','users.nickname as to_user_nickname');
             if ($startId) {
                 $queryBuild->where('id', '>', $startId);
+            }
+            if ($toUserId) {
+                $queryBuild->where('to_user_id', $toUserId);
             }
             if ($startTime) {
                 $queryBuild->where('created_at', '>=', $startTime);
