@@ -78,8 +78,9 @@ class CommChatController extends Controller
             $startTime = $params['start_time'] ?? 0;
             $page = $params['page'] ?? 1;
             $perPage = 8;
-            $queryBuild = CommChat::with('user:id,nickname')
-                ->select('id','user_id','to_user_id','content','created_at')
+            $queryBuild = CommChat::query()
+                ->leftJoin('users', 'community_chat.to_user_id', '=', 'users.id')
+                ->select('community_chat.id','user_id','to_user_id','content','community_chat.created_at','users.nickname as to_user_nickname')
                 ->where('to_user_id', $toUserId);
             if ($startId) {
                 $queryBuild->where('id', '>', $startId);
