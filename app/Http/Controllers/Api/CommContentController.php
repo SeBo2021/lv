@@ -149,7 +149,7 @@ class CommContentController extends Controller
 
         $userList = CommFocus::where('user_id', $uid)->pluck('to_user_id');
         $paginator = CommBbs::query()
-            ->leftJoin('users', 'community_bbs.id', '=', 'users.id')
+            ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
             ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
             ->whereIn('author_id', $userList)->orderBy('updated_at', 'desc')
             ->simplePaginate($perPage, ['*'], '', $page);
@@ -172,7 +172,7 @@ class CommContentController extends Controller
     {
         if ($cid2) {
             $paginator = CommBbs::query()
-                ->leftJoin('users', 'community_bbs.id', '=', 'users.id')
+                ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
                 ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
                 ->where('category_id', $cid2)->orderBy('updated_at', 'desc')
                 ->simplePaginate($perPage, ['*'], '', $page);
@@ -186,7 +186,7 @@ class CommContentController extends Controller
             $ids = $this->getChild($cid1, false);
 
             $paginator = CommBbs::query()
-                ->leftJoin('users', 'community_bbs.id', '=', 'users.id')
+                ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
                 ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
                 ->whereIn('category_id', $ids)
                 ->orderBy('updated_at', 'desc')
