@@ -43,11 +43,11 @@ class CommMiscController extends Controller
             $isSingle = $r['path'] ?? false;
 
             if ($isSingle) {
-                $data = env('RESOURCE_DOMAIN') . $r['path'];
+                $data = env('RESOURCE_DOMAIN_DEV') . $r['path'];
             } else {
                 $data = [];
                 foreach ($r as $item) {
-                    $data[] = env('RESOURCE_DOMAIN') . $item['path'];
+                    $data[] = env('RESOURCE_DOMAIN_DEV') . $item['path'];
                 }
             }
             return response()->json([
