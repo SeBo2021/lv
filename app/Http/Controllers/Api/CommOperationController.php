@@ -78,8 +78,9 @@ class CommOperationController extends Controller
                 'like' => 'required|integer'
             ])->validate();
             $bbsId = $params['bbs_id'];
+            $uid = $request->user()->id;
             $insertData = [
-                'user_id' => $request->user()->id,
+                'user_id' => $uid,
                 'bbs_id' => $bbsId,
             ];
             $is_love = $params['like'];
@@ -94,10 +95,12 @@ class CommOperationController extends Controller
                     }
                     $commentId = DB::table('community_like')->insert($insertData);
                     CommBbs::where('id', $bbsId)->increment('likes');
+                    $this->redis()->set("comm_like_{$uid}_{$bbsId}",1);
                     DB::commit();
                 } else {
                     DB::table('community_like')->where($insertData)->delete();
                     CommBbs::where('id', $bbsId)->decrement('likes');
+                    $this->redis()->del("comm_like_{$uid}_{$bbsId}");
                     DB::commit();
                 }
 

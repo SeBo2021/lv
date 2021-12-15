@@ -32,10 +32,10 @@ class CommContentController extends Controller
                 'category_id' => 'nullable',
                 'location_name' => 'nullable',
             ])->validate();
-            $content = $params['content']??'';
-            $thumbs = $params['thumbs']??'';
-            $categoryId = $params['category_id']??'';
-            $locationName = $params['location_name']??'';
+            $content = $params['content'] ?? '';
+            $thumbs = $params['thumbs'] ?? '';
+            $categoryId = $params['category_id'] ?? '';
+            $locationName = $params['location_name'] ?? '';
             $insertData = [
                 'thumbs' => $thumbs,
                 'category_id' => $categoryId,
@@ -68,11 +68,12 @@ class CommContentController extends Controller
         return [];
     }
 
-    private function updateStatue($uid,$mark){
+    private function updateStatue($uid, $mark)
+    {
         $redis = $this->redis();
         $keyCate = "status_cate_{$mark}";
         $time = time();
-        $redis->set($keyCate,$time);
+        $redis->set($keyCate, $time);
 
         // 更新关注
         if ($mark == 'focus') {
@@ -125,7 +126,7 @@ class CommContentController extends Controller
             $id = $params['id'] ?? 0;
             $data = CommBbs::query()
                 ->leftJoin('users', 'community_bbs.id', '=', 'users.id')
-                ->select('community_bbs.id','content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name','community_bbs.updated_at','nickname','sex','is_office','video')
+                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video')
                 ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get();
             return response()->json([
                 'state' => 0,
@@ -142,23 +143,18 @@ class CommContentController extends Controller
      */
     private function focus($uid, $perPage = 6, $page = 1)
     {
+
         $userList = CommFocus::where('user_id', $uid)->pluck('to_user_id');
         $paginator = CommBbs::query()
             ->leftJoin('users', 'community_bbs.id', '=', 'users.id')
-            ->select('community_bbs.id','content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name','community_bbs.updated_at','nickname','sex','is_office','video','users.id as uid')
+            ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
             ->whereIn('author_id', $userList)->orderBy('updated_at', 'desc')
             ->simplePaginate($perPage, ['*'], '', $page);
         //加入视频列表
         $res['hasMorePages'] = $paginator->hasMorePages();
-        $list = $paginator->items();
-        foreach ($list as $k => $re) {
-            if ($this->redis()->get("focus_{$uid}_{$re['uid']}") == 1) {
-                $list[$k]['is_focus'] = 1;
-            } else {
-                $list[$k]['is_focus'] = 0;
-            }
-        }
-        $res['bbs_list'] = $list;
+        $list = $paginator->items() ?? [];
+        $result = $this->proProcessData($uid, $list);
+        $data['bbs_list'] = $result;
         return $res;
     }
 
@@ -169,40 +165,67 @@ class CommContentController extends Controller
      * @param int $cid2
      * @return array|Builder[]|Collection
      */
-    private function other($uid, $cid1 = 0, $cid2 = 0,$perPage = 6, $page = 1): Collection|array
+    private function other($uid, $cid1 = 0, $cid2 = 0, $perPage = 6, $page = 1): Collection|array
     {
         if ($cid2) {
             $paginator = CommBbs::query()
                 ->leftJoin('users', 'community_bbs.id', '=', 'users.id')
-                ->select('community_bbs.id','content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name','community_bbs.updated_at','nickname','sex','is_office','video','users.id as uid')
+                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
                 ->where('category_id', $cid2)->orderBy('updated_at', 'desc')
                 ->simplePaginate($perPage, ['*'], '', $page);
             $data['hasMorePages'] = $paginator->hasMorePages();
-            $data['bbs_list'] = $paginator->items();
+            $list = $paginator->items();
+            $result = $this->proProcessData($uid, $list);
+            $data['bbs_list'] = $result;
             return $data;
         }
         if ($cid1) {
             $ids = $this->getChild($cid1, false);
+
             $paginator = CommBbs::query()
                 ->leftJoin('users', 'community_bbs.id', '=', 'users.id')
-                ->select('community_bbs.id','content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name','community_bbs.updated_at','nickname','sex','is_office','video')
+                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
                 ->whereIn('category_id', $ids)
                 ->orderBy('updated_at', 'desc')
                 ->simplePaginate($perPage, ['*'], '', $page);
             $data['hasMorePages'] = $paginator->hasMorePages();
             $list = $paginator->items();
-            foreach ($list as $k => $re) {
-                if ($this->redis()->get("focus_{$uid}_{$re['uid']}") == 1) {
-                    $list[$k]['is_focus'] = 1;
-                } else {
-                    $list[$k]['is_focus'] = 0;
-                }
-            }
-            $res['bbs_list'] = $list;
+
+            $result = $this->proProcessData($uid, $list);
+            $data['bbs_list'] = $result;
+
             return $data;
         }
 
         return [];
+    }
+
+    /**
+     * @param $uid
+     * @param $list
+     * @return mixed
+     */
+    private function proProcessData($uid, $list): mixed
+    {
+        foreach ($list as $k => $re) {
+            if ($this->redis()->get("focus_{$uid}_{$re['uid']}") == 1) {
+                $list[$k]['is_focus'] = 1;
+            } else {
+                $list[$k]['is_focus'] = 0;
+            }
+            if ($re['video']) {
+                $list[$k]['video_picture'] = [];
+            } else {
+                $list[$k]['video_picture'] = [];
+            }
+            if ($this->redis()->get("comm_like_{$uid}_{$re['id']}") == 1) {
+                $list[$k]['is_love'] = 1;
+            } else {
+                $list[$k]['is_love'] = 0;
+            }
+
+        }
+        return $list;
     }
 
     /**
@@ -214,7 +237,7 @@ class CommContentController extends Controller
     private function getChild($id, $raw = true): mixed
     {
         $data = [];
-        $tree = json_decode($this->redis()->get('common_cate'), true);
+        $tree = json_decode($this->redis()->get('common_cate'), true) ?? [];
         foreach ($tree as $item) {
             if ($item['id'] == $id) {
                 $data = $item['child'];
