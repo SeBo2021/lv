@@ -226,7 +226,7 @@ class CommContentController extends Controller
             } else {
                 $list[$k]['is_love'] = 0;
             }
-
+            $list[$k]['thumbs']  = json_decode($re['thumbs'],true);
         }
         return $list;
     }
