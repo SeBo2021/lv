@@ -28,9 +28,9 @@ class CommContentController extends Controller
             $params = ApiParamsTrait::parse($request->params);
             Validator::make($params, [
                 'content' => 'required',
-                'thumbs' => 'string',
+                'thumbs' => 'nullable',
                 'category_id' => 'nullable',
-                'location_name' => 'string',
+                'location_name' => 'nullable',
             ])->validate();
             $content = $params['content']??'';
             $thumbs = $params['thumbs']??'';

@@ -29,7 +29,7 @@ class CommRewardController extends Controller
                 'to_user_id' => 'required|integer',
                 'money' => 'required|string',
                 'bbs_id' => 'required|integer',
-                'note' => 'string'
+                'note' => 'nullable'
             ])->validate();
             $toUserId = $params['to_user_id'];
             $money = $params['money'];
