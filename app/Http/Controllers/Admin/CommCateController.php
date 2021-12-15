@@ -141,7 +141,7 @@ class CommCateController extends BaseCurlController
             } else {
                 foreach ($data as $k => $v) {
                     if ($v['id'] == $datum['parent_id']) {
-                        $data[$k]['child'][] = $datum;
+                        $data[$k]['childs'][] = $datum;
                     }
                 }
             }
