@@ -29,12 +29,12 @@ class CommContentController extends Controller
             Validator::make($params, [
                 'content' => 'required',
                 'thumbs' => 'string',
-                'category_id' => 'integer',
+                'category_id' => 'nullable',
                 'location_name' => 'string',
             ])->validate();
-            $content = $params['content'];
-            $thumbs = $params['thumbs'];
-            $categoryId = $params['category_id'];
+            $content = $params['content']??'';
+            $thumbs = $params['thumbs']??'';
+            $categoryId = $params['category_id']??'';
             $locationName = $params['location_name']??'';
             $insertData = [
                 'thumbs' => $thumbs,
@@ -68,13 +68,25 @@ class CommContentController extends Controller
         return [];
     }
 
+    private function updateStatue($uid,$mark){
+        $redis = $this->redis();
+        $keyCate = "status_cate_{$mark}";
+        $time = time();
+        $redis->set($keyCate,$time);
+
+        // 更新关注
+        if ($mark == 'focus') {
+
+        }
+    }
+
     public function lists(Request $request)
     {
         if (isset($request->params)) {
             $params = ApiParamsTrait::parse($request->params);
             Validator::make($params, [
-                'cid_1' => 'integer',
-                'cid_2' => 'integer',
+                'cid_1' => 'nullable',
+                'cid_2' => 'nullable',
             ])->validate();
             // 一二级分类
             $cid1 = $params['cid_1'] ?? 0;
