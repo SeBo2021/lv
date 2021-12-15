@@ -29,15 +29,18 @@ class CommContentController extends Controller
             Validator::make($params, [
                 'content' => 'required',
                 'thumbs' => 'nullable',
+                'video' => 'nullable',
                 'category_id' => 'nullable',
                 'location_name' => 'nullable',
             ])->validate();
             $content = $params['content'] ?? '';
-            $thumbs = $params['thumbs'] ?? '';
+            $thumbs = $params['thumbs'] ?? '[]';
+            $video = $params['video'] ?? '[]';
             $categoryId = $params['category_id'] ?? '';
             $locationName = $params['location_name'] ?? '';
             $insertData = [
                 'thumbs' => $thumbs,
+                'video' => $video,
                 'category_id' => $categoryId,
                 'location_name' => $locationName,
                 'author_id' => $request->user()->id,
