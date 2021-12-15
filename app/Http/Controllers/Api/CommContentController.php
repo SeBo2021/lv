@@ -27,7 +27,7 @@ class CommContentController extends Controller
         if (isset($request->params)) {
             $params = ApiParamsTrait::parse($request->params);
             Validator::make($params, [
-                'content' => 'required',
+                'content' => 'nullable',
                 'thumbs' => 'nullable',
                 'video' => 'nullable',
                 'category_id' => 'nullable',
