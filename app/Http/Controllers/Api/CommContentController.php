@@ -8,6 +8,7 @@ use App\Models\CommFocus;
 use App\Models\User;
 use App\Models\Video;
 use App\TraitClass\ApiParamsTrait;
+use App\TraitClass\BbsTrait;
 use App\TraitClass\PHPRedisTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -21,6 +22,7 @@ use Illuminate\Validation\ValidationException;
 class CommContentController extends Controller
 {
     use PHPRedisTrait;
+    use BbsTrait;
 
     public function post(Request $request)
     {
@@ -205,33 +207,7 @@ class CommContentController extends Controller
         return [];
     }
 
-    /**
-     * @param $uid
-     * @param $list
-     * @return mixed
-     */
-    private function proProcessData($uid, $list): mixed
-    {
-        foreach ($list as $k => $re) {
-            if ($this->redis()->get("focus_{$uid}_{$re['uid']}") == 1) {
-                $list[$k]['is_focus'] = 1;
-            } else {
-                $list[$k]['is_focus'] = 0;
-            }
-            if ($re['video']) {
-                $list[$k]['video_picture'] = [];
-            } else {
-                $list[$k]['video_picture'] = [];
-            }
-            if ($this->redis()->get("comm_like_{$uid}_{$re['id']}") == 1) {
-                $list[$k]['is_love'] = 1;
-            } else {
-                $list[$k]['is_love'] = 0;
-            }
-            $list[$k]['thumbs']  = json_decode($re['thumbs'],true);
-        }
-        return $list;
-    }
+
 
     /**
      * 得到子分类
