@@ -75,7 +75,7 @@ class CommCommentController extends Controller
             $perPage = 16;
             $queryBuild = CommComments::query()
                 ->leftJoin('users', 'community_comments.user_id', '=', 'users.id')
-                ->select('community_comments.id','content','users.id as uid','users.nickname')
+                ->select('community_comments.id','content','users.id as uid','users.nickname','community_comments.created_at as reply_at','users.avatar')
                 ->where('bbs_id',$bbsId);
             $paginator = $queryBuild->orderBy('id')->simplePaginate($perPage,'*','commentLists',$page);
             $items = $paginator->items();

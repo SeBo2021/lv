@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Video;
 use App\TraitClass\AdTrait;
 use App\TraitClass\ApiParamsTrait;
+use App\TraitClass\BbsTrait;
 use App\TraitClass\PHPRedisTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -23,7 +24,7 @@ use Illuminate\Validation\ValidationException;
 class CommHomeController extends Controller
 {
     use PHPRedisTrait;
-
+    use BbsTrait;
 
     /**
      * @throws ValidationException
@@ -44,18 +45,28 @@ class CommHomeController extends Controller
         //二级分类列表
         $perPage = 6;
         $paginator = CommBbs::query()
-            ->where('author_id', $id)
+            ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
+            ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
+            ->where('community_bbs.author_id', $id)->orderBy('updated_at', 'desc')
             ->orderBy('updated_at')
             ->simplePaginate($perPage, ['*'], '', $page);
         $secondCateList = $paginator->toArray();
         $data = $secondCateList['data'];
-
+        $uid = $request->user()->id;
+        $result = $this->proProcessData($uid, $data);
         //加入视频列表
         $res['hasMorePages'] = $paginator->hasMorePages();
-        $res['user_info'] = User::query()
-            ->select('id','nickname','is_office','location_name','attention','fans','avatar','loves')
+        $userInfo = User::query()
+            ->select('id','nickname','is_office','location_name','attention','fans','avatar','loves','sex')
             ->find($id);
-        $res['bbs_list'] = $data;
+        $uid = $request->user()->id;
+        if ($this->redis()->get("focus_{$uid}_{$userInfo->uid}") == 1) {
+            $userInfo->is_focus = 1;
+        } else {
+            $userInfo->is_focus = 0;
+        }
+        $res['user_info'] = $userInfo;
+        $res['bbs_list'] = $result;
         return response()->json([
             'state' => 0,
             'data' => $res
