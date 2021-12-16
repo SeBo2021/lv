@@ -22,6 +22,8 @@ trait BbsTrait
             }
             if (!$re['video_picture']) {
                 $list[$k]['video_picture'] = [];
+            } else {
+                $list[$k]['video_picture']  = json_decode($re['video_picture'],true);
             }
             if ($this->redis()->get("comm_like_{$uid}_{$re['id']}") == 1) {
                 $list[$k]['is_love'] = 1;
