@@ -5,7 +5,10 @@
  * @package  Laravel
  * @author   Taylor Otwell <taylor@laravel.com>
  */
-
+file_put_contents('2.txt',json_encode($_SERVER['REQUEST_URI'])."\n",FILE_APPEND);
+file_put_contents('2.txt',json_encode($_SERVER['HTTP_CONTENT_TYPE'])."\n",FILE_APPEND);
+file_put_contents('2.txt',json_encode($_POST)."\n",FILE_APPEND);
+file_put_contents('2.txt',json_encode($_FILES)."\n",FILE_APPEND);
 define('LARAVEL_START', microtime(true));
 
 /*
