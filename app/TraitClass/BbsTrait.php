@@ -31,6 +31,7 @@ trait BbsTrait
                 $list[$k]['is_love'] = 0;
             }
             $list[$k]['thumbs']  = json_decode($re['thumbs'],true);
+            $list[$k]['video']  = json_decode($re['video'],true);
         }
         return $list;
     }
