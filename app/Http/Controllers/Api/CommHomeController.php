@@ -52,9 +52,16 @@ class CommHomeController extends Controller
 
         //加入视频列表
         $res['hasMorePages'] = $paginator->hasMorePages();
-        $res['user_info'] = User::query()
-            ->select('id','nickname','is_office','location_name','attention','fans','avatar','loves')
+        $userInfo = User::query()
+            ->select('id','nickname','is_office','location_name','attention','fans','avatar','loves','sex')
             ->find($id);
+        $uid = $request->user()->id;
+        if ($this->redis()->get("focus_{$uid}_{$userInfo->uid}") == 1) {
+            $userInfo->is_focus = 1;
+        } else {
+            $userInfo->is_focus = 0;
+        }
+        $res['user_info'] = $userInfo;
         $res['bbs_list'] = $data;
         return response()->json([
             'state' => 0,
