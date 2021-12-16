@@ -32,10 +32,12 @@ class CommContentController extends Controller
                 'content' => 'nullable',
                 'thumbs' => 'nullable',
                 'video' => 'nullable',
+                'video_picture' => 'nullable',
                 'category_id' => 'nullable',
                 'location_name' => 'nullable',
             ])->validate();
             $content = $params['content'] ?? '';
+            $videoPicture = $params['video_picture'] ?? '[]';
             $thumbs = $params['thumbs'] ?? '[]';
             $video = $params['video'] ?? '[]';
             $categoryId = $params['category_id'] ?? '';
@@ -43,6 +45,7 @@ class CommContentController extends Controller
             $insertData = [
                 'thumbs' => $thumbs,
                 'video' => $video,
+                'video_picture' => $videoPicture,
                 'category_id' => $categoryId,
                 'location_name' => $locationName,
                 'author_id' => $request->user()->id,
@@ -156,7 +159,7 @@ class CommContentController extends Controller
         $userList = CommFocus::where('user_id', $uid)->pluck('to_user_id');
         $paginator = CommBbs::query()
             ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
-            ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
+            ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel','video_picture')
             ->whereIn('author_id', $userList)->orderBy('updated_at', 'desc')
             ->simplePaginate($perPage, ['*'], '', $page);
         //加入视频列表
@@ -179,7 +182,7 @@ class CommContentController extends Controller
         if ($cid2) {
             $paginator = CommBbs::query()
                 ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
-                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
+                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel','video_picture')
                 ->where('category_id', $cid2)->orderBy('updated_at', 'desc')
                 ->simplePaginate($perPage, ['*'], '', $page);
             $data['hasMorePages'] = $paginator->hasMorePages();
@@ -193,7 +196,7 @@ class CommContentController extends Controller
 
             $paginator = CommBbs::query()
                 ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
-                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
+                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel','video_picture')
                 ->whereIn('category_id', $ids)
                 ->orderBy('updated_at', 'desc')
                 ->simplePaginate($perPage, ['*'], '', $page);
