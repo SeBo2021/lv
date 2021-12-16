@@ -128,7 +128,7 @@ class CommContentController extends Controller
             ])->validate();
             $id = $params['id'] ?? 0;
             $list = CommBbs::query()
-                ->leftJoin('users', 'community_bbs.id', '=', 'users.id')
+                ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
                 ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
                 ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get();
             $uid = $request->user()->id;
