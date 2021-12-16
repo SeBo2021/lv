@@ -127,13 +127,15 @@ class CommContentController extends Controller
                 'id' => 'integer',
             ])->validate();
             $id = $params['id'] ?? 0;
-            $data = CommBbs::query()
+            $list = CommBbs::query()
                 ->leftJoin('users', 'community_bbs.id', '=', 'users.id')
                 ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
-                ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->first();
+                ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get();
+            $uid = $request->user()->id;
+            $result = $this->proProcessData($uid, $list);
             return response()->json([
                 'state' => 0,
-                'data' => $data
+                'data' => $result[0]??[]
             ]);
         }
         return [];
