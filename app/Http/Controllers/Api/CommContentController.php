@@ -93,9 +93,11 @@ class CommContentController extends Controller
             Validator::make($params, [
                 'cid_1' => 'nullable',
                 'cid_2' => 'nullable',
+                'page' => 'nullable',
             ])->validate();
             // 一二级分类
             $cid1 = $params['cid_1'] ?? 0;
+            $page = $params['page'] ?? 1;
             $cid2 = $params['cid_2'] ?? 0;
             // 得到一级分类help
             $help = $this->redis()->hGet('common_cate_help', "c_{$cid1}");
@@ -103,7 +105,7 @@ class CommContentController extends Controller
             if (in_array($help, ['focus'])) {
                 $res = $this->$help($uid);
             } else {
-                $res = $this->other($request->user()->id, $cid1, $cid2);
+                $res = $this->other($request->user()->id, $cid1, $cid2,6,$page);
             }
             return response()->json([
                 'state' => 0,
