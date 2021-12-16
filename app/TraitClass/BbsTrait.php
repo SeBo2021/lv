@@ -20,9 +20,7 @@ trait BbsTrait
             } else {
                 $list[$k]['is_focus'] = 0;
             }
-            if ($re['video']) {
-                $list[$k]['video_picture'] = [];
-            } else {
+            if (!$re['video_picture']) {
                 $list[$k]['video_picture'] = [];
             }
             if ($this->redis()->get("comm_like_{$uid}_{$re['id']}") == 1) {
