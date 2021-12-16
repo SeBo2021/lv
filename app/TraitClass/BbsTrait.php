@@ -1,0 +1,37 @@
+<?php
+
+namespace App\TraitClass;
+
+use App\Models\Ad;
+use App\Models\AdSet;
+
+trait BbsTrait
+{
+    /**
+     * @param $uid
+     * @param $list
+     * @return mixed
+     */
+    private function proProcessData($uid, $list): mixed
+    {
+        foreach ($list as $k => $re) {
+            if ($this->redis()->get("focus_{$uid}_{$re['uid']}") == 1) {
+                $list[$k]['is_focus'] = 1;
+            } else {
+                $list[$k]['is_focus'] = 0;
+            }
+            if ($re['video']) {
+                $list[$k]['video_picture'] = [];
+            } else {
+                $list[$k]['video_picture'] = [];
+            }
+            if ($this->redis()->get("comm_like_{$uid}_{$re['id']}") == 1) {
+                $list[$k]['is_love'] = 1;
+            } else {
+                $list[$k]['is_love'] = 0;
+            }
+            $list[$k]['thumbs']  = json_decode($re['thumbs'],true);
+        }
+        return $list;
+    }
+}
