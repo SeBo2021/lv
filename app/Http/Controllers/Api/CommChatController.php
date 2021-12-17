@@ -8,6 +8,7 @@ use App\Models\CommChat;
 use App\Models\CommComments;
 use App\Models\Video;
 use App\TraitClass\ApiParamsTrait;
+use App\TraitClass\PHPRedisTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,8 +18,10 @@ use Illuminate\Validation\ValidationException;
 
 class CommChatController extends Controller
 {
+    use PHPRedisTrait;
     public function post(Request $request)
     {
+
         if (isset($request->params)) {
             $params = ApiParamsTrait::parse($request->params);
             Validator::make($params, [
@@ -29,9 +32,10 @@ class CommChatController extends Controller
             $vid = $params['to_user_id'];
             $type = $params['type']??1;
             $content = $params['content'];
+            $uid = $request->user()->id;
             $insertData = [
                 'to_user_id' => $vid,
-                'user_id' => $request->user()->id,
+                'user_id' => $uid,
                 'type' => $type,
                 'content' => $content,
                 'created_at' => date('Y-m-d H:i:s'),
@@ -41,6 +45,9 @@ class CommChatController extends Controller
             try {   //先偿试队列
                 $commentId = DB::table('community_chat')->insertGetId($insertData);
                 DB::commit();
+                // 创建关系
+                $relationName = "relation_chat";
+                $this->redis()->sAdd($relationName,$commentId);
                 if ($commentId > 0) {
                     return response()->json([
                         'state' => 0,
