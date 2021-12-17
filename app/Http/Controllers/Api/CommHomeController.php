@@ -60,7 +60,7 @@ class CommHomeController extends Controller
             ->select('id','nickname','is_office','location_name','attention','fans','avatar','loves','sex')
             ->find($id);
         $uid = $request->user()->id;
-        if ($this->redis()->get("focus_{$uid}_{$userInfo->uid}") == 1) {
+        if (CommFocus::query()->where(['user_id'=>$uid,'to_user_id'=>$userInfo->id])->exists()) {
             $userInfo->is_focus = 1;
         } else {
             $userInfo->is_focus = 0;
