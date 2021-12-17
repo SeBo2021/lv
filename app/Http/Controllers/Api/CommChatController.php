@@ -23,13 +23,16 @@ class CommChatController extends Controller
             $params = ApiParamsTrait::parse($request->params);
             Validator::make($params, [
                 'to_user_id' => 'required|integer',
+                'type' => 'nullable',
                 'content' => 'required',
             ])->validate();
             $vid = $params['to_user_id'];
+            $type = $params['type']??1;
             $content = $params['content'];
             $insertData = [
                 'to_user_id' => $vid,
                 'user_id' => $request->user()->id,
+                'type' => $type,
                 'content' => $content,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
@@ -46,7 +49,7 @@ class CommChatController extends Controller
                 }
             } catch (\Exception $e) {
                 DB::rollBack();
-                Log::error('bbsComments===' . $e->getMessage());
+                Log::error('bbsChat===' . $e->getMessage());
             }
             return response()->json([
                 'state' => -1,
@@ -79,16 +82,20 @@ class CommChatController extends Controller
             $page = $params['page'] ?? 1;
             $perPage = 8;
             $queryBuild = CommChat::query()
-                ->leftJoin('users', 'community_chat.to_user_id', '=', 'users.id')
-                ->select('community_chat.id','user_id','to_user_id','content','community_chat.created_at','users.nickname as to_user_nickname','users.avatar');
+                ->leftJoin('users', 'community_chat.user_id', '=', 'users.id')
+                ->select('community_chat.id','user_id','to_user_id','content','community_chat.created_at','users.nickname as to_user_nickname','users.avatar', 'community_chat.type');
             if ($startId) {
                 $queryBuild->where('id', '>', $startId);
             } else {
                 $subIds = CommChat::query()->select(DB::raw('max(id) as max_id, to_user_id'))->groupBy('to_user_id')->pluck('max_id');
                 $queryBuild->whereIn('community_chat.id', $subIds);
             }
+            $uid = $request->user()->id;
             if ($toUserId) {
-                $queryBuild->where('to_user_id', $toUserId);
+                $queryBuild->where(function($sql) use ($uid,$toUserId){
+                    $sql->whereIn('user_id',[$uid,$toUserId]);
+                    $sql->whereIn('to_user_id',[$uid,$toUserId]);
+                });
             }
             if ($startTime) {
                 $queryBuild->where('created_at', '>=', $startTime);

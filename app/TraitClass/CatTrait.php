@@ -29,6 +29,29 @@ trait CatTrait
         return [];
     }
 
+    public function getShortCats()
+    {
+        $topCat = Category::query()
+            ->where('usage',2)
+            ->where('is_checked',1)
+            ->orderBy('sort')
+            ->get(['id','name','sort'])
+            ->toArray();
+        $topCatIds = [];
+        foreach ($topCat as $item)
+        {
+            $topCatIds[] = $item['id'];
+        }
+        if(!empty($topCatIds)){
+            return Category::query()
+                ->where('is_checked',1)
+                ->whereIn('parent_id',$topCatIds)
+                ->orderBy('sort')
+                ->get(['id','name'])->toArray();
+        }
+        return [];
+    }
+
     public function getCatName($cat)
     {
         $topCat = $this->getCats();

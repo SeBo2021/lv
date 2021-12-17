@@ -49,6 +49,12 @@ class TagController extends BaseCurlController
                 'align' => 'center',
             ],
             [
+                'field' => 'name',
+                'minWidth' => 150,
+                'title' => '标签名称',
+                'align' => 'center',
+            ],
+            [
                 'field' => 'created_at',
                 'minWidth' => 150,
                 'title' => '创建时间',
