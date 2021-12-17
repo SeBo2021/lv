@@ -100,7 +100,7 @@ class CommOperationController extends Controller
                     DB::commit();
                 } else {
                     DB::table('community_like')->where($insertData)->delete();
-                    CommBbs::where('id', $bbsId)->decrement('likes');
+                    CommBbs::where('id', $bbsId)->where('likes','>',0)->decrement('likes');
                     $this->redis()->del("comm_like_{$uid}_{$bbsId}");
                     DB::commit();
                 }
