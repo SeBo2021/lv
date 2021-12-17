@@ -102,6 +102,9 @@ class CommChatController extends Controller
             }
             $paginator = $queryBuild->orderBy('id')->simplePaginate($perPage, '*', 'commentLists', $page);
             $items = $paginator->items();
+            foreach ($items as $k=>$item) {
+                $items[$k]['no_read'] = 1;
+            }
             $res['list'] = $items;
             $res['hasMorePages'] = $paginator->hasMorePages();
             return response()->json([
