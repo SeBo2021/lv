@@ -34,10 +34,12 @@ class CommMessageController extends Controller
             $page = $params['page'] ?? 1;
             $perPage = 8;
             $queryBuild = CommChat::query()
-                ->leftJoin('users', 'community_chat.to_user_id', '=', 'users.id')
+                ->leftJoin('users', 'community_chat.user_id', '=', 'users.id')
                 ->select('community_chat.id', 'user_id', 'to_user_id', 'content', 'community_chat.created_at', 'users.nickname as to_user_nickname', 'users.avatar');
 
-            $subIds = CommChat::query()->select(DB::raw('max(id) as max_id, to_user_id'))->groupBy('to_user_id')->pluck('max_id');
+            $subIds = CommChat::query()->select(DB::raw('max(id) as max_id, to_user_id'))
+                ->where('to_user_id',$request->user()->id)
+                ->groupBy('user_id')->pluck('max_id');
             $queryBuild->whereIn('community_chat.id', $subIds);
 
             $paginator = $queryBuild->orderBy('id')->simplePaginate($perPage, '*', 'commentLists', $page);
