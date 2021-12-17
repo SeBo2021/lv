@@ -7,6 +7,7 @@ use App\Models\CommBbs;
 use App\Models\User;
 use App\Models\Video;
 use App\TraitClass\ApiParamsTrait;
+use App\TraitClass\PHPRedisTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 
 class CommOperationController extends Controller
 {
+    use PHPRedisTrait;
     /**
      * 关注
      * @param Request $request
@@ -25,7 +27,8 @@ class CommOperationController extends Controller
         if (isset($request->params)) {
             $params = ApiParamsTrait::parse($request->params);
             Validator::make($params, [
-                'to_user_id' => 'required|integer'
+                'to_user_id' => 'required|integer',
+                "focus"=>'nullable' //类型 :1-关注,0-取消收藏
             ])->validate();
             $toUserId = $params['to_user_id'];
             $insertData = [
@@ -34,21 +37,19 @@ class CommOperationController extends Controller
             ];
             DB::beginTransaction();
             try {   //先偿试队列
-                if (DB::table('community_focus')->where($insertData)->exists()) {
-                    return response()->json([
-                        'state' => -2,
-                        'msg' => '已经关注'
-                    ]);
+                $focus = $params['focus']??1;
+                if ($focus == 0) {
+                    DB::table('community_focus')->where($insertData)->delete();
+                    User::where('id', $toUserId)->where('fans','>',0)->decrement('fans');
+                } else {
+                    DB::table('community_focus')->insert($insertData);
+                    User::where('id', $toUserId)->increment('fans');
                 }
-                $commentId = DB::table('community_focus')->insert($insertData);
-                User::where('id', $toUserId)->increment('fans');
                 DB::commit();
-                if ($commentId > 0) {
-                    return response()->json([
-                        'state' => 0,
-                        'msg' => '操作成功'
-                    ]);
-                }
+                return response()->json([
+                    'state' => 0,
+                    'msg' => '操作成功'
+                ]);
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('operationFocusUser===' . $e->getMessage());
@@ -93,7 +94,7 @@ class CommOperationController extends Controller
                             'msg' => '已经操作'
                         ]);
                     }
-                    $commentId = DB::table('community_like')->insert($insertData);
+                    DB::table('community_like')->insert($insertData);
                     CommBbs::where('id', $bbsId)->increment('likes');
                     $this->redis()->set("comm_like_{$uid}_{$bbsId}",1);
                     DB::commit();
