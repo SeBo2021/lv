@@ -95,7 +95,7 @@ Route::group([
     Route::get('commComment', 'CommCommentController@lists');  //帖子评论
     Route::post('commCommentPost', 'CommCommentController@post');  //发表评论
     Route::post('commReward', 'CommRewardController@action');  //打赏
-    Route::get('commMessage', 'CommMessageController@list');  //消息列表
+    Route::get('commMessage', 'CommMessageController@lists');  //消息列表
     Route::get('commHome', 'CommHomeController@info');  //个人详情
     Route::get('commChat', 'CommChatController@lists');  //私聊-消息列表
     Route::post('commChatPost', 'CommChatController@post');  //私聊-发送消息

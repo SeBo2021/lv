@@ -25,7 +25,7 @@ class ShortController extends BaseCurlController
 {
     use VideoTrait,CatTrait,TagTrait,GoldTrait,PHPRedisTrait;
 
-    public $pageName = '社区管理';
+    public $pageName = '短视频管理';
 
 
     public function setModel()
@@ -46,13 +46,6 @@ class ShortController extends BaseCurlController
                 'sort' => 1,
                 'align' => 'center'
             ],
-            /*[
-                'field' => 'category_name',
-                'width' => 150,
-                'title' => '分类',
-                'align' => 'center',
-                'edit' => 1
-            ],*/
             [
                 'field' => 'category_name',
                 'width' => 150,
@@ -511,7 +504,7 @@ class ShortController extends BaseCurlController
                 'type' => 'checkbox',
                 'name' => '版块',
                 'default' => [],
-                'data' => array_merge($this->getCats(),[[
+                'data' => array_merge($this->getShortCats(),[[
                     'id' => 0,
                     'name' => '无'
                 ]])
