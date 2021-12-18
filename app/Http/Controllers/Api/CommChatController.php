@@ -92,12 +92,14 @@ class CommChatController extends Controller
                 'to_user_id' => 'nullable',
                 'start_id' => 'nullable',
                 'start_time' => 'nullable',
+                'sort' => 'nullable',
                 'page' => 'required|integer',
             ])->validate();
             $toUserId = $params['to_user_id'] ?? 0;
             $startId = $params['start_id'] ?? 0;
             $startTime = $params['start_time'] ?? 0;
             $page = $params['page'] ?? 1;
+            $sort = $params['sort'] ?? 1;
             $perPage = 16;
             $queryBuild = CommChat::query()
                 ->leftJoin('users', 'community_chat.user_id', '=', 'users.id')
@@ -115,7 +117,12 @@ class CommChatController extends Controller
             if ($startTime) {
                 $queryBuild->where('community_chat.created_at', '>=', $startTime);
             }
-            $paginator = $queryBuild->orderBy('id')->simplePaginate($perPage, '*', 'commentLists', $page);
+            if ($sort == 1) {
+                $queryBuild->orderBy('id','desc');
+            } else {
+                $queryBuild->orderBy('id');
+            }
+            $paginator = $queryBuild->simplePaginate($perPage, '*', 'commentLists', $page);
             $items = $paginator->items();
             $res['list'] = $items;
             $res['hasMorePages'] = $paginator->hasMorePages();
