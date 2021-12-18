@@ -42,6 +42,12 @@ class CommMessageController extends Controller
             $relationName = "relation_chat";
             $subIds = $this->redis()->sMembers($relationName);
             $queryBuild->whereIn('community_chat.id', $subIds);
+            $uid = $request->user()->id;
+
+            $queryBuild->where(function($sql) use ($uid){
+                $sql->orWhere('user_id',$uid);
+                $sql->orWhere('to_user_id',$uid);
+            });
 
             $paginator = $queryBuild->orderBy('id')->simplePaginate($perPage, '*', 'commentLists', $page);
             $items = $paginator->items();
@@ -55,7 +61,6 @@ class CommMessageController extends Controller
             $userData = User::query()->whereIn('id',$userIds)->get()->toArray();
             $userInfo = array_column($userData,null,'id');
 
-            $uid = $request->user()->id;
             foreach ($items as $k=>$item) {
                 if ($item['user_id'] == $uid) {
 
