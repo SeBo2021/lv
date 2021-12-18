@@ -45,7 +45,6 @@ class CommRewardController extends Controller
             DB::beginTransaction();
             try {   //先偿试队列
                 $originGold = $request->user()->gold;
-                User::where('id', $request->user()->id)->decrement('gold', $money);
                 DB::table('community_bbs')->where('id',$bbsId)->increment('rewards',$money);
                 User::where('id', $toUserId)->increment('gold', $money);
                 User::where('id', $request->user()->id)->decrement('gold', $money);
