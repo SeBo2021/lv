@@ -60,6 +60,8 @@ class CommMessageController extends Controller
                 if ($item['user_id'] == $uid) {
                     $items[$k]['avatar'] = $userInfo[$item['to_user_id']]['avatar'];
                     $items[$k]['to_user_nickname'] =  $userInfo[$item['to_user_id']]['nickname'];
+                } else {
+                    $items[$k]['to_user_id'] = $item['user_id'];
                 }
             }
 
