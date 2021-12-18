@@ -114,13 +114,17 @@ class CommChatController extends Controller
                     $sql->whereIn('to_user_id',[$uid,$toUserId]);
                 });
             }
-            if ($startTime) {
-                $queryBuild->where('community_chat.created_at', '>=', $startTime);
-            }
+
             if ($sort == 1) {
                 $queryBuild->orderBy('id','desc');
+                if ($startTime) {
+                    $queryBuild->where('community_chat.created_at', '<=', $startTime);
+                }
             } else {
                 $queryBuild->orderBy('id');
+                if ($startTime) {
+                    $queryBuild->where('community_chat.created_at', '>=', $startTime);
+                }
             }
             $paginator = $queryBuild->simplePaginate($perPage, '*', 'commentLists', $page);
             $items = $paginator->items();
