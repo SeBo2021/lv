@@ -98,12 +98,12 @@ class CommChatController extends Controller
             $startId = $params['start_id'] ?? 0;
             $startTime = $params['start_time'] ?? 0;
             $page = $params['page'] ?? 1;
-            $perPage = 8;
+            $perPage = 16;
             $queryBuild = CommChat::query()
                 ->leftJoin('users', 'community_chat.user_id', '=', 'users.id')
                 ->select('community_chat.id','user_id','to_user_id','content','community_chat.created_at','users.nickname as to_user_nickname','users.avatar', 'community_chat.type');
             if ($startId) {
-                $queryBuild->where('id', '>', $startId);
+                $queryBuild->where('community_chat.id', '>', $startId);
             }
             $uid = $request->user()->id;
             if ($toUserId) {
@@ -113,7 +113,7 @@ class CommChatController extends Controller
                 });
             }
             if ($startTime) {
-                $queryBuild->where('created_at', '>=', $startTime);
+                $queryBuild->where('community_chat.created_at', '>=', $startTime);
             }
             $paginator = $queryBuild->orderBy('id')->simplePaginate($perPage, '*', 'commentLists', $page);
             $items = $paginator->items();
