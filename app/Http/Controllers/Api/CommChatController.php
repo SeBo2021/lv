@@ -104,9 +104,6 @@ class CommChatController extends Controller
                 ->select('community_chat.id','user_id','to_user_id','content','community_chat.created_at','users.nickname as to_user_nickname','users.avatar', 'community_chat.type');
             if ($startId) {
                 $queryBuild->where('id', '>', $startId);
-            } else {
-                $subIds = CommChat::query()->select(DB::raw('max(id) as max_id, to_user_id'))->groupBy('to_user_id')->pluck('max_id');
-                $queryBuild->whereIn('community_chat.id', $subIds);
             }
             $uid = $request->user()->id;
             if ($toUserId) {
