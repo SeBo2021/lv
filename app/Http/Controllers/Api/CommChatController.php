@@ -104,9 +104,7 @@ class CommChatController extends Controller
             $queryBuild = CommChat::query()
                 ->leftJoin('users', 'community_chat.user_id', '=', 'users.id')
                 ->select('community_chat.id','user_id','to_user_id','content','community_chat.created_at','users.nickname as to_user_nickname','users.avatar', 'community_chat.type');
-            if ($startId) {
-                $queryBuild->where('community_chat.id', '>', $startId);
-            }
+
             $uid = $request->user()->id;
             if ($toUserId) {
                 $queryBuild->where(function($sql) use ($uid,$toUserId){
@@ -114,16 +112,21 @@ class CommChatController extends Controller
                     $sql->whereIn('to_user_id',[$uid,$toUserId]);
                 });
             }
-
             if ($sort == 1) {
                 $queryBuild->orderBy('id','desc');
                 if ($startTime) {
-                    $queryBuild->where('community_chat.created_at', '<=', $startTime);
+                    $queryBuild->where('community_chat.created_at', '<', $startTime);
+                }
+                if ($startId) {
+                    $queryBuild->where('community_chat.id', '<', $startId);
                 }
             } else {
                 $queryBuild->orderBy('id');
                 if ($startTime) {
-                    $queryBuild->where('community_chat.created_at', '>=', $startTime);
+                    $queryBuild->where('community_chat.created_at', '>', $startTime);
+                }
+                if ($startId) {
+                    $queryBuild->where('community_chat.id', '>', $startId);
                 }
             }
             $paginator = $queryBuild->simplePaginate($perPage, '*', 'commentLists', $page);
