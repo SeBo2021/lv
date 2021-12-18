@@ -38,7 +38,7 @@ class CommMessageController extends Controller
             $perPage = 8;
             $queryBuild = CommChat::query()
                 ->leftJoin('users', 'community_chat.user_id', '=', 'users.id')
-                ->select('community_chat.id', 'user_id', 'to_user_id', 'content', 'community_chat.created_at', 'users.nickname as to_user_nickname', 'users.avatar');
+                ->select('community_chat.id', 'user_id', 'to_user_id', 'content', 'community_chat.created_at', 'users.nickname as to_user_nickname', 'users.avatar','community_chat.type');
             $relationName = "relation_chat";
             $subIds = $this->redis()->sMembers($relationName);
             $queryBuild->whereIn('community_chat.id', $subIds);
