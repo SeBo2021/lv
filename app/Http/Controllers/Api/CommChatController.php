@@ -53,10 +53,9 @@ class CommChatController extends Controller
                 $existKey = "chat_pair_{$min}_{$max}";
                 $exitPair = $this->redis()->get($existKey);
                 if ($exitPair) {
-                    $this->redis()->sRem($relationName,$commentId);
-                    $this->redis()->del($existKey);
+                    $this->redis()->sRem($relationName,$exitPair);
                 } else {
-                    $this->redis()->set($existKey,time());
+                    $this->redis()->set($existKey,$commentId);
                 }
                 $this->redis()->sAdd($relationName,$commentId);
 
