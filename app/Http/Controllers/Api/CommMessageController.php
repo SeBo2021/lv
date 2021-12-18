@@ -58,10 +58,14 @@ class CommMessageController extends Controller
             $uid = $request->user()->id;
             foreach ($items as $k=>$item) {
                 if ($item['user_id'] == $uid) {
+
                     $items[$k]['avatar'] = $userInfo[$item['to_user_id']]['avatar'];
                     $items[$k]['to_user_nickname'] =  $userInfo[$item['to_user_id']]['nickname'];
                 } else {
-                    $items[$k]['to_user_id'] = $item['user_id'];
+                    $toUserId = $item['to_user_id'];
+                    $tmpUserId = $item['user_id'];
+                    $item['user_id'] =  $toUserId;
+                    $items[$k]['to_user_id'] = $tmpUserId;
                 }
             }
 
