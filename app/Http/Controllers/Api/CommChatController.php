@@ -47,7 +47,15 @@ class CommChatController extends Controller
                 DB::commit();
                 // 创建关系
                 $relationName = "relation_chat";
+                // 处理缓存结构
+                $min = min($vid,$uid);
+                $max = max($uid,$vid);
+                $existKey = "chat_pair_{$min}_{$max}";
+                if ($id = $this->redis()->get($existKey)) {
+                    $id && ( $this->redis()->sRem($relationName,$commentId));
+                }
                 $this->redis()->sAdd($relationName,$commentId);
+
                 if ($commentId > 0) {
                     return response()->json([
                         'state' => 0,

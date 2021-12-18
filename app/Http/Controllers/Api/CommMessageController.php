@@ -41,7 +41,6 @@ class CommMessageController extends Controller
                 ->select('community_chat.id', 'user_id', 'to_user_id', 'content', 'community_chat.created_at', 'users.nickname as to_user_nickname', 'users.avatar');
             $relationName = "relation_chat";
             $subIds = $this->redis()->sMembers($relationName);
-            $subIds = array_merge($subIds,[17]);
             $queryBuild->whereIn('community_chat.id', $subIds);
 
             $paginator = $queryBuild->orderBy('id')->simplePaginate($perPage, '*', 'commentLists', $page);
