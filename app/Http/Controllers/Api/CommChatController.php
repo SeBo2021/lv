@@ -54,9 +54,9 @@ class CommChatController extends Controller
                 $exitPair = $this->redis()->get($existKey);
                 if ($exitPair) {
                     $this->redis()->sRem($relationName,$exitPair);
-                } else {
-                    $this->redis()->set($existKey,$commentId);
                 }
+                $this->redis()->set($existKey,$commentId);
+
                 $this->redis()->sAdd($relationName,$commentId);
 
                 if ($commentId > 0) {
