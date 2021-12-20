@@ -101,4 +101,13 @@ Route::group([
     Route::post('commChatPost', 'CommChatController@post');  //私聊-发送消息
     Route::post('commRes', 'CommMiscController@res');  //发送资源
     Route::post('commBbs', 'CommContentController@post');  //发贴
+
+    /// 小视频模块
+    Route::get('shortCate', 'VideoShortController@cate');  //视频分类
+    Route::get('shortList', 'VideoShortController@lists');  //播放列表
+    Route::post('shortLike', 'VideoShortController@like');  //短视频点赞
+    Route::post('shortCollect', 'VideoShortController@collect');  //收藏
+
+    /// 伪直播模块
+    Route::get('liveList', 'FakeLiveShortController@lists');  //播放列表
 });
