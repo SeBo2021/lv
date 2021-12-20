@@ -347,6 +347,12 @@ class CategoryController extends BaseCurlController
                 'default' => 8,
             ],
             [
+                'field' => 'mask',
+                'type' => 'text',
+                'name' => '编程代码',
+                'default' => '',
+            ],
+            [
                 'field' => 'sort',
                 'type' => 'text',
                 'name' => '排序',
