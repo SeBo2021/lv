@@ -176,7 +176,7 @@ class CommContentController extends Controller
         $res['hasMorePages'] = $paginator->hasMorePages();
         $list = $paginator->items() ?? [];
         $result = $this->proProcessData($uid, $list);
-        $data['bbs_list'] = $result;
+        $res['bbs_list'] = $result;
         return $res;
     }
 
