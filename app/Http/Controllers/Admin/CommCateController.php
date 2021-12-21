@@ -133,19 +133,24 @@ class CommCateController extends BaseCurlController
 
     private function processCache() {
         $data = [];
-        $raw = CommCate::orderBy('order', 'desc')->select('id','name','parent_id','mark','is_allow_post','can_select_city')->get();
-        array_map(function ($datum) use (&$data) {
-            $this->redis()->hSet('common_cate_help', "c_{$datum['id']}", $datum['mark']);
-            if ($datum['parent_id'] == 0) {
-                $data[] = $datum;
-            } else {
-                foreach ($data as $k => $v) {
-                    if ($v['id'] == $datum['parent_id']) {
-                        $data[$k]['childs'][] = $datum;
+        $raw = CommCate::orderBy('order', 'desc')
+            ->select('id','name','parent_id','mark','order','is_allow_post','can_select_city')->get()->toArray();
+        foreach ($raw as $k1 => $v1) {
+            $this->redis()->hSet('common_cate_help', "c_{$v1['id']}", $v1['mark']);
+            if ($v1['parent_id'] == 0) {
+                $data[] = $v1;
+            };
+        }
+        foreach ($raw as $k2 => $v2) {
+            if ($v2['parent_id'] != 0) {
+                $this->redis()->hSet('common_cate_help', "c_{$v2['id']}", $v2['mark']);
+                foreach ($data as $k3=>$v3) {
+                    if ($v2['parent_id'] == $v3['id']) {
+                        $data[$k3]['childs'][] = $v2;
                     }
                 }
-            }
-        }, $raw->toArray());
+            };
+        }
         $this->redis()->set('common_cate',json_encode($data));
     }
     /**
@@ -214,7 +219,6 @@ class CommCateController extends BaseCurlController
 
     public function setListOutputItemExtend($item)
     {
-        //$item->category_name = $item->category['name'] ?? '';
         $item->parent_name = $item->up['name'] ?? '';
         $item->is_allow_post_name = UiService::switchTpl('is_allow_post', $item,0,"是|否");
         return $item;
