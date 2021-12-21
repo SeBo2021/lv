@@ -58,12 +58,12 @@ class CommBbsController extends BaseCurlController
                 'title' => '内容缩略',
                 'align' => 'left'
             ],
-            [
+            /*[
                 'field' => 'thumbs',
                 'minWidth' => 120,
                 'title' => '附加图集',
                 'align' => 'left'
-            ],
+            ],*/
             [
                 'field' => 'likes',
                 'minWidth' => 80,

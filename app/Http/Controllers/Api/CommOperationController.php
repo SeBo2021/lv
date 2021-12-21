@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Validator;
 class CommOperationController extends Controller
 {
     use PHPRedisTrait;
+
     /**
      * 关注
      * @param Request $request
@@ -28,19 +29,23 @@ class CommOperationController extends Controller
             $params = ApiParamsTrait::parse($request->params);
             Validator::make($params, [
                 'to_user_id' => 'required|integer',
-                "focus"=>'nullable' //类型 :1-关注,0-取消收藏
+                "focus" => 'nullable' //类型 :1-关注,0-取消收藏
             ])->validate();
             $toUserId = $params['to_user_id'];
+            $date = date('Y-m-d H:i:s', time());
             $insertData = [
                 'user_id' => $request->user()->id,
                 'to_user_id' => $toUserId,
+                'created_at' => $date,
+                'updated_at' => $date,
+
             ];
             DB::beginTransaction();
             try {   //先偿试队列
-                $focus = $params['focus']??1;
+                $focus = $params['focus'] ?? 1;
                 if ($focus == 0) {
                     DB::table('community_focus')->where($insertData)->delete();
-                    User::where('id', $toUserId)->where('fans','>',0)->decrement('fans');
+                    User::where('id', $toUserId)->where('fans', '>', 0)->decrement('fans');
                 } else {
                     DB::table('community_focus')->insert($insertData);
                     User::where('id', $toUserId)->increment('fans');
@@ -96,11 +101,11 @@ class CommOperationController extends Controller
                     }
                     DB::table('community_like')->insert($insertData);
                     CommBbs::where('id', $bbsId)->increment('likes');
-                    $this->redis()->set("comm_like_{$uid}_{$bbsId}",1);
+                    $this->redis()->set("comm_like_{$uid}_{$bbsId}", 1);
                     DB::commit();
                 } else {
                     DB::table('community_like')->where($insertData)->delete();
-                    CommBbs::where('id', $bbsId)->where('likes','>',0)->decrement('likes');
+                    CommBbs::where('id', $bbsId)->where('likes', '>', 0)->decrement('likes');
                     $this->redis()->del("comm_like_{$uid}_{$bbsId}");
                     DB::commit();
                 }
