@@ -89,9 +89,15 @@ class CommContentController extends Controller
         }
     }
 
+    /**
+     * 文章列表
+     * @param Request $request
+     * @return array|JsonResponse
+     * @throws ValidationException
+     */
     public function lists(Request $request)
     {
-        if (isset($request->params)) {
+        try {
             $params = ApiParamsTrait::parse($request->params);
             Validator::make($params, [
                 'cid_1' => 'nullable',
@@ -116,9 +122,12 @@ class CommContentController extends Controller
                 'state' => 0,
                 'data' => $res
             ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'state' => -1,
+                'msg' => $e->getMessage()
+            ]);
         }
-        return [];
-
     }
 
 
@@ -157,7 +166,6 @@ class CommContentController extends Controller
      */
     private function focus($uid, $locationName = '',$perPage = 6, $page = 1)
     {
-
         $userList = CommFocus::where('user_id', $uid)->pluck('to_user_id');
         $paginator = CommBbs::query()
             ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
@@ -175,9 +183,12 @@ class CommContentController extends Controller
     /**
      * 其它类别
      * @param $uid
+     * @param string $locationName
      * @param int $cid1
      * @param int $cid2
-     * @return array|Builder[]|Collection
+     * @param int $perPage
+     * @param int $page
+     * @return Collection|array
      */
     private function other($uid, $locationName = '',$cid1 = 0, $cid2 = 0, $perPage = 6, $page = 1): Collection|array
     {

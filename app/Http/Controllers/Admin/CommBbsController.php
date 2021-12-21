@@ -16,6 +16,7 @@ use App\Models\Category;
 use App\Models\CommBbs;
 use App\Models\CommCate;
 use App\Models\User;
+use App\Services\UiService;
 
 class CommBbsController extends BaseCurlController
 {
@@ -86,6 +87,12 @@ class CommBbsController extends BaseCurlController
                 'minWidth' => 150,
                 'title' => '发布时间',
                 'align' => 'center'
+            ],
+            [
+                'field' => 'status',
+                'minWidth' => 80,
+                'title' => '审核',
+                'align' => 'center',
             ],
             [
                 'field' => 'handle',
@@ -206,6 +213,7 @@ class CommBbsController extends BaseCurlController
     public function setListOutputItemExtend($item)
     {
         $item->category_name = $item->category['name'] ?? '';
+        $item->status = UiService::switchTpl('status', $item,0,"是|否");
         return $item;
     }
 
