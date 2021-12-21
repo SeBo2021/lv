@@ -113,7 +113,7 @@ class CommContentController extends Controller
             // 得到一级分类help
             $help = $this->redis()->hGet('common_cate_help', "c_{$cid1}");
             $uid = $request->user()->id;
-            if (in_array($help, ['focus'])) {
+            if (in_array($help, ['focus','hot'])) {
                 $res = $this->$help($uid, $locationName, 6,$page);
             } else {
                 $res = $this->other($request->user()->id, $locationName,$cid1, $cid2,6,$page);
@@ -150,6 +150,8 @@ class CommContentController extends Controller
                 ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
                 ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get();
             $uid = $request->user()->id;
+            // 增加点击数
+            CommBbs::query()->where('community_bbs.id', $id)->increment('views');
             $result = $this->proProcessData($uid, $list);
             return response()->json([
                 'state' => 0,
@@ -171,6 +173,26 @@ class CommContentController extends Controller
             ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
             ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel','video_picture')
             ->whereIn('author_id', $userList)->orderBy('updated_at', 'desc')
+            ->simplePaginate($perPage, ['*'], '', $page);
+        //加入视频列表
+        $res['hasMorePages'] = $paginator->hasMorePages();
+        $list = $paginator->items() ?? [];
+        $result = $this->proProcessData($uid, $list);
+        $res['bbs_list'] = $result;
+        return $res;
+    }
+
+    /**
+     * 最热
+     * @param $uid
+     * @return Builder[]|Collection
+     */
+    private function hot($uid, $locationName = '',$perPage = 6, $page = 1)
+    {
+        $paginator = CommBbs::query()
+            ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
+            ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel','video_picture')
+            ->orderBy('views', 'desc')
             ->simplePaginate($perPage, ['*'], '', $page);
         //加入视频列表
         $res['hasMorePages'] = $paginator->hasMorePages();
