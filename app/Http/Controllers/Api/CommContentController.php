@@ -119,7 +119,7 @@ class CommContentController extends Controller
             } else {
                 $res = $this->other($request->user()->id, $locationName,$cid1, $cid2,6,$page);
             }
-            $this->processArea($res['bbs_list']);
+            // $this->processArea($res['bbs_list']);
             return response()->json([
                 'state' => 0,
                 'data' => $res
@@ -249,6 +249,7 @@ class CommContentController extends Controller
                 ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel','video_picture')
                 ->where('category_id', $cid2)->orderBy('updated_at', 'desc');
             if ($locationName) {
+                $locationName = mb_ereg_replace('市|自治区|县','',$locationName);
                 $model->where('users.location_name','like',"%{$locationName}%");
             }
             $paginator = $model->simplePaginate($perPage, ['*'], '', $page);
