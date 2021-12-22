@@ -158,15 +158,6 @@ class ShortController extends BaseCurlController
         $tag = $this->getTagData(2);
         $cats = $this->getCats(10000);
         $data = [
-            /*[
-                'field' => 'cid',
-                'type' => 'select',
-                'name' => '分类',
-                'must' => 1,
-                'verify' => 'rq',
-                'default' => 0,
-                'data' => $this->getCateGoryData()
-            ],*/
             [
                 'field' => 'cats',
                 'type' => 'checkbox',
@@ -197,41 +188,11 @@ class ShortController extends BaseCurlController
                 'data' => $tag
             ],
             [
-                'field' => 'cover_img',
-                'type' => 'img',
-                'name' => '封面图片',
-//                'value' => $show ? : ''
-//                'verify' => 'img'
-            ],
-            [
                 'field' => 'url',
-                'type' => 'video',
+                'type' => 'movie',
                 'name' => '视频',
                 'sync' => $show ? $show->sync : 0,
-//                'value' => $show ? \App\Jobs\VideoSlice::get_slice_url($show->url,'dash',$show->sync) :''
-            ],
-            /*[
-                'field' => 'title',
-                'type' => 'text',
-                'name' => '标题',
-                'must' => 0,
-                'default' => '',
-            ],*/
-            [
-                'field' => 'restricted',
-                'type' => 'radio',
-                'name' => '观看限制',
-                'must' => 0,
-                'default' => 1,
-                'verify' => 'rq',
-                'data' => $this->restrictedType
-            ],
-            [
-                'field' => 'gold',
-                'type' => 'number',
-                'name' => '所需骚豆',
-                'value' => ($show && ($show->gold>0)) ? $show->gold/$this->goldUnit : 0,
-                'verify' => 'rq',
+                'value' => $show ? \App\Jobs\VideoSlice::get_slice_url($show->url,'dash',$show->sync) :''
             ],
             [
                 'field' => 'status',
@@ -241,14 +202,6 @@ class ShortController extends BaseCurlController
                 'default' => 0,
                 'data' => $this->uiService->trueFalseData()
             ],
-            /*[
-                'field' => 'is_recommend',
-                'type' => 'radio',
-                'name' => '推荐',
-                'verify' => '',
-                'default' => 0,
-                'data' => $this->uiService->trueFalseData()
-            ],*/
             [
                 'field' => 'sync',
                 'type' => 'radio',
