@@ -86,7 +86,7 @@ class TagController extends BaseCurlController
                 'field' => 'usage',
                 'type' => 'select',
                 'name' => '标签用途',
-                'data' => [['id' => '1', 'name' => '长视频'],['id' => '2', 'name' => '短视频']]
+                'data' => [['id' => '1', 'name' => '长视频'],['id' => '2', 'name' => '小视频']]
 
             ],
             [
@@ -121,7 +121,7 @@ class TagController extends BaseCurlController
     }
     public function setListOutputItemExtend($item)
     {
-        $item->usageName = ($item->usage==1)?"长视频":"短视频";
+        $item->usageName = ($item->usage==1)?"长视频":"小视频";
         return $item;
     }
 }

@@ -105,8 +105,12 @@ Route::group([
     /// 小视频模块
     Route::get('shortCate', 'VideoShortController@cate');  //视频分类
     Route::get('shortList', 'VideoShortController@lists');  //播放列表
-    Route::post('shortLike', 'VideoShortController@like');  //短视频点赞
+    Route::post('shortLike', 'VideoShortController@like');  //小视频点赞
     Route::post('shortCollect', 'VideoShortController@collect');  //收藏
+    /// 小视频评论
+    Route::post('shortCommentList', 'CommentShortController@lists');      //评论列表
+    Route::post('shortComment', 'CommentShortController@submit');      //评论
+    Route::post('shortCommentReply', 'CommentShortController@reply');  //回复评论
 
     /// 伪直播模块
     Route::get('liveList', 'FakeLiveShortController@lists');  //播放列表
