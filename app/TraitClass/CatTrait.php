@@ -36,9 +36,9 @@ trait CatTrait
         return [];
     }
 
-    public function getCatName($cat)
+    public function getCatName($cat,$parentId =2)
     {
-        $topCat = $this->getCats();
+        $topCat = $this->getCats($parentId);
         $catArr = json_decode($cat, true);
         $name = '';
         $characters = '||';
