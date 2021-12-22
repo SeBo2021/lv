@@ -66,26 +66,6 @@ class ShortController extends BaseCurlController
                 'align' => 'center',
             ],
             [
-                'field' => 'restricted',
-                'minWidth' => 100,
-                'title' => '观看限制',
-                'align' => 'center',
-            ],
-            [
-                'field' => 'gold',
-                'minWidth' => 100,
-                'title' => '所需骚豆',
-                'edit' => 1,
-                'align' => 'center',
-            ],
-            [
-                'field' => 'author',
-                'minWidth' => 80,
-                'title' => '作者',
-                'align' => 'center',
-                'hide' => true
-            ],
-            [
                 'field' => 'sync',
                 'minWidth' => 80,
                 'title' => '专线',
@@ -93,50 +73,9 @@ class ShortController extends BaseCurlController
                 'hide' => true
             ],
             [
-                'field' => 'duration',
-                'minWidth' => 150,
-                'title' => '时长',
-                'align' => 'center',
-            ],
-            [
-                'field' => 'duration_seconds',
-                'minWidth' => 150,
-                'title' => '时长秒',
-                'align' => 'center',
-                'hide' => true,
-            ],
-            [
-                'field' => 'cover_img',
-                'minWidth' => 150,
-                'title' => '封面图',
-                'align' => 'center',
-                'hide' => true
-            ],
-            [
                 'field' => 'url',
                 'minWidth' => 150,
                 'title' => '源视频',
-                'align' => 'center',
-                'hide' => true
-            ],
-            [
-                'field' => 'hls_url',
-                'minWidth' => 80,
-                'title' => 'hls地址',
-                'align' => 'center',
-                'hide' => true
-            ],
-            [
-                'field' => 'dash_url',
-                'minWidth' => 80,
-                'title' => 'dash地址',
-                'align' => 'center',
-                'hide' => true
-            ],
-            [
-                'field' => 'type',
-                'minWidth' => 80,
-                'title' => '视频类型',
                 'align' => 'center',
                 'hide' => true
             ],
@@ -167,12 +106,6 @@ class ShortController extends BaseCurlController
                 'title' => '是否上架',
                 'align' => 'center',
             ],
-            /*[
-                'field' => 'is_recommend',
-                'minWidth' => 80,
-                'title' => '是否推荐',
-                'align' => 'center',
-            ],*/
             [
                 'field' => 'created_at',
                 'sort' => 1,
@@ -375,17 +308,6 @@ class ShortController extends BaseCurlController
 
     protected function afterSaveSuccessEvent($model, $id = '')
     {
-        if( isset($_REQUEST['callback_upload']) && ($_REQUEST['callback_upload']==1)){
-
-            try {
-                //$job = new VideoSlice($model);
-                $job = new ProcessVideoSlice($model);
-                $this->dispatch($job);
-            }catch (\Exception $e){
-                Log::error($e->getMessage());
-            }
-        }
-        //ProcessSyncMiddleTable::dispatchAfterResponse('video');
         return $model;
     }
 
@@ -421,29 +343,6 @@ class ShortController extends BaseCurlController
         }
 
     }
-
-    /*public function afterEditTableSuccessEvent($field, array $ids)
-    {
-        if($field==='sync'){
-            foreach ($ids as $id){
-                $row = AdminVideo::query()->find($id,['id','sync','url']);
-                if($row->sync==1){
-                    $job = new ProcessSyncVideo($row);
-                    $this->dispatch($job);
-                }
-            }
-        }
-    }*/
-    /*public function setOutputHandleBtnTpl($shareData)
-    {
-        $data = $this->defaultHandleBtnAddTpl($shareData);
-        $data[] = [
-            'name' => '同步',
-            'id' => 'btn-sync',
-        ];
-        //赋值到ui数组里面必须是`btn`的key值
-        $this->uiBlade['btn'] = $data;
-    }*/
 
     //弹窗大小
     public function layuiOpenWidth()

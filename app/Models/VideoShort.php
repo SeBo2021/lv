@@ -31,7 +31,7 @@ class VideoShort extends BaseModel
      */
     public function searchableAs()
     {
-        return 'video_index';
+        return 'video_short_index';
     }
 
     /**
@@ -41,25 +41,6 @@ class VideoShort extends BaseModel
      */
     public function toSearchableArray()
     {
-        //$array = $this->toArray();
-        //'video.id','name','sync','title','url','gold','duration','type','cover_img','views','updated_at'
-        // 自定义数组...
-        //$array = $this->only(['id','name','sync','title','url','gold','duration','type','cover_img','views','updated_at']);
-
-        //Log::debug('===toSearchableArray===',$this->toArray());
         return $this->toArray();
-        //return $this->only(['id','name','sync','title','url','gold','duration','type','cover_img','views','updated_at']);
     }
-
-    //指定id
-    /*public function getScoutKey()
-    {
-        return $this->id;
-    }
-
-    public function getScoutKeyName()
-    {
-        return 'id';
-    }*/
-
 }
