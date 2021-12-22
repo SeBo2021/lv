@@ -261,7 +261,7 @@ trait VideoTrait
         if (!$pathName) {
             return '';
         }
-        return "{$$url}/aetherupload/display/{$pathName}";
+        return "{$url}/aetherupload/display/{$pathName}";
     }
 
     //获取切片链接地址、封面图
