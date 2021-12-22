@@ -57,6 +57,7 @@ $route->middleware(['admin_auth'])->name($route_name)->group(function ($route) {
         'MemberCardController',
         'VideoController',
         'ShortController',
+        'ShortCommentController',
 
         'CommCateController',
         'CommBbsController',

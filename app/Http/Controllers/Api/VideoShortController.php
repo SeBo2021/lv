@@ -65,24 +65,35 @@ class VideoShortController extends Controller
      * 读取数据
      * @param $page
      * @param $uid
-     * @param $id
+     * @param $startId
+     * @param $cateId
+     * @param $tagId
      * @return array
      */
-    private function items($page, $uid, $id)
+    private function items($page, $uid, $startId,$cateId,$tagId)
     {
-        $videoField = ['id', 'name', 'cid', 'cat', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'hls_url', 'dash_url', 'type', 'cover_img', 'views', 'likes', 'comments', 'updated_at'];
+        $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'hls_url', 'dash_url', 'type', 'cover_img', 'views', 'likes', 'comments', 'updated_at'];
         $perPage = 8;
-        $paginator = VideoShort::query()
-            ->simplePaginate($perPage, $videoField, 'shortLists', $page);
+        $model = VideoShort::query();
+        if ($cateId) {
+            $cateWord = sprintf('"%s"',$cateId);
+            $model->where('cat','like',$cateWord);
+        }
+        if ($tagId) {
+            $tagWord = sprintf('"%s"',$tagId);
+            $model->where('cat','like',$tagWord);
+        }
+        if ($startId) {
+            $model->where('id','>',$startId);
+        }
+
+        $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         $items = $paginator->items();
         $data = [];
         foreach ($items as $one) {
             $one = $this->handleShortVideoItems([$one], true)[0];
             $one['limit'] = 0;
-            // 任何类型都有 是否点赞 is_collect 并增加观看记录
-            // ProcessViewVideo::dispatchAfterResponse($user, $one);
-            //是否点赞
-            $viewRecord = $this->isShortLoveOrCollect($uid, $id);
+            $viewRecord = $this->isShortLoveOrCollect($uid, $one['id']);
             $one['is_love'] = $viewRecord['is_love'] ?? 0;
             //是否收藏
             $one['is_collect'] = $viewRecord['is_collect'] ?? 0;
@@ -114,8 +125,10 @@ class VideoShortController extends Controller
                 ],
             ])->validated();
             $page = $params['page'] ?? 1;
-            $id = $validated['id'] ?? '0';
-            $res = $this->items($page, $uid, $id);
+            $cateId = $params['cate_id'] ?? "";
+            $tagId = $params['tag_id'] ?? "";
+            $starId = $validated['start_id'] ?? '0';
+            $res = $this->items($page, $uid, $starId,$cateId,$tagId);
             return response()->json([
                 'state' => 0,
                 'data' => $res
@@ -211,10 +224,9 @@ class VideoShortController extends Controller
      * @param int $uid
      * @return mixed
      */
-    public function handleShortVideoItems($lists, $display_url = false, $uid = 0)
+    public function handleShortVideoItems($lists, $display_url = false, $uid = 0): mixed
     {
-
-        foreach ($lists as &$item) {
+        array_map(function ($item) use ($display_url,$uid){
             //$item = (array)$item;
             $domainSync = VideoTrait::getDomain($item['sync']);
             $item['cover_img'] = $domainSync . $item['cover_img'];
@@ -232,7 +244,7 @@ class VideoShortController extends Controller
             $item['is_love'] = $viewRecord['is_love'] ?? 0;
             //是否收藏
             $item['is_collect'] = $viewRecord['is_collect'] ?? 0;
-        }
+        },$lists);
         return $lists;
     }
 
@@ -244,49 +256,10 @@ class VideoShortController extends Controller
      */
     public function isShortLoveOrCollect($uid = 0, $vid = 0): array
     {
-        $one = [
-            'is_love' => 0,
-            'is_collect' => 0,
-        ];
-        if (!$uid) {
-            return $one;
-        }
-        /*$viewRecord = ViewRecord::query()->where('uid', $uid)->where('vid', $vid)->first(['id', 'is_love', 'is_collect']);
-        //是否点赞
-        $one['is_love'] = $viewRecord['is_love'] ?? 0;
-        //是否收藏
-        $one['is_collect'] = $viewRecord['is_collect'] ?? 0;*/
         $redis = $this->redis();
-
         $one['is_love'] = $redis->get("short_is_love_{$uid}_{$vid}") ?: 0;
         //是否收藏
         $one['is_collect'] = $redis->get("short_is_collect_{$uid}_{$vid}") ?: 0;
-
-        return $one;
-    }
-
-    /**
-     * 金豆判断
-     * @param $one
-     * @param $user
-     * @return mixed
-     */
-    public function vipOrGold($one, $user): mixed
-    {
-        switch ($one['restricted']) {
-            case 1:
-                if ((!$user->member_card_type) && (time() - $user->vip_expired > $user->vip_start_last)) {
-                    $one['limit'] = 1;
-                }
-                break;
-            case 2:
-                $redisHashKey = $this->apiRedisKey['user_gold_video'] . $user->id;
-                $buy = $this->redis()->sIsMember($redisHashKey, $one['id']);
-                if (!$buy) {
-                    $one['limit'] = 2;
-                }
-
-        }
         return $one;
     }
 

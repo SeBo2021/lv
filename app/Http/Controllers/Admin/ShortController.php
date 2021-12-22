@@ -26,7 +26,7 @@ class ShortController extends BaseCurlController
 {
     use VideoTrait,CatTrait,TagTrait,GoldTrait,PHPRedisTrait;
 
-    public $pageName = '短视频管理';
+    public $pageName = '小视频管理';
 
 
     public function setModel()
