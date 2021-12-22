@@ -362,9 +362,8 @@ class ShortController extends BaseCurlController
 
     public function setListOutputItemExtend($item)
     {
-        //$item->category_name = $item->category['name'] ?? '';
-        $item->category_name = $this->getCatName($item->cat);
-        $item->tag_name = $this->getTagName($item->tag);
+        $item->category_name = $this->getCatName($item->cat,10000);
+        $item->tag_name = $this->getTagName($item->tag,2);
         $item->status = UiService::switchTpl('status', $item,'','上架|下架');
         $item->is_recommend = UiService::switchTpl('is_recommend', $item,'','是|否');
         $item->sync = UiService::switchTpl('sync', $item,'','是|否');
