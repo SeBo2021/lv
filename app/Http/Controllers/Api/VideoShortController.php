@@ -72,7 +72,8 @@ class VideoShortController extends Controller
      */
     private function items($page, $uid, $startId,$cateId,$tagId)
     {
-        $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'hls_url', 'dash_url', 'type', 'cover_img', 'views', 'likes', 'comments', 'updated_at'];
+        // $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'hls_url', 'dash_url', 'type', 'cover_img', 'views', 'likes', 'comments', 'updated_at'];
+        $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'updated_at'];
         $perPage = 8;
         $model = VideoShort::query();
         if ($cateId) {
@@ -91,12 +92,13 @@ class VideoShortController extends Controller
         $items = $paginator->items();
         $data = [];
         foreach ($items as $one) {
-            $one = $this->handleShortVideoItems([$one], true)[0];
+            //  $one = $this->handleShortVideoItems([$one], true)[0];
             $one['limit'] = 0;
             $viewRecord = $this->isShortLoveOrCollect($uid, $one['id']);
             $one['is_love'] = $viewRecord['is_love'] ?? 0;
             //是否收藏
             $one['is_collect'] = $viewRecord['is_collect'] ?? 0;
+            $one['url'] = env('RESOURCE_DOMAIN_DEV') . '/' .$one['url'];
             $data[] = $one;
         }
         return [
