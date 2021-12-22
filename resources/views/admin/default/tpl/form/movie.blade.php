@@ -36,7 +36,7 @@
         console.log(real_use_url);
         // $("#videoIframe").attr('src',real_use_url);
         //=====================以上打印出同步资源地址======================
-        var url = "{{ \App\Jobs\VideoSlice::get_slice_url($form_item['value']) }}";
+        // var url = "{{ \App\Jobs\VideoSlice::get_slice_url($form_item['value']) }}";
         var playerElement = $('#dashjs');
         playerElement.show();
         var player = dashjs.MediaPlayer().create();
