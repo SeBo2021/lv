@@ -11,6 +11,7 @@ use App\Models\AdminVideo;
 use App\Models\Category;
 use App\Models\Tag;
 use App\Models\Video;
+use App\Models\VideoShort;
 use App\Services\UiService;
 use App\TraitClass\CatTrait;
 use App\TraitClass\GoldTrait;
@@ -30,7 +31,7 @@ class ShortController extends BaseCurlController
 
     public function setModel()
     {
-        return $this->model = new AdminVideo();
+        return $this->model = new VideoShort();
     }
 
     public function indexCols()
