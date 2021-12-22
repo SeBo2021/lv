@@ -255,6 +255,15 @@ trait VideoTrait
         return $sync==1 ? env('RESOURCE_DOMAIN') : env('SLICE_DOMAIN');
     }
 
+    public static function getOrigin($sync,$pathName = '')
+    {
+        $url =  $sync==1 ? env('RESOURCE_DOMAIN') : env('SLICE_DOMAIN');
+        if (!$pathName) {
+            return '';
+        }
+        return "{$$url}/aetherupload/display/{$pathName}";
+    }
+
     //获取切片链接地址、封面图
     public static function get_slice_url($pathName,$type="dash",$sync=null): string
     {

@@ -32,7 +32,7 @@
 
 @if(!empty($form_item['value']))
 <script>
-    var real_use_url = "{{ \App\Jobs\VideoSlice::getDomain($form_item['sync'])}}{{$form_item['url']}}}";
+    var real_use_url = "{{ \App\Jobs\VideoSlice::getOrigin($form_item['sync'],$form_item['url'])}}";
     console.log(real_use_url);
     // $("#videoIframe").attr('src',real_use_url);
     //=====================以上打印出同步资源地址======================

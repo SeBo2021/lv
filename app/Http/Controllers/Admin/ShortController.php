@@ -192,7 +192,7 @@ class ShortController extends BaseCurlController
                 'type' => 'movie',
                 'name' => '视频',
                 'sync' => $show ? $show->sync : 0,
-                'value' => $show ? \App\Jobs\VideoSlice::get_slice_url($show->url,'dash',$show->sync) :''
+                'value' => $show ? \App\Jobs\VideoSlice::getOrigin($show->sync,$show->url) :''
             ],
             [
                 'field' => 'status',
