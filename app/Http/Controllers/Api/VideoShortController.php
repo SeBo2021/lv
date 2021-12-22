@@ -77,11 +77,11 @@ class VideoShortController extends Controller
         $model = VideoShort::query();
         if ($cateId) {
             $cateWord = sprintf('"%s"',$cateId);
-            $model->where('cat','like',$cateWord);
+            $model->where('cat','like',"%{$cateWord}%");
         }
         if ($tagId) {
             $tagWord = sprintf('"%s"',$tagId);
-            $model->where('cat','like',$tagWord);
+            $model->where('cat','like',"%{$tagWord}%");
         }
         if ($startId) {
             $model->where('id','>',$startId);
