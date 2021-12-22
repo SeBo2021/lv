@@ -49,9 +49,9 @@ class TagController extends BaseCurlController
                 'align' => 'center',
             ],
             [
-                'field' => 'name',
+                'field' => 'usageName',
                 'minWidth' => 150,
-                'title' => '标签名称',
+                'title' => '标签用途',
                 'align' => 'center',
             ],
             [
@@ -83,6 +83,13 @@ class TagController extends BaseCurlController
                 'default' => '',
             ],
             [
+                'field' => 'usage',
+                'type' => 'select',
+                'name' => '标签用途',
+                'data' => [['id' => '1', 'name' => '长视频'],['id' => '2', 'name' => '短视频']]
+
+            ],
+            [
                 'field' => 'sort',
                 'type' => 'number',
                 'name' => '排序',
@@ -112,5 +119,9 @@ class TagController extends BaseCurlController
             'name'=>'标签名称',
         ];
     }
-
+    public function setListOutputItemExtend($item)
+    {
+        $item->usageName = ($item->usage==1)?"长视频":"短视频";
+        return $item;
+    }
 }
