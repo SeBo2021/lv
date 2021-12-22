@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\CommBbs;
 use App\Models\CommFocus;
+use App\Models\LoginLog;
 use App\Models\User;
 use App\Models\Video;
 use App\TraitClass\ApiParamsTrait;
@@ -118,6 +119,7 @@ class CommContentController extends Controller
             } else {
                 $res = $this->other($request->user()->id, $locationName,$cid1, $cid2,6,$page);
             }
+            $this->processArea($res['bbs_list']);
             return response()->json([
                 'state' => 0,
                 'data' => $res
@@ -130,6 +132,33 @@ class CommContentController extends Controller
         }
     }
 
+    /**
+     * 处理地理数据
+     * @param $data
+     */
+    private function processArea(&$data) {
+        $ids = array_column($data,'uid');
+        $lastLogin =  LoginLog::query()
+            ->select('uid',DB::raw('max(id) as max_id'))->whereIn('uid',$ids)
+            ->groupBy('uid')
+            ->get()->toArray();
+        if (!$lastLogin) {
+            return;
+        }
+        $lastLoginIds = array_column($lastLogin,'max_id');
+        $areaInfo = LoginLog::query()->whereIn('id',$lastLoginIds)
+            ->groupBy('uid')
+            ->get()->toArray();
+        if (!$areaInfo) {
+            return;
+        }
+        $areaInfoMap = array_column($areaInfo,null,'uid');
+        foreach ($data as $k => $v) {
+            $rawArea = $areaInfoMap[$v['uid']]??[];
+            $tmpArea = json_decode($rawArea['area']??'',true);
+            $data[$k]['location_name'] =$tmpArea[2]?:($tmpArea[1]?:($tmpArea[0]));
+        }
+    }
 
     /**
      * 详情
