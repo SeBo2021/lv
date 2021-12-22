@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\CommBbs;
 use App\Models\CommFocus;
 use App\Models\LoginLog;
-use App\Models\User;
-use App\Models\Video;
 use App\TraitClass\ApiParamsTrait;
 use App\TraitClass\BbsTrait;
 use App\TraitClass\PHPRedisTrait;
@@ -55,7 +53,7 @@ class CommContentController extends Controller
                 'updated_at' => date('Y-m-d H:i:s'),
             ];
             DB::beginTransaction();
-            try {   //先偿试队列
+            try {
                 $commentId = DB::table('community_bbs')->insertGetId($insertData);
                 DB::commit();
                 if ($commentId > 0) {
