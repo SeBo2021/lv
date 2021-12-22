@@ -257,7 +257,7 @@ trait VideoTrait
 
     public static function getOrigin($sync,$pathName = '')
     {
-        $url =  $sync==1 ? env('RESOURCE_DOMAIN') : env('SLICE_DOMAIN');
+        $url =  $sync==1 ? env('RESOURCE_DOMAIN_DEV') : env('SLICE_DOMAIN');
         if (!$pathName) {
             return '';
         }
