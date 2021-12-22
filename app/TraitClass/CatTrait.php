@@ -20,6 +20,13 @@ trait CatTrait
             $topCatIds[] = $item['id'];
         }
         if(!empty($topCatIds)){
+            if ($parentId != 2) {
+                return Category::query()
+                    ->where('is_checked',1)
+                    ->whereIn('id',$topCatIds)
+                    ->orderBy('sort')
+                    ->get(['id','name'])->toArray();
+            }
             return Category::query()
                 ->where('is_checked',1)
                 ->whereIn('parent_id',$topCatIds)
