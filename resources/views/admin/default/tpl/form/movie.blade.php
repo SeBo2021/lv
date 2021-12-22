@@ -36,10 +36,11 @@
         console.log(real_use_url);
         // $("#videoIframe").attr('src',real_use_url);
         //=====================以上打印出同步资源地址======================
-        // var url = "{{ \App\Jobs\VideoSlice::get_slice_url($form_item['value']) }}";
+        var url = "{{ \App\Jobs\VideoSlice::getOrigin($form_item['sync'],$form_item['url'])}}";
         var playerElement = $('#dashjs');
         playerElement.show();
         var player = dashjs.MediaPlayer().create();
+        $('#dashjs').attr('src',real_use_url);
         player.initialize(document.querySelector('#dashjs'), real_use_url, false); //true 为自动播放
     </script>
 @endif

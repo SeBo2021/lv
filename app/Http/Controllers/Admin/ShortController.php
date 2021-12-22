@@ -188,6 +188,13 @@ class ShortController extends BaseCurlController
                 'data' => $tag
             ],
             [
+                'field' => 'cover_img',
+                'type' => 'img',
+                'name' => '封面图片',
+//                'value' => $show ? : ''
+//                'verify' => 'img'
+            ],
+            [
                 'field' => 'url',
                 'type' => 'movie',
                 'name' => '视频',
