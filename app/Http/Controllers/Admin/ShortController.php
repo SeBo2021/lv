@@ -504,7 +504,7 @@ class ShortController extends BaseCurlController
                 'type' => 'checkbox',
                 'name' => '版块',
                 'default' => [],
-                'data' => array_merge($this->getShortCats(),[[
+                'data' => array_merge($this->getCats(10000),[[
                     'id' => 0,
                     'name' => '无'
                 ]])
