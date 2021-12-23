@@ -73,7 +73,7 @@ class VideoShortController extends Controller
     private function items($page, $uid, $startId,$cateId,$tagId)
     {
         // $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'hls_url', 'dash_url', 'type', 'cover_img', 'views', 'likes', 'comments', 'updated_at'];
-        $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'updated_at'];
+        $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
         $perPage = 8;
         $model = VideoShort::query();
         if ($cateId) {
