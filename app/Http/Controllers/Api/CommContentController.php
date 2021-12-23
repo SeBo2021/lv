@@ -46,6 +46,22 @@ class CommContentController extends Controller
             $thumbs = $params['thumbs'] ?? '[]';
             $video = $params['video'] ?? '[]';
             $categoryId = $params['category_id'] ?? '';
+            if ($thumbs) {
+                $thumbsRaw = json_encode($thumbs,true);
+                $thumbsData = [];
+                foreach ($thumbsRaw as $item) {
+                    $thumbsData[] = str_replace(env('RESOURCE_DOMAIN_DEV'),'',$item);
+                }
+                $thumbs = json_encode($thumbsData);
+            }
+            if ($videoPicture) {
+                $videoThumbsRaw = json_encode($videoPicture,true);
+                $videoThumbsData = [];
+                foreach ($videoThumbsRaw as $itemPic) {
+                    $videoThumbsData[] = str_replace(env('RESOURCE_DOMAIN_DEV'),'',$itemPic);
+                }
+                $videoPicture = json_encode($videoThumbsData);
+            }
             $insertData = [
                 'thumbs' => $thumbs,
                 'video' => $video,
