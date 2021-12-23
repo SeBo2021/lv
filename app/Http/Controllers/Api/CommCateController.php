@@ -59,7 +59,7 @@ class CommCateController extends Controller
      */
     private function checkFocusNew($uid): int
     {
-        $keyMe = "status_me_focus_{$uid}";;
+        $keyMe = "status_me_focus_{$uid}";
         $exist = $this->redis()->get($keyMe);
         if ($exist) {
             return 1;

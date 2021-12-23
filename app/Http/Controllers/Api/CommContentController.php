@@ -9,6 +9,7 @@ use App\Models\LoginLog;
 use App\TraitClass\ApiParamsTrait;
 use App\TraitClass\BbsTrait;
 use App\TraitClass\PHPRedisTrait;
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
@@ -16,16 +17,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 
 class CommContentController extends Controller
 {
     use PHPRedisTrait;
     use BbsTrait;
 
-    public function post(Request $request)
+    /**
+     * 文章发表
+     * @param Request $request
+     * @return array|JsonResponse
+     */
+    public function post(Request $request): JsonResponse|array
     {
-        if (isset($request->params)) {
+        DB::beginTransaction();
+        try {
             $params = ApiParamsTrait::parse($request->params);
             Validator::make($params, [
                 'content' => 'nullable',
@@ -52,38 +58,19 @@ class CommContentController extends Controller
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ];
-            DB::beginTransaction();
-            try {
-                $commentId = DB::table('community_bbs')->insertGetId($insertData);
-                DB::commit();
-                if ($commentId > 0) {
-                    return response()->json([
-                        'state' => 0,
-                        'msg' => '发帖成功'
-                    ]);
-                }
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('bbsPost===' . $e->getMessage());
-            }
+            DB::table('community_bbs')->insertGetId($insertData);
+            DB::commit();
+            return response()->json([
+                'state' => 0,
+                'msg' => '发帖成功'
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('bbsPost===' . $e->getMessage());
             return response()->json([
                 'state' => -1,
                 'msg' => $e->getMessage()
             ]);
-
-        }
-        return [];
-    }
-
-    private function updateStatue($uid, $mark)
-    {
-        $redis = $this->redis();
-        $keyCate = "status_cate_{$mark}";
-        $time = time();
-        $redis->set($keyCate, $time);
-
-        // 更新关注
-        if ($mark == 'focus') {
 
         }
     }
@@ -92,9 +79,8 @@ class CommContentController extends Controller
      * 文章列表
      * @param Request $request
      * @return array|JsonResponse
-     * @throws ValidationException
      */
-    public function lists(Request $request)
+    public function lists(Request $request): JsonResponse|array
     {
         try {
             $params = ApiParamsTrait::parse($request->params);
@@ -112,17 +98,17 @@ class CommContentController extends Controller
             // 得到一级分类help
             $help = $this->redis()->hGet('common_cate_help', "c_{$cid1}");
             $uid = $request->user()->id;
-            if (in_array($help, ['focus','hot'])) {
-                $res = $this->$help($uid, $locationName, 6,$page);
+            if (in_array($help, ['focus', 'hot'])) {
+                $res = $this->$help($uid, $locationName, 6, $page);
             } else {
-                $res = $this->other($request->user()->id, $locationName,$cid1, $cid2,6,$page);
+                $res = $this->other($request->user()->id, $locationName, $cid1, $cid2, 6, $page);
             }
             // $this->processArea($res['bbs_list']);
             return response()->json([
                 'state' => 0,
                 'data' => $res
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'state' => -1,
                 'msg' => $e->getMessage()
@@ -134,27 +120,28 @@ class CommContentController extends Controller
      * 处理地理数据
      * @param $data
      */
-    private function processArea(&$data) {
-        $ids = array_column($data,'uid');
-        $lastLogin =  LoginLog::query()
-            ->select('uid',DB::raw('max(id) as max_id'))->whereIn('uid',$ids)
+    private function processArea(&$data)
+    {
+        $ids = array_column($data, 'uid');
+        $lastLogin = LoginLog::query()
+            ->select('uid', DB::raw('max(id) as max_id'))->whereIn('uid', $ids)
             ->groupBy('uid')
             ->get()->toArray();
         if (!$lastLogin) {
             return;
         }
-        $lastLoginIds = array_column($lastLogin,'max_id');
-        $areaInfo = LoginLog::query()->whereIn('id',$lastLoginIds)
+        $lastLoginIds = array_column($lastLogin, 'max_id');
+        $areaInfo = LoginLog::query()->whereIn('id', $lastLoginIds)
             ->groupBy('uid')
             ->get()->toArray();
         if (!$areaInfo) {
             return;
         }
-        $areaInfoMap = array_column($areaInfo,null,'uid');
+        $areaInfoMap = array_column($areaInfo, null, 'uid');
         foreach ($data as $k => $v) {
-            $rawArea = $areaInfoMap[$v['uid']]??[];
-            $tmpArea = json_decode($rawArea['area']??'',true);
-            $data[$k]['location_name'] =$tmpArea[2]?:($tmpArea[1]?:($tmpArea[0]));
+            $rawArea = $areaInfoMap[$v['uid']] ?? [];
+            $tmpArea = json_decode($rawArea['area'] ?? '', true);
+            $data[$k]['location_name'] = $tmpArea[2] ?: ($tmpArea[1] ?: ($tmpArea[0]));
         }
     }
 
@@ -162,7 +149,6 @@ class CommContentController extends Controller
      * 详情
      * @param Request $request
      * @return array|JsonResponse
-     * @throws ValidationException
      */
     public function detail(Request $request): JsonResponse|array
     {
@@ -191,9 +177,9 @@ class CommContentController extends Controller
             $redis->del($keyMe);
             return response()->json([
                 'state' => 0,
-                'data' => $result[0]??[]
+                'data' => $result[0] ?? []
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'state' => -1,
                 'msg' => $e->getMessage()
@@ -204,16 +190,23 @@ class CommContentController extends Controller
     /**
      * 关注列表
      * @param $uid
+     * @param string $locationName
+     * @param int $perPage
+     * @param int $page
      * @return Builder[]|Collection
      */
-    private function focus($uid, $locationName = '',$perPage = 6, $page = 1)
+    private function focus($uid, $locationName = '', $perPage = 6, $page = 1)
     {
         $userList = CommFocus::where('user_id', $uid)->pluck('to_user_id');
-        $paginator = CommBbs::query()
+        $model = CommBbs::query()
             ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
-            ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel','video_picture')
-            ->whereIn('author_id', $userList)->orderBy('updated_at', 'desc')
-            ->simplePaginate($perPage, ['*'], '', $page);
+            ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel', 'video_picture')
+            ->whereIn('author_id', $userList)->orderBy('updated_at', 'desc');
+        if ($locationName) {
+            $locationName = mb_ereg_replace('市|自治区|县', '', $locationName);
+            $model->where('users.location_name', 'like', "%{$locationName}%");
+        }
+        $paginator = $model->simplePaginate($perPage, ['*'], '', $page);
         //加入视频列表
         $res['hasMorePages'] = $paginator->hasMorePages();
         $list = $paginator->items() ?? [];
@@ -225,15 +218,22 @@ class CommContentController extends Controller
     /**
      * 最热
      * @param $uid
+     * @param string $locationName
+     * @param int $perPage
+     * @param int $page
      * @return Builder[]|Collection
      */
-    private function hot($uid, $locationName = '',$perPage = 6, $page = 1)
+    private function hot($uid, $locationName = '', $perPage = 6, $page = 1)
     {
-        $paginator = CommBbs::query()
+        $model = CommBbs::query()
             ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
-            ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel','video_picture')
-            ->orderBy('views', 'desc')
-            ->simplePaginate($perPage, ['*'], '', $page);
+            ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel', 'video_picture')
+            ->orderBy('views', 'desc');
+        if ($locationName) {
+            $locationName = mb_ereg_replace('市|自治区|县', '', $locationName);
+            $model->where('users.location_name', 'like', "%{$locationName}%");
+        }
+        $paginator = $model->simplePaginate($perPage, ['*'], '', $page);
         //加入视频列表
         $res['hasMorePages'] = $paginator->hasMorePages();
         $list = $paginator->items() ?? [];
@@ -252,16 +252,16 @@ class CommContentController extends Controller
      * @param int $page
      * @return Collection|array
      */
-    private function other($uid, $locationName = '',$cid1 = 0, $cid2 = 0, $perPage = 6, $page = 1): Collection|array
+    private function other($uid, $locationName = '', $cid1 = 0, $cid2 = 0, $perPage = 6, $page = 1): Collection|array
     {
         if ($cid2) {
             $model = CommBbs::query()
                 ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
-                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel','video_picture')
+                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel', 'video_picture')
                 ->where('category_id', $cid2)->orderBy('updated_at', 'desc');
             if ($locationName) {
-                $locationName = mb_ereg_replace('市|自治区|县','',$locationName);
-                $model->where('users.location_name','like',"%{$locationName}%");
+                $locationName = mb_ereg_replace('市|自治区|县', '', $locationName);
+                $model->where('users.location_name', 'like', "%{$locationName}%");
             }
             $paginator = $model->simplePaginate($perPage, ['*'], '', $page);
             $data['hasMorePages'] = $paginator->hasMorePages();
@@ -272,14 +272,13 @@ class CommContentController extends Controller
         }
         if ($cid1) {
             $ids = $this->getChild($cid1, false);
-
             $model = CommBbs::query()
                 ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
-                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel','video_picture')
+                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel', 'video_picture')
                 ->whereIn('category_id', $ids)
                 ->orderBy('updated_at', 'desc');
             if ($locationName) {
-                $model->where('users.location_name','like',"%{$locationName}%");
+                $model->where('users.location_name', 'like', "%{$locationName}%");
             }
             $paginator = $model->simplePaginate($perPage, ['*'], '', $page);
             $data['hasMorePages'] = $paginator->hasMorePages();
@@ -293,7 +292,6 @@ class CommContentController extends Controller
 
         return [];
     }
-
 
 
     /**

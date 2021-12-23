@@ -2,27 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Jobs\ProcessPreviewVideo;
-use App\Jobs\ProcessSyncMiddleTable;
-use App\Jobs\ProcessSyncMiddleSectionTable;
-use App\Jobs\ProcessSyncMiddleTagTable;
-use App\Jobs\ProcessVideoSlice;
-use App\Jobs\VideoSlice;
-use App\Models\AdminVideo;
-use App\Models\Category;
-use App\Models\CommChat;
 use App\Models\CommCate;
-use App\Models\Tag;
-use App\Models\Video;
 use App\Services\UiService;
-use App\TraitClass\CatTrait;
-use App\TraitClass\GoldTrait;
 use App\TraitClass\PHPRedisTrait;
-use App\TraitClass\TagTrait;
-use App\TraitClass\VideoTrait;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class CommCateController extends BaseCurlController
 {
@@ -31,14 +13,14 @@ class CommCateController extends BaseCurlController
 
     use PHPRedisTrait;
 
-    public function setModel()
+    public function setModel(): CommCate
     {
         return $this->model = new CommCate();
     }
 
-    public function indexCols()
+    public function indexCols(): array
     {
-        $cols = [
+        return [
             [
                 'type' => 'checkbox'
             ],
@@ -101,12 +83,10 @@ class CommCateController extends BaseCurlController
                 'align' => 'center'
             ]
         ];
-
-        return $cols;
     }
 
     //表单验证
-    public function checkRule($id = '')
+    public function checkRule($id = ''): array
     {
         $data = [
             'name' => 'required|unique:community_cate,name',
@@ -118,7 +98,7 @@ class CommCateController extends BaseCurlController
         return $data;
     }
 
-    public function checkRuleFieldName($id = '')
+    public function checkRuleFieldName($id = ''): array
     {
         return [
             'name' => '版块名',
@@ -133,7 +113,7 @@ class CommCateController extends BaseCurlController
 
     private function processCache() {
         $data = [];
-        $raw = CommCate::orderBy('order', 'desc')
+        $raw = CommCate::query()->orderBy('order', 'desc')
             ->select('id','name','parent_id','mark','order','is_allow_post','can_select_city')->get()->toArray();
         foreach ($raw as $k1 => $v1) {
             $this->redis()->hSet('common_cate_help', "c_{$v1['id']}", $v1['mark']);
@@ -163,7 +143,11 @@ class CommCateController extends BaseCurlController
     }
 
 
-    public function setOutputUiCreateEditForm($show = '')
+    /**
+     * @param string $show
+     * @return mixed
+     */
+    public function setOutputUiCreateEditForm($show = ''): void
     {
         $data = [
             [
@@ -179,7 +163,7 @@ class CommCateController extends BaseCurlController
                 'type' => 'select',
                 'name' => '一级分类',
                 'default' => 0,
-                'data' => array_merge($this->uiService->allDataArr('请选择一级分类'), $this->uiService->treeData(CommCate::where('parent_id', 0)->get()->toArray(), 0))//树形select
+                'data' => array_merge($this->uiService->allDataArr('请选择一级分类'), $this->uiService->treeData(CommCate::query()->where('parent_id', 0)->get()->toArray(), 0))//树形select
 
             ],
             [
