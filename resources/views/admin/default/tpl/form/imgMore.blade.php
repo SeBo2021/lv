@@ -12,6 +12,7 @@
            @if(!empty($form_item['data']))
                 @foreach ($form_item['data'] as $k => $v)
                @php
+                  if (!is_array($v??[])) { $v = ['path'=>\App\Jobs\VideoSlice::getOrigin(1,$v??'',true),'view_src'=>\App\Jobs\VideoSlice::getOrigin(1,$v??'',true)];}
                   $v['type'] = $v['type'] ?? '';
                   $v['origin_path'] = $v['origin_path'] ?? '';
                @endphp

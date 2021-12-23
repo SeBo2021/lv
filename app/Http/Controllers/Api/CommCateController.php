@@ -24,7 +24,11 @@ class CommCateController extends Controller
         $raw = $this->redis()->get('common_cate');
         $data = json_decode($raw, true);
         foreach ($data as $k => $datum) {
-            $data[$k]['have_new'] = $this->checkHaveNew($request->user()->id,$datum['mark']);
+            if ($datum['mark'] == 'focus') {
+                $data[$k]['have_new'] = $this->checkFocusNew($request->user()->id);
+            } else {
+                $data[$k]['have_new'] = $this->checkHaveNew($request->user()->id, $datum['mark']);
+            }
         }
         return response()->json([
             'state' => 0,
@@ -38,13 +42,26 @@ class CommCateController extends Controller
      * @param $tag
      * @return int
      */
-    private function checkHaveNew($uid,$tag): int
+    private function checkHaveNew($uid, $tag): int
     {
         $keyMe = "status_me_{$tag}_$uid";
-        $keyCate = "status_cate_{$tag}";
-        $meTime = $this->redis()->get($keyMe)?:-1;
-        $cateTime = $this->redis()->get($keyCate)?:-2;
-        if ($meTime < $cateTime) {
+        $exist = $this->redis()->get($keyMe);
+        if ($exist) {
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
+     * 检查是否有最新文章
+     * @param $uid
+     * @return int
+     */
+    private function checkFocusNew($uid): int
+    {
+        $keyMe = "status_me_focus_{$uid}";;
+        $exist = $this->redis()->get($keyMe);
+        if ($exist) {
             return 1;
         }
         return 0;

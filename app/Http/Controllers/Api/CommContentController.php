@@ -166,7 +166,7 @@ class CommContentController extends Controller
      */
     public function detail(Request $request): JsonResponse|array
     {
-        if (isset($request->params)) {
+        try {
             $params = ApiParamsTrait::parse($request->params);
             Validator::make($params, [
                 'id' => 'integer',
@@ -180,12 +180,25 @@ class CommContentController extends Controller
             // 增加点击数
             CommBbs::query()->where('community_bbs.id', $id)->increment('views');
             $result = $this->proProcessData($uid, $list);
+            // 处理新文章通知
+            $redis = $this->redis();
+            $mask = $redis->get("c_{$list[0]['category_id']}");
+            if ($mask == 'focus') {
+                $keyMe = "status_me_focus_{$list[0]['user_id']}";
+            } else {
+                $keyMe = "status_me_{$mask}_$uid";
+            }
+            $redis->del($keyMe);
             return response()->json([
                 'state' => 0,
                 'data' => $result[0]??[]
             ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'state' => -1,
+                'msg' => $e->getMessage()
+            ]);
         }
-        return [];
     }
 
     /**

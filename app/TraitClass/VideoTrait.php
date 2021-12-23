@@ -255,11 +255,14 @@ trait VideoTrait
         return $sync==1 ? env('RESOURCE_DOMAIN') : env('SLICE_DOMAIN');
     }
 
-    public static function getOrigin($sync,$pathName = '')
+    public static function getOrigin($sync,$pathName = '',$simple = false)
     {
         $url =  $sync==1 ? env('RESOURCE_DOMAIN_DEV') : env('SLICE_DOMAIN');
         if (!$pathName) {
             return '';
+        }
+        if ($simple) {
+            return "{$url}/{$pathName}";
         }
         return "{$url}/aetherupload/display/{$pathName}";
     }

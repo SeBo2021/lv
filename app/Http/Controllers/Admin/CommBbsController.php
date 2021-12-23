@@ -132,6 +132,9 @@ class CommBbsController extends BaseCurlController
     //4.编辑和添加页面表单数据
     public function setOutputUiCreateEditForm($show = '')
     {
+        if ($show->video != '[]') {
+            $show->url = json_decode($show->video)[0];
+        }
         $data = [
             [
                 'field' => 'author_id',
@@ -158,13 +161,16 @@ class CommBbsController extends BaseCurlController
                 'default' => '',
                 'name' => '相册',
                 'must' => 0,
-                'verify' => '',
+                'verify' => ''
             ],
             [
                 'field' => 'video',
-                'type' => 'simpleVideo',
+                'type' => 'movie',
                 'name' => '视频',
                 'sync' =>  0,
+                'url' => $show ? $show->url : '',
+                // 'value' => $show ? \App\Jobs\VideoSlice::getOrigin($show->sync,$show->url) :''
+                'value' => $show ? $show->url :''
             ],
             [
                 'field' => 'content',
@@ -222,6 +228,24 @@ class CommBbsController extends BaseCurlController
         $thumbs = $this->rq->input('thumbs','');
         if(!$thumbs){
             $model->thumbs = '[]';
+        } else {
+            $fixPic = [];
+            $raw = json_decode($thumbs,true);
+            foreach ($raw as $item) {
+                $fixPic[] = $item['path'];
+            }
+            var_dump(json_encode($fixPic));
+            $model->thumbs = json_encode($fixPic);
+        }
+
+        $video = $this->rq->input('video','');
+        if(!$video){
+            $model->video = '[]';
+        }
+
+        $videoPicture = $this->rq->input('video_picture','');
+        if(!$videoPicture){
+            $model->video_picture = '[]';
         }
     }
 }
