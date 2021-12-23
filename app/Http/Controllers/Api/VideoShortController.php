@@ -226,7 +226,11 @@ class VideoShortController extends Controller
             ]);
         } catch (Exception $exception) {
             $msg = $exception->getMessage();
-            Log::error("actionLike", [$msg]);
+            Log::error("actionCollect", [$msg]);
+            return response()->json([
+                'state' => -1,
+                'msg' => '操作失败'
+            ]);
         }
     }
 
