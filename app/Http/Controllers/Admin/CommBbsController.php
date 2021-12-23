@@ -241,7 +241,8 @@ class CommBbsController extends BaseCurlController
         if(!$video){
             $model->video = '[]';
         } else {
-            $model->video = json_encode($video);
+            $videoData = [$video];
+            $model->video = json_encode($videoData);
         }
 
         $videoPicture = $this->rq->input('video_picture','');
