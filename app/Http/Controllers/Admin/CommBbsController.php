@@ -240,6 +240,9 @@ class CommBbsController extends BaseCurlController
         $video = $this->rq->input('video','');
         if(!$video){
             $model->video = '[]';
+        } else {
+            $videoData = [$video];
+            $model->video = json_encode($videoData);
         }
 
         $videoPicture = $this->rq->input('video_picture','');
