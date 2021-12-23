@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\ProcessViewVideo;
 use App\Models\Category;
 use App\Models\Domain;
+use App\Models\Tag;
 use App\Models\Video;
 use App\Models\VideoShort;
 use App\Models\ViewRecord;
@@ -72,7 +73,6 @@ class VideoShortController extends Controller
      */
     private function items($page, $uid, $startId,$cateId,$tagId)
     {
-        // $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'hls_url', 'dash_url', 'type', 'cover_img', 'views', 'likes', 'comments', 'updated_at'];
         $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
         $perPage = 8;
         $model = VideoShort::query();
@@ -81,8 +81,9 @@ class VideoShortController extends Controller
             $model->where('cat','like',"%{$cateWord}%");
         }
         if ($tagId) {
-            $tagWord = sprintf('"%s"',$tagId);
-            $model->where('cat','like',"%{$tagWord}%");
+            $tagInfo = Tag::query()->where(['mask'=>$this->cateMapAlias[$tagId]])->firstOrFail()?->toArray();
+            $tagWord = sprintf('"%s"',$tagInfo['id']);
+            $model->where('tag','like',"%{$tagWord}%");
         }
         if ($startId) {
             $model->where('id','>',$startId);
