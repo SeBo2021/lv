@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Api;
 
 
 use App\Http\Controllers\Controller;
-use App\Jobs\ProcessViewVideo;
 use App\Models\Category;
-use App\Models\Domain;
 use App\Models\Tag;
 use App\Models\Video;
 use App\Models\VideoShort;
@@ -71,7 +69,7 @@ class VideoShortController extends Controller
      * @param $tagId
      * @return array
      */
-    private function items($page, $uid, $startId,$cateId,$tagId)
+    private function items($page, $uid, $startId,$cateId,$tagId): array
     {
         $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
         $perPage = 8;
@@ -108,7 +106,11 @@ class VideoShortController extends Controller
         ];
     }
 
-    //播放
+    /**
+     * 播放
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function lists(Request $request)
     {
         // 业务逻辑
@@ -146,8 +148,12 @@ class VideoShortController extends Controller
         }
     }
 
-    //点赞
-    public function like(Request $request)
+    /**
+     * 点赞
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function like(Request $request): JsonResponse
     {
         try {
             $user = $request->user();
@@ -184,11 +190,15 @@ class VideoShortController extends Controller
         }
     }
 
-    // 收藏
-    public function collect(Request $request)
+    /**
+     * 收藏
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function collect(Request $request): JsonResponse
     {
         try {
-            $user = $request->user();
+            $userInfo = $request->user();
             $params = ApiParamsTrait::parse($request->params);
             $rules = [
                 'id' => 'required|integer',
@@ -196,19 +206,19 @@ class VideoShortController extends Controller
             ];
             Validator::make($params, $rules)->validate();
             $id = $params['id'];
-            $is_love = $params['collect'];
+            $isCollect = $params['collect'];
             $redis = $this->redis();
 
-
-            if ($is_love) {
-                $redis->set("short_is_collect_{$user->id}_{$id}", 1);
+            if ($isCollect) {
+                $redis->set("short_is_collect_{$userInfo->id}_{$id}", 1);
                 Video::query()->where('id', $id)->increment('favors');
             } else {
-                $redis->del("short_is_collect_{$user->id}_{$id}");
+                $redis->del("short_is_collect_{$userInfo->id}_{$id}");
                 Video::query()->where('id', $id)->decrement('favors');
             }
-            $attributes = ['uid' => $user->id, 'vid' => $id];
-            $values = ['is_love' => $is_love];
+
+            $attributes = ['uid' => $userInfo->id, 'vid' => $id];
+            $values = ['is_love' => $isCollect];
             ViewRecord::query()->updateOrInsert($attributes, $values);
             return response()->json([
                 'state' => 0,
@@ -218,37 +228,6 @@ class VideoShortController extends Controller
             $msg = $exception->getMessage();
             Log::error("actionLike", [$msg]);
         }
-    }
-
-    /**
-     * 小视频处理
-     * @param $lists
-     * @param false $display_url
-     * @param int $uid
-     * @return mixed
-     */
-    public function handleShortVideoItems($lists, $display_url = false, $uid = 0): mixed
-    {
-        array_map(function ($item) use ($display_url,$uid){
-            //$item = (array)$item;
-            $domainSync = VideoTrait::getDomain($item['sync']);
-            $item['cover_img'] = $domainSync . $item['cover_img'];
-            $item['gold'] = $item['gold'] / $this->goldUnit;
-            $item['views'] = $item['views'] > 0 ? $this->generateRandViews($item['views']) : $this->generateRandViews(rand(5, 9));
-            $item['hls_url'] = $domainSync . $item['hls_url'];
-            $item['preview_hls_url'] = $this->getPreviewPlayUrl($item['hls_url']);
-            $item['dash_url'] = $domainSync . $item['dash_url'];
-            $item['preview_dash_url'] = $this->getPreviewPlayUrl($item['dash_url'], 'dash');
-            if (!$display_url) {
-                unset($item['hls_url'], $item['dash_url']);
-            }
-            //是否点赞
-            $viewRecord = $this->isShortLoveOrCollect($uid, $item['id']);
-            $item['is_love'] = $viewRecord['is_love'] ?? 0;
-            //是否收藏
-            $item['is_collect'] = $viewRecord['is_collect'] ?? 0;
-        },$lists);
-        return $lists;
     }
 
     /**
