@@ -117,10 +117,10 @@ class CommentShortController extends Controller
             $vid = $params['vid'];
             $page = $params['page'] ?? 1;
             $perPage = 16;
-            $fields = ['comments.id', 'vid', 'uid', 'reply_cid', 'replied_uid', 'content', 'replies', 'reply_at', 'users.avatar', 'users.nickname'];
+            $fields = ['comments_short.id', 'vid', 'uid', 'reply_cid', 'replied_uid', 'content', 'replies', 'reply_at', 'users.avatar', 'users.nickname'];
             $queryBuild = DB::table('comments_short')
-                ->join('users', 'comments.uid', '=', 'users.id')
-                ->where('comments.vid', $vid);
+                ->join('users', 'comments_short.uid', '=', 'users.id')
+                ->where('comments_short.vid', $vid);
             $queryBuild = $queryBuild->where('reply_cid', $reply_cid);
             $paginator = $queryBuild->orderBy('id')->simplePaginate($perPage, $fields, 'commentLists', $page);
             $items = $paginator->items();
@@ -148,7 +148,7 @@ class CommentShortController extends Controller
             Log::error('CommentShortLists===' . $e->getMessage());
             return response()->json([
                 'state' => -1,
-                'msg' => '回复失败'
+                'msg' => $e->getMessage()
             ]);
         }
     }
