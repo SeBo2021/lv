@@ -113,7 +113,7 @@ class CommBbsController extends BaseCurlController
             [
                 'field' => 'id',
                 'type' => 'text',
-                'name' => '文章ID',
+                'name' => '文章编号',
             ],
             [
                 'field' => 'query_category_id',
@@ -132,7 +132,7 @@ class CommBbsController extends BaseCurlController
     //4.编辑和添加页面表单数据
     public function setOutputUiCreateEditForm($show = '')
     {
-        if ($show && $show->video != '[]') {
+        if ((!$show) && ($show->video??false) && $show->video != '[]') {
             $show->url = json_decode($show->video)[0];
         }
         $data = [
