@@ -46,13 +46,11 @@ class CommContentController extends Controller
             $thumbs = $params['thumbs'] ?? '[]';
             $video = $params['video'] ?? '[]';
             $categoryId = $params['category_id'] ?? '';
-            $locationName = $params['location_name'] ?? '';
             $insertData = [
                 'thumbs' => $thumbs,
                 'video' => $video,
                 'video_picture' => $videoPicture,
                 'category_id' => $categoryId,
-                'location_name' => $locationName,
                 'author_id' => $request->user()->id,
                 'content' => $content,
                 'created_at' => date('Y-m-d H:i:s'),
