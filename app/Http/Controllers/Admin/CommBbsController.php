@@ -132,7 +132,7 @@ class CommBbsController extends BaseCurlController
     //4.编辑和添加页面表单数据
     public function setOutputUiCreateEditForm($show = '')
     {
-        if ($show->video != '[]') {
+        if ($show && $show->video != '[]') {
             $show->url = json_decode($show->video)[0];
         }
         $data = [
@@ -234,7 +234,6 @@ class CommBbsController extends BaseCurlController
             foreach ($raw as $item) {
                 $fixPic[] = $item['path'];
             }
-            var_dump(json_encode($fixPic));
             $model->thumbs = json_encode($fixPic);
         }
 

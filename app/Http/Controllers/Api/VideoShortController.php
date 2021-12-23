@@ -218,7 +218,7 @@ class VideoShortController extends Controller
             }
 
             $attributes = ['uid' => $userInfo->id, 'vid' => $id];
-            $values = ['is_love' => $isCollect];
+            $values = ['is_collect' => $isCollect,'usage'=>2];
             ViewRecord::query()->updateOrInsert($attributes, $values);
             return response()->json([
                 'state' => 0,
