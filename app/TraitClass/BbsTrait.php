@@ -34,7 +34,12 @@ trait BbsTrait
                 $locationRaw = json_decode($re['location_name'],true);
                 $list[$k]['location_name'] = $locationRaw[1]??$locationRaw[0]??'';
             }
-            $list[$k]['thumbs']  = json_decode($re['thumbs'],true);
+            $thumbsRaw = json_decode($re['thumbs'],true);
+            $thumbs = [];
+            foreach ($thumbsRaw as $item) {
+                $thumbs[] = env('RESOURCE_DOMAIN_DEV') .$item;
+            }
+            $list[$k]['thumbs']  = $thumbs;
             $list[$k]['video']  = json_decode($re['video'],true);
         }
         return $list;
