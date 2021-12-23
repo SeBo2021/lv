@@ -30,6 +30,10 @@ trait BbsTrait
             } else {
                 $list[$k]['is_love'] = 0;
             }
+            if (!$re['location_name']) {
+                $locationRaw = json_decode($re['location_name'],true);
+                $list[$k]['location_name'] = $locationRaw[1]??$locationRaw[0]??'';
+            }
             $list[$k]['thumbs']  = json_decode($re['thumbs'],true);
             $list[$k]['video']  = json_decode($re['video'],true);
         }
