@@ -11,12 +11,16 @@
 // +----------------------------------------------------------------------
 
 namespace App\Http\Controllers\Admin;
+use App\Jobs\ProcessSimpleMovie;
+use App\Jobs\ProcessVideoSlice;
 use App\Models\Bbs;
 use App\Models\Category;
 use App\Models\CommBbs;
 use App\Models\CommCate;
 use App\Models\User;
 use App\Services\UiService;
+use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Support\Facades\Log;
 
 class CommBbsController extends BaseCurlController
 {
@@ -249,5 +253,21 @@ class CommBbsController extends BaseCurlController
         if(!$videoPicture){
             $model->video_picture = '[]';
         }
+    }
+
+    protected function afterSaveSuccessEvent($model, $id = '')
+    {
+       // if( isset($_REQUEST['callback_upload']) && ($_REQUEST['callback_upload']==1)){
+            /*try {*/
+                //$job = new VideoSlice($model);
+                $job = new ProcessSimpleMovie($model);
+                // $this->dispatch($job);
+                app(Dispatcher::class)->dispatchNow($job);
+            /*}catch (\Exception $e){
+                Log::error($e->getMessage());
+            }*/
+      //  }
+        //ProcessSyncMiddleTable::dispatchAfterResponse('video');
+        return $model;
     }
 }

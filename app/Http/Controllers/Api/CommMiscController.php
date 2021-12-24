@@ -39,15 +39,15 @@ class CommMiscController extends Controller
     public function res(Request $request): JsonResponse
     {
         try {
-            $r = $this->upFile($request);
+            $r = $this->upFile($request,'sftp');
             $isSingle = $r['path'] ?? false;
 
             if ($isSingle) {
-                $data = env('RESOURCE_DOMAIN_DEV') . $r['path'];
+                $data = env('RESOURCE_DOMAIN') . $r['path'];
             } else {
                 $data = [];
                 foreach ($r as $item) {
-                    $data[] = env('RESOURCE_DOMAIN_DEV') . $item['path'];
+                    $data[] = env('RESOURCE_DOMAIN') . $item['path'];
                 }
             }
             return response()->json([

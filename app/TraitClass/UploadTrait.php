@@ -6,13 +6,16 @@ use App\ExtendClass\UploadFile;
 
 trait UploadTrait
 {
-    public function upFile($request)
+    public function upFile($request,$oss_type = '')
     {
         $files = $request->input('files', 'file');
         $file_type = $request->input('file_type', 'image');
         $group_id = $request->input('group_id', '0');
         $method = $request->input('method', 'upload');
-        $oss_type = $request->input('oss_type', config('filesystems.default'));
+        if (!$oss_type) {
+            $oss_type = $request->input('oss_type', config('filesystems.default'));
+        }
+
 
         $preCheck = $_FILES[$files];
         if (is_array($preCheck['name'] ?? '')) {
