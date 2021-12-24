@@ -84,7 +84,7 @@ class VideoShortController extends Controller
             $model->where('tag','like',"%{$tagWord}%");
         }
         if ($startId) {
-            $model->where('id','>',$startId);
+            $model->where('id','>=',$startId);
         }
 
         $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
