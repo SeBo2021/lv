@@ -352,7 +352,7 @@ trait VideoTrait
     {
         foreach ($lists as &$list){
             $list = (array)$list;
-            if ($list['usage'] == 2) {
+            if (($list['usage']??1) == 2) {
                 /// 重置信息
                 $list['id'] = $list['vs_id'] ;
                 $list['name'] = $list['vs_name'] ;
@@ -397,7 +397,9 @@ trait VideoTrait
                     unset($list['dash_url']);
                 }
             }
-            unset($list['vs_id'], $list['vs_name'], $list['vs_gold'], $list['vs_cat'], $list['vs_sync'], $list['vs_title'], $list['vs_duration'], $list['vs_type'], $list['vs_restricted'], $list['vs_cover_img'], $list['vs_views'], $list['vs_updated_at'], $list['vs_hls_url'], $list['vs_dash_url'], $list['vs_url']);
+            if ($list['usage']??false) {
+                unset($list['vs_id'], $list['vs_name'], $list['vs_gold'], $list['vs_cat'], $list['vs_sync'], $list['vs_title'], $list['vs_duration'], $list['vs_type'], $list['vs_restricted'], $list['vs_cover_img'], $list['vs_views'], $list['vs_updated_at'], $list['vs_hls_url'], $list['vs_dash_url'], $list['vs_url']);
+            }
             //是否点赞
             $viewRecord = $this->isLoveOrCollect($uid,$list['id']);
             $list['is_love'] = $viewRecord['is_love'] ?? 0;
