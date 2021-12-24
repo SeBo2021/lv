@@ -50,7 +50,7 @@ class CommContentController extends Controller
                 $thumbsRaw = json_decode($thumbs,true);
                 $thumbsData = [];
                 foreach ($thumbsRaw as $item) {
-                    $thumbsData[] = str_replace(env('RESOURCE_DOMAIN_DEV'),'',$item);
+                    $thumbsData[] = str_replace(env('RESOURCE_DOMAIN'),'',$item);
                 }
                 $thumbs = json_encode($thumbsData);
             }
@@ -58,7 +58,7 @@ class CommContentController extends Controller
                 $videoThumbsRaw = json_decode($videoPicture,true);
                 $videoThumbsData = [];
                 foreach ($videoThumbsRaw as $itemPic) {
-                    $videoThumbsData[] = str_replace(env('RESOURCE_DOMAIN_DEV'),'',$itemPic);
+                    $videoThumbsData[] = str_replace(env('RESOURCE_DOMAIN'),'',$itemPic);
                 }
                 $videoPicture = json_encode($videoThumbsData);
             }
