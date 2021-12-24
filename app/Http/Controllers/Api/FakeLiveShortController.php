@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Api;
 
 
 use App\Http\Controllers\Controller;
-use App\Jobs\ProcessViewVideo;
 use App\Models\Category;
-use App\Models\Domain;
+use App\Models\Live;
+use App\Models\Tag;
 use App\Models\Video;
 use App\Models\VideoShort;
 use App\Models\ViewRecord;
@@ -26,40 +26,54 @@ class FakeLiveShortController extends Controller
     use VideoTrait;
     use PHPRedisTrait;
 
-    /**
-     * 视频分类
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function cate(Request $request): JsonResponse
-    {
-        $raw = Category::where('usage', '2')
-            ->select('id', 'name')
-            ->get();
-        $data = json_decode($raw, true);
-        return response()->json([
-            'state' => 0,
-            'data' => $data
-        ]);
-    }
+    private array $mainCateAlias = [
+        'short_hot',
+        'limit_free',
+        'short_rec'
+    ];
 
-    private function items($page,$uid,$id) {
-        $videoField = ['id', 'name', 'cid', 'cat', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'hls_url', 'dash_url', 'type', 'cover_img', 'views', 'likes', 'comments', 'updated_at'];
+    private array $cateMapAlias = [
+        '-1' => 'sub_cat_1',
+        '-2' => 'sub_cat_2',
+        '-3' => 'sub_cat_3',
+        '-4' => 'sub_cat_4',
+        '-5' => 'sub_cat_5',
+        '-6' => 'sub_cat_6',
+        '-7' => 'sub_cat_7',
+        '-8' => 'sub_cat_8',
+    ];
+
+
+
+    /**
+     * 读取数据
+     * @param $page
+     * @param $uid
+     * @param $startId
+     * @param $cateId
+     * @param $tagId
+     * @return array
+     */
+    private function items($page, $uid, $startId,$cateId,$tagId): array
+    {
+        $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'duration_seconds', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at','intro','age'];
         $perPage = 8;
-        $paginator = VideoShort::query()
-            ->simplePaginate($perPage, $videoField, 'shortLists', $page);
+        $model = Live::query();
+        $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         $items = $paginator->items();
         $data = [];
         foreach ($items as $one) {
-            $one = $this->handleShortVideoItems([$one], true)[0];
+            //  $one = $this->handleShortVideoItems([$one], true)[0];
             $one['limit'] = 0;
-            // 任何类型都有 是否点赞 is_collect 并增加观看记录
-            // ProcessViewVideo::dispatchAfterResponse($user, $one);
-            //是否点赞
-            $viewRecord = $this->isShortLoveOrCollect($uid, $id);
+            $viewRecord = $this->isShortLoveOrCollect($uid, $one['id']);
             $one['is_love'] = $viewRecord['is_love'] ?? 0;
             //是否收藏
             $one['is_collect'] = $viewRecord['is_collect'] ?? 0;
+            $one['url'] = env('RESOURCE_DOMAIN_DEV') . '/' . $one['url'];
+            $one['cover_img'] = env('RESOURCE_DOMAIN_DEV') . '/' . $one['cover_img'];
+            $one['cover_img'] = env('RESOURCE_DOMAIN_DEV') . '/' . $one['cover_img'];
+            $dSeconds = intval($one['duration_seconds'] ?: 1);
+            $one['start_second'] = $dSeconds - ($dSeconds - (time() % $dSeconds));
             $data[] = $one;
         }
         return [
@@ -68,7 +82,11 @@ class FakeLiveShortController extends Controller
         ];
     }
 
-    //播放
+    /**
+     * 播放
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function lists(Request $request)
     {
         // 业务逻辑
@@ -79,6 +97,7 @@ class FakeLiveShortController extends Controller
                 'start_id' => 'nullable',
                 'keyword' => 'nullable',
                 'cate_id' => 'nullable',
+                'tag_id' => 'nullable',
                 'sort' => 'nullable',
                 'use_gold' => [
                     'nullable',
@@ -87,8 +106,10 @@ class FakeLiveShortController extends Controller
                 ],
             ])->validated();
             $page = $params['page'] ?? 1;
-            $id = $validated['id'] ?? '0';
-            $res = $this->items($page,$uid,$id);
+            $cateId = $params['cate_id'] ?? "";
+            $tagId = $params['tag_id'] ?? "";
+            $starId = $validated['start_id'] ?? '0';
+            $res = $this->items($page, $uid, $starId,$cateId,$tagId);
             return response()->json([
                 'state' => 0,
                 'data' => $res
@@ -103,112 +124,6 @@ class FakeLiveShortController extends Controller
         }
     }
 
-    //点赞
-    public function like(Request $request)
-    {
-        try {
-            $user = $request->user();
-            $params = ApiParamsTrait::parse($request->params);
-            $rules = [
-                'id' => 'required|integer',
-                'like' => 'required|integer',
-            ];
-            Validator::make($params, $rules)->validate();
-            $id = $params['id'];
-            $is_love = $params['like'];
-            $redis = $this->redis();
-            if ($is_love) {
-                $one['is_love'] = $redis->set("short_is_love_{$user->id}_{$id}", 1);
-                VideoShort::query()->where('id', $id)->increment('likes');
-            } else {
-                $one['is_love'] = $redis->del("short_is_love_{$user->id}_{$id}", 0);
-                VideoShort::query()->where('id', $id)->decrement('likes');
-            }
-            $attributes = ['uid' => $user->id, 'vid' => $id];
-            $values = ['is_love' => $is_love];
-            ViewRecord::query()->updateOrInsert($attributes, $values);
-            return response()->json([
-                'state' => 0,
-                'msg' => '操作成功'
-            ]);
-        } catch (Exception $exception) {
-            $msg = $exception->getMessage();
-            Log::error("actionLike", [$msg]);
-            return response()->json([
-                'state' => -1,
-                'msg' => '操作失败'
-            ]);
-        }
-    }
-
-    // 收藏
-    public function collect(Request $request)
-    {
-        try {
-            $user = $request->user();
-            $params = ApiParamsTrait::parse($request->params);
-            $rules = [
-                'id' => 'required|integer',
-                'collect' => 'required|integer',
-            ];
-            Validator::make($params, $rules)->validate();
-            $id = $params['id'];
-            $is_love = $params['collect'];
-            $redis = $this->redis();
-
-
-            if ($is_love) {
-                $redis->set("short_is_collect_{$user->id}_{$id}", 1);
-                Video::query()->where('id', $id)->increment('favors');
-            } else {
-                $redis->del("short_is_collect_{$user->id}_{$id}");
-                Video::query()->where('id', $id)->decrement('favors');
-            }
-            $attributes = ['uid' => $user->id, 'vid' => $id];
-            $values = ['is_love' => $is_love];
-            ViewRecord::query()->updateOrInsert($attributes, $values);
-            return response()->json([
-                'state' => 0,
-                'msg' => '操作成功'
-            ]);
-        } catch (Exception $exception) {
-            $msg = $exception->getMessage();
-            Log::error("actionLike", [$msg]);
-        }
-    }
-
-    /**
-     * 小视频处理
-     * @param $lists
-     * @param false $display_url
-     * @param int $uid
-     * @return mixed
-     */
-    public function handleShortVideoItems($lists, $display_url = false, $uid = 0)
-    {
-
-        foreach ($lists as &$item) {
-            //$item = (array)$item;
-            $domainSync = VideoTrait::getDomain($item['sync']);
-            $item['cover_img'] = $domainSync . $item['cover_img'];
-            $item['gold'] = $item['gold'] / $this->goldUnit;
-            $item['views'] = $item['views'] > 0 ? $this->generateRandViews($item['views']) : $this->generateRandViews(rand(5, 9));
-            $item['hls_url'] = $domainSync . $item['hls_url'];
-            $item['preview_hls_url'] = $this->getPreviewPlayUrl($item['hls_url']);
-            $item['dash_url'] = $domainSync . $item['dash_url'];
-            $item['preview_dash_url'] = $this->getPreviewPlayUrl($item['dash_url'], 'dash');
-            if (!$display_url) {
-                unset($item['hls_url'], $item['dash_url']);
-            }
-            //是否点赞
-            $viewRecord = $this->isShortLoveOrCollect($uid, $item['id']);
-            $item['is_love'] = $viewRecord['is_love'] ?? 0;
-            //是否收藏
-            $item['is_collect'] = $viewRecord['is_collect'] ?? 0;
-        }
-        return $lists;
-    }
-
     /**
      * 判断是否收藏或喜欢
      * @param int $uid
@@ -217,49 +132,10 @@ class FakeLiveShortController extends Controller
      */
     public function isShortLoveOrCollect($uid = 0, $vid = 0): array
     {
-        $one = [
-            'is_love' => 0,
-            'is_collect' => 0,
-        ];
-        if (!$uid) {
-            return $one;
-        }
-        /*$viewRecord = ViewRecord::query()->where('uid', $uid)->where('vid', $vid)->first(['id', 'is_love', 'is_collect']);
-        //是否点赞
-        $one['is_love'] = $viewRecord['is_love'] ?? 0;
-        //是否收藏
-        $one['is_collect'] = $viewRecord['is_collect'] ?? 0;*/
         $redis = $this->redis();
-
-        $one['is_love'] = $redis->get("short_is_love_{$uid}_{$vid}") ?: 0;
+        $one['is_love'] = $redis->get("live_is_love_{$uid}_{$vid}") ?: 0;
         //是否收藏
-        $one['is_collect'] = $redis->get("short_is_collect_{$uid}_{$vid}") ?: 0;
-
-        return $one;
-    }
-
-    /**
-     * 金豆判断
-     * @param $one
-     * @param $user
-     * @return mixed
-     */
-    public function vipOrGold($one, $user): mixed
-    {
-        switch ($one['restricted']) {
-            case 1:
-                if ((!$user->member_card_type) && (time() - $user->vip_expired > $user->vip_start_last)) {
-                    $one['limit'] = 1;
-                }
-                break;
-            case 2:
-                $redisHashKey = $this->apiRedisKey['user_gold_video'] . $user->id;
-                $buy = $this->redis()->sIsMember($redisHashKey, $one['id']);
-                if (!$buy) {
-                    $one['limit'] = 2;
-                }
-
-        }
+        $one['is_collect'] = $redis->get("live_is_collect_{$uid}_{$vid}") ?: 0;
         return $one;
     }
 
