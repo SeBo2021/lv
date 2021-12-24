@@ -211,10 +211,10 @@ class VideoShortController extends Controller
 
             if ($isCollect) {
                 $redis->set("short_is_collect_{$userInfo->id}_{$id}", 1);
-                Video::query()->where('id', $id)->increment('favors');
+                VideoShort::query()->where('id', $id)->increment('favors');
             } else {
                 $redis->del("short_is_collect_{$userInfo->id}_{$id}");
-                Video::query()->where('id', $id)->decrement('favors');
+                VideoShort::query()->where('id', $id)->decrement('favors');
             }
 
             $attributes = ['uid' => $userInfo->id, 'vid' => $id];
@@ -226,6 +226,7 @@ class VideoShortController extends Controller
             ]);
         } catch (Exception $exception) {
             $msg = $exception->getMessage();
+            file_put_contents("1.txt",$msg,FILE_APPEND);
             Log::error("actionCollect", [$msg]);
             return response()->json([
                 'state' => -1,

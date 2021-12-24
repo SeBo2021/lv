@@ -25,7 +25,7 @@ class LiveController extends BaseCurlController
 {
     use VideoTrait,CatTrait,TagTrait,GoldTrait,PHPRedisTrait;
 
-    public $pageName = '视频管理';
+    public $pageName = '直播列表';
 
 
     public function setModel()
