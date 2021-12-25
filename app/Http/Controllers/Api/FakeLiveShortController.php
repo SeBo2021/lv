@@ -37,7 +37,7 @@ class FakeLiveShortController extends Controller
      */
     private function items($page, $uid, $startId,$cateId,$tagId): array
     {
-        $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'duration_seconds', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at','intro','age'];
+        $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'duration_seconds', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at','intro','age', 'hls_url', 'dash_url'];
         $perPage = 8;
         $model = Live::query();
         $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
@@ -50,11 +50,22 @@ class FakeLiveShortController extends Controller
             $one['is_love'] = $viewRecord['is_love'] ?? 0;
             //是否收藏
             $one['is_collect'] = $viewRecord['is_collect'] ?? 0;
-            $one['url'] = env('RESOURCE_DOMAIN_DEV') . '/' . $one['url'];
-            $one['cover_img'] = env('RESOURCE_DOMAIN_DEV') . '/' . $one['cover_img'];
-            $one['cover_img'] = env('RESOURCE_DOMAIN_DEV') . '/' . $one['cover_img'];
+            $one['url'] = env('RESOURCE_DOMAIN') . '/' . $one['url'];
+            $one['cover_img'] = env('RESOURCE_DOMAIN') . '/' . $one['cover_img'];
             $dSeconds = intval($one['duration_seconds'] ?: 1);
             $one['start_second'] = $dSeconds - ($dSeconds - (time() % $dSeconds));
+
+
+            $domainSync = VideoTrait::getDomain($one['sync']);
+            $one['cover_img'] = $domainSync . $one['cover_img'];
+            $one['gold'] = $one['gold'] / $this->goldUnit;
+            $one['views'] = $one['views'] > 0 ? $this->generateRandViews($one['views']) : $this->generateRandViews(rand(5, 9));
+            $one['hls_url'] = $domainSync . $one['hls_url'];
+            $one['preview_hls_url'] = $this->getPreviewPlayUrl($one['hls_url']);
+            $one['dash_url'] = $domainSync . $one['dash_url'];
+            $one['preview_dash_url'] = $this->getPreviewPlayUrl($one['dash_url'], 'dash');
+
+
             $data[] = $one;
         }
         return [

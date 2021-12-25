@@ -54,6 +54,14 @@ class CommContentController extends Controller
                 }
                 $thumbs = json_encode($thumbsData);
             }
+            if ($video) {
+                $videoRaw = json_decode($video,true);
+                $videoData = [];
+                foreach ($videoRaw as $itemVideo) {
+                    $videoData[] = str_replace(env('RESOURCE_DOMAIN'),'',$itemVideo);
+                }
+                $video = json_encode($videoData);
+            }
             if ($videoPicture) {
                 $videoThumbsRaw = json_decode($videoPicture,true);
                 $videoThumbsData = [];

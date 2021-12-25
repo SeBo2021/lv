@@ -23,7 +23,7 @@ trait BbsTrait
             if (!$re['video_picture']) {
                 $list[$k]['video_picture'] = [];
             } else {
-                $list[$k]['video_picture']  = json_decode($re['video_picture'],true);
+                $list[$k]['video_picture']  = [env('RESOURCE_DOMAIN') . (json_decode($re['video_picture'],true)[0]??'')];
             }
             if ($this->redis()->get("comm_like_{$uid}_{$re['id']}") == 1) {
                 $list[$k]['is_love'] = 1;
@@ -36,11 +36,17 @@ trait BbsTrait
             }
             $thumbsRaw = json_decode($re['thumbs'],true);
             $thumbs = [];
-            foreach ($thumbsRaw as $item) {
-                $thumbs[] = env('RESOURCE_DOMAIN_DEV') .$item;
+            foreach ($thumbsRaw as $itemP) {
+                $thumbs[] = env('RESOURCE_DOMAIN') .$itemP;
             }
             $list[$k]['thumbs']  = $thumbs;
-            $list[$k]['video']  = json_decode($re['video'],true);
+
+            $videoRaw  = json_decode($re['video'],true);
+            $video = [];
+            foreach ($videoRaw as $itemV) {
+                $video[] = env('RESOURCE_DOMAIN') .$itemV;
+            }
+            $list[$k]['video']  = $video;
         }
         return $list;
     }

@@ -4,33 +4,23 @@ namespace App\Jobs;
 
 use AetherUpload\Util;
 use App\TraitClass\VideoTrait;
+use Exception;
 use FFMpeg\Coordinate\TimeCode;
-use FFMpeg\FFMpeg;
+use FFMpeg\Format\Video\X264;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 
 class ProcessSimpleMovie implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, VideoTrait;
 
-    /**
-     * 任务尝试次数
-     *
-     * @var int
-     */
-    //public $tries = 3;
-
     public int $timeout = 180000; //默认60秒超时
-    //跳跃式延迟执行
-//    public $backoff = [60,180];
-    //public $backoff = [18000,36000];
 
 
     public string $mp4Path;
@@ -39,75 +29,144 @@ class ProcessSimpleMovie implements ShouldQueue
 
     public string $coverImage;
 
-    public string $originVideo;
+    public array $thumbsImage;
+
+    public string $uniImgPath;
+
+    public string $uniVideoPath;
 
     /**
      * Create a new job instance.
      *
-     * @return void
+     * @param $row
      */
     public function __construct($row)
     {
-        // 初始化数据
         $this->row = $row;
+        $date = date('Ymd');
+        $this->uniImgPath = sprintf("/upload/images/%s/", $date);
+        $this->uniVideoPath = sprintf("/upload/video/%s/", $date);
+        // 初始化数据
         $this->originName = $this->getOriginNameByJson();
         $this->mp4Path = $this->getLocalMp4ByJson();
+        $this->thumbsImage = $this->getThumbsByJson();
     }
 
-    private function getOriginNameByJson()
+    /**
+     * 得到原始文件名
+     * @return mixed
+     */
+    private function getOriginNameByJson(): mixed
     {
-        $raw = json_decode($this->row->video);
+        $raw = json_decode($this->row->video, true);
         return $raw[0] ?? '';
     }
 
-    private function getLocalMp4ByJson()
+    /**
+     * 得到封面json
+     * @return mixed
+     */
+    private function getThumbsByJson(): mixed
     {
-        $raw = json_decode($this->row->video);
-        $resource = Util::getResource($raw[0] ?? '');
-        return $resource->path;
+        return json_decode($this->row->thumbs, true);
+    }
+
+    /**
+     * 取出json格式中mp4格式
+     * @return string
+     */
+    private function getLocalMp4ByJson(): string
+    {
+        $raw = json_decode($this->row->video, true);
+        if ($raw[0] ?? false) {
+            $resource = Util::getResource($raw[0]);
+            return $resource->path;
+        }
+        return '';
     }
 
     /**
      * Execute the job.
      *
      * @return void
-     * @throws FileNotFoundException
+     * @throws Exception
      */
     public function handle()
     {
+        // 上传图片
+        if ($this->thumbsImage) {
+            $this->syncThumbs();
+        }
         // 截图第一帧
-        $this->capture();
-        // 上传截图
-        $this->syncUpload($this->coverImage);
-        // 上传视频
-        $this->syncMp4($this->mp4Path);
-    }
-
-    public function syncMp4($file)
-    {
-        $content = Storage::get($file);;
-        return Storage::disk('sftp')->put($file, $content);
+        if ($this->mp4Path) {
+            $cover = $this->capture();
+            $this->syncCover($cover);
+            // 上传视频
+            $this->syncMp4($this->originName);
+        }
     }
 
     /**
-     * @throws \Exception
+     * 同步相册封面
+     * @param $img
      */
-    public function capture()
+    public function syncCover($img)
     {
-        $path = pathinfo($this->mp4Path, PATHINFO_FILENAME);
+        $coverName = $this->uniVideoPath . $img;
+        $content = Storage::get($this->coverImage);
+        $result = Storage::disk('sftp')->put($coverName, $content);
+        if ($result) {
+            DB::table('community_bbs')->where('id', $this->row->id)->update([
+                'video_picture' => json_encode([$coverName])
+            ]);
+        }
+    }
+
+    /**
+     * 上传相册
+     */
+    public function syncThumbs()
+    {
+        foreach ($this->thumbsImage as $pic) {
+            $file = '/' . public_path() . $pic;
+            $exist = Storage::disk('sftp')->exists($pic);
+            if ($exist) {
+                continue;
+            }
+            $content = file_get_contents($file);
+            Storage::disk('sftp')->put($pic, $content);
+        }
+    }
+
+    /**
+     * 上传mp4原样样式
+     * @param $file
+     * @return bool
+     */
+    public function syncMp4($file): bool
+    {
+        $videoName = $this->uniVideoPath . $file;
+        $content = Storage::get($this->mp4Path);
+        DB::table('community_bbs')->where('id', $this->row->id)->update([
+            'video' => json_encode([$videoName])
+        ]);
+        return Storage::disk('sftp')->put($videoName, $content);
+    }
+
+    /**
+     * 截取视频封面
+     * @return string
+     * @throws Exception
+     */
+    public function capture(): string
+    {
         $file_name = $this->mp4Path;
         $subDir = env('SLICE_DIR', '/slice');
-        $sliceDir = 'public' . $subDir;
-        $tmp_path = $sliceDir . '/capture/' . $path . '/';
-        $dirname = storage_path('app/') . $tmp_path;
-        if (!is_dir($dirname)) {
-            mkdir($dirname, 0755, true);
-        }
-        $format = new \FFMpeg\Format\Video\X264();
+        $format = new X264();
         $format->setAdditionalParameters(['-vcodec', 'copy', '-acodec', 'copy']); //跳过编码
         //$format = $format->setAdditionalParameters(['-hwaccels', 'cuda']);//GPU高效转码
         $file_name_name = $file_name;
-        $model = \ProtoneMedia\LaravelFFMpeg\Support\FFMpeg::fromDisk("local") //在storage/app的位置
+        $model = FFMpeg::fromDisk("local") //在storage/app的位置
         ->open($file_name_name);
         $video = $model->export()
             ->toDisk("local")
@@ -115,9 +174,10 @@ class ProcessSimpleMovie implements ShouldQueue
         //done 生成截图
         $frame = $video->frame(TimeCode::fromSeconds(1));
         $pathInfo = pathinfo($this->originName, PATHINFO_FILENAME);
-        $secondDirAndName = '/capture/' . $pathInfo . '.jpg';
-        $cover_path = $sliceDir . $secondDirAndName;
-        $this->coverImage = $subDir . $secondDirAndName;
+        $secondDirAndName = '/' . $pathInfo . '.jpg';
+        $cover_path = $secondDirAndName;
+        $this->coverImage = $pathInfo . '.jpg';
         $frame->save($cover_path);
+        return $subDir . $secondDirAndName;
     }
 }
