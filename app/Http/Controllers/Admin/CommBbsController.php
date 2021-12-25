@@ -62,12 +62,6 @@ class CommBbsController extends BaseCurlController
                 'title' => '内容缩略',
                 'align' => 'left'
             ],
-            /*[
-                'field' => 'thumbs',
-                'minWidth' => 120,
-                'title' => '附加图集',
-                'align' => 'left'
-            ],*/
             [
                 'field' => 'likes',
                 'minWidth' => 80,
@@ -160,6 +154,13 @@ class CommBbsController extends BaseCurlController
                 'data' => array_merge($this->uiService->allDataArr('请选择版块'), $this->uiService->treeData(CommCate::get()->toArray(), 0))//树形select
             ],
             [
+                'field' => 'content',
+                'type' => 'textarea',
+                'name' => '内容',
+                'verify' => 'rq',
+                'must' => 1
+            ],
+            [
                 'field' => 'thumbs',
                 'type' => 'imgMore',
                 'default' => '',
@@ -175,13 +176,6 @@ class CommBbsController extends BaseCurlController
                 'url' => $show ? $show->url : '',
                 // 'value' => $show ? \App\Jobs\VideoSlice::getOrigin($show->sync,$show->url) :''
                 'value' => $show ? $show->url :''
-            ],
-            [
-                'field' => 'content',
-                'type' => 'textarea',
-                'name' => '内容',
-                'verify' => 'rq',
-                'must' => 1
             ],
         ];
         //赋值到ui数组里面必须是`form`的key值
@@ -236,13 +230,13 @@ class CommBbsController extends BaseCurlController
             $fixPic = [];
             $raw = json_decode($thumbs,true);
             foreach ($raw as $item) {
-                $fixPic[] = $item['path'];
+                $fixPic[] = $item['path']??$item;
             }
             $model->thumbs = json_encode($fixPic);
         }
 
-        $video = $this->rq->input('video','');
-        if(!$video){
+        $video = $this->rq->input('video','[]');
+        if(empty($video) || ($video == '[]')){
             $model->video = '[]';
         } else {
             $videoData = [$video];
