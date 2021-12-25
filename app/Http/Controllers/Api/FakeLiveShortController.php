@@ -26,25 +26,6 @@ class FakeLiveShortController extends Controller
     use VideoTrait;
     use PHPRedisTrait;
 
-    private array $mainCateAlias = [
-        'short_hot',
-        'limit_free',
-        'short_rec'
-    ];
-
-    private array $cateMapAlias = [
-        '-1' => 'sub_cat_1',
-        '-2' => 'sub_cat_2',
-        '-3' => 'sub_cat_3',
-        '-4' => 'sub_cat_4',
-        '-5' => 'sub_cat_5',
-        '-6' => 'sub_cat_6',
-        '-7' => 'sub_cat_7',
-        '-8' => 'sub_cat_8',
-    ];
-
-
-
     /**
      * 读取数据
      * @param $page
@@ -117,6 +98,52 @@ class FakeLiveShortController extends Controller
         } catch (Exception $exception) {
             $msg = $exception->getMessage();
             Log::error("shortLists", [$msg]);
+            return response()->json([
+                'state' => -1,
+                'data' => $msg
+            ]);
+        }
+    }
+
+    /**
+     * 直播时长统计接口
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function calc(Request $request): JsonResponse
+    {
+        try {
+            $uid = $request->user()->id;
+            $params = ApiParamsTrait::parse($request->params);
+            Validator::make($params, [
+                'duration_seconds' => 'nullable',
+                'time' => 'nullable',
+            ])->validated();
+            $durationSeconds = $params['duration_seconds'] ?? 0;
+            $time = $params['time'] ?? 0;
+            $redisLiveCalcKey = sprintf("live_calc_%s",$uid);
+            $redis = $this->redis();
+            $usedTime = $redis->get($redisLiveCalcKey)?:0;
+            $nowTime = $usedTime + $time;
+            $mint3 = 3 * 60;
+            $remainSecond = $mint3 - $nowTime;
+            if ($remainSecond < 0) {
+                $remainSecond = 0;
+            }
+            $redis->set($redisLiveCalcKey,$nowTime);
+
+            $startSecond = $durationSeconds - ($durationSeconds - (time() % $durationSeconds));
+
+            return response()->json([
+                'state' => 0,
+                'data' => [
+                    'start_second' => $startSecond,
+                    'remain_second' => $remainSecond
+                ]
+            ]);
+        } catch (Exception $exception) {
+            $msg = $exception->getMessage();
+            Log::error("liveCalc", [$msg]);
             return response()->json([
                 'state' => -1,
                 'data' => $msg
