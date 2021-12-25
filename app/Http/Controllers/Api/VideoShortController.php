@@ -97,8 +97,8 @@ class VideoShortController extends Controller
             $one['is_love'] = $viewRecord['is_love'] ?? 0;
             //是否收藏
             $one['is_collect'] = $viewRecord['is_collect'] ?? 0;
-            $one['url'] = env('RESOURCE_DOMAIN_DEV') . '/' .$one['url'];
-            $one['cover_img'] = env('RESOURCE_DOMAIN_DEV') . $one['cover_img'];
+            $one['url'] = env('RESOURCE_DOMAIN')  .$one['url'];
+            $one['cover_img'] = env('RESOURCE_DOMAIN') . $one['cover_img'];
             $data[] = $one;
         }
         return [

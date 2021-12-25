@@ -1,15 +1,10 @@
 <?php
 namespace App\Http\Controllers\Admin;
 
-use App\Jobs\ProcessPreviewVideo;
-use App\Jobs\ProcessSyncMiddleTable;
+use App\Jobs\ProcessShort;
 use App\Jobs\ProcessSyncMiddleSectionTable;
 use App\Jobs\ProcessSyncMiddleTagTable;
-use App\Jobs\ProcessVideoSlice;
-use App\Jobs\VideoSlice;
-use App\Models\AdminVideo;
 use App\Models\Category;
-use App\Models\Tag;
 use App\Models\Video;
 use App\Models\VideoShort;
 use App\Services\UiService;
@@ -18,9 +13,8 @@ use App\TraitClass\GoldTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\TagTrait;
 use App\TraitClass\VideoTrait;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class ShortController extends BaseCurlController
 {
@@ -188,19 +182,13 @@ class ShortController extends BaseCurlController
                 'data' => $tag
             ],
             [
-                'field' => 'cover_img',
-                'type' => 'img',
-                'name' => '封面图片',
-//                'value' => $show ? : ''
-//                'verify' => 'img'
-            ],
-            [
                 'field' => 'url',
                 'type' => 'movie',
                 'name' => '视频',
-                'sync' => $show ? $show->sync : 0,
+                'sync' =>  $show ? $show->sync : 0,
                 'url' => $show ? $show->url : '',
-                'value' => $show ? \App\Jobs\VideoSlice::getOrigin($show->sync,$show->url) :''
+                // 'value' => $show ? \App\Jobs\VideoSlice::getOrigin($show->sync,$show->url) :''
+                'value' => $show ? $show->url :''
             ],
             [
                 'field' => 'status',
@@ -249,11 +237,6 @@ class ShortController extends BaseCurlController
         ];
     }
 
-    /*public function setModelRelaction($model)
-    {
-        return $model->with('category');
-    }*/
-
     public function setListOutputItemExtend($item)
     {
         $item->category_name = $this->getCatName($item->cat,10000);
@@ -269,6 +252,17 @@ class ShortController extends BaseCurlController
 
     protected function afterSaveSuccessEvent($model, $id = '')
     {
+        $isVideo = ($_REQUEST['callback_upload']??0);
+        /*try {*/
+        //$job = new VideoSlice($model);
+        $job = new ProcessShort($model,$isVideo);
+        // $this->dispatch($job);
+        app(Dispatcher::class)->dispatchNow($job);
+        /*}catch (\Exception $e){
+            Log::error($e->getMessage());
+        }*/
+        //  }
+        //ProcessSyncMiddleTable::dispatchAfterResponse('video');
         return $model;
     }
 
@@ -281,13 +275,7 @@ class ShortController extends BaseCurlController
         $model->author = admin('nickname');
         $model->gold = $this->rq->input('gold',0);
         $model->gold *= $this->goldUnit;
-        if(isset($model->url)){
-            $model->dash_url = self::get_slice_url($model->url);
-            $model->hls_url = self::get_slice_url($model->url,'hls');
-            if(isset($model->cover_img) && !$model->cover_img){
-                $model->cover_img = self::get_slice_url($model->url,'cover');
-            }
-        }
+
         //自动打标签
         if(isset($model->tagNames) && (empty($tags))){
             $tagLists = $this->getTagData();
@@ -423,50 +411,6 @@ class ShortController extends BaseCurlController
                     'data-value' => 0,
                 ]
             ];
-            $data[] = [
-                'class' => 'layui-btn-danger',
-                'name' => '同步版块中间表',
-                'id' => 'btn-syncMiddleCatTable',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "cid_vid",
-                    'data-value' => 0,
-                ]
-            ];
-            $data[] = [
-                'class' => 'layui-btn-danger',
-                'name' => '同步标签中间表',
-                'id' => 'btn-syncMiddleTagTable',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "tid_vid",
-                    'data-value' => 0,
-                ]
-            ];
-            $data[] = [
-                'class' => 'layui-btn-danger',
-                'name' => '同步封面',
-                'id' => 'btn-syncCoverImg',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "cover_img",
-                    'data-value' => 0,
-                ]
-            ];
-            $data[] = [
-                'class' => 'layui-btn-danger',
-                'name' => '批量预览',
-                'id' => 'btn-preview',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "preview",
-                    'data-value' => 0,
-                ]
-            ];
         }
         if ($this->isCanEdit()) {
             $data[] = [
@@ -491,17 +435,6 @@ class ShortController extends BaseCurlController
                     'data-value' => 0,
                 ]
             ];
-            $data[] = [
-                'class' => 'layui-btn-dark',
-                'name' => '智能打标签',
-                'id' => 'btn-autoTag',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "tag_match",
-                    'data-value' => 0,
-                ]
-            ];
 
             $data[] = [
                 'class' => 'layui-btn-dark',
@@ -523,39 +456,6 @@ class ShortController extends BaseCurlController
                     'data-input-type' => "checkbox",
                     'data-title' => "确定批量操作吗",
                     'data-field' => "tag",
-                ]
-            ];
-            $data[] = [
-                'class' => 'layui-btn-danger',
-                'name' => 'VIP限制',
-                'id' => 'btn-vipRestricted',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "restricted",
-                    'data-value' => 1,
-                ]
-            ];
-            $data[] = [
-                'class' => 'layui-btn-danger',
-                'name' => '骚豆限制',
-                'id' => 'btn-goldRestricted',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "restricted",
-                    'data-value' => 2,
-                ]
-            ];
-            $data[] = [
-                'class' => 'layui-btn-danger',
-                'name' => '设置免费',
-                'id' => 'btn-setFree',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "restricted",
-                    'data-value' => 0,
                 ]
             ];
         }
@@ -592,26 +492,11 @@ class ShortController extends BaseCurlController
             return $type_r;
         } else {
             switch ($field){
-                case 'tid_vid':
-                    ProcessSyncMiddleTagTable::dispatchAfterResponse();
-                    $r=true;
-                    break;
-                case 'cid_vid':
-                    ProcessSyncMiddleSectionTable::dispatchAfterResponse();
-                    $r=true;
-                    break;
                 case 'cover_img':
                     $covers = Video::query()->whereIn($id, $id_arr)->get(['id','cover_img']);
                     foreach ($covers as $cover){
                         $this->syncUpload($cover->cover_img);
                     }
-                    $r=true;
-                    break;
-                case 'preview':
-                    $previews = Video::query()->whereIn($id, $id_arr)->get(['id','url','sync','dash_url','hls_url']);
-                    //ProcessPreviewVideo::dispatchAfterResponse($previews);
-                    $job = new ProcessPreviewVideo($previews);
-                    $this->dispatch($job);
                     $r=true;
                     break;
                 case 'cat':
@@ -629,27 +514,6 @@ class ShortController extends BaseCurlController
                     //更新标签中间表
                     ProcessSyncMiddleTagTable::dispatchAfterResponse();
                     $r=true;
-                    break;
-                case 'tag_match':
-                    $videos = Video::query()->whereIn($id, $id_arr)->get(['id','tag','name'])->toArray();
-                    $tags = $this->getTagData();
-                    foreach ($videos as $video){
-                        $tagIds = [];
-                        $tagArr = @json_decode($video['tag'],true);
-                        if(empty($tagArr) || !$tagArr){
-                            foreach ($tags as $tag) {
-                                $pos = strpos($video['name'], $tag['name']);
-                                if($pos){
-                                    $tagIds[] = $tag['id'];
-                                }
-                            }
-                        }
-                        if(!empty($tagIds)){
-                            $tagStore = json_encode($tagIds);
-                            Video::query()->where('id',$video['id'])->update(['tag'=>$tagStore]);
-                        }
-                    }
-                    $r = true;
                     break;
                 case 'duration_seconds':
                     $videos = Video::query()->whereIn($id, $id_arr)->get(['id','duration','duration_seconds'])->toArray();
