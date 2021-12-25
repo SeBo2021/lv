@@ -11,7 +11,7 @@
 // +----------------------------------------------------------------------
 
 namespace App\Http\Controllers\Admin;
-use App\Jobs\ProcessSimpleMovie;
+use App\Jobs\ProcessBbs;
 use App\Jobs\ProcessVideoSlice;
 use App\Models\Bbs;
 use App\Models\Category;
@@ -130,7 +130,7 @@ class CommBbsController extends BaseCurlController
     //4.编辑和添加页面表单数据
     public function setOutputUiCreateEditForm($show = '')
     {
-        if ((!$show) && ($show->video??false) && $show->video != '[]') {
+        if ($show && ($show->video??false) && $show->video != '[]') {
             $show->url = json_decode($show->video)[0];
         }
         $data = [
@@ -172,7 +172,7 @@ class CommBbsController extends BaseCurlController
                 'field' => 'video',
                 'type' => 'movie',
                 'name' => '视频',
-                'sync' =>  0,
+                'sync' =>  $show ? $show->sync : '',
                 'url' => $show ? $show->url : '',
                 // 'value' => $show ? \App\Jobs\VideoSlice::getOrigin($show->sync,$show->url) :''
                 'value' => $show ? $show->url :''
@@ -251,10 +251,10 @@ class CommBbsController extends BaseCurlController
 
     protected function afterSaveSuccessEvent($model, $id = '')
     {
-       // if( isset($_REQUEST['callback_upload']) && ($_REQUEST['callback_upload']==1)){
+        $isVideo = ($_REQUEST['callback_upload']??0);
             /*try {*/
                 //$job = new VideoSlice($model);
-                $job = new ProcessSimpleMovie($model);
+                $job = new ProcessBbs($model,1,$isVideo);
                 // $this->dispatch($job);
                 app(Dispatcher::class)->dispatchNow($job);
             /*}catch (\Exception $e){

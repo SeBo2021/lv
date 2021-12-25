@@ -32,11 +32,11 @@
 
 @if(!empty($form_item['value']))
     <script>
-        var real_use_url = "{{ \App\Jobs\VideoSlice::getOrigin($form_item['sync'],$form_item['url'])}}";
+        var real_use_url = "{{ \App\Jobs\VideoSlice::getDomain($form_item['sync']) .$form_item['url'] }}";
         console.log(real_use_url);
         // $("#videoIframe").attr('src',real_use_url);
         //=====================以上打印出同步资源地址======================
-        var url = "{{ \App\Jobs\VideoSlice::getOrigin($form_item['sync'],$form_item['url'])}}";
+        var url = "{{ \App\Jobs\VideoSlice::getDomain($form_item['sync']). $form_item['url'] }}";
         var playerElement = $('#dashjs');
         playerElement.show();
         var player = dashjs.MediaPlayer().create();
@@ -51,7 +51,6 @@
         let previewUrl = '{{ env('APP_URL') }}/aetherupload/display/'+this.savedPath; //预览
         $('#dashjs').attr('src',previewUrl);
         // $('#dashjs')[0].play();
-        // Example
         $('#result').append(
             '<p>执行回调 - 文件已上传，原名：<span >' + this.resourceName + '</span> | 大小：<span >' + parseFloat(this.resourceSize / (1024 * 1024)).toFixed(2) + 'MB（按1kb=1024b换算得出）' + '</span> | 储存名：<span >' + this.savedPath.substr(this.savedPath.lastIndexOf('_') + 1) + '</span></p>'
         );
