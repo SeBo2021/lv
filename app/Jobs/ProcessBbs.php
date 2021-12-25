@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 
-class ProcessSimpleMovie implements ShouldQueue
+class ProcessBbs implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, VideoTrait;
 
@@ -35,17 +35,24 @@ class ProcessSimpleMovie implements ShouldQueue
 
     public string $uniVideoPath;
 
+    public int $isThumbs;
+    public int $isVideo;
+
     /**
      * Create a new job instance.
      *
      * @param $row
+     * @param int $isThumbs 是否处理相册
+     * @param int $isVideo 是否处理视频
      */
-    public function __construct($row)
+    public function __construct($row,$isThumbs = 0,$isVideo = 0)
     {
         $this->row = $row;
         $date = date('Ymd');
         $this->uniImgPath = sprintf("/upload/images/%s/", $date);
         $this->uniVideoPath = sprintf("/upload/video/%s/", $date);
+        $this->isThumbs = $isThumbs;
+        $this->isVideo = $isVideo;
         // 初始化数据
         $this->originName = $this->getOriginNameByJson();
         $this->mp4Path = $this->getLocalMp4ByJson();
@@ -94,11 +101,11 @@ class ProcessSimpleMovie implements ShouldQueue
     public function handle()
     {
         // 上传图片
-        if ($this->thumbsImage) {
+        if (($this->isThumbs) && ($this->thumbsImage)) {
             $this->syncThumbs();
         }
         // 截图第一帧
-        if ($this->mp4Path) {
+        if (($this->isVideo) && ($this->mp4Path)) {
             $cover = $this->capture();
             $this->syncCover($cover);
             // 上传视频
@@ -134,7 +141,10 @@ class ProcessSimpleMovie implements ShouldQueue
                 continue;
             }
             $content = file_get_contents($file);
-            Storage::disk('sftp')->put($pic, $content);
+            $upload = Storage::disk('sftp')->put($pic, $content);
+            if ($upload) {
+                Storage::delete($this->mp4Path);
+            }
         }
     }
 
@@ -148,9 +158,19 @@ class ProcessSimpleMovie implements ShouldQueue
         $videoName = $this->uniVideoPath . $file;
         $content = Storage::get($this->mp4Path);
         DB::table('community_bbs')->where('id', $this->row->id)->update([
+            'sync' => 1,
             'video' => json_encode([$videoName])
         ]);
-        return Storage::disk('sftp')->put($videoName, $content);
+        $exist = Storage::disk('sftp')->exists($videoName);
+        if ($exist) {
+            // 文件已经上传过
+            return true;
+        }
+        $upload = Storage::disk('sftp')->put($videoName, $content);
+        if ($upload) {
+            Storage::delete($this->mp4Path);
+        }
+        return $upload;
     }
 
     /**
