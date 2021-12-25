@@ -114,4 +114,5 @@ Route::group([
 
     /// 伪直播模块
     Route::get('liveList', 'FakeLiveShortController@lists');  //播放列表
+    Route::post('liveCalc', 'FakeLiveShortController@calc');  //直播统计
 });
