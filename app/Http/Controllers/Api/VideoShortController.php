@@ -94,9 +94,9 @@ class VideoShortController extends Controller
             //  $one = $this->handleShortVideoItems([$one], true)[0];
             $one['limit'] = 0;
             $viewRecord = $this->isShortLoveOrCollect($uid, $one['id']);
-            $one['is_love'] = $viewRecord['is_love'] ?? 0;
+            $one['is_love'] = intval($viewRecord['is_love']) ?? 0;
             //是否收藏
-            $one['is_collect'] = $viewRecord['is_collect'] ?? 0;
+            $one['is_collect'] = intval($viewRecord['is_collect']) ?? 0;
             $one['url'] = env('RESOURCE_DOMAIN')  .$one['url'];
             $one['cover_img'] = env('RESOURCE_DOMAIN') . $one['cover_img'];
             $data[] = $one;

@@ -262,8 +262,6 @@ trait QueryWhereTrait
                 'value' => $value //搜索值
             ]
         ];
-        var_dump("kkkkkkkkkkkkkk{$value}");
-        file_put_contents("11.txt","kkkkkkkkkkkk",FILE_APPEND);
         $this->addWhere($data);
     }
 }
