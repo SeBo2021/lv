@@ -51,7 +51,7 @@ class FakeLiveShortController extends Controller
             //是否收藏
             $one['is_collect'] = $viewRecord['is_collect'] ?? 0;
             $one['url'] = env('RESOURCE_DOMAIN') . '/' . $one['url'];
-            $one['cover_img'] = env('RESOURCE_DOMAIN') . '/' . $one['cover_img'];
+            // $one['cover_img'] = env('RESOURCE_DOMAIN') . '/' . $one['cover_img'];
             $dSeconds = intval($one['duration_seconds'] ?: 1);
             $one['start_second'] = $dSeconds - ($dSeconds - (time() % $dSeconds));
 

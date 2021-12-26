@@ -1,15 +1,9 @@
 <?php
 namespace App\Http\Controllers\Admin;
 
-use App\Jobs\ProcessPreviewVideo;
-use App\Jobs\ProcessSyncMiddleTable;
-use App\Jobs\ProcessSyncMiddleSectionTable;
-use App\Jobs\ProcessSyncMiddleTagTable;
-use App\Jobs\ProcessVideoSlice;
-use App\Jobs\VideoSlice;
-use App\Models\AdminVideo;
+use App\Jobs\ProcessLive;
 use App\Models\Category;
-use App\Models\Tag;
+use App\Models\Live;
 use App\Models\Video;
 use App\Services\UiService;
 use App\TraitClass\CatTrait;
@@ -17,9 +11,8 @@ use App\TraitClass\GoldTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\TagTrait;
 use App\TraitClass\VideoTrait;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class LiveController extends BaseCurlController
 {
@@ -30,7 +23,7 @@ class LiveController extends BaseCurlController
 
     public function setModel()
     {
-        return $this->model = new AdminVideo();
+        return $this->model = new Live();
     }
 
     public function indexCols()
@@ -46,48 +39,30 @@ class LiveController extends BaseCurlController
                 'sort' => 1,
                 'align' => 'center'
             ],
-            /*[
-                'field' => 'category_name',
-                'width' => 150,
-                'title' => '分类',
-                'align' => 'center',
-                'edit' => 1
-            ],*/
-            [
-                'field' => 'category_name',
-                'width' => 150,
-                'title' => '版块',
-                'align' => 'center',
-            ],
-            [
-                'field' => 'tag_name',
-                'minWidth' => 100,
-                'title' => '标签',
-                'align' => 'center',
-            ],
             [
                 'field' => 'name',
                 'minWidth' => 150,
-                'title' => '片名',
-                'align' => 'center',
-            ],
-            [
-                'field' => 'restricted',
-                'minWidth' => 100,
-                'title' => '观看限制',
-                'align' => 'center',
-            ],
-            [
-                'field' => 'gold',
-                'minWidth' => 100,
-                'title' => '所需骚豆',
-                'edit' => 1,
+                'title' => '直播名',
                 'align' => 'center',
             ],
             [
                 'field' => 'author',
                 'minWidth' => 80,
-                'title' => '作者',
+                'title' => '主播名',
+                'align' => 'center',
+                'hide' => true
+            ],
+            [
+                'field' => 'age',
+                'minWidth' => 80,
+                'title' => '年龄',
+                'align' => 'center',
+                'hide' => true
+            ],
+            [
+                'field' => 'intro',
+                'minWidth' => 80,
+                'title' => '简介',
                 'align' => 'center',
                 'hide' => true
             ],
@@ -147,38 +122,11 @@ class LiveController extends BaseCurlController
                 'hide' => true
             ],
             [
-                'field' => 'cat',
-                'minWidth' => 100,
-                'title' => '版块类别(JSON)',
-                'align' => 'center',
-                'hide' => true
-            ],
-            [
-                'field' => 'tag',
-                'minWidth' => 100,
-                'title' => '标签(JSON)',
-                'align' => 'center',
-                'hide' => true
-            ],
-            [
-                'field' => 'tagNames',
-                'minWidth' => 100,
-                'title' => '自动标签内容',
-                'align' => 'center',
-                'hide' => true
-            ],
-            [
                 'field' => 'status',
                 'minWidth' => 80,
                 'title' => '是否上架',
                 'align' => 'center',
             ],
-            /*[
-                'field' => 'is_recommend',
-                'minWidth' => 80,
-                'title' => '是否推荐',
-                'align' => 'center',
-            ],*/
             [
                 'field' => 'created_at',
                 'sort' => 1,
@@ -205,69 +153,34 @@ class LiveController extends BaseCurlController
         return $cols;
     }
 
-    /*public function getCateGoryData()
-    {
-        return array_merge($this->uiService->allDataArr('请选择分类'), $this->uiService->treeData(Category::checked()->get()->toArray(), 0));//树形select
-    }*/
-    public function getCatNavData()
-    {
-        $res = Category::query()
-            ->where('is_checked',1)
-            ->where('parent_id',2)
-            ->orderBy('sort')
-            ->get(['id','name']);
-        $data = $this->uiService->allDataArr('请选择分类');
-        foreach ($res as $item) {
-            $data[$item->id] = [
-                'id' => $item->id,
-                'name' => $item->name,
-            ];
-        }
-        return $data;
-    }
-
     public function setOutputUiCreateEditForm($show = '')
     {
-        $tag = $this->getTagData();
-        $cats = $this->getCats();
+
         $data = [
-            /*[
-                'field' => 'cid',
-                'type' => 'select',
-                'name' => '分类',
-                'must' => 1,
-                'verify' => 'rq',
-                'default' => 0,
-                'data' => $this->getCateGoryData()
-            ],*/
-            [
-                'field' => 'cats',
-                'type' => 'checkbox',
-                'name' => '版块',
-                'verify' => '',
-                'value' => ($show && ($show->cat)) ? json_decode($show->cat,true) : [],
-                'data' => $cats
-            ],
             [
                 'field' => 'name',
                 'type' => 'text',
-                'name' => '片名',
+                'name' => '直播名',
                 'must' => 1,
                 'verify' => 'rq',
             ],
             [
-                'field' => 'tagNames',
+                'field' => 'author',
                 'type' => 'text',
                 'tips' => '输入包含标签词的内容即可,格式不限,如:#内射#口交#人妻...',
-                'name' => '自动标签内容'
+                'name' => '主播名'
             ],
             [
-                'field' => 'tags',
-                'type' => 'checkbox',
-                'name' => '标签',
-                'verify' => '',
-                'value' => ($show && ($show->tag)) ? json_decode($show->tag,true) : [],
-                'data' => $tag
+                'field' => 'age',
+                'type' => 'text',
+                'tips' => '输入包含标签词的内容即可,格式不限,如:#内射#口交#人妻...',
+                'name' => '年龄'
+            ],
+            [
+                'field' => 'intro',
+                'type' => 'textarea',
+                'name' => '简介',
+                'must' => 1
             ],
             [
                 'field' => 'cover_img',
@@ -279,32 +192,9 @@ class LiveController extends BaseCurlController
             [
                 'field' => 'url',
                 'type' => 'video',
-                'name' => '视频',
+                'name' => '视频内容',
                 'sync' => $show ? $show->sync : 0,
 //                'value' => $show ? \App\Jobs\VideoSlice::get_slice_url($show->url,'dash',$show->sync) :''
-            ],
-            /*[
-                'field' => 'title',
-                'type' => 'text',
-                'name' => '标题',
-                'must' => 0,
-                'default' => '',
-            ],*/
-            [
-                'field' => 'restricted',
-                'type' => 'radio',
-                'name' => '观看限制',
-                'must' => 0,
-                'default' => 1,
-                'verify' => 'rq',
-                'data' => $this->restrictedType
-            ],
-            [
-                'field' => 'gold',
-                'type' => 'number',
-                'name' => '所需骚豆',
-                'value' => ($show && ($show->gold>0)) ? $show->gold/$this->goldUnit : 0,
-                'verify' => 'rq',
             ],
             [
                 'field' => 'status',
@@ -314,14 +204,6 @@ class LiveController extends BaseCurlController
                 'default' => 0,
                 'data' => $this->uiService->trueFalseData()
             ],
-            /*[
-                'field' => 'is_recommend',
-                'type' => 'radio',
-                'name' => '推荐',
-                'verify' => '',
-                'default' => 0,
-                'data' => $this->uiService->trueFalseData()
-            ],*/
             [
                 'field' => 'sync',
                 'type' => 'radio',
@@ -355,7 +237,7 @@ class LiveController extends BaseCurlController
     public function checkRuleFieldName($id = '')
     {
         return [
-            'name'=>'片名',
+            'name'=>'直播名',
 //            'cover_img'=>'封面图片',
 //            'cid'=>'分类',
         ];
@@ -384,13 +266,13 @@ class LiveController extends BaseCurlController
     {
         if( isset($_REQUEST['callback_upload']) && ($_REQUEST['callback_upload']==1)){
 
-            try {
-                //$job = new VideoSlice($model);
-                $job = new ProcessVideoSlice($model);
-                $this->dispatch($job);
-            }catch (\Exception $e){
+            /*try {*/
+                $job = new ProcessLive($model);
+                // $this->dispatch($job);
+                app(Dispatcher::class)->dispatchNow($job);
+            /*}catch (\Exception $e){
                 Log::error($e->getMessage());
-            }
+            }*/
         }
         //ProcessSyncMiddleTable::dispatchAfterResponse('video');
         return $model;
@@ -463,69 +345,11 @@ class LiveController extends BaseCurlController
         return '95%'; // TODO: Change the autogenerated stub
     }
 
-    public function handleResultModel($model)
-    {
-        $cid = $this->rq->input('cid');
-        $cat = $this->rq->input('cat');
-        $tag = $this->rq->input('tag');
-        $page = $this->rq->input('page', 1);
-        $pagesize = $this->rq->input('limit', 30);
-        $order_by_name = $this->orderByName();
-        $order_by_type = $this->orderByType();
-        $model = $this->orderBy($model, $order_by_name, $order_by_type);
 
-        if(!$tag && !$cat && !$cid){
-            $total = $model->count();
-            $currentPageData = $model->forPage($page, $pagesize)->get();
-        }else{
-            $items = $model->get();
-            $resultTag = $this->getSearchCheckboxResult($items,$tag,'tag');
-            if($cid>0){
-                $cat = Category::query()->where('parent_id',$cid)->get('id')->pluck('id')->all();
-                $result = $this->getSearchCheckboxResult($resultTag,$cat,'cat');
-            }else{
-                if(!empty($resultTag)){
-                    $result = $this->getSearchCheckboxResult($resultTag,$cat,'cat');
-                }else{
-                    $result = $this->getSearchCheckboxResult($items,$cat,'cat');
-                }
-            }
-            $total = count($result);
-            //获取当前页数据
-            $offset = ($page-1)*$pagesize;
-            $currentPageData = array_slice($result,$offset,$pagesize);
-        }
-
-        return [
-            'total' => $total,
-            'result' => $currentPageData
-        ];
-
-    }
 
     public function setOutputSearchFormTpl($shareData)
     {
         $data = [
-            [
-                'field' => 'cat',
-                'type' => 'checkbox',
-                'name' => '版块',
-                'default' => [],
-                'data' => array_merge($this->getCats(),[[
-                    'id' => 0,
-                    'name' => '无'
-                ]])
-            ],
-            [
-                'field' => 'tag',
-                'type' => 'checkbox',
-                'name' => '标签',
-                'default' => [],
-                'data' => array_merge($this->getTagData(),[[
-                    'id' => 0,
-                    'name' => '无'
-                ]])
-            ],
             [
                 'field' => 'id',
                 'type' => 'text',
@@ -534,7 +358,7 @@ class LiveController extends BaseCurlController
             [
                 'field' => 'query_like_name',//这个搜索写的查询条件在app/TraitClass/QueryWhereTrait.php 里面写
                 'type' => 'text',
-                'name' => '片名',
+                'name' => '直播名',
             ],
             [
                 'field' => 'query_status',
@@ -542,13 +366,6 @@ class LiveController extends BaseCurlController
                 'name' => '是否上架',
                 'default' => '',
                 'data' => $this->uiService->trueFalseData(1)
-            ],
-            [
-                'field' => 'cid',
-                'type' => 'select',
-                'name' => '分类',
-                'default' => '',
-                'data' => $this->getCatNavData()
             ],
         ];
         //赋值到ui数组里面必须是`search`的key值
@@ -572,45 +389,12 @@ class LiveController extends BaseCurlController
             ];
             $data[] = [
                 'class' => 'layui-btn-danger',
-                'name' => '同步版块中间表',
-                'id' => 'btn-syncMiddleCatTable',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "cid_vid",
-                    'data-value' => 0,
-                ]
-            ];
-            $data[] = [
-                'class' => 'layui-btn-danger',
-                'name' => '同步标签中间表',
-                'id' => 'btn-syncMiddleTagTable',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "tid_vid",
-                    'data-value' => 0,
-                ]
-            ];
-            $data[] = [
-                'class' => 'layui-btn-danger',
                 'name' => '同步封面',
                 'id' => 'btn-syncCoverImg',
                 'data'=>[
                     'data-type' => "handle",
                     'data-title' => "确定批量操作吗",
                     'data-field' => "cover_img",
-                    'data-value' => 0,
-                ]
-            ];
-            $data[] = [
-                'class' => 'layui-btn-danger',
-                'name' => '批量预览',
-                'id' => 'btn-preview',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "preview",
                     'data-value' => 0,
                 ]
             ];
@@ -635,73 +419,6 @@ class LiveController extends BaseCurlController
                     'data-type' => "handle",
                     'data-title' => "确定批量下架吗",
                     'data-field' => "status",
-                    'data-value' => 0,
-                ]
-            ];
-            $data[] = [
-                'class' => 'layui-btn-dark',
-                'name' => '智能打标签',
-                'id' => 'btn-autoTag',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "tag_match",
-                    'data-value' => 0,
-                ]
-            ];
-
-            $data[] = [
-                'class' => 'layui-btn-dark',
-                'name' => '批量版块',
-                'id' => 'btn-batchCat',
-                'data'=>[
-                    'data-type' => "batchHandle",
-                    'data-input-type' => "checkbox",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "cat",
-                ]
-            ];
-            $data[] = [
-                'class' => 'layui-btn-dark',
-                'name' => '批量标签',
-                'id' => 'btn-batchTag',
-                'data'=>[
-                    'data-type' => "batchHandle",
-                    'data-input-type' => "checkbox",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "tag",
-                ]
-            ];
-            $data[] = [
-                'class' => 'layui-btn-danger',
-                'name' => 'VIP限制',
-                'id' => 'btn-vipRestricted',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "restricted",
-                    'data-value' => 1,
-                ]
-            ];
-            $data[] = [
-                'class' => 'layui-btn-danger',
-                'name' => '骚豆限制',
-                'id' => 'btn-goldRestricted',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "restricted",
-                    'data-value' => 2,
-                ]
-            ];
-            $data[] = [
-                'class' => 'layui-btn-danger',
-                'name' => '设置免费',
-                'id' => 'btn-setFree',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "restricted",
                     'data-value' => 0,
                 ]
             ];
@@ -739,64 +456,12 @@ class LiveController extends BaseCurlController
             return $type_r;
         } else {
             switch ($field){
-                case 'tid_vid':
-                    ProcessSyncMiddleTagTable::dispatchAfterResponse();
-                    $r=true;
-                    break;
-                case 'cid_vid':
-                    ProcessSyncMiddleSectionTable::dispatchAfterResponse();
-                    $r=true;
-                    break;
                 case 'cover_img':
-                    $covers = Video::query()->whereIn($id, $id_arr)->get(['id','cover_img']);
+                    $covers = Live::query()->whereIn($id, $id_arr)->get(['id','cover_img']);
                     foreach ($covers as $cover){
                         $this->syncUpload($cover->cover_img);
                     }
                     $r=true;
-                    break;
-                case 'preview':
-                    $previews = Video::query()->whereIn($id, $id_arr)->get(['id','url','sync','dash_url','hls_url']);
-                    //ProcessPreviewVideo::dispatchAfterResponse($previews);
-                    $job = new ProcessPreviewVideo($previews);
-                    $this->dispatch($job);
-                    $r=true;
-                    break;
-                case 'cat':
-                    $value_arr = explode(',',$value);
-                    $buildQueryVideo = Video::query()->whereIn($id, $id_arr);
-                    $buildQueryVideo->update(['cat'=>json_encode($value_arr)]);
-                    //队列执行更新版块中间表
-                    ProcessSyncMiddleSectionTable::dispatchAfterResponse();
-                    $r=true;
-                    break;
-                case 'tag':
-                    $value_arr = explode(',',$value);
-                    $buildQueryVideo = Video::query()->whereIn($id, $id_arr);
-                    $buildQueryVideo->update(['tag'=>json_encode($value_arr)]);
-                    //更新标签中间表
-                    ProcessSyncMiddleTagTable::dispatchAfterResponse();
-                    $r=true;
-                    break;
-                case 'tag_match':
-                    $videos = Video::query()->whereIn($id, $id_arr)->get(['id','tag','name'])->toArray();
-                    $tags = $this->getTagData();
-                    foreach ($videos as $video){
-                        $tagIds = [];
-                        $tagArr = @json_decode($video['tag'],true);
-                        if(empty($tagArr) || !$tagArr){
-                            foreach ($tags as $tag) {
-                                $pos = strpos($video['name'], $tag['name']);
-                                if($pos){
-                                    $tagIds[] = $tag['id'];
-                                }
-                            }
-                        }
-                        if(!empty($tagIds)){
-                            $tagStore = json_encode($tagIds);
-                            Video::query()->where('id',$video['id'])->update(['tag'=>$tagStore]);
-                        }
-                    }
-                    $r = true;
                     break;
                 case 'duration_seconds':
                     $videos = Video::query()->whereIn($id, $id_arr)->get(['id','duration','duration_seconds'])->toArray();
@@ -819,17 +484,13 @@ class LiveController extends BaseCurlController
                     $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update([$field => $value]);
                     break;
             }
-
+            // 记录日志
             if ($r) {
                 $this->insertLog($this->getPageName() . lang('成功修改ids') . '：' . implode(',', $id_arr));
-                //清除缓存
-                $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
             } else {
                 $this->insertLog($this->getPageName() . lang('失败ids') . '：' . implode(',', $id_arr));
             }
             return $this->editTablePutLog($r, $field, $id_arr);
         }
-
     }
-
 }
