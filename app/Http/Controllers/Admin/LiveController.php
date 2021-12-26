@@ -2,24 +2,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Jobs\ProcessLive;
-use App\Models\Category;
 use App\Models\Live;
-use App\Models\Video;
 use App\Services\UiService;
-use App\TraitClass\CatTrait;
-use App\TraitClass\GoldTrait;
 use App\TraitClass\PHPRedisTrait;
-use App\TraitClass\TagTrait;
 use App\TraitClass\VideoTrait;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Http\Request;
 
 class LiveController extends BaseCurlController
 {
-    use VideoTrait,CatTrait,TagTrait,GoldTrait,PHPRedisTrait;
+    // 使用了video同样的切片原理
+    use VideoTrait,PHPRedisTrait;
 
     public $pageName = '直播列表';
-
 
     public function setModel()
     {
@@ -47,24 +42,21 @@ class LiveController extends BaseCurlController
             ],
             [
                 'field' => 'author',
-                'minWidth' => 80,
+                'minWidth' => 20,
                 'title' => '主播名',
                 'align' => 'center',
-                'hide' => true
             ],
             [
                 'field' => 'age',
-                'minWidth' => 80,
+                'minWidth' => 10,
                 'title' => '年龄',
                 'align' => 'center',
-                'hide' => true
             ],
             [
                 'field' => 'intro',
                 'minWidth' => 80,
                 'title' => '简介',
                 'align' => 'center',
-                'hide' => true
             ],
             [
                 'field' => 'sync',
@@ -161,40 +153,39 @@ class LiveController extends BaseCurlController
                 'field' => 'name',
                 'type' => 'text',
                 'name' => '直播名',
+                'tips' => '类似于视频名字,方便管理,(1到20个字符之内)',
                 'must' => 1,
                 'verify' => 'rq',
             ],
             [
                 'field' => 'author',
                 'type' => 'text',
-                'tips' => '输入包含标签词的内容即可,格式不限,如:#内射#口交#人妻...',
+                'tips' => '给主播一个性感的名字,(1到20个字符以内)',
                 'name' => '主播名'
             ],
             [
                 'field' => 'age',
-                'type' => 'text',
-                'tips' => '输入包含标签词的内容即可,格式不限,如:#内射#口交#人妻...',
+                'type' => 'number',
+                'tips' => '都喜欢18岁的,(正整数)',
                 'name' => '年龄'
             ],
             [
                 'field' => 'intro',
                 'type' => 'textarea',
                 'name' => '简介',
+                'tips' => '比如有无在会所工作的经历,(1到50字符)',
                 'must' => 1
             ],
             [
                 'field' => 'cover_img',
                 'type' => 'img',
                 'name' => '封面图片',
-//                'value' => $show ? : ''
-//                'verify' => 'img'
             ],
             [
                 'field' => 'url',
                 'type' => 'video',
                 'name' => '视频内容',
                 'sync' => $show ? $show->sync : 0,
-//                'value' => $show ? \App\Jobs\VideoSlice::get_slice_url($show->url,'dash',$show->sync) :''
             ],
             [
                 'field' => 'status',
@@ -214,7 +205,6 @@ class LiveController extends BaseCurlController
             ],
 
         ];
-        //赋值给UI数组里面,必须是form为key
         $this->uiBlade['form'] = $data;
 
     }
@@ -223,13 +213,11 @@ class LiveController extends BaseCurlController
     public function checkRule($id = '')
     {
         $data = [
-            'name'=>'required|unique:video,name',
-//            'cover_img'=>'required',
-//            'cid'=>'required',
+            'name'=>'required|unique:live,name',
         ];
         //$id值存在表示编辑的验证
         if ($id) {
-            $data['name'] = 'required|unique:video,name,' . $id;
+            $data['name'] = 'required|unique:live,name,' . $id;
         }
         return $data;
     }
@@ -238,27 +226,13 @@ class LiveController extends BaseCurlController
     {
         return [
             'name'=>'直播名',
-//            'cover_img'=>'封面图片',
-//            'cid'=>'分类',
         ];
     }
 
-    /*public function setModelRelaction($model)
-    {
-        return $model->with('category');
-    }*/
-
     public function setListOutputItemExtend($item)
     {
-        //$item->category_name = $item->category['name'] ?? '';
-        $item->category_name = $this->getCatName($item->cat);
-        $item->tag_name = $this->getTagName($item->tag);
         $item->status = UiService::switchTpl('status', $item,'','上架|下架');
-        $item->is_recommend = UiService::switchTpl('is_recommend', $item,'','是|否');
         $item->sync = UiService::switchTpl('sync', $item,'','是|否');
-        $item->type = UiService::switchTpl('type', $item,'','长|短');
-        $item->restricted = $this->restrictedType[$item->restricted]['name'];
-        $item->gold = $item->gold/$this->goldUnit;
         return $item;
     }
 
@@ -274,19 +248,15 @@ class LiveController extends BaseCurlController
                 Log::error($e->getMessage());
             }*/
         }
-        //ProcessSyncMiddleTable::dispatchAfterResponse('video');
         return $model;
     }
 
     public function beforeSaveEvent($model, $id = '')
     {
-        $cats = $this->rq->input('cats',[]);
-        $model->cat = json_encode($cats);
-        $tags = $this->rq->input('tags',[]);
-        $model->tag = json_encode($tags);
-        $model->author = admin('nickname');
-        $model->gold = $this->rq->input('gold',0);
-        $model->gold *= $this->goldUnit;
+        // 预留分类与标签与金币
+        $model->cat = json_encode([]);
+        $model->tag = json_encode([]);
+        $model->gold = 0;
         if(isset($model->url)){
             $model->dash_url = self::get_slice_url($model->url);
             $model->hls_url = self::get_slice_url($model->url,'hls');
@@ -294,45 +264,7 @@ class LiveController extends BaseCurlController
                 $model->cover_img = self::get_slice_url($model->url,'cover');
             }
         }
-        //自动打标签
-        if(isset($model->tagNames) && (empty($tags))){
-            $tagLists = $this->getTagData();
-            $tagArr = [];
-            foreach ($tagLists as $tagList){
-                $pos = strpos($model->tagNames,$tagList['name']);
-                if($pos!==false){
-                    $tagArr[] = $tagList['id'];
-                }
-            }
-            if(!empty($tagArr)){
-                $model->tag = json_encode($tagArr);
-            }
-        }
-
     }
-
-    /*public function afterEditTableSuccessEvent($field, array $ids)
-    {
-        if($field==='sync'){
-            foreach ($ids as $id){
-                $row = AdminVideo::query()->find($id,['id','sync','url']);
-                if($row->sync==1){
-                    $job = new ProcessSyncVideo($row);
-                    $this->dispatch($job);
-                }
-            }
-        }
-    }*/
-    /*public function setOutputHandleBtnTpl($shareData)
-    {
-        $data = $this->defaultHandleBtnAddTpl($shareData);
-        $data[] = [
-            'name' => '同步',
-            'id' => 'btn-sync',
-        ];
-        //赋值到ui数组里面必须是`btn`的key值
-        $this->uiBlade['btn'] = $data;
-    }*/
 
     //弹窗大小
     public function layuiOpenWidth()
@@ -345,13 +277,11 @@ class LiveController extends BaseCurlController
         return '95%'; // TODO: Change the autogenerated stub
     }
 
-
-
     public function setOutputSearchFormTpl($shareData)
     {
         $data = [
             [
-                'field' => 'id',
+                'field' => 'by_id',
                 'type' => 'text',
                 'name' => '编号',
             ],
@@ -368,7 +298,6 @@ class LiveController extends BaseCurlController
                 'data' => $this->uiService->trueFalseData(1)
             ],
         ];
-        //赋值到ui数组里面必须是`search`的key值
         $this->uiBlade['search'] = $data;
     }
 
@@ -464,17 +393,17 @@ class LiveController extends BaseCurlController
                     $r=true;
                     break;
                 case 'duration_seconds':
-                    $videos = Video::query()->whereIn($id, $id_arr)->get(['id','duration','duration_seconds'])->toArray();
-                    foreach ($videos as $video){
-                        if(!empty($video['duration'])){
-                            if($video['duration_seconds']==0){
-                                $duration_seconds = $this->transferSeconds($video['duration']);
-                                Video::query()->where('id',$video['id'])->update(['duration_seconds' => $duration_seconds]);
+                    $lives = Live::query()->whereIn($id, $id_arr)->get(['id','duration','duration_seconds'])->toArray();
+                    foreach ($lives as $v){
+                        if(!empty($v['duration'])){
+                            if($v['duration_seconds']==0){
+                                $duration_seconds = $this->transferSeconds($v['duration']);
+                                Live::query()->where('id',$v['id'])->update(['duration_seconds' => $duration_seconds]);
                             }
                         }else{
-                            if(!empty($video['duration_seconds'])){
-                                $format = $this->formatSeconds($video['duration_seconds']);
-                                Video::query()->where('id',$video['id'])->update(['duration' => $format]);
+                            if(!empty($v['duration_seconds'])){
+                                $format = $this->formatSeconds($v['duration_seconds']);
+                                Live::query()->where('id',$v['id'])->update(['duration' => $format]);
                             }
                         }
                     }
