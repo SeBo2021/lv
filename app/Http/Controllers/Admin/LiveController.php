@@ -239,14 +239,13 @@ class LiveController extends BaseCurlController
     protected function afterSaveSuccessEvent($model, $id = '')
     {
         if( isset($_REQUEST['callback_upload']) && ($_REQUEST['callback_upload']==1)){
-
-            /*try {*/
+            try {
                 $job = new ProcessLive($model);
-                // $this->dispatch($job);
-                app(Dispatcher::class)->dispatchNow($job);
-            /*}catch (\Exception $e){
+                $this->dispatch($job);
+                // app(Dispatcher::class)->dispatchNow($job);
+            }catch (\Exception $e){
                 Log::error($e->getMessage());
-            }*/
+            }
         }
         return $model;
     }

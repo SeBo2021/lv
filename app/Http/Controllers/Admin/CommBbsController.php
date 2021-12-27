@@ -251,17 +251,14 @@ class CommBbsController extends BaseCurlController
 
     protected function afterSaveSuccessEvent($model, $id = '')
     {
-        $isVideo = ($_REQUEST['callback_upload']??0);
-            /*try {*/
-                //$job = new VideoSlice($model);
-                $job = new ProcessBbs($model,1,$isVideo);
-                // $this->dispatch($job);
-                app(Dispatcher::class)->dispatchNow($job);
-            /*}catch (\Exception $e){
-                Log::error($e->getMessage());
-            }*/
-      //  }
-        //ProcessSyncMiddleTable::dispatchAfterResponse('video');
+        $isVideo = ($_REQUEST['callback_upload'] ?? 0);
+        try {
+            $job = new ProcessBbs($model, 1, $isVideo);
+            $this->dispatch($job);
+            // app(Dispatcher::class)->dispatchNow($job);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
         return $model;
     }
 }

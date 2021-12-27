@@ -15,6 +15,7 @@ use App\TraitClass\TagTrait;
 use App\TraitClass\VideoTrait;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ShortController extends BaseCurlController
 {
@@ -84,13 +85,6 @@ class ShortController extends BaseCurlController
                 'field' => 'tag',
                 'minWidth' => 100,
                 'title' => '标签(JSON)',
-                'align' => 'center',
-                'hide' => true
-            ],
-            [
-                'field' => 'tagNames',
-                'minWidth' => 100,
-                'title' => '自动标签内容',
                 'align' => 'center',
                 'hide' => true
             ],
@@ -166,12 +160,6 @@ class ShortController extends BaseCurlController
                 'name' => '片名',
                 'must' => 1,
                 'verify' => 'rq',
-            ],
-            [
-                'field' => 'tagNames',
-                'type' => 'text',
-                'tips' => '输入包含标签词的内容即可,格式不限,如:#内射#口交#人妻...',
-                'name' => '自动标签内容'
             ],
             [
                 'field' => 'tags',
@@ -253,16 +241,13 @@ class ShortController extends BaseCurlController
     protected function afterSaveSuccessEvent($model, $id = '')
     {
         $isVideo = ($_REQUEST['callback_upload']??0);
-        /*try {*/
-        //$job = new VideoSlice($model);
-        $job = new ProcessShort($model,$isVideo);
-        // $this->dispatch($job);
-        app(Dispatcher::class)->dispatchNow($job);
-        /*}catch (\Exception $e){
+        try {
+            $job = new ProcessShort($model,$isVideo);
+            $this->dispatch($job);
+            // app(Dispatcher::class)->dispatchNow($job);
+        }catch (\Exception $e){
             Log::error($e->getMessage());
-        }*/
-        //  }
-        //ProcessSyncMiddleTable::dispatchAfterResponse('video');
+        }
         return $model;
     }
 
