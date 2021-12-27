@@ -15,6 +15,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\CommComments;
+use App\Services\UiService;
 
 class CommCommentsController extends BaseCurlController
 {
@@ -34,6 +35,9 @@ class CommCommentsController extends BaseCurlController
     {
         //这里99%跟layui的表格设置参数一样
         $data = [
+            [
+                'type' => 'checkbox'
+            ],
             [
                 'field' => 'id',
                 'width' => 80,
@@ -66,6 +70,12 @@ class CommCommentsController extends BaseCurlController
                 'title' => '评论时间',
                 'align' => 'center'
             ],
+            [
+                'field' => 'handle',
+                'minWidth' => 150,
+                'title' => '操作',
+                'align' => 'center'
+            ]
         ];
         //要返回给数组
         return $data;
@@ -98,11 +108,21 @@ class CommCommentsController extends BaseCurlController
         $item->user_name = $item->user['nickname'] ?? '';
         $item->bbs_content = mb_substr($item->bbs['content'] ?? '',0,50);
         $item->content = mb_substr($item['content'] ?? '',0,50);
+        $item->handle = UiService::editDelTpl(0,1);
         return $item;
     }
 
     public function setOutputHandleBtnTpl($shareData)
     {
-        return [];
+        if ($this->isCanDel()) {
+            $data[] = [
+                'class' => 'layui-btn-danger',
+                'name' => '删除',
+                'data' => [
+                    'data-type' => "allDel"
+                ]
+            ];
+        }
+        $this->uiBlade['btn'] = $data;
     }
 }

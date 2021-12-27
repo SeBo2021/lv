@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Comment;
+use App\Services\UiService;
 
 class ShortCommentController extends BaseCurlIndexController
 {
@@ -68,5 +69,45 @@ class ShortCommentController extends BaseCurlIndexController
         ];
 
         return $cols;
+    }
+
+    //3.设置搜索数据表单
+    public function setOutputSearchFormTpl($shareData)
+    {
+        $data = [
+
+            [
+                'field' => 'query_like_name',//这个搜索写的查询条件在app/TraitClass/QueryWhereTrait.php 里面写
+                'type' => 'text',
+                'name' => '评论者id',
+            ],
+            [
+                'field' => 'query_category_id',
+                'type' => 'text',
+                'name' => '文章id',
+            ],
+        ];
+        //赋值到ui数组里面必须是`search`的key值
+        $this->uiBlade['search'] = $data;
+    }
+
+    public function setListOutputItemExtend($item)
+    {
+        $item->handle = UiService::editDelTpl(0,1);
+        return $item;
+    }
+
+    public function setOutputHandleBtnTpl($shareData)
+    {
+        if ($this->isCanDel()) {
+            $data[] = [
+                'class' => 'layui-btn-danger',
+                'name' => '删除',
+                'data' => [
+                    'data-type' => "allDel"
+                ]
+            ];
+        }
+        $this->uiBlade['btn'] = $data;
     }
 }
