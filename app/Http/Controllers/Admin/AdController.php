@@ -15,12 +15,12 @@ class AdController extends BaseCurlController
 
     public string $pageName = '广告';
 
-    public function setModel()
+    public function setModel(): Ad
     {
         return $this->model = new Ad();
     }
 
-    public function indexCols()
+    public function indexCols(): array
     {
         $cols = [
             [
