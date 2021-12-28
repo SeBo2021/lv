@@ -11,7 +11,7 @@ class ChannelsController extends BaseCurlController
 {
     public $pageName = '渠道';
 
-    public $channelType = [
+    public array $channelType = [
         0 => [
             'id' => 0,
             'name' => 'CPA'
@@ -26,14 +26,14 @@ class ChannelsController extends BaseCurlController
         ],
     ];
 
-    public function setModel()
+    public function setModel(): Channel
     {
         return $this->model = new Channel();
     }
 
-    public function indexCols()
+    public function indexCols(): array
     {
-        $cols = [
+        return [
             [
                 'type' => 'checkbox'
             ],
@@ -115,8 +115,6 @@ class ChannelsController extends BaseCurlController
                 'align' => 'center'
             ]
         ];
-
-        return $cols;
     }
 
     public function setOutputUiCreateEditForm($show = '')
