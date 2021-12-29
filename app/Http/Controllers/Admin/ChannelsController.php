@@ -51,13 +51,6 @@ class ChannelsController extends BaseCurlController
                 'align' => 'center'
             ],
             [
-                'field' => 'account',
-                'minWidth' => 100,
-                'title' => '账号',
-                'hide' => true,
-                'align' => 'center'
-            ],
-            [
                 'field' => 'name',
                 'minWidth' => 100,
                 'title' => '渠道名称',
@@ -127,12 +120,6 @@ class ChannelsController extends BaseCurlController
     public function setOutputUiCreateEditForm($show = '')
     {
         $data = [
-            [
-                'field' => 'account',
-                'type' => 'text',
-                'name' => '账号',
-                'verify' => 'rq'
-            ],
             [
                 'field' => 'password',
                 'type' => 'text',
@@ -204,6 +191,7 @@ class ChannelsController extends BaseCurlController
     {
         if($id == ''){
             $model->number = 'S'.Str::random(6) . $model->id;
+            $model->password = $model->number;
             $one = DB::table('domain')->where('status',1)->inRandomOrder()->first();
             switch ($model->type){
                 case 0:
@@ -234,15 +222,12 @@ class ChannelsController extends BaseCurlController
     public function checkRule($id = '')
     {
         $data = [
-            'account' => 'unique:account',
-//            'password' => 'required',
             'name'=>'required|unique:channels,name',
             'promotion_code'=>'required|unique:channels,promotion_code',
         ];
         //$id值存在表示编辑的验证
         if ($id) {
             $data['password'] = '';
-            $data['account'] = 'required|unique:account' . $id;
             $data['name'] = 'required|unique:channels,name,' . $id;
             $data['promotion_code'] = 'required|unique:channels,promotion_code,' . $id;
         }
@@ -252,7 +237,6 @@ class ChannelsController extends BaseCurlController
     public function checkRuleFieldName($id = '')
     {
         return [
-            'account'=>'渠道账号',
             'name'=>'渠道名称',
             'promotion_code'=>'推广码',
         ];
