@@ -51,13 +51,6 @@ class ChannelsController extends BaseCurlController
                 'align' => 'center'
             ],
             [
-                'field' => 'account',
-                'minWidth' => 100,
-                'title' => '账号',
-                'hide' => true,
-                'align' => 'center'
-            ],
-            [
                 'field' => 'name',
                 'minWidth' => 100,
                 'title' => '渠道名称',
@@ -128,16 +121,9 @@ class ChannelsController extends BaseCurlController
     {
         $data = [
             [
-                'field' => 'account',
-                'type' => 'text',
-                'name' => '账号',
-                'verify' => 'rq'
-            ],
-            [
                 'field' => 'password',
                 'type' => 'text',
                 'name' => '密码',
-                'verify' => $show ? '' : 'rq',
                 // 'remove'=>$show?'1':0,//1表示移除，编辑页面不出现
                 'value' => '',
                 'mark' => $show ? '不填表示不修改密码' : '',
@@ -204,6 +190,7 @@ class ChannelsController extends BaseCurlController
     {
         if($id == ''){
             $model->number = 'S'.Str::random(6) . $model->id;
+            $model->password = $model->number;
             $one = DB::table('domain')->where('status',1)->inRandomOrder()->first();
             switch ($model->type){
                 case 0:
@@ -216,8 +203,6 @@ class ChannelsController extends BaseCurlController
             $model->statistic_url = env('RESOURCE_DOMAIN') . '/channel/index.html?' . http_build_query(['code' => $model->number]);
             //https://sao.yinlian66.com/channel/index.html?code=1
             $model->save();
-//            todo 添加渠道账号
-//            $channelAccount = '';
 
             $this->writeChannelDeduction($model->id,$model->deduction,$model->updated_at);
         }
@@ -236,16 +221,12 @@ class ChannelsController extends BaseCurlController
     public function checkRule($id = '')
     {
         $data = [
-//            'account' => 'required|unique:admins,account',
-            'account' => 'unique:admins,account',
-//            'password' => 'required',
             'name'=>'required|unique:channels,name',
             'promotion_code'=>'required|unique:channels,promotion_code',
         ];
         //$id值存在表示编辑的验证
         if ($id) {
             $data['password'] = '';
-            $data['account'] = 'required|unique:admins,account,' . $id;
             $data['name'] = 'required|unique:channels,name,' . $id;
             $data['promotion_code'] = 'required|unique:channels,promotion_code,' . $id;
         }
