@@ -130,14 +130,12 @@ class ChannelsController extends BaseCurlController
                 'field' => 'account',
                 'type' => 'text',
                 'name' => '账号',
-                'must' => 1,
                 'verify' => 'rq'
             ],
             [
                 'field' => 'password',
                 'type' => 'text',
                 'name' => '密码',
-                'must' => 1,
                 'verify' => $show ? '' : 'rq',
                 // 'remove'=>$show?'1':0,//1表示移除，编辑页面不出现
                 'value' => '',
@@ -237,8 +235,9 @@ class ChannelsController extends BaseCurlController
     public function checkRule($id = '')
     {
         $data = [
-            'account' => 'required|unique:admins,account',
-            'password' => 'required',
+//            'account' => 'required|unique:admins,account',
+            'account' => 'unique:admins,account',
+//            'password' => 'required',
             'name'=>'required|unique:channels,name',
             'promotion_code'=>'required|unique:channels,promotion_code',
         ];
