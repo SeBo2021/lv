@@ -216,8 +216,6 @@ class ChannelsController extends BaseCurlController
             $model->statistic_url = env('RESOURCE_DOMAIN') . '/channel/index.html?' . http_build_query(['code' => $model->number]);
             //https://sao.yinlian66.com/channel/index.html?code=1
             $model->save();
-//            todo 添加渠道账号
-//            $channelAccount = '';
 
             $this->writeChannelDeduction($model->id,$model->deduction,$model->updated_at);
         }
@@ -236,8 +234,7 @@ class ChannelsController extends BaseCurlController
     public function checkRule($id = '')
     {
         $data = [
-//            'account' => 'required|unique:admins,account',
-            'account' => 'unique:admins,account',
+            'account' => 'unique:account',
 //            'password' => 'required',
             'name'=>'required|unique:channels,name',
             'promotion_code'=>'required|unique:channels,promotion_code',
@@ -245,7 +242,7 @@ class ChannelsController extends BaseCurlController
         //$id值存在表示编辑的验证
         if ($id) {
             $data['password'] = '';
-            $data['account'] = 'required|unique:admins,account,' . $id;
+            $data['account'] = 'required|unique:account' . $id;
             $data['name'] = 'required|unique:channels,name,' . $id;
             $data['promotion_code'] = 'required|unique:channels,promotion_code,' . $id;
         }
@@ -255,6 +252,7 @@ class ChannelsController extends BaseCurlController
     public function checkRuleFieldName($id = '')
     {
         return [
+            'account'=>'渠道账号',
             'name'=>'渠道名称',
             'promotion_code'=>'推广码',
         ];
