@@ -124,7 +124,6 @@ class ChannelsController extends BaseCurlController
                 'field' => 'password',
                 'type' => 'text',
                 'name' => '密码',
-                'verify' => $show ? '' : 'rq',
                 // 'remove'=>$show?'1':0,//1表示移除，编辑页面不出现
                 'value' => '',
                 'mark' => $show ? '不填表示不修改密码' : '',
