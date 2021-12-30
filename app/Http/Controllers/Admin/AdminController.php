@@ -24,9 +24,9 @@ class AdminController extends BaseCurlController
 
 
     //2.首页设置列表显示的信息
-    public function indexCols()
+    public function indexCols(): array
     {
-        $cols = [
+        return [
             [
                 'type' => 'checkbox'
             ],
@@ -85,8 +85,6 @@ class AdminController extends BaseCurlController
             ]
 
         ];
-
-        return $cols;
     }
 
     //3.设置搜索部分
