@@ -30,7 +30,14 @@ trait StatisticTrait
             $queryBuild->increment($field);
             //更新扣量表
             if($channel_id > 0){
-                $deductionValue = DB::table('channels')->where('id',$channel_id)->value('deduction');
+//                $deductionValue = DB::table('channels')->where('id',$channel_id)->value('deduction');
+                $channelInfo = DB::table('channels')->find($channel_id);
+                $deductionValue = $channelInfo->deduction;
+                $is_deduction = $channelInfo->is_deduction;
+                /*//todo 是否前十个下载扣量
+                 * if($is_deduction>0){
+
+                }*/
                 $stepValue = round(1*(1-$deductionValue/10000),2) * 100;
                 DB::table('statistic_day_deduction')
                     ->where('channel_id',$channel_id)
@@ -47,7 +54,9 @@ trait StatisticTrait
             ];
             $insertDeductionData = $insertData;
             if($channel_id > 0){
-                $deductionValue = DB::table('channels')->where('id',$channel_id)->value('deduction');
+//                $deductionValue = DB::table('channels')->where('id',$channel_id)->value('deduction');
+                $channelInfo = DB::table('channels')->find($channel_id);
+                $deductionValue = $channelInfo->is_deduction==1 ? $channelInfo->deduction :0;
                 $insertDeductionData[$field] = round(1*(1-$deductionValue/10000),2) * 100;
             }
             DB::beginTransaction();
