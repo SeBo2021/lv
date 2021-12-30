@@ -174,6 +174,9 @@ class ChannelsController extends BaseCurlController
                 $this->writeChannelDeduction($id,$model->deduction);
             }
         }
+        if($model->password){
+            DB::connection('channel_mysql')->table('admins')->update(['password'=>bcrypt($model->number)]);
+        }
     }
 
     public function writeChannelDeduction($id, $deduction=5000, $date=null)
