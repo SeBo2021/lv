@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Channel;
 use App\Services\UiService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ChannelsController extends BaseCurlController
@@ -74,7 +75,7 @@ class ChannelsController extends BaseCurlController
                 'field' => 'number',
                 'minWidth' => 80,
                 'title' => '渠道码',
-                'hide' => true,
+//                'hide' => true,
                 'align' => 'center',
             ],
             [
@@ -167,11 +168,22 @@ class ChannelsController extends BaseCurlController
     {
         $model->status = 1;
         $model->deduction *= 100;
-        if($id>0 && $model->deduction>0){
-            $originalDeduction = $model->getOriginal()['deduction'];
-            if($originalDeduction != $model->deduction){
-                //dd('修改扣量');
-                $this->writeChannelDeduction($id,$model->deduction);
+        if($id>0){ //编辑
+            if($model->deduction>0){
+                $originalDeduction = $model->getOriginal()['deduction'];
+                if($originalDeduction != $model->deduction){
+                    //dd('修改扣量');
+                    $this->writeChannelDeduction($id,$model->deduction);
+                }
+            }
+            $password = $this->rq->input('password');
+            if($password){
+                $exists = DB::connection('channel_mysql')->table('admins')->where('account',$model->number)->first();
+                if($exists){
+                    DB::connection('channel_mysql')->table('admins')->where('account',$model->number)->update(['password'=>bcrypt($password)]);
+                }else{
+                    $this->createChannelAccount($model,bcrypt($password));
+                }
             }
         }
     }
@@ -186,11 +198,28 @@ class ChannelsController extends BaseCurlController
         DB::table('statistic_channel_deduction')->insert($insertData);
     }
 
+    public function createChannelAccount($model,$password='')
+    {
+        $insertChannelAccount = [
+            'nickname' => $model->name,
+            'account' => $model->number,
+            'password' => $password,
+            'created_at' => time(),
+            'updated_at' => time(),
+        ];
+        $rid = DB::connection('channel_mysql')->table('admins')->insertGetId($insertChannelAccount);
+        DB::connection('channel_mysql')->table('model_has_roles')->insert([
+            'role_id' => 2,
+            'model_id' => $rid,
+            'model_type' => 'admin',
+        ]);
+    }
+
     public function afterSaveSuccessEvent($model, $id = '')
     {
-        if($id == ''){
+        if($id == ''){ //添加
             $model->number = 'S'.Str::random(6) . $model->id;
-            $model->password = $model->number;
+            //
             $one = DB::table('domain')->where('status',1)->inRandomOrder()->first();
             switch ($model->type){
                 case 0:
@@ -205,6 +234,9 @@ class ChannelsController extends BaseCurlController
             $model->save();
 
             $this->writeChannelDeduction($model->id,$model->deduction,$model->updated_at);
+            //创建渠道用户
+            $password = !empty($model->password) ? $model->password : bcrypt($model->number);
+            $this->createChannelAccount($model,$password);
         }
         return $model;
     }
