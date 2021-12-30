@@ -12,6 +12,11 @@ class ChannelsController extends BaseCurlController
 {
     public $pageName = '渠道';
 
+    public array $isDeduction = [
+        1 => ['id' => 1, 'name' => '开'],
+        0 => ['id' => 0, 'name' => '关'],
+    ];
+
     public array $channelType = [
         0 => [
             'id' => 0,
@@ -143,14 +148,6 @@ class ChannelsController extends BaseCurlController
                 'must' => 1,
             ],
             [
-                'field' => 'deduction',
-                'type' => 'number',
-                'name' => '扣量(点)',
-                'value' => ($show && ($show->deduction>0)) ? $show->deduction/100 : 50,
-                'must' => 1,
-                'default' => '50',
-            ],
-            [
                 'field' => 'type',
                 'type' => 'radio',
                 'name' => '类型',
@@ -158,6 +155,78 @@ class ChannelsController extends BaseCurlController
                 'default' => 0,
                 'verify' => 'rq',
                 'data' => $this->channelType
+            ],
+            [
+                'field' => 'deduction',
+                'type' => 'number',
+                'name' => '扣量(点) (CPA使用)',
+                'value' => ($show && ($show->deduction>0)) ? $show->deduction/100 : 50,
+                'must' => 0,
+                'default' => '50',
+            ],
+            [
+                'field' => 'unit_price',
+                'type' => 'text',
+                'name' => '单价 (CPA使用)',
+                'must' => 0,
+            ],
+            [
+                'field' => 'is_deduction',
+                'type' => 'radio',
+                'name' => '前10个下载不扣量 (CPA使用)',
+                'default' => 0,
+                'data' => $this->isDeduction
+            ],
+            [
+                'field' => 'deduction_period',
+                'type' => 'text',
+                'event' => 'timeRange',
+                'name' => '扣量时间段 (CPS使用)',
+                'must' => 0,
+                'attr' => 'data-format=HH:mm:ss data-range=~',//需要特殊分割
+                'default' => '00:00:00 ~ 23:59:59',
+            ],
+            [
+                'field' => 'level_one',
+                'type' => 'number',
+                'name' => '一阶 (CPS使用)',
+                'tips' => '1单',
+            ],
+            [
+                'field' => 'level_two',
+                'type' => 'number',
+                'name' => '二阶 (CPS使用)',
+                'tips' => '2-3单',
+            ],
+            [
+                'field' => 'level_three',
+                'type' => 'number',
+                'name' => '三阶 (CPS使用)',
+                'tips' => '4-5单',
+            ],
+            [
+                'field' => 'level_four',
+                'type' => 'number',
+                'name' => '四阶 (CPS使用)',
+                'tips' => '6-10单',
+            ],
+            [
+                'field' => 'level_five',
+                'type' => 'number',
+                'name' => '五阶 (CPS使用)',
+                'tips' => '11单及以上',
+            ],
+            [
+                'field' => 'next_day_ratio',
+                'type' => 'number',
+                'name' => '次日付费暗扣比例 (CPS使用)',
+                'default' => '',
+            ],
+            [
+                'field' => 'share_ratio',
+                'type' => 'number',
+                'name' => '分成比例 (CPS使用)',
+                'default' => '',
             ],
         ];
         //赋值给UI数组里面,必须是form为key
