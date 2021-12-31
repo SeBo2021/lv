@@ -193,7 +193,7 @@ class VideoController extends Controller
             try {
                 Video::query()->where('id', $id)->increment('likes');
                 $attributes = ['uid' => $user->id, 'vid' => $id];
-                $values = ['is_collect' => $is_collect];
+                $values = ['is_collect' => $is_collect,'time_at'=>time()];
                 ViewRecord::query()->updateOrInsert($attributes, $values);
                 return response()->json([
                     'state' => 0,
