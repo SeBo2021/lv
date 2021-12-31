@@ -273,6 +273,7 @@ class SearchController extends Controller
         $data = Category::with('childs:id,name,parent_id')
             ->where('parent_id','2')
             ->select('id','name','parent_id')
+            ->orderBy('sort')
             ->get();
         return response()->json([
             'state'=>0,
