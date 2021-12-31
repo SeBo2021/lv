@@ -21,10 +21,11 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Passport\Token;
+use \App\TraitClass\PHPRedisTrait;
 
 class UserController extends Controller
 {
-    use MemberCardTrait,SmsTrait,LoginTrait,VideoTrait;
+    use MemberCardTrait,SmsTrait,LoginTrait,VideoTrait,PHPRedisTrait;
 
     public function set(Request $request): JsonResponse|array
     {
@@ -236,6 +237,11 @@ class UserController extends Controller
                         ->all();
                     if(!empty($collectIds)){
                         DB::table('view_record')->whereIn('id',$collectIds)->update(['is_collect'=>0]);
+                    }
+                    //清除相关redis中的key
+                    $redis = $this->redis();
+                    foreach ($vid as $redis_vid){
+                        $redis->del("short_is_collect_{$user->id}_{$redis_vid}");
                     }
                 }
                 return response()->json([

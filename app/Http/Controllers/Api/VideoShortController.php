@@ -247,7 +247,7 @@ class VideoShortController extends Controller
         $redis = $this->redis();
         $one['is_love'] = $redis->get("short_is_love_{$uid}_{$vid}") ?: 0;
         //是否收藏
-        $one['is_collect'] = $redis->get("short_is_collect_{$uid}_{$vid}") ? 1 : 0;
+        $one['is_collect'] = $redis->get("short_is_collect_{$uid}_{$vid}") ?: 0;
         return $one;
     }
 
