@@ -365,7 +365,8 @@ trait VideoTrait
                 $list['restricted'] = $list['vs_restricted'] ;
                 $list['cover_img'] = $list['vs_cover_img'] ;
                 $list['views'] = $list['vs_views'] ;
-                $list['updated_at'] = $list['vs_updated_at'] ;
+//                $list['updated_at'] = $list['vs_updated_at'] ;
+                $list['updated_at'] = $list['time_at']>0 ? date('Y-m-d H:i:s',$list['time_at']) : $list['vs_updated_at'];
                 $list['hls_url'] = $list['vs_hls_url'] ;
                 $list['dash_url'] = $list['vs_dash_url'] ;
 
@@ -392,6 +393,9 @@ trait VideoTrait
                 $list['preview_hls_url'] = $this->getPreviewPlayUrl($list['hls_url']);
                 $list['dash_url'] = $domainSync . $list['dash_url'];
                 $list['preview_dash_url'] = $this->getPreviewPlayUrl($list['dash_url'], 'dash');
+                if($list['time_at']>0){
+                    $list['updated_at'] = date('Y-m-d H:i:s',$list['time_at']);
+                }
                 if (!$display_url) {
                     unset($list['hls_url']);
                     unset($list['dash_url']);
