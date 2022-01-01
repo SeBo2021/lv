@@ -5,11 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Channel;
 use App\Services\UiService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ChannelsController extends BaseCurlController
 {
     public $pageName = '渠道';
+
+    public array $isDeduction = [
+        1 => ['id' => 1, 'name' => '开'],
+        0 => ['id' => 0, 'name' => '关'],
+    ];
 
     public array $channelType = [
         0 => [
@@ -74,7 +80,7 @@ class ChannelsController extends BaseCurlController
                 'field' => 'number',
                 'minWidth' => 80,
                 'title' => '渠道码',
-                'hide' => true,
+//                'hide' => true,
                 'align' => 'center',
             ],
             [
@@ -142,14 +148,6 @@ class ChannelsController extends BaseCurlController
                 'must' => 1,
             ],
             [
-                'field' => 'deduction',
-                'type' => 'number',
-                'name' => '扣量(点)',
-                'value' => ($show && ($show->deduction>0)) ? $show->deduction/100 : 50,
-                'must' => 1,
-                'default' => '50',
-            ],
-            [
                 'field' => 'type',
                 'type' => 'radio',
                 'name' => '类型',
@@ -157,6 +155,54 @@ class ChannelsController extends BaseCurlController
                 'default' => 0,
                 'verify' => 'rq',
                 'data' => $this->channelType
+            ],
+            [
+                'field' => 'deduction',
+                'type' => 'number',
+                'name' => '扣量(点) (CPA使用)',
+                'value' => ($show && ($show->deduction>0)) ? $show->deduction/100 : 50,
+                'must' => 0,
+                'default' => '50',
+            ],
+            [
+                'field' => 'unit_price',
+                'type' => 'text',
+                'name' => '单价 (CPA使用)',
+                'must' => 0,
+            ],
+            [
+                'field' => 'is_deduction',
+                'type' => 'radio',
+                'name' => '前10个下载不扣量 (CPA使用)',
+                'default' => 0,
+                'data' => $this->isDeduction
+            ],
+            [
+                'field' => 'deduction_period',
+                'type' => 'text',
+                'event' => 'timeRange',
+                'name' => '扣量时间段 (CPS使用)',
+                'must' => 0,
+                'attr' => 'data-format=HH:mm:ss data-range=~',//需要特殊分割
+                'default' => '00:00:00 ~ 23:59:59',
+            ],
+            [
+                'field' => 'level_one',
+                'type' => 'number',
+                'name' => '一阶 (CPS使用)',
+                'tips' => '1-10单【填1表示扣第1单，如填1,3表示扣第一单和第三单，不填不扣】',
+            ],
+            [
+                'field' => 'level_five',
+                'type' => 'number',
+                'name' => '二阶 (CPS使用)',
+                'tips' => '11单及以上【填间隔值：填1，表示扣第12，14，16..类推，2表示扣第13,16,19..】',
+            ],
+            [
+                'field' => 'share_ratio',
+                'type' => 'number',
+                'name' => '分成比例 (CPS使用)',
+                'default' => '',
             ],
         ];
         //赋值给UI数组里面,必须是form为key
@@ -167,11 +213,22 @@ class ChannelsController extends BaseCurlController
     {
         $model->status = 1;
         $model->deduction *= 100;
-        if($id>0 && $model->deduction>0){
-            $originalDeduction = $model->getOriginal()['deduction'];
-            if($originalDeduction != $model->deduction){
-                //dd('修改扣量');
-                $this->writeChannelDeduction($id,$model->deduction);
+        if($id>0){ //编辑
+            if($model->deduction>0){
+                $originalDeduction = $model->getOriginal()['deduction'];
+                if($originalDeduction != $model->deduction){
+                    //dd('修改扣量');
+                    $this->writeChannelDeduction($id,$model->deduction);
+                }
+            }
+            $password = $this->rq->input('password');
+            if($password){
+                $exists = DB::connection('channel_mysql')->table('admins')->where('account',$model->number)->first();
+                if($exists){
+                    DB::connection('channel_mysql')->table('admins')->where('account',$model->number)->update(['password'=>bcrypt($password)]);
+                }else{
+                    $this->createChannelAccount($model,bcrypt($password));
+                }
             }
         }
     }
@@ -186,11 +243,28 @@ class ChannelsController extends BaseCurlController
         DB::table('statistic_channel_deduction')->insert($insertData);
     }
 
+    public function createChannelAccount($model,$password='')
+    {
+        $insertChannelAccount = [
+            'nickname' => $model->name,
+            'account' => $model->number,
+            'password' => $password,
+            'created_at' => time(),
+            'updated_at' => time(),
+        ];
+        $rid = DB::connection('channel_mysql')->table('admins')->insertGetId($insertChannelAccount);
+        DB::connection('channel_mysql')->table('model_has_roles')->insert([
+            'role_id' => 2,
+            'model_id' => $rid,
+            'model_type' => 'admin',
+        ]);
+    }
+
     public function afterSaveSuccessEvent($model, $id = '')
     {
-        if($id == ''){
+        if($id == ''){ //添加
             $model->number = 'S'.Str::random(6) . $model->id;
-            $model->password = $model->number;
+            //
             $one = DB::table('domain')->where('status',1)->inRandomOrder()->first();
             switch ($model->type){
                 case 0:
@@ -205,6 +279,9 @@ class ChannelsController extends BaseCurlController
             $model->save();
 
             $this->writeChannelDeduction($model->id,$model->deduction,$model->updated_at);
+            //创建渠道用户
+            $password = !empty($model->password) ? $model->password : bcrypt($model->number);
+            $this->createChannelAccount($model,$password);
         }
         return $model;
     }
