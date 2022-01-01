@@ -188,7 +188,7 @@ class ChannelsController extends BaseCurlController
             ],
             [
                 'field' => 'level_one',
-                'type' => 'number',
+                'type' => 'text',
                 'name' => '一阶 (CPS使用)',
                 'tips' => '1-10单【填1表示扣第1单，如填1,3表示扣第一单和第三单，不填不扣】',
             ],
