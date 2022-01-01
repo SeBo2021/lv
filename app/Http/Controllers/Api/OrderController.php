@@ -53,6 +53,7 @@ class OrderController extends Controller
         };
         $goodsInfo = $this->$goodsMethod($params['goods_id']);
         $now = date('Y-m-d H:i:s', time());
+        $user = $request->user();
         try {
             $number = self::getPayNumber();
             DB::beginTransaction();
@@ -67,7 +68,8 @@ class OrderController extends Controller
                     '2' => 'money',
                     '3' => 'gold',
                 }],
-                'uid' => $request->user()->id,
+                'uid' => $user->id,
+                'channel_id' => $user->channel_id??0,
                 'status' => 0,
                 'created_at' => $now,
                 'updated_at' => $now,
