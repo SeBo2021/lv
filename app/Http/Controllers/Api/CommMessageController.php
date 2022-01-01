@@ -49,7 +49,9 @@ class CommMessageController extends Controller
                 $sql->orWhere('to_user_id',$uid);
             });
 
-            $paginator = $queryBuild->orderBy('id')->simplePaginate($perPage, '*', 'commentLists', $page);
+            $paginator = $queryBuild
+                ->orderByDesc('id')
+                ->simplePaginate($perPage, '*', 'commentLists', $page);
             $items = $paginator->items();
 
             $userIds = [];
@@ -63,7 +65,6 @@ class CommMessageController extends Controller
 
             foreach ($items as $k=>$item) {
                 if ($item['user_id'] == $uid) {
-
                     $items[$k]['avatar'] = $userInfo[$item['to_user_id']]['avatar'];
                     $items[$k]['to_user_nickname'] =  $userInfo[$item['to_user_id']]['nickname'];
                 } else {
