@@ -393,7 +393,7 @@ trait VideoTrait
                 $list['preview_hls_url'] = $this->getPreviewPlayUrl($list['hls_url']);
                 $list['dash_url'] = $domainSync . $list['dash_url'];
                 $list['preview_dash_url'] = $this->getPreviewPlayUrl($list['dash_url'], 'dash');
-                if($list['time_at']>0){
+                if(isset($list['time_at']) && ($list['time_at']>0)){
                     $list['updated_at'] = date('Y-m-d H:i:s',$list['time_at']);
                 }
                 if (!$display_url) {
