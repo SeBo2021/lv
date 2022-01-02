@@ -177,7 +177,7 @@ class ChannelsController extends BaseCurlController
                 'default' => 0,
                 'data' => $this->isDeduction
             ],
-            [
+            /*[
                 'field' => 'deduction_period',
                 'type' => 'text',
                 'event' => 'timeRange',
@@ -185,7 +185,7 @@ class ChannelsController extends BaseCurlController
                 'must' => 0,
                 'attr' => 'data-format=HH:mm:ss data-range=~',//需要特殊分割
                 'default' => '00:00:00 ~ 23:59:59',
-            ],
+            ],*/
             [
                 'field' => 'level_one',
                 'type' => 'text',
