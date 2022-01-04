@@ -6,6 +6,7 @@ use App\Jobs\ProcessStatisticsChannelCps;
 use App\Models\Order;
 use App\Services\UiService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class OrderController extends BaseCurlController
@@ -29,6 +30,20 @@ class OrderController extends BaseCurlController
                 'field' => 'id',
                 'width' => 80,
                 'title' => '编号',
+                'sort' => 1,
+                'align' => 'center'
+            ],
+            [
+                'field' => 'uid',
+                'minWidth' => 80,
+                'title' => '用户',
+                'sort' => 1,
+                'align' => 'center'
+            ],
+            [
+                'field' => 'channel_id',
+                'minWidth' => 80,
+                'title' => '渠道',
                 'sort' => 1,
                 'align' => 'center'
             ],
@@ -95,6 +110,7 @@ class OrderController extends BaseCurlController
         $item->type = $types[$item->type];
         //$item->amount = round($item->amount/100,2);
         $item->status = UiService::switchTpl('status', $item,'','完成|未付');
+        $item->channel_id = DB::table('users')->where('id',$item->uid)->first()->name;
         return $item;
     }
 
