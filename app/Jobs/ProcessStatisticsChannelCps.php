@@ -40,7 +40,7 @@ class ProcessStatisticsChannelCps implements ShouldQueue
         if(($channelInfo->status == 1) && ($channelInfo->type==2)){ //正常的CPS渠道
             $date_at = date('Y-m-d');
             $has = DB::connection('channel_mysql')->table('channel_cps')
-                ->where('promotion_code',$channelInfo->channel_code)
+                ->where('promotion_code',$channelInfo->promotion_code)
                 ->whereDate('date_at',$date_at)
                 ->first();
             $level_one = explode(',', $channelInfo->level_one);
