@@ -141,8 +141,7 @@ class OrderController extends BaseCurlController
         } else {
             $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update([$field => $value]);
             if ($r) {
-                //todo
-                $orderInfo = $this->model->where('id',$id)->first();
+                $orderInfo = $this->model->whereIn($id, $id_arr)->first();
                 //########渠道CPS日统计########
                 ProcessStatisticsChannelCps::dispatchAfterResponse($orderInfo);
                 //#############################
