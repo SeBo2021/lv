@@ -88,7 +88,7 @@ class ProcessStatisticsChannelCps implements ShouldQueue
                     $updateData['orders'] = $has->orders + 1;
                 }
                 DB::connection('channel_mysql')->table('channel_cps')
-                    ->where('promotion_code',$channelInfo->channel_code)
+                    ->where('promotion_code',$channelInfo->promotion_code)
                     ->whereDate('date_at',$date_at)
                     ->update($updateData);
             }
