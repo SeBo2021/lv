@@ -264,6 +264,7 @@ class ChannelsController extends BaseCurlController
     {
         //
         $one = DB::table('domain')->where('status',1)->inRandomOrder()->first();
+        $model->type += 0;
         $model->url = match ($model->type) {
             0, 2 => $one->name . '?' . http_build_query(['channel_id' => $model->promotion_code]),
             1 => $one->name . '/downloadFast?' . http_build_query(['channel_id' => $model->promotion_code]),
@@ -273,15 +274,13 @@ class ChannelsController extends BaseCurlController
 
             $model->statistic_url = env('RESOURCE_DOMAIN') . '/channel/index.html?' . http_build_query(['code' => $model->number]);
             //https://sao.yinlian66.com/channel/index.html?code=1
-            $model->save();
 
             $this->writeChannelDeduction($model->id,$model->deduction,$model->updated_at);
             //创建渠道用户
             $password = !empty($model->password) ? $model->password : bcrypt($model->number);
             $this->createChannelAccount($model,$password);
-        }else{
-            $model->save();
         }
+        $model->save();
         return $model;
     }
 
