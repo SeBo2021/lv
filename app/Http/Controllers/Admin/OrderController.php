@@ -110,7 +110,8 @@ class OrderController extends BaseCurlController
         $item->type = $types[$item->type];
         //$item->amount = round($item->amount/100,2);
         $item->status = UiService::switchTpl('status', $item,'','完成|未付');
-        $item->channel_id = DB::table('users')->where('id',$item->uid)->first()->name;
+        $channel_name = $item->channel_id>0 ? DB::table('channels')->where('id',$item->channel_id)->value('name') : '官方';
+        $item->channel_id = $channel_name . '('.$item->channel_id.')';
         return $item;
     }
 
