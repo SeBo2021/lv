@@ -419,11 +419,10 @@ class CategoryController extends BaseCurlController
                 $keys = $redis->keys(($this->apiRedisKey['home_lists']).$parent->id.'-*');
             }
             $this->redisBatchDel($keys,$redis);
-            $model->save();
         } else {
             $model->path_level = $model->id;
-            $model->save();
         }
+        $model->save();
 
         return $model;
     }
