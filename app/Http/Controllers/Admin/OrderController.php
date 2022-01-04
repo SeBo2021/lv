@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Jobs\ProcessStatisticsChannelCps;
 use App\Models\Order;
 use App\Services\UiService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class OrderController extends BaseCurlController
@@ -96,11 +98,46 @@ class OrderController extends BaseCurlController
         return $item;
     }
 
-    protected function afterSaveSuccessEvent($model, $id = '')
+    public function editTable(Request $request)
     {
-        if($model->status == 1){
-            Log::info('===testQuickEdit===',['ok']);
+        $this->rq = $request;
+        $ids = $request->input('ids'); // 修改的表主键id批量分割字符串
+        //分割ids
+        $id_arr = explode(',', $ids);
+
+        $id_arr = is_array($id_arr) ? $id_arr : [$id_arr];
+
+        if (empty($id_arr)) {
+            return $this->returnFailApi(lang('没有选择数据'));
         }
-        return $model;
+        //表格编辑过滤IDS
+        $id_arr = $this->editTableFilterIds($id_arr);
+
+        $field = $request->input('field'); // 修改哪个字段
+        $value = $request->input('field_value'); // 修改字段值
+        $id = 'id'; // 表主键id值
+
+        $type_r = $this->editTableTypeEvent($id_arr, $field, $value);
+
+        if ($type_r) {
+            return $type_r;
+        } else {
+            $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update([$field => $value]);
+            if ($r) {
+                //todo
+                $orderInfo = $this->model->where('id',$id)->first();
+                //########渠道CPS日统计########
+                ProcessStatisticsChannelCps::dispatchAfterResponse($orderInfo);
+                //#############################
+                if($field=='status' && $value==1){
+                    $this->insertLog($this->getPageName() . lang('手动完成订单成功') . '：' . implode(',', $id_arr));
+                }
+                $this->insertLog($this->getPageName() . lang('成功修改ids') . '：' . implode(',', $id_arr));
+            } else {
+                $this->insertLog($this->getPageName() . lang('失败ids') . '：' . implode(',', $id_arr));
+            }
+            return $this->editTablePutLog($r, $field, $id_arr);
+        }
+
     }
 }
