@@ -36,6 +36,7 @@ class ProcessStatisticsChannelCps implements ShouldQueue
         //$amount = $this->orderInfo->amount;
         $channel_id = $this->orderInfo->channel_id;
         $channelInfo = DB::table('channels')->where('id',$channel_id)->first();
+
         if(($channelInfo->status == 1) && ($channelInfo->type==2)){ //正常的CPS渠道
             $date_at = date('Y-m-d');
             $has = DB::connection('channel_mysql')->table('channel_cps')
