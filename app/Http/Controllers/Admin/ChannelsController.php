@@ -12,6 +12,11 @@ class ChannelsController extends BaseCurlController
 {
     public $pageName = '渠道';
 
+    public array $isDeduction = [
+        1 => ['id' => 1, 'name' => '开'],
+        0 => ['id' => 0, 'name' => '关'],
+    ];
+
     public array $channelType = [
         0 => [
             'id' => 0,
@@ -143,14 +148,6 @@ class ChannelsController extends BaseCurlController
                 'must' => 1,
             ],
             [
-                'field' => 'deduction',
-                'type' => 'number',
-                'name' => '扣量(点)',
-                'value' => ($show && ($show->deduction>0)) ? $show->deduction/100 : 50,
-                'must' => 1,
-                'default' => '50',
-            ],
-            [
                 'field' => 'type',
                 'type' => 'radio',
                 'name' => '类型',
@@ -158,6 +155,54 @@ class ChannelsController extends BaseCurlController
                 'default' => 0,
                 'verify' => 'rq',
                 'data' => $this->channelType
+            ],
+            [
+                'field' => 'deduction',
+                'type' => 'number',
+                'name' => '扣量(点) (CPA使用)',
+                'value' => ($show && ($show->deduction>0)) ? $show->deduction/100 : 50,
+                'must' => 0,
+                'default' => '50',
+            ],
+            [
+                'field' => 'unit_price',
+                'type' => 'text',
+                'name' => '单价 (CPA使用)',
+                'must' => 0,
+            ],
+            [
+                'field' => 'is_deduction',
+                'type' => 'radio',
+                'name' => '前10个下载不扣量 (CPA使用)',
+                'default' => 0,
+                'data' => $this->isDeduction
+            ],
+            /*[
+                'field' => 'deduction_period',
+                'type' => 'text',
+                'event' => 'timeRange',
+                'name' => '扣量时间段 (CPS使用)',
+                'must' => 0,
+                'attr' => 'data-format=HH:mm:ss data-range=~',//需要特殊分割
+                'default' => '00:00:00 ~ 23:59:59',
+            ],*/
+            [
+                'field' => 'level_one',
+                'type' => 'text',
+                'name' => '一阶 (CPS使用)',
+                'tips' => '1-10单【填1表示扣第1单，如填1,3表示扣第一单和第三单，不填不扣】',
+            ],
+            [
+                'field' => 'level_two',
+                'type' => 'number',
+                'name' => '二阶 (CPS使用)',
+                'tips' => '11单及以上【填间隔值：填1，表示扣第12，14，16..类推，2表示扣第13,16,19..】',
+            ],
+            [
+                'field' => 'share_ratio',
+                'type' => 'number',
+                'name' => '分成比例 (CPS使用)',
+                'default' => '',
             ],
         ];
         //赋值给UI数组里面,必须是form为key
@@ -221,14 +266,10 @@ class ChannelsController extends BaseCurlController
             $model->number = 'S'.Str::random(6) . $model->id;
             //
             $one = DB::table('domain')->where('status',1)->inRandomOrder()->first();
-            switch ($model->type){
-                case 0:
-                    $model->url = $one->name . '?'.http_build_query(['channel_id' => $model->promotion_code]);
-                    break;
-                case 1:
-                    $model->url = $one->name . '/downloadFast?'.http_build_query(['channel_id' => $model->promotion_code]);
-                    break;
-            }
+            $model->url = match ($model->type) {
+                0, 2 => $one->name . '?' . http_build_query(['channel_id' => $model->promotion_code]),
+                1 => $one->name . '/downloadFast?' . http_build_query(['channel_id' => $model->promotion_code]),
+            };
             $model->statistic_url = env('RESOURCE_DOMAIN') . '/channel/index.html?' . http_build_query(['code' => $model->number]);
             //https://sao.yinlian66.com/channel/index.html?code=1
             $model->save();

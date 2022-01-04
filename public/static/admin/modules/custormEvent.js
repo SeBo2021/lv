@@ -255,6 +255,39 @@ layui.define(['layerOpen', 'request', 'utable', 'uploader', 'laydate', 'colorpic
 
   });
 
+  $('[ui-event="timeRange"]').each(function () {
+    othis = $(this);
+    var format = othis.data('format') || 'HH:mm:ss';
+    var value = othis.val() || othis.data('value');
+    var min = othis.data('min');
+    var max = othis.data('max');
+    var set_config = othis.data('config');
+    var lang = othis.data('lang') || '';
+    var range = othis.data('range') || '';
+    var config = {
+      elem: this
+      , trigger: 'click'
+      , type: 'time',
+      format: format,
+      value: value || '',
+      lang: lang
+    }
+    if (range) {
+      config.range = range;
+    }
+    if (set_config) {
+      config = $.extend({}, config, set_config);
+    }
+    if (min) {
+      config.min = min;
+    }
+    if (max) {
+      config.max = max;
+    }
+
+    laydate.render(config);
+
+  });
 
   collapse();
 

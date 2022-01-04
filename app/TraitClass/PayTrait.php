@@ -4,6 +4,7 @@ namespace App\TraitClass;
 
 
 use App\Jobs\ProcessMemberCard;
+use App\Jobs\ProcessStatisticsChannelCps;
 use App\Models\Gold;
 use App\Models\MemberCard;
 use App\Models\Order;
@@ -156,10 +157,15 @@ trait PayTrait
             'status' => 1,
             'updated_at' => date('Y-m-d H:i:s', time()),
         ]);
+
         if (!$update) {
             throw new Exception('订单更新失败', -1);
         }
+
         $orderInfo = $orderModel->firstOrFail();
+        //########渠道CPS日统计########
+        ProcessStatisticsChannelCps::dispatchAfterResponse($orderInfo);
+        //#############################
         $nowData = date('Y-m-d H:i:s',time());
 
 
