@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Order;
 use App\Services\UiService;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends BaseCurlController
 {
@@ -16,9 +17,9 @@ class OrderController extends BaseCurlController
         return $this->model = new Order();
     }
 
-    public function indexCols()
+    public function indexCols(): array
     {
-        $cols = [
+        return [
             [
                 'type' => 'checkbox'
             ],
@@ -76,8 +77,6 @@ class OrderController extends BaseCurlController
             ]
         ];
 
-        return $cols;
-
     }
 
     public function setOutputHandleBtnTpl($shareData)
@@ -97,4 +96,11 @@ class OrderController extends BaseCurlController
         return $item;
     }
 
+    protected function afterSaveSuccessEvent($model, $id = '')
+    {
+        if($model->status == 1){
+            Log::info('===testQuickEdit===',['ok']);
+        }
+        return $model;
+    }
 }
