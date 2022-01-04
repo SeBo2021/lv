@@ -266,14 +266,10 @@ class ChannelsController extends BaseCurlController
             $model->number = 'S'.Str::random(6) . $model->id;
             //
             $one = DB::table('domain')->where('status',1)->inRandomOrder()->first();
-            switch ($model->type){
-                case 0:
-                    $model->url = $one->name . '?'.http_build_query(['channel_id' => $model->promotion_code]);
-                    break;
-                case 1:
-                    $model->url = $one->name . '/downloadFast?'.http_build_query(['channel_id' => $model->promotion_code]);
-                    break;
-            }
+            $model->url = match ($model->type) {
+                0, 2 => $one->name . '?' . http_build_query(['channel_id' => $model->promotion_code]),
+                1 => $one->name . '/downloadFast?' . http_build_query(['channel_id' => $model->promotion_code]),
+            };
             $model->statistic_url = env('RESOURCE_DOMAIN') . '/channel/index.html?' . http_build_query(['code' => $model->number]);
             //https://sao.yinlian66.com/channel/index.html?code=1
             $model->save();
