@@ -262,14 +262,15 @@ class ChannelsController extends BaseCurlController
 
     public function afterSaveSuccessEvent($model, $id = '')
     {
+        //
+        $one = DB::table('domain')->where('status',1)->inRandomOrder()->first();
+        $model->url = match ($model->type) {
+            0, 2 => $one->name . '?' . http_build_query(['channel_id' => $model->promotion_code]),
+            1 => $one->name . '/downloadFast?' . http_build_query(['channel_id' => $model->promotion_code]),
+        };
         if($id == ''){ //添加
             $model->number = 'S'.Str::random(6) . $model->id;
-            //
-            $one = DB::table('domain')->where('status',1)->inRandomOrder()->first();
-            $model->url = match ($model->type) {
-                0, 2 => $one->name . '?' . http_build_query(['channel_id' => $model->promotion_code]),
-                1 => $one->name . '/downloadFast?' . http_build_query(['channel_id' => $model->promotion_code]),
-            };
+
             $model->statistic_url = env('RESOURCE_DOMAIN') . '/channel/index.html?' . http_build_query(['code' => $model->number]);
             //https://sao.yinlian66.com/channel/index.html?code=1
             $model->save();
@@ -278,6 +279,8 @@ class ChannelsController extends BaseCurlController
             //创建渠道用户
             $password = !empty($model->password) ? $model->password : bcrypt($model->number);
             $this->createChannelAccount($model,$password);
+        }else{
+            $model->save();
         }
         return $model;
     }
