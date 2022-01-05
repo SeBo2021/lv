@@ -51,6 +51,7 @@ class ProcessStatisticsChannelCps implements ShouldQueue
                     'name' => $channelInfo->name,
                     'promotion_code' => $channelInfo->promotion_code,
                     'channel_id' => $channel_id,
+                    'pid' => $channelInfo->pid,
                     'channel_code' => $channelInfo->number,
                     'share_ratio' => $channelInfo->share_ratio,
                     'share_amount' => $isUsage ? round(($this->orderInfo->amount * $channelInfo->share_ratio)/100,2) : 0,
