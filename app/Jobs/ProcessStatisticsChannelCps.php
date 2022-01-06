@@ -65,6 +65,7 @@ class ProcessStatisticsChannelCps implements ShouldQueue
             }else{ //累计
                 $order_index = $has->order_index + 1;
                 //是否有纳入统计条目
+                $usage_index = false;
                 if($has->orders < 11){
                     if(!in_array($order_index,$level_one)){
                         $usage_index = $order_index;
@@ -73,10 +74,13 @@ class ProcessStatisticsChannelCps implements ShouldQueue
                     if($has->orders == 11){
                         $usage_index = 11;
                     }
-
                     if($has->usage_index >= 11){
-                        $usage_index = $has->usage_index + $channelInfo->level_two;
+                        $second_index = $has->usage_index + $channelInfo->level_two;
+                        if($second_index == $order_index){
+                            $usage_index = $second_index;
+                        }
                     }
+
                 }
                 $updateData = [
                     'order_index' => $order_index,
