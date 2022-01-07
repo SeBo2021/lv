@@ -54,6 +54,14 @@ class OrderController extends Controller
         $goodsInfo = $this->$goodsMethod($params['goods_id']);
         $now = date('Y-m-d H:i:s', time());
         $user = $request->user();
+        //是否有效打折
+        $useRealValue = false;
+        if($goodsInfo['real_value'] > 0){
+            $validPeriodTime = strtotime($user->created_at) + $goodsInfo['expired_hours']*3600;
+            if($validPeriodTime > time()){
+                $useRealValue = true;
+            }
+        }
         try {
             $number = self::getPayNumber();
             DB::beginTransaction();
@@ -64,7 +72,7 @@ class OrderController extends Controller
                 'type' => $params['type'],
                 'type_id' => $params['goods_id'],
                 'amount' => $goodsInfo[match ($params['type']) {
-                    '1' => 'value',
+                    '1' => $useRealValue ? 'real_value' : 'value',
                     '2' => 'money',
                     '3' => 'gold',
                 }],

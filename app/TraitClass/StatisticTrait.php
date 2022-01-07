@@ -61,6 +61,7 @@ trait StatisticTrait
             if($channel_id > 0){
 //                $deductionValue = DB::table('channels')->where('id',$channel_id)->value('deduction');
                 $channelInfo = DB::table('channels')->find($channel_id);
+                $insertDeductionData['pid'] = $channelInfo->pid;
                 $deductionValue = $channelInfo->is_deduction==1 ? $channelInfo->deduction :0;
                 $insertDeductionData[$field] = round(1*(1-$deductionValue/10000),2) * 100;
             }

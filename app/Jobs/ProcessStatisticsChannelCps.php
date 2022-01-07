@@ -34,13 +34,13 @@ class ProcessStatisticsChannelCps implements ShouldQueue
     public function handle()
     {
         //$amount = $this->orderInfo->amount;
-        $channel_id = $this->orderInfo->channel_id;
+        $channel_id = $this->orderInfo->channel_id ?? 0;
         $channelInfo = DB::table('channels')->where('id',$channel_id)->first();
 
         if(($channelInfo->status == 1) && ($channelInfo->type==2)){ //正常的CPS渠道
             $date_at = date('Y-m-d');
             $has = DB::connection('channel_mysql')->table('channel_cps')
-                ->where('promotion_code',$channelInfo->channel_code)
+                ->where('promotion_code',$channelInfo->promotion_code)
                 ->whereDate('date_at',$date_at)
                 ->first();
             $level_one = explode(',', $channelInfo->level_one);
@@ -50,6 +50,8 @@ class ProcessStatisticsChannelCps implements ShouldQueue
                 DB::connection('channel_mysql')->table('channel_cps')->insert([
                     'name' => $channelInfo->name,
                     'promotion_code' => $channelInfo->promotion_code,
+                    'channel_id' => $channel_id,
+                    'pid' => $channelInfo->pid,
                     'channel_code' => $channelInfo->number,
                     'share_ratio' => $channelInfo->share_ratio,
                     'share_amount' => $isUsage ? round(($this->orderInfo->amount * $channelInfo->share_ratio)/100,2) : 0,
@@ -63,6 +65,7 @@ class ProcessStatisticsChannelCps implements ShouldQueue
             }else{ //累计
                 $order_index = $has->order_index + 1;
                 //是否有纳入统计条目
+                $usage_index = false;
                 if($has->orders < 11){
                     if(!in_array($order_index,$level_one)){
                         $usage_index = $order_index;
@@ -71,10 +74,13 @@ class ProcessStatisticsChannelCps implements ShouldQueue
                     if($has->orders == 11){
                         $usage_index = 11;
                     }
-
                     if($has->usage_index >= 11){
-                        $usage_index = $has->usage_index + $channelInfo->level_two;
+                        $second_index = $has->usage_index + $channelInfo->level_two+1;
+                        if($second_index == $order_index){
+                            $usage_index = $second_index;
+                        }
                     }
+
                 }
                 $updateData = [
                     'order_index' => $order_index,
@@ -88,7 +94,7 @@ class ProcessStatisticsChannelCps implements ShouldQueue
                     $updateData['orders'] = $has->orders + 1;
                 }
                 DB::connection('channel_mysql')->table('channel_cps')
-                    ->where('promotion_code',$channelInfo->channel_code)
+                    ->where('promotion_code',$channelInfo->promotion_code)
                     ->whereDate('date_at',$date_at)
                     ->update($updateData);
             }

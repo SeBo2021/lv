@@ -141,12 +141,11 @@ class OrderController extends BaseCurlController
         } else {
             $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update([$field => $value]);
             if ($r) {
-                //todo
-                $orderInfo = $this->model->where('id',$id)->first();
+                $orderInfo = $this->model->whereIn($id, $id_arr)->first();
                 //########渠道CPS日统计########
                 ProcessStatisticsChannelCps::dispatchAfterResponse($orderInfo);
                 //#############################
-                if($field=='status' && $value==1){
+                if(($field=='status') && ($value==1)){
                     $this->insertLog($this->getPageName() . lang('手动完成订单成功') . '：' . implode(',', $id_arr));
                 }
                 $this->insertLog($this->getPageName() . lang('成功修改ids') . '：' . implode(',', $id_arr));
