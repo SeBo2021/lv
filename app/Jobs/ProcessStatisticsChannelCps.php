@@ -86,7 +86,7 @@ class ProcessStatisticsChannelCps implements ShouldQueue
                     'order_index' => $order_index,
                     'last_order_id' => $this->orderInfo->id,
                 ];
-                if(isset($usage_index)){
+                if($usage_index){
                     $updateData['usage_index'] = $usage_index;
                     $updateData['share_ratio'] = $channelInfo->share_ratio;
                     $updateData['share_amount'] = round(($this->orderInfo->amount * $channelInfo->share_ratio)/100 + $has->share_amount,2);
