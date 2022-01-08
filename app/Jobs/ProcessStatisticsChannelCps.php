@@ -65,7 +65,7 @@ class ProcessStatisticsChannelCps implements ShouldQueue
             }else{ //累计
                 $order_index = $has->order_index + 1;
                 //是否有纳入统计条目
-                $usage_index = false;
+                $usage_index = 0;
                 if($has->orders < 11){
                     if(!in_array($order_index,$level_one)){
                         $usage_index = $order_index;
@@ -86,7 +86,7 @@ class ProcessStatisticsChannelCps implements ShouldQueue
                     'order_index' => $order_index,
                     'last_order_id' => $this->orderInfo->id,
                 ];
-                if($usage_index){
+                if($usage_index>0){
                     $updateData['usage_index'] = $usage_index;
                     $updateData['share_ratio'] = $channelInfo->share_ratio;
                     $updateData['share_amount'] = round(($this->orderInfo->amount * $channelInfo->share_ratio)/100 + $has->share_amount,2);
