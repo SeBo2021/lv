@@ -71,7 +71,7 @@ class ProcessStatisticsChannelCps implements ShouldQueue
                         $usage_index = $order_index;
                     }
                 }else{
-                    if($has->orders == 11){
+                    if($has->order_index == 11){
                         $usage_index = 11;
                     }
                     if($has->usage_index >= 11){
