@@ -109,6 +109,7 @@ class ProcessLogin implements ShouldQueue
         $downloadInfo = DB::table('app_download')
             ->where('status',0)
             ->whereDate('created_at','>=', $lastDayDate)
+            ->orderByDesc('created_at')
             ->get(['id','channel_id','device_system','ip','agent_info','code','created_at'])->toArray();
         //$loginAgentInfo = $this->loginLogData['source_info'];
         $nowTime = time();
