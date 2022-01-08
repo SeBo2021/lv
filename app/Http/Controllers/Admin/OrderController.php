@@ -143,7 +143,9 @@ class OrderController extends BaseCurlController
             if ($r) {
                 $orderInfo = $this->model->whereIn($id, $id_arr)->first();
                 //########渠道CPS日统计########
-                ProcessStatisticsChannelCps::dispatchAfterResponse($orderInfo);
+                if($orderInfo->status == 1){
+                    ProcessStatisticsChannelCps::dispatchAfterResponse($orderInfo);
+                }
                 //#############################
                 if(($field=='status') && ($value==1)){
                     $this->insertLog($this->getPageName() . lang('手动完成订单成功') . '：' . implode(',', $id_arr));
