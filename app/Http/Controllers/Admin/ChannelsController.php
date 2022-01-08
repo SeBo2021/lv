@@ -196,7 +196,7 @@ class ChannelsController extends BaseCurlController
                 'field' => 'level_two',
                 'type' => 'number',
                 'name' => '二阶 (CPS使用)',
-                'tips' => '11单及以上【填间隔值：填1，表示扣第12，14，16..类推，2表示扣第13,16,19..】',
+                'tips' => '11单及以上【填间隔值：填1，表示累计第11,13,15..类推，2表示只累计第11,14,17..】',
             ],
             [
                 'field' => 'share_ratio',
