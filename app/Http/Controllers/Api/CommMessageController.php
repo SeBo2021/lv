@@ -65,8 +65,8 @@ class CommMessageController extends Controller
 
             foreach ($items as $k=>$item) {
                 if ($item['user_id'] == $uid) {
-                    $items[$k]['avatar'] = $userInfo[$item['to_user_id']]['avatar'];
-                    $items[$k]['to_user_nickname'] =  $userInfo[$item['to_user_id']]['nickname'];
+                    $items[$k]['avatar'] = isset($userInfo[$item['to_user_id']]) ? $userInfo[$item['to_user_id']]['avatar'] : '';
+                    $items[$k]['to_user_nickname'] =  isset($userInfo[$item['to_user_id']]) ? $userInfo[$item['to_user_id']]['nickname'] : '用户不存在';
                 } else {
                     $toUserId = $item['to_user_id'];
                     $tmpUserId = $item['user_id'];
