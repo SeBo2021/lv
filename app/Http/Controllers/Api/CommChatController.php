@@ -60,6 +60,9 @@ class CommChatController extends Controller
                 $this->redis()->sAdd($relationName,$commentId);
 
                 if ($commentId > 0) {
+                    //消息红点提示
+                    $keyMe = "status_me_message_$uid";
+                    $this->redis()->set($keyMe,1);
                     return response()->json([
                         'state' => 0,
                         'msg' => '发送成功'
