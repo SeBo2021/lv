@@ -137,7 +137,7 @@ class CommChatController extends Controller
             $res['list'] = $items;
             $res['hasMorePages'] = $paginator->hasMorePages();
             //清除key========
-            $keyMe = "status_me_message_".$uid;
+            $keyMe = "status_me_message_".$toUserId;
             $this->redis()->del($keyMe);
             //===========================
             return response()->json([
