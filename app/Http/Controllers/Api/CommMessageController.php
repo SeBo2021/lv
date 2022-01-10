@@ -58,7 +58,7 @@ class CommMessageController extends Controller
             foreach ($items as $k=>$item) {
                 $userIds[] = $item['user_id'];
                 $userIds[] = $item['to_user_id'];
-                $items[$k]['no_read'] = 1;
+                $items[$k]['no_read'] = 0;
             }
             $userData = User::query()->whereIn('id',$userIds)->get()->toArray();
             $userInfo = array_column($userData,null,'id');
