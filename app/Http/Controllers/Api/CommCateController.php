@@ -27,8 +27,7 @@ class CommCateController extends Controller
             if ($datum['mark'] == 'focus') {
                 $data[$k]['have_new'] = $this->checkFocusNew($request->user()->id);
             } else {
-//                $data[$k]['have_new'] = $this->checkHaveNew($request->user()->id, $datum['mark']);
-                $data[$k]['have_new'] = 1;
+                $data[$k]['have_new'] = $this->checkHaveNew($request->user()->id, $datum['mark']);
             }
         }
         return response()->json([
