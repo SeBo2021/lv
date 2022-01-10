@@ -29,8 +29,6 @@ class CommCateController extends Controller
             } else {
                 $data[$k]['have_new'] = $this->checkHaveNew($request->user()->id, $datum['mark']);
             }
-            //is_allow_post 关闭app发贴功能
-
         }
         return response()->json([
             'state' => 0,
