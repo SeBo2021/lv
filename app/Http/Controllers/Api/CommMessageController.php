@@ -55,11 +55,11 @@ class CommMessageController extends Controller
             $items = $paginator->items();
 
             $userIds = [];
-            $keyMe = "status_me_message_$uid";
+
             foreach ($items as $k=>$item) {
                 $userIds[] = $item['user_id'];
                 $userIds[] = $item['to_user_id'];
-                $items[$k]['no_read'] = $this->redis()->get($keyMe) ? 1: 0;
+                $items[$k]['no_read'] = $this->redis()->get("status_me_message_".$item['to_user_id']) ? 1: 0;
             }
             $userData = User::query()->whereIn('id',$userIds)->get()->toArray();
             $userInfo = array_column($userData,null,'id');
