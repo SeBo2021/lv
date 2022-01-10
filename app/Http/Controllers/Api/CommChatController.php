@@ -111,7 +111,7 @@ class CommChatController extends Controller
             $uid = $request->user()->id;
             if ($toUserId) {
                 //清除key========
-                $keyMe = "status_me_message_".$toUserId;
+                $keyMe = "status_me_message_".$uid;
                 $this->redis()->del($keyMe);
                 //===========================
                 $queryBuild->where(function($sql) use ($uid,$toUserId){
