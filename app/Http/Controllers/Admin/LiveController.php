@@ -8,6 +8,7 @@ use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class LiveController extends BaseCurlController
 {
