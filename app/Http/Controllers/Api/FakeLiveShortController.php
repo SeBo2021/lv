@@ -147,7 +147,7 @@ class FakeLiveShortController extends Controller
             return response()->json([
                 'state' => 0,
                 'data' => [
-                    'vip' => $uid->vip>0 ? 1 : 0,
+                    'is_vip' => $uid->vip>0 ? 1 : 0,
                     'start_second' => $startSecond,
                     'remain_second' => $remainSecond
                 ]
