@@ -106,7 +106,7 @@ class CommContentController extends Controller
     {
         try {
             $params = ApiParamsTrait::parse($request->params);
-            Log::info('===COMMLIST===',[$params]);
+            //Log::info('===COMMLIST===',[$params]);
             Validator::make($params, [
                 'cid_1' => 'nullable',
                 'cid_2' => 'nullable',
@@ -127,6 +127,7 @@ class CommContentController extends Controller
                 $res = $this->other($request->user()->id, $locationName, $cid1, $cid2, 6, $page);
             }
             $this->processArea($res['bbs_list']);
+            Log::info('===COMMLIST-res===',[$res]);
             return response()->json([
                 'state' => 0,
                 'data' => $res
@@ -293,7 +294,7 @@ class CommContentController extends Controller
             $data['bbs_list'] = $result;
             return $data;
         }
-        if ($cid1) {
+        elseif ($cid1) {
             $ids = $this->getChild($cid1, false);
             $model = CommBbs::query()
                 ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
