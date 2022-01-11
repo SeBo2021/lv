@@ -120,8 +120,9 @@ trait PayTrait
         $user = User::query()->findOrFail($uid);
         $member_card_type = !empty($user->member_card_type) ? (array)$user->member_card_type : [];
         $member_card_type[] = $cardInfo->id;
+        $vip = max($member_card_type);
         $updateMember = implode(',',$member_card_type);
-        User::query()->find($uid)->update(['member_card_type' => $updateMember]);
+        User::query()->find($uid)->update(['member_card_type' => $updateMember,'vip'=>$vip]);
         //队列执行
         if($cardInfo->expired_hours >= 0) {
             $job = new ProcessMemberCard($user->id,$cardInfo->id,($cardInfo->expired_hours?:10*365*34)*60*60);
