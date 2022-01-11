@@ -27,6 +27,7 @@ class CommOperationController extends Controller
     {
         if (isset($request->params)) {
             $params = ApiParamsTrait::parse($request->params);
+            Log::info('===Foucs===',[$params]);
             Validator::make($params, [
                 'to_user_id' => 'required|integer',
                 "focus" => 'nullable' //类型 :1-关注,0-取消收藏
@@ -81,6 +82,7 @@ class CommOperationController extends Controller
     {
         if (isset($request->params)) {
             $params = ApiParamsTrait::parse($request->params);
+            Log::info('===LIKE===',[$params]);
             Validator::make($params, [
                 'bbs_id' => 'required|integer',
                 'like' => 'required|integer'
