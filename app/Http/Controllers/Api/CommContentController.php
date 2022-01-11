@@ -123,10 +123,10 @@ class CommContentController extends Controller
             $uid = $request->user()->id;
             if (in_array($help, ['focus', 'hot'])) {
                 $res = $this->$help($uid, $locationName, 6, $page);
-                Log::info('===COMMLIST-res===',[$res]);
+                Log::info('===COMMLIST-'.$help,[$res]);
             } else {
                 $res = $this->other($request->user()->id, $locationName, $cid1, $cid2, 6, $page);
-                Log::info('===COMMLIST-res===',[$res]);
+                Log::info('===COMMLIST-other===',[$res]);
             }
             $this->processArea($res['bbs_list']);
             return response()->json([
