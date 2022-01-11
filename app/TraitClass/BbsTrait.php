@@ -48,7 +48,6 @@ trait BbsTrait
                 $video[] = env('RESOURCE_DOMAIN') .$itemV;
             }
             $list[$k]['video']  = $video;
-            $list[$k]['is_vip']  = $list[$k]['vip_expired']>$nowTime ? 1 : 0;
         }
         return $list;
     }
