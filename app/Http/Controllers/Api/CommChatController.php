@@ -111,9 +111,10 @@ class CommChatController extends Controller
             $uid = $request->user()->id;
             if ($toUserId) {
                 //清除key========
-                $keyMe = "status_me_message_".$toUserId;
-                Log::info("===delKey===",[$keyMe]);
-                $this->redis()->del($keyMe);
+                $min = min($toUserId,$uid);
+                $max = max($toUserId,$uid);
+                $chatPairKey = "chat_pair_{$min}_{$max}";
+                $this->redis()->del($chatPairKey);
                 //===========================
                 $queryBuild->where(function($sql) use ($uid,$toUserId){
                     $sql->whereIn('user_id',[$uid,$toUserId]);
