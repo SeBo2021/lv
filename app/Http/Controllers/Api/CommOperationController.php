@@ -42,7 +42,7 @@ class CommOperationController extends Controller
             ];
             DB::beginTransaction();
             try {   //先偿试队列
-                $focus = $params['focus'] ?? 1;
+                $focus = $params['focus'];
                 $one = DB::table('community_focus')->where('user_id',$uid)->where('to_user_id',$toUserId)->first();
                 if (($focus == 0) && $one) {
                     DB::table('community_focus')->where('user_id',$uid)->where('to_user_id',$toUserId)->delete();
@@ -94,7 +94,7 @@ class CommOperationController extends Controller
             $is_love = $params['like'];
             DB::beginTransaction();
             try {   //先偿试队列
-                if ($is_love) {
+                if ($is_love==1) {
                     if (DB::table('community_like')->where($insertData)->exists()) {
                         return response()->json([
                             'state' => -2,
