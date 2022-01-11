@@ -96,8 +96,9 @@ class CommOperationController extends Controller
             $is_love = $params['like'];
             DB::beginTransaction();
             try {   //先偿试队列
+                $one = DB::table('community_like')->where($insertData)->first();
                 if ($is_love==1) {
-                    if (DB::table('community_like')->where($insertData)->exists()) {
+                    if ($one) {
                         return response()->json([
                             'state' => -2,
                             'msg' => '已经操作'
@@ -105,10 +106,12 @@ class CommOperationController extends Controller
                     }
                     DB::table('community_like')->insert($insertData);
                     CommBbs::where('id', $bbsId)->increment('likes');
+                    User::where('id', $one->author_id)->increment('loves');
                     $this->redis()->set("comm_like_{$uid}_{$bbsId}", 1);
                 } else {
                     DB::table('community_like')->where($insertData)->delete();
                     CommBbs::where('id', $bbsId)->where('likes', '>', 0)->decrement('likes');
+                    User::where('id', $one->author_id)->where('loves', '>', 0)->decrement('loves');
                     $this->redis()->del("comm_like_{$uid}_{$bbsId}");
                 }
                 DB::commit();
