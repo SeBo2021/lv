@@ -14,6 +14,7 @@ trait BbsTrait
      */
     private function proProcessData($uid, $list): mixed
     {
+        $nowTime = now();
         foreach ($list as $k => $re) {
             if ($this->redis()->get("focus_{$uid}_{$re['uid']}") == 1) {
                 $list[$k]['is_focus'] = 1;
@@ -47,6 +48,7 @@ trait BbsTrait
                 $video[] = env('RESOURCE_DOMAIN') .$itemV;
             }
             $list[$k]['video']  = $video;
+            $list[$k]['is_vip']  = $list[$k]['vip_expired']>$nowTime ? 1 : 0;
         }
         return $list;
     }
