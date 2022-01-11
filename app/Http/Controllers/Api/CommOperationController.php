@@ -48,10 +48,12 @@ class CommOperationController extends Controller
                 if (($focus == 0) && $one) {
                     DB::table('community_focus')->where('user_id',$uid)->where('to_user_id',$toUserId)->delete();
                     User::where('id', $toUserId)->where('fans', '>', 0)->decrement('fans');
+                    User::where('id', $uid)->where('attention', '>', 0)->decrement('attention');
                 }
                 elseif (($focus == 1) && (!$one)) {
                     DB::table('community_focus')->insert($insertData);
                     User::where('id', $toUserId)->increment('fans');
+                    User::where('id', $uid)->increment('attention');
                 }
                 DB::commit();
                 return response()->json([
