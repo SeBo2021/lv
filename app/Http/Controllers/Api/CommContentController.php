@@ -123,10 +123,10 @@ class CommContentController extends Controller
             $uid = $request->user()->id;
             if (in_array($help, ['focus', 'hot'])) {
                 $res = $this->$help($uid, $locationName, 6, $page);
-                Log::info('===COMMLIST-'.$help,[$res]);
+                //Log::info('===COMMLIST-'.$help,[$res]);
             } else {
                 $res = $this->other($request->user()->id, $locationName, $cid1, $cid2, 6, $page);
-                Log::info('===COMMLIST-other===',[$res]);
+                //Log::info('===COMMLIST-other===',[$res]);
             }
             $this->processArea($res['bbs_list']);
             return response()->json([
@@ -148,6 +148,7 @@ class CommContentController extends Controller
     private function processArea(&$data)
     {
         $ids = array_column($data, 'uid');
+        $ids = array_filter($ids);
         $lastLogin = LoginLog::query()
             ->select('uid', DB::raw('max(id) as max_id'))->whereIn('uid', $ids)
             ->groupBy('uid')
@@ -295,7 +296,7 @@ class CommContentController extends Controller
             $data['bbs_list'] = $result;
             return $data;
         }
-        elseif ($cid1) {
+        if ($cid1) {
             $ids = $this->getChild($cid1, false);
             $model = CommBbs::query()
                 ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
