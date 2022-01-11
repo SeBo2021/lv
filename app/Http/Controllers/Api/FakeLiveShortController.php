@@ -64,8 +64,6 @@ class FakeLiveShortController extends Controller
             $one['preview_hls_url'] = $this->getPreviewPlayUrl($one['hls_url']);
             $one['dash_url'] = $domainSync . $one['dash_url'];
             $one['preview_dash_url'] = $this->getPreviewPlayUrl($one['dash_url'], 'dash');
-
-
             $data[] = $one;
         }
         return [
@@ -124,7 +122,8 @@ class FakeLiveShortController extends Controller
     public function calc(Request $request): JsonResponse
     {
         try {
-            $uid = $request->user()->id;
+            $user = $request->user();
+            $uid = $user->id;
             $params = ApiParamsTrait::parse($request->params);
             Validator::make($params, [
                 'duration_seconds' => 'nullable',
@@ -148,6 +147,7 @@ class FakeLiveShortController extends Controller
             return response()->json([
                 'state' => 0,
                 'data' => [
+                    'vip' => $uid->vip>0 ? 1 : 0,
                     'start_second' => $startSecond,
                     'remain_second' => $remainSecond
                 ]
