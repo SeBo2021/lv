@@ -110,6 +110,10 @@ class CommChatController extends Controller
 
             $uid = $request->user()->id;
             if ($toUserId) {
+                //清除key========
+                $keyMe = "status_me_message_".$toUserId;
+                $this->redis()->del($keyMe);
+                //===========================
                 $queryBuild->where(function($sql) use ($uid,$toUserId){
                     $sql->whereIn('user_id',[$uid,$toUserId]);
                     $sql->whereIn('to_user_id',[$uid,$toUserId]);
@@ -136,10 +140,7 @@ class CommChatController extends Controller
             $items = $paginator->items();
             $res['list'] = $items;
             $res['hasMorePages'] = $paginator->hasMorePages();
-            //清除key========
-            $keyMe = "status_me_message_".$toUserId;
-            $this->redis()->del($keyMe);
-            //===========================
+
             return response()->json([
                 'state' => 0,
                 'data' => $res
