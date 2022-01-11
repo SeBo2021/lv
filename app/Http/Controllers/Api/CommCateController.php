@@ -46,14 +46,18 @@ class CommCateController extends Controller
     {
         $keyMe = "status_me_{$tag}_$uid";
         $exist = $this->redis()->get($keyMe);
-        if($tag == 'message'){
+        if ($exist) {
+            return 1;
+        }
+        return 0;
+        /*if($tag == 'message'){
             return $exist ? 0 : 1;
         }else{
             if ($exist) {
                 return 1;
             }
             return 0;
-        }
+        }*/
     }
 
     /**
