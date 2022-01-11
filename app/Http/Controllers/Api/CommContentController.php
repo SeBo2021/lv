@@ -296,7 +296,7 @@ class CommContentController extends Controller
             $ids = $this->getChild($cid1, false);
             $model = CommBbs::query()
                 ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
-                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel', 'video_picture')
+                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip_expired', 'users.vip as vipLevel', 'video_picture')
                 ->whereIn('category_id', $ids)
                 ->orderBy('updated_at', 'desc');
             if ($locationName) {
