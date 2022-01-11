@@ -34,20 +34,27 @@ class CommRewardController extends Controller
             $toUserId = $params['to_user_id'];
             $money = $params['money'];
             $bbsId = $params['bbs_id'];
-            $note = $params['note']??'';
+            /*$note = $params['note']??'';
             $insertData = [
                 'user_id' => $request->user()->id,
                 'to_user_id' => $toUserId,
                 'bbs_id' => $bbsId,
                 'note' => $note,
                 'money' => $money,
-            ];
+            ];*/
+            $user = $request->user();
             DB::beginTransaction();
             try {   //先偿试队列
-                $originGold = $request->user()->gold;
+                $originGold = $user->gold;
+                if($originGold < $money){
+                    return response()->json([
+                        'state' => -1,
+                        'msg' => '余额不足'
+                    ]);
+                }
                 DB::table('community_bbs')->where('id',$bbsId)->increment('rewards',$money);
                 User::where('id', $toUserId)->increment('gold', $money);
-                User::where('id', $request->user()->id)->decrement('gold', $money);
+                User::where('id', $user->id)->decrement('gold', $money);
                 $now = date('Y-m-d H:i:s');
                 // 已方记录
                 GoldLog::query()->create([
