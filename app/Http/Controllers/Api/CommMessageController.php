@@ -73,7 +73,7 @@ class CommMessageController extends Controller
                     $tmpUserId = $item['user_id'];
                     $item['user_id'] =  $toUserId;
                     $items[$k]['to_user_id'] = $tmpUserId;
-                    $items[$k]['no_read'] = $this->redis()->get("status_me_message_".$item['to_user_id']) ? 0 : 1;
+                    $items[$k]['no_read'] = $this->redis()->get("status_me_message_".$item['to_user_id']) ? 1 : 0;
                 }
             }
 
