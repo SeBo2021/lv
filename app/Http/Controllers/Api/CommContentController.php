@@ -125,7 +125,7 @@ class CommContentController extends Controller
             } else {
                 $res = $this->other($request->user()->id, $locationName, $cid1, $cid2, 6, $page);
             }
-            // $this->processArea($res['bbs_list']);
+             $this->processArea($res['bbs_list']);
             return response()->json([
                 'state' => 0,
                 'data' => $res
