@@ -95,7 +95,7 @@ class CommChatController extends Controller
     {
         if (isset($request->params)) {
             $params = ApiParamsTrait::parse($request->params);
-            Log::info('===CommChat===',[$params]);
+            //Log::info('===CommChat===',[$params]);
             Validator::make($params, [
                 'to_user_id' => 'nullable',
                 'start_id' => 'nullable',
@@ -142,11 +142,10 @@ class CommChatController extends Controller
             $res['list'] = $items;
             $res['hasMorePages'] = $paginator->hasMorePages();
             //清除key========
-            Log::info('===CommChat-items===',[$items,$toUserId,$uid]);
-            if(!empty($items) && ($toUserId == $uid)){ //别人发给我的
+            //Log::info('===CommChat-items===',[$items,$toUserId,$uid]);
+            if(!empty($items) && ($items[0]->to_user_id == $uid)){ //别人发给我的
                 $unReadUserKey = 'status_me_unread_' . $uid;
-                $toUid = $items[0]->user_id == $uid ? $items[0]->to_user_id : $items[0]->user_id;
-                $this->redis()->sRem($unReadUserKey,$toUid);
+                $this->redis()->sRem($unReadUserKey,$items[0]->user_id);
                 if(empty($this->redis()->sMembers($unReadUserKey))){
                     $keyMe = "status_me_message_".$uid;
                     $this->redis()->del($keyMe);
