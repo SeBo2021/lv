@@ -76,7 +76,7 @@ class CommMessageController extends Controller
 
                     $unReadUserKey = 'status_me_unread_' . $uid;
                     $unReads = $this->redis()->sMembers($unReadUserKey);
-                    $items[$k]['no_read'] = !in_array($toUserId,$unReads) ? 0 : 1;
+                    $items[$k]['no_read'] = in_array($toUserId,$unReads) ? 0 : 1;
                     //Log::info('===CommMessage==',[$unReadUserKey,$unReads,$toUserId,!in_array($toUserId,$unReads),$items[$k]['no_read']]);
                 }
             }
