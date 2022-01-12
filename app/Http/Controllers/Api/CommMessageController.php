@@ -71,13 +71,14 @@ class CommMessageController extends Controller
                 } else {
                     $toUserId = $item['to_user_id'];
                     $tmpUserId = $item['user_id'];
+                    $sendUserId = $item['user_id'];
                     $item['user_id'] =  $toUserId;
                     $items[$k]['to_user_id'] = $tmpUserId;
 
                     $unReadUserKey = 'status_me_unread_' . $uid;
                     $unReads = $this->redis()->sMembers($unReadUserKey);
-                    $items[$k]['no_read'] = in_array($toUserId,$unReads) ? 0 : 1;
-                    Log::info('===CommMessage==',[$unReadUserKey,$unReads,$toUserId,!in_array($toUserId,$unReads),$items[$k]['no_read']]);
+                    $items[$k]['no_read'] = in_array($sendUserId,$unReads) ? 0 : 1;
+                    Log::info('===CommMessage==',[$unReadUserKey,$unReads,$sendUserId,!in_array($sendUserId,$unReads),$items[$k]['no_read']]);
                 }
             }
 
