@@ -60,6 +60,9 @@ class CommChatController extends Controller
                 $this->redis()->sAdd($relationName,$commentId);
 
                 if ($commentId > 0) {
+                    //存入未读用户
+                    $unReadUserKey = 'status_me_unread_' . $vid;
+                    $this->redis()->sAdd($unReadUserKey,$uid);
                     //消息红点提示=========================
                     $keyMe = "status_me_message_".$vid;
                     $this->redis()->set($keyMe,1);
@@ -138,10 +141,15 @@ class CommChatController extends Controller
             $res['list'] = $items;
             $res['hasMorePages'] = $paginator->hasMorePages();
             //清除key========
-            $min = min($toUserId,$uid);
-            $max = max($toUserId,$uid);
-            $chatPairKey = "chat_pair_{$min}_{$max}";
-            $this->redis()->del($chatPairKey);
+            if(!empty($items) && ($toUserId == $uid)){ //别人发给我的
+                $unReadUserKey = 'status_me_unread_' . $uid;
+                $toUid = $items[0]->user_id == $uid ? $items[0]->to_user_id : $items[0]->user_id;
+                $this->redis()->sRem($unReadUserKey,$toUid);
+                if(empty($this->redis()->sMembers($unReadUserKey))){
+                    $keyMe = "status_me_message_".$uid;
+                    $this->redis()->del($keyMe);
+                }
+            }
             //===========================
             return response()->json([
                 'state' => 0,
