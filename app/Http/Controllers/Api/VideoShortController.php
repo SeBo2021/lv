@@ -67,9 +67,10 @@ class VideoShortController extends Controller
      * @param $startId
      * @param $cateId
      * @param $tagId
+     * @param $words
      * @return array
      */
-    private function items($page, $uid, $startId,$cateId,$tagId): array
+    private function items($page, $uid, $startId,$cateId,$tagId,$words): array
     {
         $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
         $perPage = 8;
@@ -86,7 +87,9 @@ class VideoShortController extends Controller
         if ($startId) {
             $model->where('id','>=',$startId);
         }
-
+        if(!empty($words)){
+            $model = VideoShort::search($words)->where('status', 1);
+        }
         $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         $items = $paginator->items();
         $data = [];
@@ -130,11 +133,20 @@ class VideoShortController extends Controller
                     Rule::in(['1', '0']),
                 ],
             ])->validated();
+
             $page = $params['page'] ?? 1;
             $cateId = $params['cate_id'] ?? "";
             $tagId = $params['tag_id'] ?? "";
             $starId = $validated['start_id'] ?? '0';
-            $res = $this->items($page, $uid, $starId,$cateId,$tagId);
+            //关键词搜索
+            $words = $params['keyword'] ?? null;
+            if($words!==null){
+                $cateId = "";
+                $tagId = "";
+                $starId = '0';
+            }
+            $res = $this->items($page, $uid, $starId,$cateId,$tagId,$words);
+
             return response()->json([
                 'state' => 0,
                 'data' => $res
