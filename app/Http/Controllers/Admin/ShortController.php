@@ -179,6 +179,24 @@ class ShortController extends BaseCurlController
                 'value' => $show ? $show->url :''
             ],
             [
+                'field' => 'restricted',
+                'type' => 'radio',
+                'name' => '观看限制',
+                'must' => 0,
+                'default' => 1,
+                'verify' => 'rq',
+                'data' => [
+                    0 => [
+                        'id' => 0,
+                        'name' => '免费'
+                    ],
+                    1 => [
+                        'id' => 1,
+                        'name' => 'VIP会员卡'
+                    ],
+                ]
+            ],
+            [
                 'field' => 'status',
                 'type' => 'radio',
                 'name' => '是否上架',
