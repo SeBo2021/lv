@@ -73,12 +73,11 @@ class CommMessageController extends Controller
                     $tmpUserId = $item['user_id'];
                     $item['user_id'] =  $toUserId;
                     $items[$k]['to_user_id'] = $tmpUserId;
-                    //$existKey = "chat_pair_{$min}_{$max}";
-                    //                $exitPair = $this->redis()->get($existKey);
+
                     $min = min($toUserId,$tmpUserId);
                     $max = max($toUserId,$tmpUserId);
                     $chatPairKey = "chat_pair_{$min}_{$max}";
-                    $items[$k]['no_read'] = $this->redis()->get($chatPairKey) ? 1 : 0;
+                    $items[$k]['no_read'] = $this->redis()->get($chatPairKey) ? 0 : 1;
                 }
             }
 

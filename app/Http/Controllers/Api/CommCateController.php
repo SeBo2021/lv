@@ -44,7 +44,6 @@ class CommCateController extends Controller
      */
     private function checkHaveNew($uid, $tag): int
     {
-//        $keyMe = "status_me_{$tag}_$uid";
         $keyMe = "status_me_".$tag."_".$uid;
         $exist = $this->redis()->get($keyMe);
         if ($exist) {

@@ -60,9 +60,10 @@ class CommChatController extends Controller
                 $this->redis()->sAdd($relationName,$commentId);
 
                 if ($commentId > 0) {
-                    //消息红点提示
+                    //消息红点提示=========================
                     $keyMe = "status_me_message_".$vid;
                     $this->redis()->set($keyMe,1);
+                    //===================================
                     return response()->json([
                         'state' => 0,
                         'msg' => '发送成功'
@@ -110,12 +111,6 @@ class CommChatController extends Controller
 
             $uid = $request->user()->id;
             if ($toUserId) {
-                //清除key========
-                $min = min($toUserId,$uid);
-                $max = max($toUserId,$uid);
-                $chatPairKey = "chat_pair_{$min}_{$max}";
-                $this->redis()->del($chatPairKey);
-                //===========================
                 $queryBuild->where(function($sql) use ($uid,$toUserId){
                     $sql->whereIn('user_id',[$uid,$toUserId]);
                     $sql->whereIn('to_user_id',[$uid,$toUserId]);
@@ -142,7 +137,12 @@ class CommChatController extends Controller
             $items = $paginator->items();
             $res['list'] = $items;
             $res['hasMorePages'] = $paginator->hasMorePages();
-
+            //清除key========
+            $min = min($toUserId,$uid);
+            $max = max($toUserId,$uid);
+            $chatPairKey = "chat_pair_{$min}_{$max}";
+            $this->redis()->del($chatPairKey);
+            //===========================
             return response()->json([
                 'state' => 0,
                 'data' => $res
