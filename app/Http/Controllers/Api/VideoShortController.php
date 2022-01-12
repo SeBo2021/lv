@@ -89,8 +89,10 @@ class VideoShortController extends Controller
         }
         if(!empty($words)){
             $model = VideoShort::search($words)->where('status', 1);
+            $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
+        }else{
+            $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         }
-        $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         $items = $paginator->items();
         $data = [];
         foreach ($items as $one) {
