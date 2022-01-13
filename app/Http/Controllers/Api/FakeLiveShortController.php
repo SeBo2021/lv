@@ -130,6 +130,7 @@ class FakeLiveShortController extends Controller
                 'time' => 'nullable',
             ])->validated();
             $durationSeconds = $params['duration_seconds'] ?? 0;
+            $durationSeconds += 0;
             $time = $params['time'] ?? 0;
             $redisLiveCalcKey = sprintf("live_calc_%s",$uid);
             $redis = $this->redis();
