@@ -141,14 +141,14 @@ class VideoShortController extends Controller
             $tagId = $params['tag_id'] ?? "";
             $starId = $validated['start_id'] ?? '0';
             //关键词搜索
-            $words = $params['keyword'] ?? null;
-            if($words!==null){
+            $words = $params['keyword'] ?? '';
+            if(!empty($words)){
                 $cateId = "";
                 $tagId = "";
                 $starId = '0';
             }
             $res = $this->items($page, $uid, $starId,$cateId,$tagId,$words);
-
+            Log::info('===VideoShortLists===',[$params]);
             return response()->json([
                 'state' => 0,
                 'data' => $res
