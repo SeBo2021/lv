@@ -37,7 +37,7 @@ class ProcessStatisticsChannelCps implements ShouldQueue
         $channel_id = $this->orderInfo->channel_id ?? 0;
         $channelInfo = DB::table('channels')->where('id',$channel_id)->first();
 
-        if(($channelInfo->status == 1) && ($channelInfo->type==2)){ //正常的CPS渠道
+        if($channelInfo && ($channelInfo->status == 1) && ($channelInfo->type==2)){ //正常的CPS渠道
             $date_at = date('Y-m-d');
             $has = DB::connection('channel_mysql')->table('channel_cps')
                 ->where('promotion_code',$channelInfo->promotion_code)
@@ -65,28 +65,30 @@ class ProcessStatisticsChannelCps implements ShouldQueue
             }else{ //累计
                 $order_index = $has->order_index + 1;
                 //是否有纳入统计条目
-                $usage_index = false;
-                if($has->orders < 11){
+                $usage_index = 0;
+                $level_one_limits = 31;
+
+                if($has->orders < $level_one_limits){
                     if(!in_array($order_index,$level_one)){
                         $usage_index = $order_index;
                     }
                 }else{
-                    if($has->orders == 11){
-                        $usage_index = 11;
-                    }
-                    if($has->usage_index >= 11){
-                        $second_index = $has->usage_index + $channelInfo->level_two+1;
-                        if($second_index == $order_index){
-                            $usage_index = $second_index;
+                    if($order_index == $level_one_limits){
+                        $usage_index = $level_one_limits;
+                    }else{
+                        if($has->usage_index >= $level_one_limits){
+                            $second_index = $has->usage_index + $channelInfo->level_two+1;
+                            if($second_index === $order_index){
+                                $usage_index = $second_index;
+                            }
                         }
                     }
-
                 }
                 $updateData = [
                     'order_index' => $order_index,
                     'last_order_id' => $this->orderInfo->id,
                 ];
-                if(isset($usage_index)){
+                if($usage_index>0){
                     $updateData['usage_index'] = $usage_index;
                     $updateData['share_ratio'] = $channelInfo->share_ratio;
                     $updateData['share_amount'] = round(($this->orderInfo->amount * $channelInfo->share_ratio)/100 + $has->share_amount,2);

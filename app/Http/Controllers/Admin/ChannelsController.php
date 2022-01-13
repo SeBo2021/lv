@@ -190,13 +190,13 @@ class ChannelsController extends BaseCurlController
                 'field' => 'level_one',
                 'type' => 'text',
                 'name' => '一阶 (CPS使用)',
-                'tips' => '1-10单【填1表示扣第1单，如填1,3表示扣第一单和第三单，不填不扣】',
+                'tips' => '1-30单【填1表示扣第1单，如填1,3表示扣第一单和第三单，不填不扣】',
             ],
             [
                 'field' => 'level_two',
                 'type' => 'number',
                 'name' => '二阶 (CPS使用)',
-                'tips' => '11单及以上【填间隔值：填1，表示扣第12，14，16..类推，2表示扣第13,16,19..】',
+                'tips' => '31单及以上【填间隔值：填1，表示累计第31,33,35..类推，2表示只累计第31,34,37..】',
             ],
             [
                 'field' => 'share_ratio',
