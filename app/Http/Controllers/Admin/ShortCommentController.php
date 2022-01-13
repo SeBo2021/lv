@@ -99,6 +99,7 @@ class ShortCommentController extends BaseCurlIndexController
 
     public function setOutputHandleBtnTpl($shareData)
     {
+        $data = [];
         if ($this->isCanDel()) {
             $data[] = [
                 'class' => 'layui-btn-danger',
