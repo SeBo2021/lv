@@ -63,14 +63,14 @@ class VideoShortController extends Controller
     /**
      * 读取数据
      * @param $page
-     * @param $uid
+     * @param $user
      * @param $startId
      * @param $cateId
      * @param $tagId
      * @param $words
      * @return array
      */
-    private function items($page, $uid, $startId,$cateId,$tagId,$words): array
+    private function items($page, $user, $startId,$cateId,$tagId,$words): array
     {
         $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
         $perPage = 8;
@@ -98,18 +98,36 @@ class VideoShortController extends Controller
         foreach ($items as $one) {
             //  $one = $this->handleShortVideoItems([$one], true)[0];
             $one['limit'] = 0;
-            $viewRecord = $this->isShortLoveOrCollect($uid, $one['id']);
+            $one = $this->viewLimit($one, $user);
+            $viewRecord = $this->isShortLoveOrCollect($user->id, $one['id']);
             $one['is_love'] = intval($viewRecord['is_love']) ?? 0;
             //是否收藏
             $one['is_collect'] = intval($viewRecord['is_collect']) ?? 0;
             $one['url'] = env('RESOURCE_DOMAIN')  .$one['url'];
             $one['cover_img'] = env('RESOURCE_DOMAIN') . $one['cover_img'];
+
             $data[] = $one;
         }
         return [
             'list' => $data,
             'hasMorePages' => $paginator->hasMorePages()
         ];
+    }
+
+    /**
+     * 观看限制判断
+     * @param $one
+     * @param $user
+     * @return mixed
+     */
+    public function viewLimit($one, $user): mixed
+    {
+        if ($one['restricted'] == 1) {
+            if ((!$user->member_card_type) && (time() - $user->vip_expired > $user->vip_start_last)) {
+                $one['limit'] = 1;
+            }
+        }
+        return $one;
     }
 
     /**
@@ -121,7 +139,7 @@ class VideoShortController extends Controller
     {
         // 业务逻辑
         try {
-            $uid = $request->user()->id;
+            $user = $request->user();
             $params = ApiParamsTrait::parse($request->params);
             $validated = Validator::make($params, [
                 'start_id' => 'nullable',
@@ -147,8 +165,8 @@ class VideoShortController extends Controller
                 $tagId = "";
                 $starId = '0';
             }
-            $res = $this->items($page, $uid, $starId,$cateId,$tagId,$words);
-            //Log::info('===VideoShortLists===',[$params]);
+            $res = $this->items($page, $user, $starId,$cateId,$tagId,$words);
+            Log::info('===VideoShortLists===',[$params]);
             return response()->json([
                 'state' => 0,
                 'data' => $res
