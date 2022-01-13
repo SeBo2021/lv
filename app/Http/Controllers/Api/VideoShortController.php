@@ -148,7 +148,7 @@ class VideoShortController extends Controller
                 $starId = '0';
             }
             $res = $this->items($page, $uid, $starId,$cateId,$tagId,$words);
-            Log::info('===VideoShortLists===',[$params]);
+            //Log::info('===VideoShortLists===',[$params]);
             return response()->json([
                 'state' => 0,
                 'data' => $res
