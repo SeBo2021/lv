@@ -6,23 +6,14 @@ use App\Models\Category;
 
 trait CatTrait
 {
-    public function getCats($parentId = 2,$catAlias=[])
+    public function getCats($parentId = 2)
     {
-        if(!empty($catAlias)){
-            $topCat = Category::whereIn('mask', $catAlias)
-                ->where('is_checked',1)
-                ->orderBy('sort')
-                ->get(['id','name','sort'])
-                ->toArray();
-        } else{
-            $topCat = Category::query()
-                ->where('parent_id',$parentId)
-                ->where('is_checked',1)
-                ->orderBy('sort')
-                ->get(['id','name','sort'])
-                ->toArray();
-        }
-
+        $topCat = Category::query()
+            ->where('parent_id',$parentId)
+            ->where('is_checked',1)
+            ->orderBy('sort')
+            ->get(['id','name','sort'])
+            ->toArray();
         $topCatIds = [];
         foreach ($topCat as $item)
         {
