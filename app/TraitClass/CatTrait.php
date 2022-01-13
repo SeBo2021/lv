@@ -3,6 +3,7 @@
 namespace App\TraitClass;
 
 use App\Models\Category;
+use Illuminate\Support\Facades\Log;
 
 trait CatTrait
 {
@@ -14,6 +15,7 @@ trait CatTrait
             ->orderBy('sort')
             ->get(['id','name','sort'])
             ->toArray();
+        Log::info('==topCat===',[$topCat]);
         $topCatIds = [];
         foreach ($topCat as $item)
         {
