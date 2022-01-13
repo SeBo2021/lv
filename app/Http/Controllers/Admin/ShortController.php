@@ -149,7 +149,7 @@ class ShortController extends BaseCurlController
     public function setOutputUiCreateEditForm($show = '')
     {
         $tag = $this->getTagData(2);
-        $cats = $this->getCats(0,$this->cateAlias);
+        $cats = $this->getCats(10000);
         $data = [
             [
                 'field' => 'cats',
