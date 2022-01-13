@@ -3,12 +3,13 @@
 namespace App\TraitClass;
 
 use App\Models\WhiteList;
+use App\TraitClass\IpTrait;
 
 trait WhiteListTrait
 {
     public function whitelistPolice()
     {
-        $ip = $_SERVER['HTTP_X_REAL_IP'] ?? \request()->getClientIp();
+        $ip = IpTrait::getRealIp();
         //白名单
         $whiteList = WhiteList::query()
             ->where('status',1)
