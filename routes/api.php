@@ -84,4 +84,35 @@ Route::group([
     Route::post('oderCreate', 'OrderController@create');  //订单创建接口
     Route::get('orderQuery', 'OrderController@query');  //订单查询接口
     Route::post('orderPay', 'OrderController@orderPay');  //订单支付接口
+
+    /// 社区模块
+    Route::get('commCate', 'CommCateController@info');  //板块分类
+    Route::get('commCity', 'CommMiscController@city');  //地区列表
+    Route::get('commList', 'CommContentController@lists');  //内容列表
+    Route::get('commDetail', 'CommContentController@detail');  //内容列表
+    Route::post('commFocus', 'CommOperationController@foucs');  //关注用户
+    Route::post('commLike', 'CommOperationController@like');  //点赞用户
+    Route::get('commComment', 'CommCommentController@lists');  //帖子评论
+    Route::post('commCommentPost', 'CommCommentController@post');  //发表评论
+    Route::post('commReward', 'CommRewardController@action');  //打赏
+    Route::get('commMessage', 'CommMessageController@lists');  //消息列表
+    Route::get('commHome', 'CommHomeController@info');  //个人详情
+    Route::get('commChat', 'CommChatController@lists');  //私聊-消息列表
+    Route::post('commChatPost', 'CommChatController@post');  //私聊-发送消息
+    Route::post('commRes', 'CommMiscController@res');  //发送资源
+    Route::post('commBbs', 'CommContentController@post');  //发贴
+
+    /// 小视频模块
+    Route::get('shortCate', 'VideoShortController@cate');  //视频分类
+    Route::get('shortList', 'VideoShortController@lists');  //播放列表
+    Route::post('shortLike', 'VideoShortController@like');  //小视频点赞
+    Route::post('shortCollect', 'VideoShortController@collect');  //收藏
+    /// 小视频评论
+    Route::post('shortCommentList', 'CommentShortController@lists');      //评论列表
+    Route::post('shortComment', 'CommentShortController@submit');      //评论
+    Route::post('shortCommentReply', 'CommentShortController@reply');  //回复评论
+
+    /// 伪直播模块
+    Route::get('liveList', 'FakeLiveShortController@lists');  //播放列表
+    Route::post('liveCalc', 'FakeLiveShortController@calc');  //直播统计
 });

@@ -21,10 +21,11 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Passport\Token;
+use \App\TraitClass\PHPRedisTrait;
 
 class UserController extends Controller
 {
-    use MemberCardTrait,SmsTrait,LoginTrait,VideoTrait;
+    use MemberCardTrait,SmsTrait,LoginTrait,VideoTrait,PHPRedisTrait;
 
     public function set(Request $request): JsonResponse|array
     {
@@ -237,6 +238,11 @@ class UserController extends Controller
                     if(!empty($collectIds)){
                         DB::table('view_record')->whereIn('id',$collectIds)->update(['is_collect'=>0]);
                     }
+                    //清除相关redis中的key
+                    $redis = $this->redis();
+                    foreach ($vid as $redis_vid){
+                        $redis->del("short_is_collect_{$user->id}_{$redis_vid}");
+                    }
                 }
                 return response()->json([
                     'state'=>0,
@@ -249,10 +255,24 @@ class UserController extends Controller
                 $perPage = $params['pageSize'];
             }
             $user = $request->user();
-            $paginator = DB::table('video')
+            /*$paginator = DB::table('video')
                 ->join('view_record','video.id','=','view_record.vid')
                 ->where('view_record.uid',$user->id)
                 ->where('view_record.is_collect',1)
+                ->simplePaginate($perPage,$this->videoFields,'myCollect',$page);*/
+            // 暂时放在一起
+            $paginator = DB::table('view_record')
+                ->leftJoin('video','view_record.vid','=','video.id')
+                ->select(
+                    'video.id','video.name','video.gold','video.cat','video.sync','video.title','video.duration','video.type','video.restricted','video.cover_img','video.views','video.updated_at','video.hls_url','video.dash_url',
+                    'view_record.is_love','view_record.is_collect',
+                    'view_record.usage','view_record.time_at',
+                    'video_short.id as vs_id','video_short.name as vs_name','video_short.gold as vs_gold','video_short.cat as vs_cat','video_short.sync as vs_sync','video_short.title as vs_title','video_short.duration as vs_duration','video_short.type as vs_type','video_short.restricted as vs_restricted','video_short.cover_img as vs_cover_img','video_short.views as vs_views','video_short.updated_at as vs_updated_at','video_short.hls_url as vs_hls_url','video_short.dash_url as vs_dash_url','video_short.url as url',
+                )
+                ->leftJoin('video_short','view_record.vid','=','video_short.id')
+                ->where('view_record.uid',$user->id)
+                ->where('view_record.is_collect',1)
+                ->orderByDesc('view_record.time_at')
                 ->simplePaginate($perPage,$this->videoFields,'myCollect',$page);
             //路径处理
             $res['list'] = $this->handleVideoItems($paginator->items());

@@ -35,9 +35,10 @@ class AnyUpload
     /**
      * @param string $fileField 表单file元素的name
      * @param array $config 配置项
-     * @param bool $base64 是否解析base64编码，可省略。若开启，则$fileField代表的是base64编码的字符串表单名
+     * @param string $method_type
+     * @param null $data
      */
-    public function config($fileField = 'file', $config=[], $method_type = "upload")
+    public function config($fileField = 'file', $config=[], $method_type = "upload",$data = null)
     {
 
         $this->stateMap = [
@@ -78,7 +79,7 @@ class AnyUpload
                 break;
             default:
                 //普通表单上传
-                $this->upFile();
+                $this->upFile($data);
                 break;
         }
 
@@ -115,11 +116,16 @@ class AnyUpload
 
     /**
      * 上传文件的主处理方法
+     * @param null $useDefault
      * @return mixed
      */
-    private function upFile()
+    private function upFile($data = null)
     {
-        $file = $this->file = $_FILES[$this->fileField];
+        if ($data) {
+            $file = $this->file = $data;
+        } else {
+            $file = $this->file = $_FILES[$this->fileField];
+        }
         if (!$file) {
             $this->stateInfo = $this->getStateInfo("ERROR_FILE_NOT_FOUND");
             return;
@@ -134,7 +140,6 @@ class AnyUpload
             $this->stateInfo = $this->getStateInfo("ERROR_TMPFILE");
             return;
         }
-
         $this->oriName = $file['name'];
         $this->fileSize = $file['size'];
 

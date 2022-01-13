@@ -14,11 +14,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\File;
 use App\Models\FileGroup;
+use App\TraitClass\UploadTrait;
 use Illuminate\Http\Request;
 use App\ExtendClass\UploadFile;
 
 class FileUploadController extends BaseController
 {
+    use UploadTrait;
     //
     public function handle($type, Request $request)
     {
@@ -93,12 +95,7 @@ class FileUploadController extends BaseController
 
     protected function upload($request)
     {
-        $files = $request->input('files', 'file');
-        $file_type = $request->input('file_type', 'image');
-        $group_id = $request->input('group_id', '0');
-        $method = $request->input('method', 'upload');
-        $oss_type = $request->input('oss_type', config('filesystems.default'));
-        $r = UploadFile::upload($files, $file_type, $method, $group_id, [],$oss_type , admin('id'));
+        $r = $this->upFile($request);
         return response()->json($r);
     }
 

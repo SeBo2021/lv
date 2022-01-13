@@ -255,6 +255,18 @@ trait VideoTrait
         return $sync==1 ? env('RESOURCE_DOMAIN') : env('SLICE_DOMAIN');
     }
 
+    public static function getOrigin($sync,$pathName = '',$simple = false)
+    {
+        $url =  $sync==1 ? env('RESOURCE_DOMAIN_DEV') : env('SLICE_DOMAIN');
+        if (!$pathName) {
+            return '';
+        }
+        if ($simple) {
+            return "{$url}/{$pathName}";
+        }
+        return "{$url}/aetherupload/display/{$pathName}";
+    }
+
     //获取切片链接地址、封面图
     public static function get_slice_url($pathName,$type="dash",$sync=null): string
     {
@@ -336,23 +348,62 @@ trait VideoTrait
         return $h*3600 + $i*60 + $s;
     }
 
-    public function handleVideoItems($lists,$display_url=false,$uid = 0)
+    public function handleVideoItems($lists,$display_url=false,$uid = 0,$processSort = false)
     {
         foreach ($lists as &$list){
             $list = (array)$list;
-            $domainSync = VideoTrait::getDomain($list['sync']);
-            $list['cover_img'] = $domainSync.$list['cover_img'];
-            $list['gold'] = $list['gold']/$this->goldUnit;
-            $list['views'] = $list['views']>0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5,9));
-            $list['hls_url'] = $domainSync . $list['hls_url'];
-            $list['preview_hls_url'] = $this->getPreviewPlayUrl($list['hls_url']);
-            $list['dash_url'] = $domainSync . $list['dash_url'];
-            $list['preview_dash_url'] = $this->getPreviewPlayUrl($list['dash_url'],'dash');
-            if(!$display_url){
-                unset($list['hls_url']);
-                unset($list['dash_url']);
-            }
+            if (($list['usage']??1) == 2) {
+                /// 重置信息
+                $list['id'] = $list['vs_id'] ;
+                $list['name'] = $list['vs_name'] ;
+                $list['gold'] = $list['vs_gold'] ;
+                $list['cat'] = $list['vs_cat'] ;
+                $list['sync'] = $list['vs_sync'] ;
+                $list['title'] = $list['vs_title'] ;
+                $list['duration'] = $list['vs_duration'] ;
+                $list['type'] = $list['vs_type'] ;
+                $list['restricted'] = $list['vs_restricted'] ;
+                $list['cover_img'] = $list['vs_cover_img'] ;
+                $list['views'] = $list['vs_views'] ;
+//                $list['updated_at'] = $list['vs_updated_at'] ;
+                $list['updated_at'] = $list['time_at']>0 ? date('Y-m-d H:i:s',$list['time_at']) : $list['vs_updated_at'];
+                $list['hls_url'] = $list['vs_hls_url'] ;
+                $list['dash_url'] = $list['vs_dash_url'] ;
 
+                $domainSync = VideoTrait::getDomain($list['sync']);
+
+                $list['cover_img'] = $domainSync . $list['cover_img'];
+                $list['gold'] = $list['gold'] / $this->goldUnit;
+                $list['views'] = $list['views'] > 0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5, 9));
+                $list['hls_url'] = '';
+                $list['preview_hls_url'] = '';
+                $list['dash_url'] = '';
+                $list['preview_dash_url'] ='';
+                if (!$display_url) {
+                    unset($list['hls_url']);
+                    unset($list['dash_url']);
+                }
+                $list['url'] = env('RESOURCE_DOMAIN_DEV') . '/' .$list['url'];
+            } else {
+                $domainSync = VideoTrait::getDomain($list['sync']);
+                $list['cover_img'] = $domainSync . $list['cover_img'];
+                $list['gold'] = $list['gold'] / $this->goldUnit;
+                $list['views'] = $list['views'] > 0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5, 9));
+                $list['hls_url'] = $domainSync . $list['hls_url'];
+                $list['preview_hls_url'] = $this->getPreviewPlayUrl($list['hls_url']);
+                $list['dash_url'] = $domainSync . $list['dash_url'];
+                $list['preview_dash_url'] = $this->getPreviewPlayUrl($list['dash_url'], 'dash');
+                if(isset($list['time_at']) && ($list['time_at']>0)){
+                    $list['updated_at'] = date('Y-m-d H:i:s',$list['time_at']);
+                }
+                if (!$display_url) {
+                    unset($list['hls_url']);
+                    unset($list['dash_url']);
+                }
+            }
+            if ($list['usage']??false) {
+                unset($list['vs_id'], $list['vs_name'], $list['vs_gold'], $list['vs_cat'], $list['vs_sync'], $list['vs_title'], $list['vs_duration'], $list['vs_type'], $list['vs_restricted'], $list['vs_cover_img'], $list['vs_views'], $list['vs_updated_at'], $list['vs_hls_url'], $list['vs_dash_url'], $list['vs_url']);
+            }
             //是否点赞
             $viewRecord = $this->isLoveOrCollect($uid,$list['id']);
             $list['is_love'] = $viewRecord['is_love'] ?? 0;

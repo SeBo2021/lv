@@ -6,10 +6,10 @@ use App\Models\Category;
 
 trait CatTrait
 {
-    public function getCats()
+    public function getCats($parentId = 2)
     {
         $topCat = Category::query()
-            ->where('parent_id',2)
+            ->where('parent_id',$parentId)
             ->where('is_checked',1)
             ->orderBy('sort')
             ->get(['id','name','sort'])
@@ -20,6 +20,13 @@ trait CatTrait
             $topCatIds[] = $item['id'];
         }
         if(!empty($topCatIds)){
+            if ($parentId != 2) {
+                return Category::query()
+                    ->where('is_checked',1)
+                    ->whereIn('id',$topCatIds)
+                    ->orderBy('sort')
+                    ->get(['id','name'])->toArray();
+            }
             return Category::query()
                 ->where('is_checked',1)
                 ->whereIn('parent_id',$topCatIds)
@@ -29,9 +36,9 @@ trait CatTrait
         return [];
     }
 
-    public function getCatName($cat)
+    public function getCatName($cat,$parentId =2)
     {
-        $topCat = $this->getCats();
+        $topCat = $this->getCats($parentId);
         $catArr = json_decode($cat, true);
         $name = '';
         $characters = '||';

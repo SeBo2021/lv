@@ -66,6 +66,8 @@ class ProcessLogin implements ShouldQueue
 
         //增加登录次数
         $uid = $this->loginLogData['uid'];
+        // 冗余最后一次登录地理信息
+        User::query()->where('id',$uid)->update(['location_name'=>$areaJson]);
         User::query()->where('id',$uid)->increment('login_numbers');
         //生成邀请码、更新手机平台、绑定渠道
         $this->updateUserInfo();

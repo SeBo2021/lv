@@ -103,7 +103,7 @@ class CommentController extends Controller
                 ->join('users','comments.uid','=','users.id')
                 ->where('comments.vid',$vid);
             $queryBuild = $queryBuild->where('reply_cid',$reply_cid);
-            $paginator = $queryBuild->orderBy('id')->simplePaginate($perPage,$fields,'commentLists',$page);
+            $paginator = $queryBuild->orderByDesc('id')->simplePaginate($perPage,$fields,'commentLists',$page);
             $items = $paginator->items();
             $res['list'] = $items;
             $res['hasMorePages'] = $paginator->hasMorePages();

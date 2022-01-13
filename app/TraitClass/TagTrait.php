@@ -7,14 +7,14 @@ use App\Models\Tag;
 trait TagTrait
 {
 
-    public function getTagData()
+    public function getTagData($usage = 1)
     {
-        return Tag::query()->get(['id','name'])->toArray();
+        return Tag::query()->where('usage',$usage)->get(['id','name'])->toArray();
     }
 
-    public function getTagName($tag)
+    public function getTagName($tag,$usage = 1)
     {
-        $tagData = $this->getTagData();
+        $tagData = $this->getTagData($usage);
         $tagArr = json_decode($tag, true);
         $name = '';
         $characters = '||';

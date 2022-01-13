@@ -299,6 +299,13 @@ class CategoryController extends BaseCurlController
                 'mark' => $name['mark'] ?? ''
             ],
             [
+                'field' => 'usage',
+                'name' => '用途',
+                'type' => 'select',
+                'on' => '1',
+                'data' => [['id' => '1', 'name' => '电影'],['id' => '2', 'name' => '小视频']]
+            ],
+            [
                 'field' => 'parent_id',
                 'name' => '上级',
                 'must' => 1,
@@ -338,6 +345,12 @@ class CategoryController extends BaseCurlController
                 'type' => 'number',
                 'name' => '版块显示数量',
                 'default' => 8,
+            ],
+            [
+                'field' => 'mask',
+                'type' => 'text',
+                'name' => '编程代码',
+                'default' => '',
             ],
             [
                 'field' => 'sort',

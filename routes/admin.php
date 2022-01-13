@@ -56,6 +56,17 @@ $route->middleware(['admin_auth'])->name($route_name)->group(function ($route) {
         'MemberController',
         'MemberCardController',
         'VideoController',
+        'ShortController',
+        'ShortCommentController',
+        'LiveController',
+
+        'CommCateController',
+        'CommBbsController',
+        'CommMessageController',
+        'CommCommentsController',
+        'CommChatController',
+        'CommRewardController',
+
         'UserVideoController',
         'LoginLogController',
         'RechargeController',
@@ -79,7 +90,6 @@ $route->middleware(['admin_auth'])->name($route_name)->group(function ($route) {
         //以下是例子部分的演示,不需要就删除
         'CategoryController',
         'TagController',
-
     ];
     //只有首页
     $only_index = [
