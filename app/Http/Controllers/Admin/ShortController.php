@@ -23,6 +23,11 @@ class ShortController extends BaseCurlController
 
     public $pageName = '小视频管理';
 
+    public array $cateAlias = [
+        'short_hot',
+        'limit_free',
+        'short_rec'
+    ];
 
     public function setModel()
     {
@@ -144,7 +149,7 @@ class ShortController extends BaseCurlController
     public function setOutputUiCreateEditForm($show = '')
     {
         $tag = $this->getTagData(2);
-        $cats = $this->getCats(10000);
+        $cats = $this->getCats(0,$this->cateAlias);
         $data = [
             [
                 'field' => 'cats',
