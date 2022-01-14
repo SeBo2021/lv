@@ -118,16 +118,14 @@ class CommContentController extends Controller
             $page = $params['page'] ?? 1;
             $locationName = $params['location_name'] ?? '';
             $cid2 = $params['cid_2'] ?? 0;
-            Log::info('===COMMLIST-params==',[$params]);
+            //Log::info('===COMMLIST-params==',[$params]);
             // 得到一级分类help
             $help = $this->redis()->hGet('common_cate_help', "c_{$cid1}");
             $uid = $request->user()->id;
             if (in_array($help, ['focus', 'hot'])) {
                 $res = $this->$help($uid, $locationName, 6, $page);
-                Log::info('===COMMLIST-focus-hot'.$help,[$res]);
             } else {
                 $res = $this->other($request->user()->id, $locationName, $cid1, $cid2, 6, $page);
-                Log::info('===COMMLIST-other===',[$res]);
             }
             $this->processArea($res['bbs_list']);
             return response()->json([
