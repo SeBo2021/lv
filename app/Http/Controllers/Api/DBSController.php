@@ -142,6 +142,7 @@ class DBSController extends Controller implements Pay
      * @return mixed
      * @throws GuzzleException
      * @throws ValidationException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function method(Request $request): mixed
     {
@@ -151,7 +152,8 @@ class DBSController extends Controller implements Pay
             'money' => 'required|string',
         ])->validate();
         Log::info('dbs_method_params===',[$params]);//三方参数日志
-        $mercId = SELF::getPayEnv()['DBS']['merchant_id'];
+        $mercId = self::getPayEnv()['DBS']['merchant_id'];
+        Log::info('dbs_method_info===',[self::getPayEnv()]);//三方参数日志
         $isArray = stripos($params['money'],',');
         if ($isArray) {
             $money = array_map(function ($d){
