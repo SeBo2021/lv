@@ -53,6 +53,7 @@ class VideoShortController extends Controller
             ->orderBy('sort', 'desc')
             ->select('id', 'name')
             ->get();
+        Log::info('===VideoShortCate==',[$raw]);
         $data = json_decode($raw, true);
         return response()->json([
             'state' => 0,
