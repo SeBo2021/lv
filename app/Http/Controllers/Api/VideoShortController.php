@@ -50,6 +50,7 @@ class VideoShortController extends Controller
     public function cate(Request $request): JsonResponse
     {
         $raw = Category::whereIn('mask', $this->mainCateAlias)
+            ->where('is_checked',1)
             ->orderBy('sort', 'desc')
             ->select('id', 'name')
             ->get();
