@@ -15,7 +15,7 @@ trait CatTrait
             ->orderBy('sort')
             ->get(['id','name','sort'])
             ->toArray();
-        Log::info('==topCat===',[$topCat]);
+        //Log::info('==topCat===',[$topCat]);
         $topCatIds = [];
         foreach ($topCat as $item)
         {

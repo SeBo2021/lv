@@ -114,6 +114,7 @@ class CommCommentsController extends BaseCurlController
 
     public function setOutputHandleBtnTpl($shareData)
     {
+        $data = [];
         if ($this->isCanDel()) {
             $data[] = [
                 'class' => 'layui-btn-danger',
