@@ -55,6 +55,7 @@ class VideoShortController extends Controller
             ->get();
         Log::info('===VideoShortCate==',[$raw]);
         $data = json_decode($raw, true);
+        Log::info('===VideoShortCateData==',[$data]);
         return response()->json([
             'state' => 0,
             'data' => $data
