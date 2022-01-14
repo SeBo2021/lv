@@ -8,15 +8,17 @@ use Illuminate\Support\Facades\Log;
 
 trait WhiteListTrait
 {
-    public function whitelistPolice()
+    public function whitelistPolice(): bool
     {
-        $ip = IpTrait::getRealIp();
+        $ip = \request()->getClientIp();
+        //$ip = IpTrait::getRealIp();
         //白名单
         $whiteList = WhiteList::query()
             ->where('status',1)
             ->where('type',1)
             ->pluck('ip')->toArray();
-        Log::info('===adminLoginIPS===',[$whiteList,$ip]);
+        //Log::info('===adminLoginIPS===',[$whiteList,$ip]);
+        Log::info('===adminSERVER===',[$_SERVER]);
         if(!in_array($ip, $whiteList)){
             return false;
         }
