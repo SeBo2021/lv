@@ -50,6 +50,7 @@ class VideoShortController extends Controller
     public function cate(Request $request): JsonResponse
     {
         $raw = Category::whereIn('mask', $this->mainCateAlias)
+            ->where('is_checked',1)
             ->orderBy('sort', 'desc')
             ->select('id', 'name')
             ->get();
@@ -74,7 +75,7 @@ class VideoShortController extends Controller
     {
         $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
         $perPage = 8;
-        $model = VideoShort::query();
+        $model = VideoShort::query()->where('status',1);
         if ($cateId) {
             $cateWord = sprintf('"%s"',$cateId);
             $model->where('cat','like',"%{$cateWord}%");
