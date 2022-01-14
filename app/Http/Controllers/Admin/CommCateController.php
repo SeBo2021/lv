@@ -115,7 +115,7 @@ class CommCateController extends BaseCurlController
         $data = [];
         $raw = CommCate::query()->orderBy('order', 'desc')
             ->select('id','name','parent_id','mark','order','is_allow_post','can_select_city')
-            ->where('is_checked',1)
+            //->where('is_checked',1)
             ->get()->toArray();
         foreach ($raw as $k1 => $v1) {
             $this->redis()->hSet('common_cate_help', "c_{$v1['id']}", $v1['mark']);
