@@ -23,6 +23,11 @@ class ShortController extends BaseCurlController
 
     public $pageName = '小视频管理';
 
+    public array $cateAlias = [
+        'short_hot',
+        'limit_free',
+        'short_rec'
+    ];
 
     public function setModel()
     {
@@ -145,6 +150,7 @@ class ShortController extends BaseCurlController
     {
         $tag = $this->getTagData(2);
         $cats = $this->getCats(10000);
+        Log::info('==ShortCats===',[$cats]);
         $data = [
             [
                 'field' => 'cats',
