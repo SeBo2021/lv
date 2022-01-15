@@ -34,9 +34,9 @@ class ShortController extends BaseCurlController
         return $this->model = new VideoShort();
     }
 
-    public function indexCols()
+    public function indexCols(): array
     {
-        $cols = [
+        return [
             [
                 'type' => 'checkbox'
             ],
@@ -121,29 +121,6 @@ class ShortController extends BaseCurlController
                 'align' => 'center'
             ]
         ];
-
-        return $cols;
-    }
-
-    /*public function getCateGoryData()
-    {
-        return array_merge($this->uiService->allDataArr('请选择分类'), $this->uiService->treeData(Category::checked()->get()->toArray(), 0));//树形select
-    }*/
-    public function getCatNavData()
-    {
-        $res = Category::query()
-            ->where('is_checked',1)
-            ->where('parent_id',2)
-            ->orderBy('sort')
-            ->get(['id','name']);
-        $data = $this->uiService->allDataArr('请选择分类');
-        foreach ($res as $item) {
-            $data[$item->id] = [
-                'id' => $item->id,
-                'name' => $item->name,
-            ];
-        }
-        return $data;
     }
 
     public function setOutputUiCreateEditForm($show = '')
@@ -392,13 +369,6 @@ class ShortController extends BaseCurlController
                 'name' => '是否上架',
                 'default' => '',
                 'data' => $this->uiService->trueFalseData(1)
-            ],
-            [
-                'field' => 'cid',
-                'type' => 'select',
-                'name' => '分类',
-                'default' => '',
-                'data' => $this->getCatNavData()
             ],
         ];
         //赋值到ui数组里面必须是`search`的key值

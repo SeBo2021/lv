@@ -4,7 +4,7 @@ namespace App\TraitClass;
 
 trait MemberCardTrait
 {
-    public $cardRights = [
+    public array $cardRights = [
         1 => [
             'id' => 1,
             'icon' => 1,
@@ -12,52 +12,62 @@ trait MemberCardTrait
         ],
         2 => [
             'id' => 2,
-            'icon' => 10,
-            'name' => '专属客服'
+            'icon' => 2,
+            'name' => '会员福利群'
         ],
         3 => [
             'id' => 3,
-            'icon' => 4,
+            'icon' => 3,
             'name' => '会员专有标识'
         ],
         4 => [
             'id' => 4,
-            'icon' => 3,
-            'name' => '会员福利群'
+            'icon' => 4,
+            'name' => '空降女友抽奖'
         ],
         5 => [
             'id' => 5,
-            'icon' => 7,
-            'name' => '评论特权'
+            'icon' => 5,
+            'name' => '祼聊外围'
         ],
         6 => [
             'id' => 6,
-            'icon' => 2,
-            'name' => '高清视频'
+            'icon' => 6,
+            'name' => '评论特权'
         ],
         7 => [
             'id' => 7,
-            'icon' => 9,
-            'name' => '收藏特权'
+            'icon' => 7,
+            'name' => '骚豆影片免费'
         ],
         8 => [
             'id' => 8,
-            'icon' => 5,
-            'name' => '空降女友抽奖'
+            'icon' => 8,
+            'name' => '收藏特权'
         ],
         9 => [
             'id' => 9,
-            'icon' => 6,
-            'name' => '祼聊外围'
+            'icon' => 9,
+            'name' => '专属客服'
         ],
         10 => [
             'id' => 10,
-            'icon' => 8,
-            'name' => '骚豆影片免费'
+            'icon' => 10,
+            'name' => '小视频特权'
+        ],
+        11 => [
+            'id' => 11,
+            'icon' => 11,
+            'name' => '社交特权'
+        ],
+        12 => [
+            'id' => 12,
+            'icon' => 12,
+            'name' => '视频直播'
         ],
     ];
 
-    public function numToRights($num)
+    public function numToRights($num): array
     {
         $rights = [];
         foreach ($this->cardRights as $right)
@@ -70,7 +80,7 @@ trait MemberCardTrait
         return $rights;
     }
 
-    public function getRightsName($num)
+    public function getRightsName($num): string
     {
         $ids = $this->numToRights($num);
         $name = '';
@@ -82,7 +92,7 @@ trait MemberCardTrait
         return rtrim($name,$char);
     }
 
-    public function binTypeToNum($rights)
+    public function binTypeToNum($rights): float|object|int
     {
         $num = 0;
         foreach ($rights as $right)
