@@ -22,12 +22,13 @@ class CommCateController extends Controller
     public function info(Request $request): JsonResponse
     {
         $raw = $this->redis()->get('common_cate');
-        $data = (array) @json_decode($raw, true);
+        $data = @json_decode($raw, true) ?? [];
+        $user = $request->user();
         foreach ($data as $k => $datum) {
             if ($datum['mark'] == 'focus') {
-                $data[$k]['have_new'] = $this->checkFocusNew($request->user()->id);
+                $data[$k]['have_new'] = $this->checkFocusNew($user->id);
             } else {
-                $data[$k]['have_new'] = $this->checkHaveNew($request->user()->id, $datum['mark']);
+                $data[$k]['have_new'] = $this->checkHaveNew($user->id, $datum['mark']);
             }
         }
         return response()->json([
