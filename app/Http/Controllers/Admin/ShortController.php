@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 use App\Jobs\ProcessShort;
 use App\Jobs\ProcessSyncMiddleSectionTable;
 use App\Jobs\ProcessSyncMiddleTagTable;
+use App\Models\AdminVideoShort;
 use App\Models\Category;
 use App\Models\Video;
 use App\Models\VideoShort;
@@ -31,7 +32,7 @@ class ShortController extends BaseCurlController
 
     public function setModel()
     {
-        return $this->model = new VideoShort();
+        return $this->model = new AdminVideoShort();
     }
 
     public function indexCols(): array
