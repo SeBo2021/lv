@@ -121,38 +121,39 @@ class FakeLiveShortController extends Controller
      */
     public function calc(Request $request): JsonResponse
     {
-        try {
-            $user = $request->user();
-            $uid = $user->id;
-            $params = ApiParamsTrait::parse($request->params);
-            Validator::make($params, [
-                'duration_seconds' => 'nullable',
-                'time' => 'nullable',
-            ])->validated();
-            $durationSeconds = $params['duration_seconds'] ?? 0;
-            $durationSeconds += 0;
-            $time = $params['time'] ?? 0;
-            $redisLiveCalcKey = sprintf("live_calc_%s",$uid);
-            $redis = $this->redis();
-            $usedTime = $redis->get($redisLiveCalcKey)?:0;
-            $nowTime = $usedTime + $time;
-            $mint3 = 3 * 60;
-            $remainSecond = $mint3 - $nowTime;
-            if ($remainSecond < 0) {
-                $remainSecond = 0;
-            }
-            $redis->set($redisLiveCalcKey,$nowTime);
+        $user = $request->user();
+        $uid = $user->id;
+        $params = ApiParamsTrait::parse($request->params);
+        Validator::make($params, [
+            'duration_seconds' => 'nullable',
+            'time' => 'nullable',
+        ])->validated();
+        $durationSeconds = $params['duration_seconds'] ?? 0;
+        $durationSeconds += 0;
+        $time = $params['time'] ?? 0;
+        $redisLiveCalcKey = sprintf("live_calc_%s",$uid);
+        $redis = $this->redis();
+        $usedTime = $redis->get($redisLiveCalcKey)?:0;
+        $nowTime = $usedTime + $time;
+        $mint3 = 3 * 60;
+        $remainSecond = $mint3 - $nowTime;
+        if ($remainSecond < 0) {
+            $remainSecond = 0;
+        }
+        $redis->set($redisLiveCalcKey,$nowTime);
 
-            $startSecond = $durationSeconds - ($durationSeconds - (time() % $durationSeconds));
+        $startSecond = $durationSeconds - ($durationSeconds - (time() % $durationSeconds));
 
-            return response()->json([
-                'state' => 0,
-                'data' => [
-                    'is_vip' => $user->vip>0 ? 1 : 0,
-                    'start_second' => $startSecond,
-                    'remain_second' => $remainSecond
-                ]
-            ]);
+        return response()->json([
+            'state' => 0,
+            'data' => [
+                'is_vip' => $user->vip>0 ? 1 : 0,
+                'start_second' => $startSecond,
+                'remain_second' => $remainSecond
+            ]
+        ]);
+        /*try {
+
         } catch (Exception $exception) {
             $msg = $exception->getMessage();
             Log::error("liveCalc", [$msg]);
@@ -160,7 +161,7 @@ class FakeLiveShortController extends Controller
                 'state' => -1,
                 'data' => $msg
             ]);
-        }
+        }*/
     }
 
     /**
