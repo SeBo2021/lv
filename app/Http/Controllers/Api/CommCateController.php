@@ -21,9 +21,10 @@ class CommCateController extends Controller
      */
     public function info(Request $request): JsonResponse
     {
-        $raw = $this->redis()->get('common_cate');
-        $data = @json_decode($raw, true) ?? [];
         $user = $request->user();
+        $raw = $this->redis()->get('common_cate');
+        $data = @json_decode($raw, true);
+        $data = $data ?? [];
         foreach ($data as $k => $datum) {
             if ($datum['mark'] == 'focus') {
                 $data[$k]['have_new'] = $this->checkFocusNew($user->id);
