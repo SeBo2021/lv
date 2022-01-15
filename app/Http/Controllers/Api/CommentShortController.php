@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Video;
 use App\Models\VideoShort;
 use App\TraitClass\ApiParamsTrait;
+use App\TraitClass\VipRights;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,7 @@ use Illuminate\Validation\ValidationException;
 
 class CommentShortController extends Controller
 {
+    use VipRights;
     /**
      * 视频评论
      * @param Request $request
@@ -23,6 +25,14 @@ class CommentShortController extends Controller
     public function submit(Request $request): JsonResponse
     {
         try {
+            //权限控制
+            $user = $request->user();
+            if(!$this->commentRight($user)){
+                return response()->json([
+                    'state' => -2,
+                    'msg' => "权限不足",
+                ]);
+            }
             $params = ApiParamsTrait::parse($request->params);
             Validator::make($params, [
                 'vid' => 'required|integer',
@@ -32,7 +42,7 @@ class CommentShortController extends Controller
             $content = $params['content'];
             $insertData = [
                 'vid' => $vid,
-                'uid' => $request->user()->id,
+                'uid' => $user->id,
                 'content' => $content,
                 'reply_at' => date('Y-m-d H:i:s'),
             ];
@@ -62,6 +72,14 @@ class CommentShortController extends Controller
      */
     public function reply(Request $request): JsonResponse
     {
+        //权限控制
+        $user = $request->user();
+        if(!$this->commentRight($user)){
+            return response()->json([
+                'state' => -2,
+                'msg' => "权限不足",
+            ]);
+        }
         try {
             $params = ApiParamsTrait::parse($request->params);
             $validated = Validator::make($params, [

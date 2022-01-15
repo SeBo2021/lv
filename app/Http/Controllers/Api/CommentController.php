@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Video;
 use App\TraitClass\ApiParamsTrait;
+use App\TraitClass\VipRights;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class CommentController extends Controller
 {
+    use VipRights;
     public function submit(Request $request)
     {
         if(isset($request->params)) {
@@ -22,13 +24,20 @@ class CommentController extends Controller
             ])->validate();
             $vid = $params['vid'];
             $content = $params['content'];
+            $user = $request->user();
             $insertData = [
                 'vid' => $vid,
-                'uid' => $request->user()->id,
+                'uid' => $user->id,
                 'content' => $content,
                 'reply_at' => date('Y-m-d H:i:s'),
             ];
             //权限控制
+            if(!$this->commentRight($user)){
+                return response()->json([
+                    'state' => -2,
+                    'msg' => "权限不足",
+                ]);
+            }
 
             DB::beginTransaction();
             try {   //先偿试队列
@@ -57,6 +66,14 @@ class CommentController extends Controller
     public function reply(Request $request)
     {
         if(isset($request->params)) {
+            $user = $request->user();
+            //权限控制
+            if(!$this->commentRight($user)){
+                return response()->json([
+                    'state' => -2,
+                    'msg' => "权限不足",
+                ]);
+            }
             $params = ApiParamsTrait::parse($request->params);
             $validated = Validator::make($params, [
                 'comment_id' => 'required|integer|min:1',
@@ -72,7 +89,7 @@ class CommentController extends Controller
             $insertData = [
                 'reply_cid' => $validated['comment_id'],
                 'vid' => $validated['vid'],
-                'uid' => $request->user()->id,
+                'uid' => $user->id,
                 'replied_uid' => $replied_uid,
                 'content' => $validated['content'],
                 'reply_at' => date('Y-m-d H:i:s'),
