@@ -114,6 +114,32 @@ class FakeLiveShortController extends Controller
         }
     }
 
+    public static function transferSeconds($str)
+    {
+        $His = explode(':',$str);
+        $seconds = 0;
+        if(!empty($His)){
+            switch (array_key_last($His)){
+                case 0:
+                    $His[0]+=0;
+                    $seconds = $His[0];
+                    break;
+                case 1:
+                    $His[0]+=0;
+                    $His[1]+=0;
+                    $seconds = $His[0]*60 + $His[1];
+                    break;
+                case 2:
+                    $His[0]+=0;
+                    $His[1]+=0;
+                    $His[2]+=0;
+                    $seconds = $His[0] * 60 * 60 + $His[1] * 60 + $His[2];
+                    break;
+            }
+        }
+        return $seconds;
+    }
+
     /**
      * 直播时长统计接口
      * @param Request $request
@@ -128,9 +154,12 @@ class FakeLiveShortController extends Controller
             'duration_seconds' => 'nullable',
             'time' => 'nullable',
         ])->validated();
-        Log::info('==LiveCalcParams==',[$params]);
+        //Log::info('==LiveCalcParams==',[$params]);
         $durationSeconds = $params['duration_seconds'] ?? 0;
-        $durationSeconds += 0;
+        if(!is_int($durationSeconds)){
+            $durationSeconds = self::transferSeconds($durationSeconds);
+        }
+        Log::info('==LiveCalcParams==',[$params,$durationSeconds]);
         $time = $params['time'] ?? 0;
         $redisLiveCalcKey = sprintf("live_calc_%s",$uid);
         $redis = $this->redis();
