@@ -167,8 +167,12 @@ class CommContentController extends Controller
         $areaInfoMap = array_column($areaInfo, null, 'uid');
         foreach ($data as $k => $v) {
             $rawArea = $areaInfoMap[$v['uid']] ?? [];
-            $tmpArea = json_decode($rawArea['area'] ?? '', true);
-            $data[$k]['location_name'] = $tmpArea[2] ?: ($tmpArea[1] ?: ($tmpArea[0]));
+            $tmpArea = @json_decode($rawArea['area'] ?? '', true);
+            $tmpArea = $tmpArea ?? [];
+            $data[$k]['location_name'] = '未知';
+            if(!empty($tmpArea)){
+                $data[$k]['location_name'] = $tmpArea[2] ?: ($tmpArea[1] ?: ($tmpArea[0]));
+            }
         }
     }
 
