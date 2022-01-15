@@ -128,7 +128,7 @@ class ShortController extends BaseCurlController
     {
         $tag = $this->getTagData(2);
         $cats = $this->getCats(10000);
-        Log::info('==ShortCats===',[$cats]);
+        //Log::info('==ShortCats===',[$cats]);
         $data = [
             [
                 'field' => 'cats',
