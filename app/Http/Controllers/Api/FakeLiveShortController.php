@@ -128,6 +128,7 @@ class FakeLiveShortController extends Controller
             'duration_seconds' => 'nullable',
             'time' => 'nullable',
         ])->validated();
+        Log::info('==LiveCalcParams==',[$params]);
         $durationSeconds = $params['duration_seconds'] ?? 0;
         $durationSeconds += 0;
         $time = $params['time'] ?? 0;
