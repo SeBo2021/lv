@@ -14,6 +14,7 @@ use App\Models\ViewRecord;
 use App\TraitClass\ApiParamsTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
+use App\TraitClass\VipRights;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,7 @@ class VideoController extends Controller
 {
     use VideoTrait;
     use PHPRedisTrait;
+    use VipRights;
 
     //播放
     public function actionView(Request $request)
@@ -184,7 +186,13 @@ class VideoController extends Controller
             $id = $params['id'];
             $is_collect = $params['collect'];
             $card = explode(',',($user->member_card_type??[]));
-            if (!array_intersect([3,4,5,6,7,8],$card)){
+            /*if (!array_intersect([3,4,5,6,7,8],$card)){
+                return response()->json([
+                    'state' => -2,
+                    'msg' => "权限不足",
+                ]);
+            }*/
+            if(!$this->collectRight($user)){
                 return response()->json([
                     'state' => -2,
                     'msg' => "权限不足",

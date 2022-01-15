@@ -13,6 +13,7 @@ use App\Models\ViewRecord;
 use App\TraitClass\ApiParamsTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
+use App\TraitClass\VipRights;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ class VideoShortController extends Controller
 {
     use VideoTrait;
     use PHPRedisTrait;
+    use VipRights;
 
     private array $mainCateAlias = [
         'short_hot',
@@ -123,9 +125,11 @@ class VideoShortController extends Controller
      */
     public function viewLimit($one, $user): mixed
     {
-        if ($one['restricted'] == 1) {
-            if ((!$user->member_card_type) && (time() - $user->vip_expired > $user->vip_start_last)) {
-                $one['limit'] = 1;
+        if($user->long_vedio_times<1){
+            if ($one['restricted'] == 1) {
+                if ((!$user->member_card_type) && (time() - $user->vip_expired > $user->vip_start_last)) {
+                    $one['limit'] = 1;
+                }
             }
         }
         return $one;
@@ -231,6 +235,12 @@ class VideoShortController extends Controller
      */
     public function collect(Request $request): JsonResponse
     {
+        if(!$this->collectRight($request->user())){
+            return response()->json([
+                'state' => -2,
+                'msg' => "权限不足",
+            ]);
+        }
         try {
             $userInfo = $request->user();
             $params = ApiParamsTrait::parse($request->params);
