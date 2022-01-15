@@ -175,7 +175,7 @@ class FakeLiveShortController extends Controller
         $startSecond = $durationSeconds - ($durationSeconds - (time() % $durationSeconds));
 
         $isVip = $user->vip>0 ? 1 : 0;
-        if($user->long_vedio_times>0){ //todo
+        if($user->long_vedio_times>0){ //有次数也视为VIP
             $isVip = 1;
         }
         return response()->json([
