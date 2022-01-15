@@ -17,14 +17,14 @@ class MemberCardController extends BaseCurlController
 
 
     //1.设置模型
-    public function setModel()
+    public function setModel(): MemberCard
     {
         return $this->model = new MemberCard();
     }
 
-    public function indexCols()
+    public function indexCols(): array
     {
-        $cols = [
+        return [
             [
                 'type' => 'checkbox'
             ],
@@ -88,8 +88,6 @@ class MemberCardController extends BaseCurlController
                 'align' => 'center'
             ]
         ];
-
-        return $cols;
     }
 
     //4.编辑和添加页面表单数据
