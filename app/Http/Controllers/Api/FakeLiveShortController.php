@@ -159,7 +159,7 @@ class FakeLiveShortController extends Controller
         if(!is_int($durationSeconds)){
             $durationSeconds = self::transferSeconds($durationSeconds);
         }
-        Log::info('==LiveCalcParams==',[$params,$durationSeconds]);
+        //Log::info('==LiveCalcParams==',[$params,$durationSeconds]);
         $time = $params['time'] ?? 0;
         $redisLiveCalcKey = sprintf("live_calc_%s",$uid);
         $redis = $this->redis();
