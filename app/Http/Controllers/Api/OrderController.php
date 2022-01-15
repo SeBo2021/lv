@@ -56,7 +56,8 @@ class OrderController extends Controller
         $user = $request->user();
         //是否有效打折
         $useRealValue = false;
-        if($goodsInfo['real_value'] > 0){
+        $realValue = $goodsInfo['real_value'] ?? 0;
+        if($realValue > 0){
             $validPeriodTime = strtotime($user->created_at) + $goodsInfo['expired_hours']*3600;
             if($validPeriodTime > time()){
                 $useRealValue = true;
