@@ -8,6 +8,7 @@ use App\Jobs\ProcessSyncMiddleTagTable;
 use App\Jobs\ProcessVideoSlice;
 use App\Jobs\VideoSlice;
 use App\Models\AdminVideo;
+use App\Models\AdminVideoShort;
 use App\Models\Category;
 use App\Models\Tag;
 use App\Models\Video;
@@ -27,15 +28,14 @@ class VideoController extends BaseCurlController
 
     public $pageName = '视频管理';
 
-
     public function setModel()
     {
         return $this->model = new AdminVideo();
     }
 
-    public function indexCols()
+    public function indexCols(): array
     {
-        $cols = [
+        return [
             [
                 'type' => 'checkbox'
             ],
@@ -201,8 +201,6 @@ class VideoController extends BaseCurlController
                 'align' => 'center'
             ]
         ];
-
-        return $cols;
     }
 
     /*public function getCateGoryData()
