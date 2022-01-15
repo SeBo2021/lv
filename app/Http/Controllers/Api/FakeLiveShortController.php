@@ -174,10 +174,14 @@ class FakeLiveShortController extends Controller
 
         $startSecond = $durationSeconds - ($durationSeconds - (time() % $durationSeconds));
 
+        $isVip = $user->vip>0 ? 1 : 0;
+        if($user->long_vedio_times>0){ //todo
+            $isVip = 1;
+        }
         return response()->json([
             'state' => 0,
             'data' => [
-                'is_vip' => $user->vip>0 ? 1 : 0,
+                'is_vip' => $isVip,
                 'start_second' => $startSecond,
                 'remain_second' => $remainSecond
             ]
