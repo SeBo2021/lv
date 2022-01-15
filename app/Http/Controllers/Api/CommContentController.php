@@ -104,40 +104,42 @@ class CommContentController extends Controller
      */
     public function lists(Request $request): JsonResponse|array
     {
-        try {
-            $params = ApiParamsTrait::parse($request->params);
-            //Log::info('===COMMLIST===',[$params]);
-            Validator::make($params, [
-                'cid_1' => 'nullable',
-                'cid_2' => 'nullable',
-                'location_name' => 'nullable',
-                'page' => 'nullable',
-            ])->validate();
-            // 一二级分类
-            $cid1 = $params['cid_1'] ?? 0;
-            $page = $params['page'] ?? 1;
-            $locationName = $params['location_name'] ?? '';
-            $cid2 = $params['cid_2'] ?? 0;
-            //Log::info('===COMMLIST-params==',[$params]);
-            // 得到一级分类help
-            $help = $this->redis()->hGet('common_cate_help', "c_{$cid1}");
-            $uid = $request->user()->id;
-            if (in_array($help, ['focus', 'hot'])) {
-                $res = $this->$help($uid, $locationName, 6, $page);
-            } else {
-                $res = $this->other($request->user()->id, $locationName, $cid1, $cid2, 6, $page);
-            }
-            $this->processArea($res['bbs_list']);
-            return response()->json([
-                'state' => 0,
-                'data' => $res
-            ]);
+        $params = ApiParamsTrait::parse($request->params);
+        //Log::info('===COMMLIST===',[$params]);
+        Validator::make($params, [
+            'cid_1' => 'nullable',
+            'cid_2' => 'nullable',
+            'location_name' => 'nullable',
+            'page' => 'nullable',
+        ])->validate();
+        // 一二级分类
+        $cid1 = $params['cid_1'] ?? 0;
+        $page = $params['page'] ?? 1;
+        $locationName = $params['location_name'] ?? '';
+        $cid2 = $params['cid_2'] ?? 0;
+        //Log::info('===COMMLIST-params==',[$params]);
+        // 得到一级分类help
+        $help = $this->redis()->hGet('common_cate_help', "c_{$cid1}");
+        $uid = $request->user()->id;
+        if (in_array($help, ['focus', 'hot'])) {
+            $res = $this->$help($uid, $locationName, 6, $page);
+        } else {
+            $res = $this->other($request->user()->id, $locationName, $cid1, $cid2, 6, $page);
+        }
+        //Log::info('===CommContent===',[$res['bbs_list']]);
+        $this->processArea($res['bbs_list']);
+        return response()->json([
+            'state' => 0,
+            'data' => $res
+        ]);
+        /*try {
+
         } catch (Exception $e) {
             return response()->json([
                 'state' => -1,
                 'msg' => $e->getMessage()
             ]);
-        }
+        }*/
     }
 
     /**
