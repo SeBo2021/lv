@@ -28,6 +28,8 @@ class CommentController extends Controller
                 'content' => $content,
                 'reply_at' => date('Y-m-d H:i:s'),
             ];
+            //权限控制
+
             DB::beginTransaction();
             try {   //先偿试队列
                 $commentId = DB::table('comments')->insertGetId($insertData);
