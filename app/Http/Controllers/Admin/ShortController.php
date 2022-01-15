@@ -29,7 +29,7 @@ class ShortController extends BaseCurlController
         'short_rec'
     ];
 
-    public function setModel(): VideoShort
+    public function setModel()
     {
         return $this->model = new VideoShort();
     }
