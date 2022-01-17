@@ -217,6 +217,5 @@ trait PayTrait
         }
         return $payEnv;
 
-        //return RechargeChannel::query()->where('status',1)->get()?->toArray();
     }
 }
