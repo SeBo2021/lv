@@ -83,10 +83,8 @@ class VideoShortController extends Controller
             $model->where('cat','like',"%{$cateWord}%");
         }
         if ($tagId) {
-            //$tagInfo = Tag::query()->where(['mask'=>$this->cateMapAlias[$tagId]])->firstOrFail()?->toArray();
-            $tagInfo = Tag::query()->where(['mask'=>$this->cateMapAlias[$tagId]])->first();
-            if($tagInfo){
-                $tagInfo = $tagInfo->toArray();
+            $tagInfo = Tag::query()->where(['mask'=>$this->cateMapAlias[$tagId]])->firstOrFail()?->toArray();
+            if(!empty($tagInfo)){
                 $tagWord = sprintf('"%s"',$tagInfo['id']);
                 $model->where('tag','like',"%{$tagWord}%");
             }
