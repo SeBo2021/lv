@@ -83,9 +83,12 @@ class VideoShortController extends Controller
             $model->where('cat','like',"%{$cateWord}%");
         }
         if ($tagId) {
-            $tagInfo = Tag::query()->where(['mask'=>$this->cateMapAlias[$tagId]])->firstOrFail()?->toArray();
-            $tagWord = sprintf('"%s"',$tagInfo['id']);
-            $model->where('tag','like',"%{$tagWord}%");
+            //$tagInfo = Tag::query()->where(['mask'=>$this->cateMapAlias[$tagId]])->firstOrFail()?->toArray();
+            $tagInfo = Tag::query()->where(['mask'=>$this->cateMapAlias[$tagId]])->first();
+            if($tagInfo){
+                $tagWord = (string) $tagInfo['id'];
+                $model->where('tag','like',"%{$tagWord}%");
+            }
         }
         if ($startId) {
             $model->where('id','>=',$startId);
@@ -140,7 +143,7 @@ class VideoShortController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function lists(Request $request)
+    public function lists(Request $request): JsonResponse
     {
         // 业务逻辑
         try {
