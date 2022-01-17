@@ -206,13 +206,17 @@ trait PayTrait
      */
     public static function getPayEnv(): mixed
     {
-        $payEnv = cache()->get('payEnv');
+        /*$payEnv = cache()->get('payEnv');
         if (!$payEnv) {
             $payEnv = RechargeChannel::query()
                 ->where('status',1)
                 ->get()?->toArray();
             cache()->set('payEnv',array_column($payEnv,null,'name'));
         }
-        return $payEnv;
+        return $payEnv;*/
+
+        return RechargeChannel::query()
+            ->where('status',1)
+            ->get()?->toArray();
     }
 }

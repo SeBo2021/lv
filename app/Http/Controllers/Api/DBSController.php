@@ -167,12 +167,12 @@ class DBSController extends Controller implements Pay
             'money' => $money,
             'time' => strval(time().'000'),
             // 'mode' => 'sdk',
-            'sign' => $this->sign($mercId, $params['money'],SELF::getPayEnv()['DBS']['secret']),
+            'sign' => $this->sign($mercId, $params['money'],self::getPayEnv()['DBS']['secret']),
         ];
         Log::info('dbs_method_request===',[$input]);//三方参数日志
         $response = (new Client([
             'headers' => ['Content-Type' => 'application/json']
-        ]))->post(SELF::getPayEnv()['DBS']['other_url'], [
+        ]))->post(self::getPayEnv()['DBS']['other_url'], [
             'body'=>json_encode($input)
         ])->getBody();
         Log::info('dbs_method_response===',[$response]);//三方响应日志

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 use App\Jobs\ProcessShort;
 use App\Jobs\ProcessSyncMiddleSectionTable;
 use App\Jobs\ProcessSyncMiddleTagTable;
+use App\Jobs\ProcessVideoShort;
 use App\Models\AdminVideoShort;
 use App\Models\Category;
 use App\Models\Video;
@@ -242,9 +243,10 @@ class ShortController extends BaseCurlController
 
     protected function afterSaveSuccessEvent($model, $id = '')
     {
-        $isVideo = ($_REQUEST['callback_upload']??0);
+        //$isVideo = ($_REQUEST['callback_upload']??0);
         try {
-            $job = new ProcessShort($model,$isVideo);
+//            $job = new ProcessShort($model,$isVideo);
+            $job = new ProcessVideoShort($model);
             $this->dispatch($job);
             // app(Dispatcher::class)->dispatchNow($job);
         }catch (\Exception $e){
