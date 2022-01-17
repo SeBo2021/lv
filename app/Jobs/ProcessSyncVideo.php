@@ -14,9 +14,9 @@ class ProcessSyncVideo implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, VideoTrait;
 
-    public $row;
+    public object $row;
 
-    public $timeout = 18000; //默认60秒超时
+    public int $timeout = 18000; //默认60秒超时
 
     /**
      * Create a new job instance.
