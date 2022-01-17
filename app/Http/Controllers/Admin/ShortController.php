@@ -264,7 +264,13 @@ class ShortController extends BaseCurlController
         $model->author = admin('nickname');
         $model->gold = $this->rq->input('gold',0);
         $model->gold *= $this->goldUnit;
-
+        if(isset($model->url)){
+            $model->dash_url = self::get_slice_url($model->url);
+            $model->hls_url = self::get_slice_url($model->url,'hls');
+            if(isset($model->cover_img) && !$model->cover_img){
+                $model->cover_img = self::get_slice_url($model->url,'cover');
+            }
+        }
         //自动打标签
         if(isset($model->tagNames) && (empty($tags))){
             $tagLists = $this->getTagData();

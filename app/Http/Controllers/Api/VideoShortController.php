@@ -106,10 +106,13 @@ class VideoShortController extends Controller
             $one = $this->viewLimit($one, $user);
             $viewRecord = $this->isShortLoveOrCollect($user->id, $one['id']);
             $one['is_love'] = intval($viewRecord['is_love']) ?? 0;
+            $resourceDomain = env('RESOURCE_DOMAIN');
             //是否收藏
             $one['is_collect'] = intval($viewRecord['is_collect']) ?? 0;
-            $one['url'] = env('RESOURCE_DOMAIN')  .$one['url'];
-            $one['cover_img'] = env('RESOURCE_DOMAIN') . $one['cover_img'];
+            $one['url'] = $resourceDomain  .$one['url'];
+            $one['hls_url'] = $resourceDomain  .$one['hls_url'];
+            $one['dash_url'] = $resourceDomain  .$one['dash_url'];
+            $one['cover_img'] = $resourceDomain . $one['cover_img'];
 
             $data[] = $one;
         }
