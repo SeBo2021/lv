@@ -75,7 +75,7 @@ class VideoShortController extends Controller
      */
     private function items($page, $user, $startId,$cateId,$tagId,$words): array
     {
-        $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
+        $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'dash_url', 'hls_url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
         $perPage = 8;
         $model = VideoShort::query()->where('status',1);
         if ($cateId) {
