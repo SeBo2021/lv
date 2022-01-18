@@ -507,7 +507,7 @@ class ShortController extends BaseCurlController
             switch ($field){
                 case 'slice':
                     $items = VideoShort::query()->whereIn($id, $id_arr)->get(['id','url','hls_url','dash_url']);
-                    $domain = env('SLICE_DOMAIN');
+                    $domain = env('RESOURCE_DOMAIN');
                     foreach ($items as $item){
                         if(empty($item->hls_url) || empty($item->dash_url)){
                             $this->saveOriginFile($domain . $item->url);
