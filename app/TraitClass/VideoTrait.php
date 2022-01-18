@@ -121,7 +121,7 @@ trait VideoTrait
     {
         $fileName = basename($file);
         //$path = storage_path('app/public/shortVideo');
-        Storage::putFileAs('shortVideos',new File($file),$fileName);
+        Storage::putFileAs('shortVideos',(new \GuzzleHttp\Client())->get($file, ['verify' => false])->getBody(),$fileName);
     }
 
     /**
