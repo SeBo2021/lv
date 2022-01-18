@@ -120,8 +120,19 @@ trait VideoTrait
     public function saveOriginFile($file)
     {
         $fileName = basename($file);
-        //$path = storage_path('app/public/shortVideo');
-        Storage::putFileAs('shortVideos',(new \GuzzleHttp\Client())->get($file, ['verify' => false])->getBody(),$fileName);
+        $path = storage_path('app/public/shortVideo');
+        // 创建 stream
+        $opts = array(
+            'http'=>array(
+                'method'=>"GET",
+                'header'=>"Accept-language: en\r\n" .
+                    "Cookie: foo=bar\r\n"
+            )
+        );
+        $context = stream_context_create($opts);
+        // 以下面设置的 HTTP 头来打开文件
+        $file = file_get_contents($file, false, $context);
+        file_put_contents($path . $fileName,$file);
     }
 
     /**
