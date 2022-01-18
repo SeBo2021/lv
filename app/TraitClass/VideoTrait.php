@@ -8,6 +8,7 @@ use Exception;
 use FFMpeg\FFMpeg;
 use FFMpeg\Format\Video\X264;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Http\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -114,6 +115,13 @@ trait VideoTrait
             $content = file_get_contents($abPath);
             Storage::disk('sftp')->put($img,$content);
         }
+    }
+
+    public function saveOriginFile($file)
+    {
+        $fileName = basename($file);
+        //$path = storage_path('app/public/shortVideo');
+        Storage::putFileAs('shortVideos',new File($file),$fileName);
     }
 
     /**

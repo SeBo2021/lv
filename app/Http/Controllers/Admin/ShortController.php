@@ -420,7 +420,7 @@ class ShortController extends BaseCurlController
                 'data'=>[
                     'data-type' => "handle",
                     'data-title' => "确定批量操作吗",
-                    'data-field' => "dash_url",
+                    'data-field' => "slice",
                     'data-value' => 0,
                 ]
             ];
@@ -505,6 +505,14 @@ class ShortController extends BaseCurlController
             return $type_r;
         } else {
             switch ($field){
+                case 'slice':
+                    $items = VideoShort::query()->whereIn($id, $id_arr)->get(['id','url']);
+                    $domain = env('SLICE_DOMAIN');
+                    foreach ($items as $item){
+                        $this->saveOriginFile($domain . $item->url);
+                    }
+                    $r=true;
+                    break;
                 case 'cover_img':
                     $covers = VideoShort::query()->whereIn($id, $id_arr)->get(['id','cover_img']);
                     foreach ($covers as $cover){
@@ -514,7 +522,7 @@ class ShortController extends BaseCurlController
                     break;
                 case 'cat':
                     $value_arr = explode(',',$value);
-                    $buildQueryVideo = Video::query()->whereIn($id, $id_arr);
+                    $buildQueryVideo = VideoShort::query()->whereIn($id, $id_arr);
                     $buildQueryVideo->update(['cat'=>json_encode($value_arr)]);
                     //队列执行更新版块中间表
                     ProcessSyncMiddleSectionTable::dispatchAfterResponse();
