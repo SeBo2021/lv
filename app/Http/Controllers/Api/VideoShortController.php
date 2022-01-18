@@ -75,10 +75,12 @@ class VideoShortController extends Controller
      */
     private function items($page, $user, $startId,$cateId,$tagId,$words): array
     {
-        $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
+        $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'dash_url', 'hls_url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
         $perPage = 8;
         $model = VideoShort::query()->where('status',1);
+        $listIsRand = false;
         if ($cateId) {
+            $listIsRand = Category::query()->where('id',$cateId)->value('is_rand')==1;
             $cateWord = sprintf('"%s"',$cateId);
             $model->where('cat','like',"%{$cateWord}%");
         }
@@ -99,6 +101,7 @@ class VideoShortController extends Controller
             $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         }
         $items = $paginator->items();
+
         $data = [];
         foreach ($items as $one) {
             //  $one = $this->handleShortVideoItems([$one], true)[0];
@@ -106,12 +109,19 @@ class VideoShortController extends Controller
             $one = $this->viewLimit($one, $user);
             $viewRecord = $this->isShortLoveOrCollect($user->id, $one['id']);
             $one['is_love'] = intval($viewRecord['is_love']) ?? 0;
+            $resourceDomain = env('RESOURCE_DOMAIN');
             //是否收藏
             $one['is_collect'] = intval($viewRecord['is_collect']) ?? 0;
-            $one['url'] = env('RESOURCE_DOMAIN')  .$one['url'];
-            $one['cover_img'] = env('RESOURCE_DOMAIN') . $one['cover_img'];
+            $one['url'] = $resourceDomain  .$one['url'];
+            $one['hls_url'] = $resourceDomain  .$one['hls_url'];
+            $one['dash_url'] = $resourceDomain  .$one['dash_url'];
+            $one['cover_img'] = $resourceDomain . $one['cover_img'];
 
             $data[] = $one;
+        }
+        //是否随机
+        if($listIsRand){
+            shuffle($data);
         }
         return [
             'list' => $data,

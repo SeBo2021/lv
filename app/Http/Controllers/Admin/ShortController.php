@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 use App\Jobs\ProcessShort;
 use App\Jobs\ProcessSyncMiddleSectionTable;
 use App\Jobs\ProcessSyncMiddleTagTable;
+use App\Jobs\ProcessVideoShort;
 use App\Models\AdminVideoShort;
 use App\Models\Category;
 use App\Models\Video;
@@ -99,6 +100,20 @@ class ShortController extends BaseCurlController
                 'minWidth' => 80,
                 'title' => '是否上架',
                 'align' => 'center',
+            ],
+            [
+                'field' => 'hls_url',
+                'minWidth' => 80,
+                'title' => 'hls地址',
+                'align' => 'center',
+                'hide' => true
+            ],
+            [
+                'field' => 'dash_url',
+                'minWidth' => 80,
+                'title' => 'dash地址',
+                'align' => 'center',
+                'hide' => true
             ],
             [
                 'field' => 'created_at',
@@ -242,9 +257,10 @@ class ShortController extends BaseCurlController
 
     protected function afterSaveSuccessEvent($model, $id = '')
     {
-        $isVideo = ($_REQUEST['callback_upload']??0);
+        //$isVideo = ($_REQUEST['callback_upload']??0);
         try {
-            $job = new ProcessShort($model,$isVideo);
+//            $job = new ProcessShort($model,$isVideo);
+            $job = new ProcessVideoShort($model);
             $this->dispatch($job);
             // app(Dispatcher::class)->dispatchNow($job);
         }catch (\Exception $e){
@@ -262,7 +278,13 @@ class ShortController extends BaseCurlController
         $model->author = admin('nickname');
         $model->gold = $this->rq->input('gold',0);
         $model->gold *= $this->goldUnit;
-
+        if(isset($model->url)){
+            $model->dash_url = self::get_slice_url($model->url);
+            $model->hls_url = self::get_slice_url($model->url,'hls');
+            if(isset($model->cover_img) && !$model->cover_img){
+                $model->cover_img = self::get_slice_url($model->url,'cover');
+            }
+        }
         //自动打标签
         if(isset($model->tagNames) && (empty($tags))){
             $tagLists = $this->getTagData();
@@ -391,6 +413,17 @@ class ShortController extends BaseCurlController
                     'data-value' => 0,
                 ]
             ];
+            $data[] = [
+                'class' => 'layui-btn-danger',
+                'name' => '远程切片',
+                'id' => 'btn-originSlice',
+                'data'=>[
+                    'data-type' => "handle",
+                    'data-title' => "确定批量操作吗",
+                    'data-field' => "dash_url",
+                    'data-value' => 0,
+                ]
+            ];
         }
         if ($this->isCanEdit()) {
             $data[] = [
@@ -473,7 +506,7 @@ class ShortController extends BaseCurlController
         } else {
             switch ($field){
                 case 'cover_img':
-                    $covers = Video::query()->whereIn($id, $id_arr)->get(['id','cover_img']);
+                    $covers = VideoShort::query()->whereIn($id, $id_arr)->get(['id','cover_img']);
                     foreach ($covers as $cover){
                         $this->syncUpload($cover->cover_img);
                     }
@@ -489,24 +522,24 @@ class ShortController extends BaseCurlController
                     break;
                 case 'tag':
                     $value_arr = explode(',',$value);
-                    $buildQueryVideo = Video::query()->whereIn($id, $id_arr);
+                    $buildQueryVideo = VideoShort::query()->whereIn($id, $id_arr);
                     $buildQueryVideo->update(['tag'=>json_encode($value_arr)]);
                     //更新标签中间表
                     ProcessSyncMiddleTagTable::dispatchAfterResponse();
                     $r=true;
                     break;
                 case 'duration_seconds':
-                    $videos = Video::query()->whereIn($id, $id_arr)->get(['id','duration','duration_seconds'])->toArray();
+                    $videos = VideoShort::query()->whereIn($id, $id_arr)->get(['id','duration','duration_seconds'])->toArray();
                     foreach ($videos as $video){
                         if(!empty($video['duration'])){
                             if($video['duration_seconds']==0){
                                 $duration_seconds = $this->transferSeconds($video['duration']);
-                                Video::query()->where('id',$video['id'])->update(['duration_seconds' => $duration_seconds]);
+                                VideoShort::query()->where('id',$video['id'])->update(['duration_seconds' => $duration_seconds]);
                             }
                         }else{
                             if(!empty($video['duration_seconds'])){
                                 $format = $this->formatSeconds($video['duration_seconds']);
-                                Video::query()->where('id',$video['id'])->update(['duration' => $format]);
+                                VideoShort::query()->where('id',$video['id'])->update(['duration' => $format]);
                             }
                         }
                     }
@@ -518,11 +551,11 @@ class ShortController extends BaseCurlController
             }
 
             if ($r) {
-                $this->insertLog($this->getPageName() . lang('成功修改ids') . '：' . implode(',', $id_arr));
+                $this->insertLog($this->getPageName() . lang('短视频-成功修改ids') . '：' . implode(',', $id_arr));
                 //清除缓存
                 $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
             } else {
-                $this->insertLog($this->getPageName() . lang('失败ids') . '：' . implode(',', $id_arr));
+                $this->insertLog($this->getPageName() . lang('短视频-失败ids') . '：' . implode(',', $id_arr));
             }
             return $this->editTablePutLog($r, $field, $id_arr);
         }

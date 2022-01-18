@@ -211,8 +211,11 @@ trait PayTrait
             $payEnv = RechargeChannel::query()
                 ->where('status',1)
                 ->get()?->toArray();
-            cache()->set('payEnv',array_column($payEnv,null,'name'));
+            $payEnv = array_column($payEnv,null,'name');
+//            cache()->set('payEnv',array_column($payEnv,null,'name'));
+            cache()->set('payEnv',$payEnv);
         }
         return $payEnv;
+
     }
 }

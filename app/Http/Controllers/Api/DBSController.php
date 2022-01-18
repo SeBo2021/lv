@@ -152,6 +152,13 @@ class DBSController extends Controller implements Pay
             'money' => 'required|string',
         ])->validate();
         Log::info('dbs_method_params===',[$params]);//三方参数日志
+        $methods = self::getPayEnv();
+        if( !$methods || empty($methods)){
+            return response()->json([
+                'state' => '-1',
+                'msg' => '支付方式获取失败',
+            ]);
+        }
         $mercId = self::getPayEnv()['DBS']['merchant_id'];
         Log::info('dbs_method_info===',[self::getPayEnv()]);//三方参数日志
         $isArray = stripos($params['money'],',');
@@ -167,12 +174,12 @@ class DBSController extends Controller implements Pay
             'money' => $money,
             'time' => strval(time().'000'),
             // 'mode' => 'sdk',
-            'sign' => $this->sign($mercId, $params['money'],SELF::getPayEnv()['DBS']['secret']),
+            'sign' => $this->sign($mercId, $params['money'],self::getPayEnv()['DBS']['secret']),
         ];
         Log::info('dbs_method_request===',[$input]);//三方参数日志
         $response = (new Client([
             'headers' => ['Content-Type' => 'application/json']
-        ]))->post(SELF::getPayEnv()['DBS']['other_url'], [
+        ]))->post(self::getPayEnv()['DBS']['other_url'], [
             'body'=>json_encode($input)
         ])->getBody();
         Log::info('dbs_method_response===',[$response]);//三方响应日志

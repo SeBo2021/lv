@@ -12,7 +12,7 @@
 
 namespace App\Http\Controllers\Admin;
 use App\Jobs\ProcessBbs;
-use App\Jobs\ProcessVideoSlice;
+use App\Jobs\ProcessVideoShort;
 use App\Models\Bbs;
 use App\Models\Category;
 use App\Models\CommBbs;
