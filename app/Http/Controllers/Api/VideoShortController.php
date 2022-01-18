@@ -78,7 +78,9 @@ class VideoShortController extends Controller
         $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'dash_url', 'hls_url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
         $perPage = 8;
         $model = VideoShort::query()->where('status',1);
+        $listIsRand = false;
         if ($cateId) {
+            $listIsRand = Category::query()->where('id',$cateId)->value('is_rand')==1;
             $cateWord = sprintf('"%s"',$cateId);
             $model->where('cat','like',"%{$cateWord}%");
         }
@@ -99,6 +101,7 @@ class VideoShortController extends Controller
             $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         }
         $items = $paginator->items();
+
         $data = [];
         foreach ($items as $one) {
             //  $one = $this->handleShortVideoItems([$one], true)[0];
@@ -115,6 +118,10 @@ class VideoShortController extends Controller
             $one['cover_img'] = $resourceDomain . $one['cover_img'];
 
             $data[] = $one;
+        }
+        //是否随机
+        if($listIsRand){
+            shuffle($data);
         }
         return [
             'list' => $data,
