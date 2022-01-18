@@ -120,7 +120,7 @@ trait VideoTrait
     public function saveOriginFile($file)
     {
         $fileName = basename($file);
-        $path = storage_path('app/public/shortVideo');
+        $path = storage_path('app/public/shortVideo/');
         // 创建 stream
         $opts = array(
             'http'=>array(
