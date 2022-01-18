@@ -258,7 +258,7 @@ class MemberController extends BaseCurlController
     public function setListOutputItemExtend($item)
     {
         $item->systemPlatform = $this->deviceSystems[$item->device_system];
-        $item->channel_id = $this->getChannelSelectData(true)[$item->channel_id]['name'];
+        $item->channel_id = isset($this->getChannelSelectData(true)[$item->channel_id]) ? $this->getChannelSelectData(true)[$item->channel_id]['name'] : '该渠道被删除';
         $item->area = DB::table('login_log')->where('uid',$item->id)->orderByDesc('id')->value('area');
         $item->status = UiService::switchTpl('status', $item,'');
         $item->phone_number = $item->phone_number>0 ? $item->phone_number : '未绑定';

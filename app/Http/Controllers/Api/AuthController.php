@@ -76,7 +76,7 @@ class AuthController extends Controller
         $deviceInfo = !is_string($validated['dev']) ? json_encode($validated['dev']) : $validated['dev'] ;
         $appInfo = !is_string($validated['env']) ? json_encode($validated['env']) : $validated['env'] ;
 
-        $ip = IpTrait::getRealIp();
+        $ip = \request()->getClientIp();
         $test = $validated['test'] ?? false;
 
         $user = new User();
