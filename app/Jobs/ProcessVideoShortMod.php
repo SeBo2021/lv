@@ -95,7 +95,7 @@ class ProcessVideoShortMod implements ShouldQueue
         $context = stream_context_create($opts);
         // 以下面设置的 HTTP 头来打开文件
         $file = file_get_contents($file, false, $context);
-        file_put_contents($path . $fileName,$file);
+        file_put_contents($path . $fileName, $file, LOCK_EX);
     }
 
     public function transcodeShortMp4($file_name)
