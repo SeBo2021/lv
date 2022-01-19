@@ -77,6 +77,27 @@ class ProcessVideoShortMod implements ShouldQueue
         //$this->generatePreview($this->row);
     }
 
+    public function saveOriginFile($file)
+    {
+        $fileName = basename($file);
+        $path = storage_path('app/public/shortVideo/');
+        if(!is_dir($path)){
+            mkdir($path, 0755, true);
+        }
+        // 创建 stream
+        $opts = array(
+            'http'=>array(
+                'method'=>"GET",
+                'header'=>"Accept-language: en\r\n" .
+                    "Cookie: foo=bar\r\n"
+            )
+        );
+        $context = stream_context_create($opts);
+        // 以下面设置的 HTTP 头来打开文件
+        $file = file_get_contents($file, false, $context);
+        file_put_contents($path . $fileName,$file);
+    }
+
     public function transcodeShortMp4($file_name)
     {
         return '/public/shortVideo/'.$file_name.'.mp4';

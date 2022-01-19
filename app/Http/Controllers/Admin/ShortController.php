@@ -511,7 +511,6 @@ class ShortController extends BaseCurlController
                     //$domain = env('RESOURCE_DOMAIN');
                     foreach ($items as $item){
                         if(empty($item->hls_url) || empty($item->dash_url)){
-                            //$this->saveOriginFile($domain . $item->url);
                             $job = new ProcessVideoShortMod($item);
                             $this->dispatch($job);
                         }
