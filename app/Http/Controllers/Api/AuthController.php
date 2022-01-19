@@ -65,7 +65,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $params = ApiParamsTrait::parse($request->params);
-        Log::debug('login_request_params_info===',[$params]);//参数日志
+        //Log::debug('login_request_params_info===',[$params]);//参数日志
         $validated = Validator::make($params,$this->loginRules)->validated();
         //短时间内禁止同一设备注册多个账号
         $key = $this->apiRedisKey['register_did'].$validated['did'];
@@ -76,7 +76,10 @@ class AuthController extends Controller
         $deviceInfo = !is_string($validated['dev']) ? json_encode($validated['dev']) : $validated['dev'] ;
         $appInfo = !is_string($validated['env']) ? json_encode($validated['env']) : $validated['env'] ;
 
-        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? \request()->getClientIp();
+        $ip = $request->getClientIp();
+        $HTTP_X_REAL_IP = $_SERVER['HTTP_X_REAL_IP'] ?? '';
+        $HTTP_X_FORWARDED_FOR = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
+        Log::debug('login_IP_info===',['HTTP_X_REAL_IP:'.$HTTP_X_REAL_IP,'HTTP_X_FORWARDED_FOR:'.$HTTP_X_FORWARDED_FOR,'ClientIp'.$ip]);//参数日志
         $test = $validated['test'] ?? false;
 
         $user = new User();
