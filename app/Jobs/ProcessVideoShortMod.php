@@ -54,12 +54,16 @@ class ProcessVideoShortMod implements ShouldQueue
      */
     public function handle()
     {
-        //
+        //远程下载
+        $domain = env('RESOURCE_DOMAIN');
+        $originUrl = $this->row->url;
+        $this->saveOriginFile($domain . $originUrl);
+        //切片
         $this->short_dash_slice($this->row);
         $this->short_hls_slice($this->row,true);
 
         //先更新播放地址
-        $url = basename($this->row->url).'.mp4';
+        $url = basename($this->row->url);
         $coverImg = self::get_slice_url($url,'cover');
         DB::table('video_short')->where('id',$this->row->id)->update([
             'dash_url' => self::get_slice_url($url),
@@ -163,9 +167,9 @@ class ProcessVideoShortMod implements ShouldQueue
         $updateData['duration'] = $this->formatSeconds($durationSeconds);
         DB::table('video_short')->where('id',$this->row->id)->update($updateData);
         //删除mp4文件
-        if($del!==false){
+        /*if($del!==false){
             Storage::delete($mp4_path);
-        }
+        }*/
     }
 
 }
