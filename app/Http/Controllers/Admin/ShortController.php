@@ -107,14 +107,14 @@ class ShortController extends BaseCurlController
                 'minWidth' => 80,
                 'title' => 'hls地址',
                 'align' => 'center',
-                'hide' => true
+                'hide' => false
             ],
             [
                 'field' => 'dash_url',
                 'minWidth' => 80,
                 'title' => 'dash地址',
                 'align' => 'center',
-                'hide' => true
+                'hide' => false
             ],
             [
                 'field' => 'created_at',
