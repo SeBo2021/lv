@@ -5,6 +5,7 @@ use App\Jobs\ProcessShort;
 use App\Jobs\ProcessSyncMiddleSectionTable;
 use App\Jobs\ProcessSyncMiddleTagTable;
 use App\Jobs\ProcessVideoShort;
+use App\Jobs\ProcessVideoShortMod;
 use App\Models\AdminVideoShort;
 use App\Models\Category;
 use App\Models\Video;
@@ -511,6 +512,8 @@ class ShortController extends BaseCurlController
                     foreach ($items as $item){
                         if(empty($item->hls_url) || empty($item->dash_url)){
                             $this->saveOriginFile($domain . $item->url);
+                            $job = new ProcessVideoShortMod($item);
+                            $this->dispatch($job);
                         }
                     }
                     $r=true;

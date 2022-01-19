@@ -121,6 +121,9 @@ trait VideoTrait
     {
         $fileName = basename($file);
         $path = storage_path('app/public/shortVideo/');
+        if(!is_dir($path)){
+            mkdir($path, 0755, true);
+        }
         // 创建 stream
         $opts = array(
             'http'=>array(
