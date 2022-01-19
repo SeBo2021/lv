@@ -63,7 +63,7 @@ class ProcessVideoShortMod implements ShouldQueue
         $this->short_hls_slice($this->row,true);
 
         //先更新播放地址
-        $url = basename($this->row->url).'.mp4';
+        $url = basename($this->row->url);
         $coverImg = self::get_slice_url($url,'cover');
         DB::table('video_short')->where('id',$this->row->id)->update([
             'dash_url' => self::get_slice_url($url),
