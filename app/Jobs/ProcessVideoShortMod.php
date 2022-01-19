@@ -65,16 +65,22 @@ class ProcessVideoShortMod implements ShouldQueue
         //$this->generatePreview($this->row);
     }
 
+    public function transcodeShortMp4($file_name)
+    {
+        return '/public/shortVideo/'.$file_name.'.mp4';
+    }
+
     /**
      * @throws \Exception
      */
     public function short_dash_slice($row)
     {
         //切片转码成m4s格式文件
-        $mp4_path = env('RESOURCE_DOMAIN') . $row->url;
+        //$mp4_path = env('RESOURCE_DOMAIN') . $row->url;
         $file_name = pathinfo($row->url,PATHINFO_FILENAME);
         //不是mp4格式转mp4
-        $mp4_path = $this->transcodeMp4($mp4_path,$file_name);
+        //$mp4_path = $this->transcodeMp4($mp4_path,$file_name);
+        $mp4_path = $this->transcodeShortMp4($file_name);
         //创建对应的切片目录
         $sliceDir = 'public'.env('SLICE_DIR','/slice');
         $tmp_path = $sliceDir.'/dash/'.$file_name.'/';
@@ -103,10 +109,11 @@ class ProcessVideoShortMod implements ShouldQueue
 
     public function short_hls_slice($row, $del=false)
     {
-        $mp4_path = $this->getMp4Path();
+        //$mp4_path = $this->getMp4Path();
         $file_name = pathinfo($row->url,PATHINFO_FILENAME);
         //不是mp4格式转mp4
-        $mp4_path = $this->transcodeMp4($mp4_path,$file_name);
+        //$mp4_path = $this->transcodeMp4($mp4_path,$file_name);
+        $mp4_path = $this->transcodeShortMp4($file_name);
         //创建对应的切片目录
         $tmp_path = 'public'.env('SLICE_DIR','/slice').'/hls/'.$file_name.'/';
         $dirname = storage_path('app/').$tmp_path;
