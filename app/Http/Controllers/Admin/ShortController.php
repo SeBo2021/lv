@@ -5,6 +5,7 @@ use App\Jobs\ProcessShort;
 use App\Jobs\ProcessSyncMiddleSectionTable;
 use App\Jobs\ProcessSyncMiddleTagTable;
 use App\Jobs\ProcessVideoShort;
+use App\Jobs\ProcessVideoShortMod;
 use App\Models\AdminVideoShort;
 use App\Models\Category;
 use App\Models\Video;
@@ -420,7 +421,7 @@ class ShortController extends BaseCurlController
                 'data'=>[
                     'data-type' => "handle",
                     'data-title' => "确定批量操作吗",
-                    'data-field' => "dash_url",
+                    'data-field' => "slice",
                     'data-value' => 0,
                 ]
             ];
@@ -505,6 +506,18 @@ class ShortController extends BaseCurlController
             return $type_r;
         } else {
             switch ($field){
+                case 'slice':
+                    $items = VideoShort::query()->whereIn($id, $id_arr)->get(['id','url','hls_url','dash_url']);
+                    $domain = env('RESOURCE_DOMAIN');
+                    foreach ($items as $item){
+                        if(empty($item->hls_url) || empty($item->dash_url)){
+                            $this->saveOriginFile($domain . $item->url);
+                            $job = new ProcessVideoShortMod($item);
+                            $this->dispatch($job);
+                        }
+                    }
+                    $r=true;
+                    break;
                 case 'cover_img':
                     $covers = VideoShort::query()->whereIn($id, $id_arr)->get(['id','cover_img']);
                     foreach ($covers as $cover){
@@ -514,7 +527,7 @@ class ShortController extends BaseCurlController
                     break;
                 case 'cat':
                     $value_arr = explode(',',$value);
-                    $buildQueryVideo = Video::query()->whereIn($id, $id_arr);
+                    $buildQueryVideo = VideoShort::query()->whereIn($id, $id_arr);
                     $buildQueryVideo->update(['cat'=>json_encode($value_arr)]);
                     //队列执行更新版块中间表
                     ProcessSyncMiddleSectionTable::dispatchAfterResponse();
