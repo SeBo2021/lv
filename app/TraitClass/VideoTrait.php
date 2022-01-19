@@ -111,7 +111,7 @@ trait VideoTrait
     public function syncUpload($img)
     {
         $abPath = public_path().$img;
-        if(file_exists($abPath)){
+        if(file_exists($abPath) && is_file($abPath)){
             $content = file_get_contents($abPath);
             Storage::disk('sftp')->put($img,$content);
         }
