@@ -54,7 +54,9 @@ class ProcessVideoShortMod implements ShouldQueue
      */
     public function handle()
     {
-        //
+        //远程下载
+        $this->saveOriginFile(env('RESOURCE_DOMAIN').$this->row->url);
+        //切片
         $this->short_dash_slice($this->row);
         $this->short_hls_slice($this->row,true);
 
