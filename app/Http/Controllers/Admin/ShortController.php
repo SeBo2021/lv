@@ -510,10 +510,8 @@ class ShortController extends BaseCurlController
                     $items = VideoShort::query()->whereIn($id, $id_arr)->get(['id','url','hls_url','dash_url']);
                     //$domain = env('RESOURCE_DOMAIN');
                     foreach ($items as $item){
-                        if(empty($item->hls_url) || empty($item->dash_url)){
-                            $job = new ProcessVideoShortMod($item);
-                            $this->dispatch($job);
-                        }
+                        $job = new ProcessVideoShortMod($item);
+                        $this->dispatch($job);
                     }
                     $r=true;
                     break;
