@@ -158,6 +158,7 @@ class VideoShortController extends Controller
         try {
             $user = $request->user();
             $params = ApiParamsTrait::parse($request->params);
+            Log::info('==ShortVideo==',[$params,$user->id]);
             $validated = Validator::make($params, [
                 'start_id' => 'nullable',
                 'keyword' => 'nullable',
