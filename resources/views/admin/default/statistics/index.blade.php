@@ -605,7 +605,7 @@
             //console.log(layui.laydate);
             laydate.render({
                 elem: '#range_date'
-                ,type: 'datetime' //默认，可不填
+                ,type: 'date' //默认，可不填
                 ,range:'~'
             });
             //搜索

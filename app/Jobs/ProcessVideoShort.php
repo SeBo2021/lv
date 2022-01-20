@@ -150,10 +150,20 @@ class ProcessVideoShort implements ShouldQueue
         $updateData = ['duration_seconds' => $durationSeconds];
         $updateData['duration'] = $this->formatSeconds($durationSeconds);
         DB::table('video_short')->where('id',$this->row->id)->update($updateData);
-        //删除mp4文件
-        if($del!==false){
-            Storage::delete($mp4_path);
+
+        //同步mp4到资源服
+        $content = Storage::get($mp4_path);
+        $videoName = sprintf("/short/video/%s/", date('Ymd')) . $this->row->url;
+        $upload = Storage::disk('sftp')->put($videoName, $content);
+        if ($upload) {
+            Storage::delete($this->mp4Path);
         }
+        //删除mp4文件
+        /*if($del!==false){
+            Storage::delete($mp4_path);
+        }*/
+
+
     }
 
 }
