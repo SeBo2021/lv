@@ -16,7 +16,8 @@ class ConfigController extends Controller
     {
         $appConfig = config_cache('app');
         if(!empty($appConfig)){
-            $res['announcement'] = $appConfig['announcement'];
+            Log::info('==ConfigAnnouncement==',[$appConfig['announcement']]);
+            $res['announcement'] = stripslashes(addslashes($appConfig['announcement']));
             $res['anActionType'] = $appConfig['announcement_action_type'];
             //视频ID
             $res['videoId'] = $appConfig['announcement_video_id'];
