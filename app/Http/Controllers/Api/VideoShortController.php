@@ -158,7 +158,7 @@ class VideoShortController extends Controller
         try {
             $user = $request->user();
             $params = ApiParamsTrait::parse($request->params);
-            Log::info('==ShortVideo==',[$params,$user->id]);
+
             $validated = Validator::make($params, [
                 'start_id' => 'nullable',
                 'keyword' => 'nullable',
@@ -185,10 +185,12 @@ class VideoShortController extends Controller
             }
             $res = $this->items($page, $user, $starId,$cateId,$tagId,$words);
             //Log::info('===VideoShortLists===',[$params]);
+            Log::info('==ShortVideo==',[$params,$user->id,$res]);
             return response()->json([
                 'state' => 0,
                 'data' => $res
             ]);
+
         } catch (Exception $exception) {
             $msg = $exception->getMessage();
             Log::error("shortLists", [$msg]);
