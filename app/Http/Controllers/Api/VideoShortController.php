@@ -79,20 +79,22 @@ class VideoShortController extends Controller
         $perPage = 8;
         $model = VideoShort::query()->where('status',1);
         $listIsRand = false;
-        if ($cateId) {
-            $listIsRand = Category::query()->where('id',$cateId)->value('is_rand')==1;
-            $cateWord = sprintf('"%s"',$cateId);
-            $model->where('cat','like',"%{$cateWord}%");
-        }
+
         if ($tagId) {
             $tagInfo = Tag::query()->where(['mask'=>$this->cateMapAlias[$tagId]])->firstOrFail()?->toArray();
             if(!empty($tagInfo)){
                 $tagWord = sprintf('"%s"',$tagInfo['id']);
-                $model->where('tag','like',"%{$tagWord}%");
+                $model = $model->where('tag','like',"%{$tagWord}%");
+            }
+        }else{
+            if ($cateId) {
+                $listIsRand = Category::query()->where('id',$cateId)->value('is_rand')==1;
+                $cateWord = sprintf('"%s"',$cateId);
+                $model = $model->where('cat','like',"%{$cateWord}%");
             }
         }
         if ($startId) {
-            $model->where('id','>=',$startId);
+            $model = $model->where('id','>=',$startId);
         }
         if(!empty($words)){
             $model = VideoShort::search($words)->where('status', 1);
@@ -184,8 +186,7 @@ class VideoShortController extends Controller
                 $starId = '0';
             }
             $res = $this->items($page, $user, $starId,$cateId,$tagId,$words);
-            //Log::info('===VideoShortLists===',[$params]);
-            Log::info('==ShortVideo==',[$params,$user->id,$res]);
+            //Log::info('==ShortVideo==',[$params,$user->id,$res]);
             return response()->json([
                 'state' => 0,
                 'data' => $res
