@@ -21,7 +21,7 @@ use Laravel\Passport\Token;
 
 class AuthController extends Controller
 {
-    use LoginTrait,PHPRedisTrait;
+    use LoginTrait, PHPRedisTrait, IpTrait;
     /**
      * Create user
      *
@@ -77,6 +77,7 @@ class AuthController extends Controller
         $appInfo = !is_string($validated['env']) ? json_encode($validated['env']) : $validated['env'] ;
 
         $ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $request->getClientIp();
+        $ip = $this->forceToIpV4($ip);
         /*$HTTP_X_REAL_IP = $_SERVER['HTTP_X_REAL_IP'] ?? '';
         $HTTP_X_FORWARDED_FOR = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';*/
         Log::debug('login_SEVER_info===',$_SERVER);//参数日志

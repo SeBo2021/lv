@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 
 
 use App\Models\Recharge;
+use App\Services\UiService;
+use Illuminate\Support\Facades\DB;
 
 class RechargeController extends BaseCurlIndexController
 {
@@ -59,4 +61,62 @@ class RechargeController extends BaseCurlIndexController
         ];
         return $cols;
     }
+
+    /*public function setListOutputItemExtend($item)
+    {
+        return $item;
+    }*/
+
+    public function getChannelSelectData($all=null): array
+    {
+        $queryBuild = DB::table('channels');
+        if($all===null){
+            $queryBuild = $queryBuild->where('status',1);
+        }
+        $items = [ ''=>'全部',0 => '官方'] + $queryBuild->pluck('name','id')->all();
+        $lists = [];
+        foreach ($items as $key => $value){
+            $lists[$key] = [
+                'id' => $key,
+                'name' => $value,
+            ];
+        }
+        return $lists;
+    }
+
+    /*public function setOutputSearchFormTpl($shareData)
+    {
+
+        $data = [
+            [
+                'field' => 'query_channel_id',
+                'type' => 'select',
+                'name' => '选择渠道',
+                'data' => $this->getChannelSelectData()
+            ],
+            [
+                'field' => 'query_order_type',
+                'type' => 'select',
+                'name' => '订单类型',
+                'data' => [
+                    1=>'会员卡',
+                    2=>'视频',
+                    3=>'骚豆',
+                ]
+            ],
+            [
+                'field' => 'query_device_system',
+                'type' => 'select',
+                'name' => '手机系统平台',
+                'data' => [
+                    1=>'苹果',
+                    2=>'安卓',
+                ]
+            ],
+
+        ];
+        //赋值到ui数组里面必须是`search`的key值
+        $this->uiBlade['search'] = $data;
+    }*/
+
 }
