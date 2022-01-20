@@ -156,7 +156,7 @@ class ProcessVideoShort implements ShouldQueue
         $videoName = sprintf("/short/video/%s/", date('Ymd')) . $this->row->url;
         $upload = Storage::disk('sftp')->put($videoName, $content);
         if ($upload) {
-            Storage::delete($this->mp4Path);
+            Storage::delete($mp4_path);
         }
         //删除mp4文件
         /*if($del!==false){
