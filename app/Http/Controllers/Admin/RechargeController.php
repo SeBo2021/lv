@@ -84,7 +84,7 @@ class RechargeController extends BaseCurlIndexController
         return $lists;
     }
 
-    /*public function setOutputSearchFormTpl($shareData)
+    public function setOutputSearchFormTpl($shareData)
     {
 
         $data = [
@@ -95,7 +95,7 @@ class RechargeController extends BaseCurlIndexController
                 'data' => $this->getChannelSelectData()
             ],
             [
-                'field' => 'query_order_type',
+                'field' => 'query_type',
                 'type' => 'select',
                 'name' => '订单类型',
                 'data' => [
@@ -117,6 +117,6 @@ class RechargeController extends BaseCurlIndexController
         ];
         //赋值到ui数组里面必须是`search`的key值
         $this->uiBlade['search'] = $data;
-    }*/
+    }
 
 }

@@ -101,6 +101,20 @@ trait QueryWhereTrait
 
     }
 
+    public function whereByQueryDeviceSystem($value)
+    {
+        if($value!==''){
+            $data = [
+                'device_system' => [
+                    'type' => '=',
+                    'value' => $value
+                ]
+            ];
+            $this->addWhere($data);
+        }
+
+    }
+
     public function whereByQueryCreatedAt($value)
     {
         $dateArr = explode('~',$value);
@@ -225,6 +239,17 @@ trait QueryWhereTrait
             ]
         ];
         $this->unsetAllWhere();
+        $this->addWhere($data);
+    }
+
+    public function whereByType($value)
+    {
+        $data = [
+            'id' => [
+                'type' => '=',
+                'value' => $value
+            ]
+        ];
         $this->addWhere($data);
     }
 
