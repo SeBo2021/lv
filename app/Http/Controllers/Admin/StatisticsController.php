@@ -31,8 +31,8 @@ class StatisticsController extends BaseCurlController
         $timeRange = $request->input('range_date', 0);
         if($timeRange > 0){
             $timeRangeArr = explode('~',$timeRange);
-            $startDate = trim($timeRangeArr[0]);
-            $endDate = trim($timeRangeArr[1]);
+            $startDate = trim($timeRangeArr[0].' 00:00:00');
+            $endDate = trim($timeRangeArr[1].' 23:59:59');
         }
         switch ($request->input('type','')){
             case 'totalStatistic':
