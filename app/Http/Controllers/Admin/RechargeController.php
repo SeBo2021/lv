@@ -47,6 +47,12 @@ class RechargeController extends BaseCurlIndexController
                 'align' => 'center'
             ],
             [
+                'field' => 'device_system',
+                'minWidth' => 100,
+                'title' => '系统设备',
+                'align' => 'center'
+            ],
+            [
                 'field' => 'created_at',
                 'minWidth' => 150,
                 'title' => '创建时间',
@@ -88,31 +94,46 @@ class RechargeController extends BaseCurlIndexController
     {
 
         $data = [
-            /*[
+            [
                 'field' => 'query_channel_id',
                 'type' => 'select',
                 'name' => '选择渠道',
                 'data' => $this->getChannelSelectData()
-            ],*/
-            /*[
+            ],
+            [
                 'field' => 'query_type',
                 'type' => 'select',
                 'name' => '订单类型',
                 'data' => [
-                    1=>'会员卡',
-                    2=>'视频',
-                    3=>'骚豆',
+                    1=>[
+                        'id'=>1,
+                        'name'=>'会员卡'
+                    ],
+                    2=>[
+                        'id'=>2,
+                        'name'=>'视频'
+                    ],
+                    3=>[
+                        'id'=>3,
+                        'name'=>'骚豆'
+                    ],
                 ]
-            ],*/
-            /*[
+            ],
+            [
                 'field' => 'query_device_system',
                 'type' => 'select',
                 'name' => '手机系统平台',
                 'data' => [
-                    1=>'苹果',
-                    2=>'安卓',
+                    1=>[
+                        'id'=>1,
+                        'name'=>'苹果'
+                    ],
+                    2=>[
+                        'id'=>2,
+                        'name'=>'安卓'
+                    ]
                 ]
-            ],*/
+            ],
 
         ];
         //赋值到ui数组里面必须是`search`的key值

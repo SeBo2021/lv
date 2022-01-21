@@ -242,7 +242,7 @@ trait QueryWhereTrait
         $this->addWhere($data);
     }
 
-    /*public function whereByType($value)
+    public function whereByQueryType($value)
     {
         $data = [
             'id' => [
@@ -251,7 +251,7 @@ trait QueryWhereTrait
             ]
         ];
         $this->addWhere($data);
-    }*/
+    }
 
     /*public function whereByTag($value)
     {
