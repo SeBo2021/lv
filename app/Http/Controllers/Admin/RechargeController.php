@@ -88,12 +88,12 @@ class RechargeController extends BaseCurlIndexController
     {
 
         $data = [
-            [
+            /*[
                 'field' => 'query_channel_id',
                 'type' => 'select',
                 'name' => '选择渠道',
                 'data' => $this->getChannelSelectData()
-            ],
+            ],*/
             /*[
                 'field' => 'query_type',
                 'type' => 'select',
@@ -104,7 +104,7 @@ class RechargeController extends BaseCurlIndexController
                     3=>'骚豆',
                 ]
             ],*/
-            [
+            /*[
                 'field' => 'query_device_system',
                 'type' => 'select',
                 'name' => '手机系统平台',
@@ -112,7 +112,7 @@ class RechargeController extends BaseCurlIndexController
                     1=>'苹果',
                     2=>'安卓',
                 ]
-            ],
+            ],*/
 
         ];
         //赋值到ui数组里面必须是`search`的key值
