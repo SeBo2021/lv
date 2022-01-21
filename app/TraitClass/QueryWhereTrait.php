@@ -242,7 +242,7 @@ trait QueryWhereTrait
         $this->addWhere($data);
     }
 
-    public function whereByOrderType($value)
+    public function whereByType($value)
     {
         $data = [
             'id' => [

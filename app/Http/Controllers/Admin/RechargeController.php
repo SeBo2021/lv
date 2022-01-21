@@ -94,8 +94,8 @@ class RechargeController extends BaseCurlIndexController
                 'name' => '选择渠道',
                 'data' => $this->getChannelSelectData()
             ],
-            [
-                'field' => 'query_order_type',
+            /*[
+                'field' => 'query_type',
                 'type' => 'select',
                 'name' => '订单类型',
                 'data' => [
@@ -103,7 +103,7 @@ class RechargeController extends BaseCurlIndexController
                     2=>'视频',
                     3=>'骚豆',
                 ]
-            ],
+            ],*/
             [
                 'field' => 'query_device_system',
                 'type' => 'select',
