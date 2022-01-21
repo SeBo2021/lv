@@ -109,7 +109,7 @@ class DBSController extends Controller implements Pay
             if ($mercId != (SELF::getPayEnv()['DBS']['merchant_id']??'')) {
                 return 'success';
             }
-            $signPass = $this->sign(
+            /*$signPass = $this->sign(
                 $jsonResp['code'],
                 $jsonResp['mercId'],
                 $jsonResp['oid'],
@@ -117,7 +117,7 @@ class DBSController extends Controller implements Pay
                 $jsonResp['tradeNo'],
                 SELF::getPayEnv()['DBS']['secret']??'',
                 $jsonResp['sign'],
-            );
+            );*/
 
             /*if (!$signPass) {
                 // 签名验证不通过
