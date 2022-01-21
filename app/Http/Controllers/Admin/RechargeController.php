@@ -105,6 +105,10 @@ class RechargeController extends BaseCurlIndexController
                 'type' => 'select',
                 'name' => '订单类型',
                 'data' => [
+                    0=>[
+                        'id'=>'',
+                        'name'=>'全部'
+                    ],
                     1=>[
                         'id'=>1,
                         'name'=>'会员卡'
@@ -124,6 +128,10 @@ class RechargeController extends BaseCurlIndexController
                 'type' => 'select',
                 'name' => '手机系统平台',
                 'data' => [
+                    0=>[
+                        'id'=>'',
+                        'name'=>'全部'
+                    ],
                     1=>[
                         'id'=>1,
                         'name'=>'苹果'
