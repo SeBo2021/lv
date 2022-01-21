@@ -66,10 +66,10 @@ class StatisticsController extends BaseCurlController
                 $totalData->total_register = $newData['newRegister'];
 
                 $json = [
-                    'access' => $totalData->total_access,
-                    'hits' => $totalData->total_hits,
-                    'install' => $totalData->total_install,
-                    'register' => $totalData->total_register,
+                    'access' => $totalData->total_access ?? 0,
+                    'hits' => $totalData->total_hits ?? 0,
+                    'install' => $totalData->total_install ?? 0,
+                    'register' => $totalData->total_register ?? 0,
                     'keep1AG' => round($totalData->avg_keep_day_rate,2) . '%',
                     'keep7AG' => round($totalData->avg_keep_week_rate,2).'%',
                     'keep30AG' => round($totalData->avg_keep_month_rate,2).'%',
