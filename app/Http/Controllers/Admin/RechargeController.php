@@ -95,7 +95,7 @@ class RechargeController extends BaseCurlIndexController
                 'data' => $this->getChannelSelectData()
             ],
             [
-                'field' => 'query_type',
+                'field' => 'query_order_type',
                 'type' => 'select',
                 'name' => '订单类型',
                 'data' => [
