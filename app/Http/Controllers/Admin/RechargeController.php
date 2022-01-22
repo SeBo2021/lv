@@ -10,6 +10,40 @@ use Illuminate\Support\Facades\DB;
 
 class RechargeController extends BaseCurlIndexController
 {
+    public array $orderType = [
+        0=>[
+            'id'=>'',
+            'name'=>'全部'
+        ],
+        1=>[
+            'id'=>1,
+            'name'=>'会员卡'
+        ],
+        2=>[
+            'id'=>2,
+            'name'=>'视频'
+        ],
+        3=>[
+            'id'=>3,
+            'name'=>'骚豆'
+        ],
+    ];
+
+    public array $deviceSystem = [
+        0=>[
+            'id'=>'',
+            'name'=>'全部'
+        ],
+        1=>[
+            'id'=>1,
+            'name'=>'苹果'
+        ],
+        2=>[
+            'id'=>2,
+            'name'=>'安卓'
+        ]
+    ];
+
     public function setModel()
     {
         return $this->model = new Recharge();
@@ -43,7 +77,7 @@ class RechargeController extends BaseCurlIndexController
             [
                 'field' => 'type',
                 'minWidth' => 100,
-                'title' => '充值方式',
+                'title' => '订单类型',
                 'align' => 'center'
             ],
             [
@@ -68,10 +102,12 @@ class RechargeController extends BaseCurlIndexController
         return $cols;
     }
 
-    /*public function setListOutputItemExtend($item)
+    public function setListOutputItemExtend($item)
     {
+        $item->type = $this->orderType[$item->type]['name'];
+        $item->device_system = $this->orderType[$item->device_system]['name'];
         return $item;
-    }*/
+    }
 
     public function getChannelSelectData($all=null): array
     {
@@ -104,45 +140,14 @@ class RechargeController extends BaseCurlIndexController
                 'field' => 'query_type',
                 'type' => 'select',
                 'name' => '订单类型',
-                'data' => [
-                    0=>[
-                        'id'=>'',
-                        'name'=>'全部'
-                    ],
-                    1=>[
-                        'id'=>1,
-                        'name'=>'会员卡'
-                    ],
-                    2=>[
-                        'id'=>2,
-                        'name'=>'视频'
-                    ],
-                    3=>[
-                        'id'=>3,
-                        'name'=>'骚豆'
-                    ],
-                ]
+                'data' => $this->orderType,
             ],
             [
                 'field' => 'query_device_system',
                 'type' => 'select',
                 'name' => '手机系统平台',
-                'data' => [
-                    0=>[
-                        'id'=>'',
-                        'name'=>'全部'
-                    ],
-                    1=>[
-                        'id'=>1,
-                        'name'=>'苹果'
-                    ],
-                    2=>[
-                        'id'=>2,
-                        'name'=>'安卓'
-                    ]
-                ]
+                'data' => $this->deviceSystem
             ],
-
         ];
         //赋值到ui数组里面必须是`search`的key值
         $this->uiBlade['search'] = $data;
