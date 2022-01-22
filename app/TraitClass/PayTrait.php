@@ -191,6 +191,7 @@ trait PayTrait
             'amount' => $orderInfo->amount,
             'device_system' => $payInfo->device_system,
             'channel_id' => $orderInfo->channel_id,
+            'order_id' => $orderInfo->id,
             'created_at' => $nowData,
             'updated_at' => $nowData,
         ];
