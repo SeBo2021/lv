@@ -111,10 +111,8 @@ class RechargeController extends BaseCurlIndexController
     {
         $item->channel_id = isset($this->getChannelSelectData(true)[$item->channel_id]) ? $this->getChannelSelectData(true)[$item->channel_id]['name'] : '该渠道被删除';
         if($item->type == 1){
-            //$remark = json_decode(DB::table('orders')->where('id',$item->order_id)->value('remark'),true);
-            $remark = DB::table('orders')->where('id',$item->order_id)->value('remark');
-//            $item->type = $remark['name'] ?? '';
-            $item->type = $remark;
+            $remark = json_decode(DB::table('orders')->where('id',$item->order_id)->value('remark'),true);
+            $item->type = $remark['name'] ?? '';
         }else{
             $item->type = '金币';
         }
