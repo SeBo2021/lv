@@ -12,9 +12,10 @@ trait IpTrait
 
     public function forceToIpV4($ip): string
     {
+        $IPV4 = $ip;
         if(filter_var($ip,FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)){
-            $ip = hexdec(substr($ip, 0, 2)). "." . hexdec(substr($ip, 2, 2)). "." . hexdec(substr($ip, 5, 2)). "." . hexdec(substr($ip, 7, 2));
+            $IPV4 = hexdec(substr($ip, 0, 2)). "." . hexdec(substr($ip, 2, 2)). "." . hexdec(substr($ip, 5, 2)). "." . hexdec(substr($ip, 7, 2));
         }
-        return $ip;
+        return $IPV4;
     }
 }
