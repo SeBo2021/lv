@@ -6,10 +6,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Recharge;
 use App\Services\UiService;
+use App\TraitClass\ChannelTrait;
 use Illuminate\Support\Facades\DB;
 
 class RechargeController extends BaseCurlIndexController
 {
+    use ChannelTrait;
+
     public array $orderType = [
         0=>[
             'id'=>'',
@@ -21,10 +24,6 @@ class RechargeController extends BaseCurlIndexController
         ],
         2=>[
             'id'=>2,
-            'name'=>'视频'
-        ],
-        3=>[
-            'id'=>3,
             'name'=>'骚豆'
         ],
     ];
@@ -63,6 +62,12 @@ class RechargeController extends BaseCurlIndexController
                 'align' => 'center'
             ],
             [
+                'field' => 'channel_id',
+                'width' => 100,
+                'title' => '推广渠道',
+                'align' => 'center'
+            ],
+            [
                 'field' => 'uid',
                 'width' => 100,
                 'title' => '会员',
@@ -83,7 +88,7 @@ class RechargeController extends BaseCurlIndexController
             [
                 'field' => 'device_system',
                 'minWidth' => 100,
-                'title' => '系统设备',
+                'title' => '手机系统平台',
                 'align' => 'center'
             ],
             [
@@ -104,26 +109,16 @@ class RechargeController extends BaseCurlIndexController
 
     public function setListOutputItemExtend($item)
     {
-        $item->type = $this->orderType[$item->type]['name'];
-        $item->device_system = $this->orderType[$item->device_system]['name'];
-        return $item;
-    }
+        $item->channel_id = isset($this->getChannelSelectData(true)[$item->channel_id]) ? $this->getChannelSelectData(true)[$item->channel_id]['name'] : '该渠道被删除';
+        if($item->type == 1){
+            $remark = json_decode(DB::table('orders')->where('id',$item->order_id)->value('remark'),true);
+            $item->type = $remark['name'] ?? '';
+        }else{
+            $item->type = '金币';
+        }
 
-    public function getChannelSelectData($all=null): array
-    {
-        $queryBuild = DB::table('channels');
-        if($all===null){
-            $queryBuild = $queryBuild->where('status',1);
-        }
-        $items = [ ''=>'全部',0 => '官方'] + $queryBuild->pluck('name','id')->all();
-        $lists = [];
-        foreach ($items as $key => $value){
-            $lists[$key] = [
-                'id' => $key,
-                'name' => $value,
-            ];
-        }
-        return $lists;
+        $item->device_system = $this->deviceSystem[$item->device_system]['name'];
+        return $item;
     }
 
     public function setOutputSearchFormTpl($shareData)

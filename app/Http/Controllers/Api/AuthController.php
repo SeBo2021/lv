@@ -80,7 +80,7 @@ class AuthController extends Controller
         $ip = $this->forceToIpV4($ip);
         /*$HTTP_X_REAL_IP = $_SERVER['HTTP_X_REAL_IP'] ?? '';
         $HTTP_X_FORWARDED_FOR = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';*/
-        Log::debug('login_SEVER_info===',$_SERVER);//参数日志
+        //Log::debug('login_SEVER_info===',$_SERVER);//参数日志
         $test = $validated['test'] ?? false;
 
         $user = new User();
