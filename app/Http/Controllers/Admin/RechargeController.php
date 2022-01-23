@@ -48,9 +48,9 @@ class RechargeController extends BaseCurlIndexController
         return $this->model = new Recharge();
     }
 
-    public function indexCols()
+    public function indexCols(): array
     {
-        $cols = [
+        return [
             [
                 'type' => 'checkbox'
             ],
@@ -104,7 +104,6 @@ class RechargeController extends BaseCurlIndexController
                 'align' => 'center'
             ]
         ];
-        return $cols;
     }
 
     public function setListOutputItemExtend($item)

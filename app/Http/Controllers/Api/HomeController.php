@@ -83,7 +83,7 @@ class HomeController extends Controller
 
         //二级分类列表
         $res = $redis->get($sectionKey);
-        $perPage = 6;
+        $perPage = 4;
         if(!$res){
             $paginator = Category::query()
                 ->where('parent_id',$cid)
