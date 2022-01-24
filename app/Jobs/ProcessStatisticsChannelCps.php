@@ -56,6 +56,8 @@ class ProcessStatisticsChannelCps implements ShouldQueue
                     'share_ratio' => $channelInfo->share_ratio,
                     'share_amount' => $isUsage ? round(($this->orderInfo->amount * $channelInfo->share_ratio)/100,2) : 0,
                     'total_recharge_amount' => $isUsage ? $this->orderInfo->amount : 0,
+                    'total_amount' => $this->orderInfo->amount,
+                    'total_orders' =>  1,
                     'orders' =>  $isUsage ? 1 : 0,
                     'date_at' => $date_at,
                     'last_order_id' => $this->orderInfo->id,
@@ -85,6 +87,8 @@ class ProcessStatisticsChannelCps implements ShouldQueue
                     }
                 }
                 $updateData = [
+                    'total_amount' => $has->total_amount + $this->orderInfo->amount,
+                    'total_orders' => $has->orders + 1,
                     'order_index' => $order_index,
                     'last_order_id' => $this->orderInfo->id,
                 ];
