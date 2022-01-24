@@ -100,6 +100,10 @@ class VideoShortController extends Controller
             $model = VideoShort::search($words)->where('status', 1);
             $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
         }else{
+            //是否随机
+            if($listIsRand){
+                $model = $model->inRandomOrder();
+            }
             $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         }
         $items = $paginator->items();
@@ -121,10 +125,7 @@ class VideoShortController extends Controller
 
             $data[] = $one;
         }
-        //是否随机
-        if($listIsRand){
-            shuffle($data);
-        }
+
         return [
             'list' => $data,
             'hasMorePages' => $paginator->hasMorePages()
