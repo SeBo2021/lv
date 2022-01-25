@@ -65,7 +65,7 @@ class ProcessVideoShort implements ShouldQueue
         $this->syncSlice($this->row->url,true);
         $this->syncUpload($this->row->cover_img);
         //生成预览
-        $this->generatePreview($this->row);
+        //$this->generatePreview($this->row);
     }
 
     /**
@@ -159,14 +159,10 @@ class ProcessVideoShort implements ShouldQueue
         $updateData['duration'] = $this->formatSeconds($durationSeconds);
         $updateData['url'] = $videoName;
         DB::table('video_short')->where('id',$this->row->id)->update($updateData);
-
-
         //删除mp4文件
         /*if($del!==false){
             Storage::delete($mp4_path);
         }*/
-
-
     }
 
 }
