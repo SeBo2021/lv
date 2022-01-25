@@ -76,7 +76,7 @@ class RechargeController extends BaseCurlIndexController
             ],
             [
                 'field' => 'order_id',
-                'width' => 100,
+                'minWidth' => 100,
                 'title' => '订单ID',
                 'align' => 'center'
             ],
