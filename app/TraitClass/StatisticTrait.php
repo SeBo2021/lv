@@ -49,6 +49,13 @@ trait StatisticTrait
                     ->where('device_system',$device_system)
                     ->where('at_time',$dateArr['day_time'])
                     ->increment($field,$stepValue);
+                if($field == 'install'){
+                    DB::table('statistic_day_deduction')
+                        ->where('channel_id',$channel_id)
+                        ->where('device_system',$device_system)
+                        ->where('at_time',$dateArr['day_time'])
+                        ->increment('install_real');
+                }
             }
         }else{
             $insertData = [
@@ -64,6 +71,10 @@ trait StatisticTrait
                 $insertDeductionData['pid'] = $channelInfo->pid;
                 $deductionValue = $channelInfo->is_deduction==1 ? $channelInfo->deduction :0;
                 $insertDeductionData[$field] = round(1*(1-$deductionValue/10000),2) * 100;
+                //增加真实安装量
+                if($field == 'install'){
+                    $insertDeductionData['install_real'] = 1;
+                }
             }
             DB::beginTransaction();
             DB::table('statistic_day')->insert($insertData);

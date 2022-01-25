@@ -2,6 +2,8 @@
 
 namespace App\TraitClass;
 
+use Illuminate\Support\Facades\DB;
+
 trait MemberCardTrait
 {
     public array $cardRights = [
@@ -100,6 +102,23 @@ trait MemberCardTrait
             $num += pow(2,$right-1);
         }
         return $num;
+    }
+
+    public function getMemberCardList(): array
+    {
+        $queryBuild = DB::table('member_card');
+        /*if($all===null){
+            $queryBuild = $queryBuild->where('status',1);
+        }*/
+        $items = [ ''=>'全部',0 => '金币'] + $queryBuild->pluck('name','id')->all();
+        $lists = [];
+        foreach ($items as $key => $value){
+            $lists[$key] = [
+                'id' => $key,
+                'name' => $value,
+            ];
+        }
+        return $lists;
     }
 
 }

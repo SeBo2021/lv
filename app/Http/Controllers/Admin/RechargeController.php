@@ -7,11 +7,12 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Recharge;
 use App\Services\UiService;
 use App\TraitClass\ChannelTrait;
+use App\TraitClass\MemberCardTrait;
 use Illuminate\Support\Facades\DB;
 
 class RechargeController extends BaseCurlIndexController
 {
-    use ChannelTrait;
+    use ChannelTrait,MemberCardTrait;
 
     public array $orderType = [
         0=>[
@@ -70,7 +71,7 @@ class RechargeController extends BaseCurlIndexController
             [
                 'field' => 'uid',
                 'width' => 100,
-                'title' => '会员',
+                'title' => '会员ID',
                 'align' => 'center'
             ],
             [
@@ -92,6 +93,12 @@ class RechargeController extends BaseCurlIndexController
                 'align' => 'center'
             ],
             [
+                'field' => 'status',
+                'minWidth' => 100,
+                'title' => '状态',
+                'align' => 'center'
+            ],
+            [
                 'field' => 'created_at',
                 'minWidth' => 150,
                 'title' => '创建时间',
@@ -109,13 +116,13 @@ class RechargeController extends BaseCurlIndexController
     public function setListOutputItemExtend($item)
     {
         $item->channel_id = isset($this->getChannelSelectData(true)[$item->channel_id]) ? $this->getChannelSelectData(true)[$item->channel_id]['name'] : '该渠道被删除';
-        if($item->type == 1){
-            $remark = json_decode(DB::table('orders')->where('id',$item->order_id)->value('remark'),true);
-            $item->type = $remark['name'] ?? '';
-        }else{
+        if($item->type!=1){
             $item->type = '金币';
+        }else{
+            $remark = json_decode($item->remark,true);
+            $item->type = $remark['name'] ?? '';
         }
-
+        $item->status = UiService::switchTpl('status', $item,'','完成|未付');
         $item->device_system = $this->deviceSystem[$item->device_system]['name'];
         return $item;
     }
@@ -125,16 +132,16 @@ class RechargeController extends BaseCurlIndexController
 
         $data = [
             [
-                'field' => 'query_channel_id',
+                'field' => 'channel_id',
                 'type' => 'select',
                 'name' => '选择渠道',
                 'data' => $this->getChannelSelectData()
             ],
             [
-                'field' => 'query_type',
+                'field' => 'type',
                 'type' => 'select',
                 'name' => '订单类型',
-                'data' => $this->orderType,
+                'data' => $this->getMemberCardList(),
             ],
             [
                 'field' => 'query_device_system',
@@ -145,6 +152,39 @@ class RechargeController extends BaseCurlIndexController
         ];
         //赋值到ui数组里面必须是`search`的key值
         $this->uiBlade['search'] = $data;
+    }
+
+    public function handleResultModel($model)
+    {
+        $type = $this->rq->input('type','');
+        $channel_id = $this->rq->input('channel_id',null);
+        $page = $this->rq->input('page', 1);
+        $pagesize = $this->rq->input('limit', 30);
+        $order_by_name = $this->orderByName();
+        $order_by_type = $this->orderByType();
+        $model = $this->orderBy($model, $order_by_name, $order_by_type);
+//        $build = DB::table('recharge')
+        $build = $model->join('orders','recharge.order_id','=','orders.id');
+        //dump($channel_id);
+        if($channel_id!==null){
+            $build = $build->where('recharge.channel_id',$channel_id);
+        }
+        if($type!==''){
+            if($type == 0){
+                $build = $build->where('orders.type','!=',1);
+            }else{
+                $build = $build->where('orders.type',1)->where('orders.type_id',$type);
+            }
+        }
+
+        $total = $build->count();
+        $field = ['recharge.id','recharge.amount','recharge.uid','recharge.order_id','orders.status',
+            'recharge.channel_id','recharge.device_system','recharge.created_at','orders.type','orders.type_id','orders.remark'];
+        $currentPageData = $build->forPage($page, $pagesize)->get($field);
+        return [
+            'total' => $total,
+            'result' => $currentPageData
+        ];
     }
 
 }
