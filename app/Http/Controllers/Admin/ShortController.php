@@ -117,6 +117,13 @@ class ShortController extends BaseCurlController
                 'hide' => false
             ],
             [
+                'field' => 'cover_img',
+                'minWidth' => 80,
+                'title' => '封面图',
+                'align' => 'center',
+                'hide' => false
+            ],
+            [
                 'field' => 'created_at',
                 'sort' => 1,
                 'minWidth' => 150,
