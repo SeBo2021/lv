@@ -156,7 +156,7 @@ class RechargeController extends BaseCurlIndexController
 
     public function handleResultModel($model)
     {
-        $type = $this->rq->input('type','');
+        $type = $this->rq->input('type',null);
         $channel_id = $this->rq->input('channel_id',null);
         $page = $this->rq->input('page', 1);
         $pagesize = $this->rq->input('limit', 30);
@@ -169,9 +169,9 @@ class RechargeController extends BaseCurlIndexController
         if($channel_id!==null){
             $build = $build->where('recharge.channel_id',$channel_id);
         }
-        if($type!==''){
+        if($type!==null){
             if($type == 0){
-                $build = $build->where('orders.type','!=',1);
+                $build = $build->where('orders.type',2);
             }else{
                 $build = $build->where('orders.type',1)->where('orders.type_id',$type);
             }
