@@ -17,6 +17,7 @@ use App\TraitClass\VipRights;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -102,7 +103,15 @@ class VideoShortController extends Controller
         }else{
             //是否随机
             if($listIsRand){
-                $model = $model->inRandomOrder();
+                if($page == 1){
+                    $model = $model->inRandomOrder();
+                    $modelStr = serialize($model);
+                    DB::table('short_video_model')->where('uid',$user->id)->where('cate_id',$cateId)->delete();
+                    DB::table('short_video_model')->insert(['uid'=>$user->id,'cate_id'=>$cateId,'short_serialize' =>$modelStr]);
+                }else{
+                    $short_serialize = DB::table('short_video_model')->where('uid',$user->id)->where('cate_id',$cateId)->value('short_serialize');
+                    $model = $short_serialize ? unserialize($short_serialize) : $model;
+                }
             }
             $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         }
