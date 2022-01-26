@@ -89,13 +89,14 @@ class VideoShortController extends Controller
             }
         }else{
             if ($cateId) {
-                $listIsRand = Category::query()->where('id',$cateId)->value('is_rand')==1;
+                //$listIsRand = Category::query()->where('id',$cateId)->value('is_rand')==1;
                 $cateWord = sprintf('"%s"',$cateId);
                 $model = $model->where('cat','like',"%{$cateWord}%");
             }
         }
         if ($startId) {
-            $model = $model->where('id','>=',$startId);
+//            $model = $model->where('id','>=',$startId);
+            $model = $model->where('id','<=',$startId);
         }
         if(!empty($words)){
             $model = VideoShort::search($words)->where('status', 1);
@@ -113,6 +114,7 @@ class VideoShortController extends Controller
                     $model = $short_serialize ? unserialize($short_serialize) : $model;
                 }
             }*/
+            $model = $model->orderByDesc('id');
             $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         }
         $items = $paginator->items();
