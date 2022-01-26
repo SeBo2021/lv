@@ -52,7 +52,7 @@ class LandingController extends Controller
             'device_system' => $request->input('device_system',0),
         ];
         $insert['channel_id'] = $this->getChannelId($request->input('channel_id',0));
-        DB::table('access')->insertOrIgnore($insert);
+        //DB::table('access')->insertOrIgnore($insert);
         //统计访问量
         $this->saveStatisticByDay('access',$insert['channel_id'],$insert['device_system'],$dateArr);
         return response()->json($insert);
