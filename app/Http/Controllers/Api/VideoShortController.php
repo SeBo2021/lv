@@ -102,7 +102,7 @@ class VideoShortController extends Controller
             $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
         }else{
             //是否随机
-            if($listIsRand){
+            /*if($listIsRand){
                 if($page == 1){
                     $model = $model->inRandomOrder();
                     $modelStr = serialize($model);
@@ -112,7 +112,7 @@ class VideoShortController extends Controller
                     $short_serialize = DB::table('short_video_model')->where('uid',$user->id)->where('cate_id',$cateId)->value('short_serialize');
                     $model = $short_serialize ? unserialize($short_serialize) : $model;
                 }
-            }
+            }*/
             $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         }
         $items = $paginator->items();
