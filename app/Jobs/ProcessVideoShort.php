@@ -158,6 +158,8 @@ class ProcessVideoShort implements ShouldQueue
         $updateData = ['duration_seconds' => $durationSeconds];
         $updateData['duration'] = $this->formatSeconds($durationSeconds);
         $updateData['url'] = $videoName;
+        $updateData['cover_img'] = self::get_slice_url($videoName,'cover');
+
         DB::table('video_short')->where('id',$this->row->id)->update($updateData);
         //删除mp4文件
         /*if($del!==false){
