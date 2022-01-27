@@ -55,7 +55,8 @@ class RechargeController extends BaseCurlIndexController
     {
         return [
             [
-                'type' => 'checkbox'
+                'type' => 'checkbox',
+                'fixed' => 'left'
             ],
             [
                 'field' => 'id',
@@ -118,6 +119,7 @@ class RechargeController extends BaseCurlIndexController
                 'field' => 'handle',
                 'minWidth' => 150,
                 'title' => '操作',
+                'fixed' => 'right',
                 'align' => 'center'
             ]
         ];
@@ -201,15 +203,25 @@ class RechargeController extends BaseCurlIndexController
             }
         }
 
-//        $totalAmount = $build->sum('recharge.amount');
+        $totalAmount = $build->sum('recharge.amount');
+
         $total = $build->count();
         $field = ['recharge.id','recharge.amount','recharge.uid','recharge.order_id','orders.status',
             'recharge.channel_id','recharge.device_system','recharge.created_at','orders.type','orders.type_id','orders.remark'];
         $currentPageData = $build->forPage($page, $pagesize)->get($field);
+        $this->listOutputJson($total, $currentPageData, 0,['handle'=>9]);
         return [
             'total' => $total,
+            'totalRow' => ['amount'=>$totalAmount],
             'result' => $currentPageData
         ];
+    }
+
+    //首页共享数据
+    public function indexShareData()
+    {
+        //设置首页数据替换
+        $this->setListConfig(['open_width' => '600px', 'open_height' => '700px','tableConfig' => ['totalRow' => true]]);
     }
 
 }

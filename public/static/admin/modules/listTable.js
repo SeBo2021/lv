@@ -143,8 +143,11 @@ layui.define(['utable', 'uform', 'request', 'laypage', 'layer', 'custormEvent'],
 
     render_config.where._token = $('[name="csrf-token"]').attr('content');
     reloadConfig = render_config;
-    /*render_config.totalRow = true;
-    console.log(render_config);*/
+    if(listConfig.tableConfig){
+      render_config = $.extend(render_config, listConfig.tableConfig);
+    }
+    //console.log(render_config);
+    // console.log(listConfig);
     table.render(render_config);
     //监听表的事件
     handleListenTable(extendFun);
