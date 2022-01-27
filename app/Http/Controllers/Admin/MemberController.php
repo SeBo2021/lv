@@ -28,7 +28,8 @@ class MemberController extends BaseCurlController
     {
         $cols = [
             [
-                'type' => 'checkbox'
+                'type' => 'checkbox',
+                'fixed' => 'left'
             ],
             [
                 'field' => 'id',
@@ -147,6 +148,7 @@ class MemberController extends BaseCurlController
                 'field' => 'handle',
                 'minWidth' => 150,
                 'title' => '操作',
+                //'fixed' => 'right',
                 'align' => 'center'
             ]
         ];
