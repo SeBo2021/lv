@@ -159,6 +159,13 @@ class RechargeController extends BaseCurlIndexController
                 'name' => '手机系统平台',
                 'data' => $this->deviceSystem
             ],
+            [
+                'field' => 'created_at',
+                'type' => 'datetime',
+//                'attr' => 'data-range=true',
+                'attr' => 'data-range=~',//需要特殊分割
+                'name' => '时间范围',
+            ],
         ];
         //赋值到ui数组里面必须是`search`的key值
         $this->uiBlade['search'] = $data;
@@ -168,6 +175,7 @@ class RechargeController extends BaseCurlIndexController
     {
         $type = $this->rq->input('type',null);
         $channel_id = $this->rq->input('channel_id',null);
+        $created_at = $this->rq->input('created_at',null);
         $page = $this->rq->input('page', 1);
         $pagesize = $this->rq->input('limit', 30);
         $order_by_name = $this->orderByName();
@@ -178,6 +186,12 @@ class RechargeController extends BaseCurlIndexController
         //dump($channel_id);
         if($channel_id!==null){
             $build = $build->where('recharge.channel_id',$channel_id);
+        }
+        if($created_at!==null){
+            $dateArr = explode('~',$created_at);
+            if(isset($dateArr[0]) && isset($dateArr[1])){
+                $build = $build->whereBetween('recharge.created_at', [trim($dateArr[0]),trim($dateArr[1])]);
+            }
         }
         if($type!==null){
             if($type == 0){
