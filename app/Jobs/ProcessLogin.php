@@ -69,6 +69,12 @@ class ProcessLogin implements ShouldQueue
         // 冗余最后一次登录地理信息
         User::query()->where('id',$uid)->update(['location_name'=>$areaJson]);
         User::query()->where('id',$uid)->increment('login_numbers');
+        if($this->loginLogData['type']==1){
+            //统计安装量
+            $channel_id = $this->bindChannel();
+            $device_system = $updateData['device_system'] ?? $this->device_system;
+            $this->saveStatisticByDay('install',$channel_id,$device_system);
+        }
         //生成邀请码、更新手机平台、绑定渠道
         $this->updateUserInfo();
     }
@@ -94,10 +100,6 @@ class ProcessLogin implements ShouldQueue
         if(!$this->code){
             $invitationCode = Str::random(2).$uid.Str::random(2);
             $updateData['promotion_code'] = $invitationCode;
-            $channel_id = $this->bindChannel();
-            $device_system = $updateData['device_system'] ?? $this->device_system;
-            //统计安装量
-            $this->saveStatisticByDay('install',$channel_id,$device_system);
         }
         if(!empty($updateData)){
             User::query()->where('id',$uid)->update($updateData);
