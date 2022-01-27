@@ -75,6 +75,13 @@ trait StatisticTrait
                 if($field == 'install'){
                     $insertDeductionData['install_real'] = 1;
                 }
+                //增加cps安装量
+                if($channelInfo->type == 2){
+                    DB::connection('channel_mysql')->table('channel_cps')
+                        ->where('channel_id',$channel_id)
+                        ->where('date_at',date('Y-m-d'))
+                        ->increment('install');
+                }
             }
             DB::beginTransaction();
             DB::table('statistic_day')->insert($insertData);
