@@ -14,6 +14,8 @@ class RechargeController extends BaseCurlIndexController
 {
     use ChannelTrait,MemberCardTrait;
 
+//    public $pageName = '充值';
+
     public array $orderType = [
         0=>[
             'id'=>'',
@@ -60,6 +62,7 @@ class RechargeController extends BaseCurlIndexController
                 'width' => 80,
                 'title' => '编号',
                 'sort' => 1,
+                'totalRowText' => '合计',
                 'align' => 'center'
             ],
             [
@@ -84,6 +87,7 @@ class RechargeController extends BaseCurlIndexController
                 'field' => 'amount',
                 'minWidth' => 100,
                 'title' => '金额',
+                'totalRow' => true,
                 'align' => 'center'
             ],
             [
@@ -183,6 +187,7 @@ class RechargeController extends BaseCurlIndexController
             }
         }
 
+//        $totalAmount = $build->sum('recharge.amount');
         $total = $build->count();
         $field = ['recharge.id','recharge.amount','recharge.uid','recharge.order_id','orders.status',
             'recharge.channel_id','recharge.device_system','recharge.created_at','orders.type','orders.type_id','orders.remark'];
