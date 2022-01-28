@@ -85,6 +85,7 @@ class OrderController extends Controller
                 'created_at' => $now,
                 'updated_at' => $now,
             ];
+            Log::info('order_create_Data===',[$createData]);//参数日志
             DB::beginTransaction();
             // 创建订单
             $order = Order::query()->create($createData);
