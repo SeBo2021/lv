@@ -219,7 +219,7 @@ class RechargeController extends BaseCurlIndexController
 
         $total = $build->count();
         $field = ['recharge.id','recharge.amount','recharge.uid','recharge.order_id','orders.status',
-            'recharge.channel_id','recharge.device_system','recharge.created_at','orders.type','orders.type_id','orders.remark'];
+            'recharge.channel_id','recharge.device_system','recharge.created_at','orders.type','orders.forward','orders.vid','orders.type_id','orders.remark'];
         $currentPageData = $build->forPage($page, $pagesize)->get($field);
         $this->listOutputJson($total, $currentPageData, 0,['handle'=>9]);
         return [
