@@ -192,7 +192,7 @@ class RechargeController extends BaseCurlIndexController
             [
                 'field' => 'forward',
                 'type' => 'select',
-                'name' => '订单类型',
+                'name' => '充值来源',
                 'data' => $this->forward,
             ],
             [
@@ -244,6 +244,7 @@ class RechargeController extends BaseCurlIndexController
             }
         }
         if($forward!==null){
+            $forward += 0;
             $build = match ($forward) {
                 4 => $build->where('orders.forward', 'live'),
                 3 => $build->where('orders.forward', 'short'),
