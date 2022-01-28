@@ -154,14 +154,14 @@ trait PayTrait
             ]
         );
         $orderModel = Order::query()->where(['id' => $payInfo->order_id??0]);
-        $update = $orderModel->update([
+        $orderModel->update([
             'status' => 1,
             'updated_at' => date('Y-m-d H:i:s', time()),
         ]);
 
-        if (!$update) {
+        /*if (!$update) {
             throw new Exception('订单更新失败', -1);
-        }
+        }*/
 
         $orderInfo = $orderModel->firstOrFail();
         //########渠道CPS日统计########
