@@ -15,6 +15,28 @@ class RechargeController extends BaseCurlIndexController
     use ChannelTrait,MemberCardTrait;
 
 //    public $pageName = '充值';
+    public array $forward = [
+        0=>[
+            'id'=>'',
+            'name'=>'全部'
+        ],
+        1=>[
+            'id'=>1,
+            'name'=>'我的'
+        ],
+        2=>[
+            'id'=>2,
+            'name'=>'长视频'
+        ],
+        3=>[
+            'id'=>3,
+            'name'=>'小视频'
+        ],
+        4=>[
+            'id'=>4,
+            'name'=>'直播'
+        ],
+    ];
 
     public array $orderType = [
         0=>[
@@ -168,6 +190,12 @@ class RechargeController extends BaseCurlIndexController
                 'data' => $this->getMemberCardList(),
             ],
             [
+                'field' => 'forward',
+                'type' => 'select',
+                'name' => '订单类型',
+                'data' => $this->forward,
+            ],
+            [
                 'field' => 'query_device_system',
                 'type' => 'select',
                 'name' => '手机系统平台',
@@ -188,6 +216,7 @@ class RechargeController extends BaseCurlIndexController
     public function handleResultModel($model)
     {
         $type = $this->rq->input('type',null);
+        $forward = $this->rq->input('forward',null);
         $channel_id = $this->rq->input('channel_id',null);
         $created_at = $this->rq->input('created_at',null);
         $page = $this->rq->input('page', 1);
@@ -214,6 +243,15 @@ class RechargeController extends BaseCurlIndexController
                 $build = $build->where('orders.type',1)->where('orders.type_id',$type);
             }
         }
+        if($forward!==null){
+            $build = match ($forward) {
+                4 => $build->where('orders.forward', 'live'),
+                3 => $build->where('orders.forward', 'short'),
+                2 => $build->where('orders.forward', 'video'),
+                1 => $build->where('orders.forward', '')
+                //default => $build->where('orders.forward', ''),
+            };
+        }
 
         $totalAmount = $build->sum('recharge.amount');
 
@@ -221,7 +259,7 @@ class RechargeController extends BaseCurlIndexController
         $field = ['recharge.id','recharge.amount','recharge.uid','recharge.order_id','orders.status',
             'recharge.channel_id','recharge.device_system','recharge.created_at','orders.type','orders.forward','orders.vid','orders.type_id','orders.remark'];
         $currentPageData = $build->forPage($page, $pagesize)->get($field);
-        $this->listOutputJson($total, $currentPageData, 0,['handle'=>9]);
+        $this->listOutputJson($total, $currentPageData, 0);
         return [
             'total' => $total,
             'totalRow' => ['amount'=>$totalAmount],
