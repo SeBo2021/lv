@@ -147,7 +147,7 @@ class RechargeController extends BaseCurlIndexController
                 'field' => 'handle',
                 'minWidth' => 150,
                 'title' => '操作',
-                'fixed' => 'right',
+//                'fixed' => 'right',
                 'align' => 'center'
             ]
         ];
