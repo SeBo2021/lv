@@ -73,6 +73,12 @@ class RechargeController extends BaseCurlIndexController
                 'align' => 'center'
             ],
             [
+                'field' => 'forward',
+                'width' => 100,
+                'title' => '充值来源',
+                'align' => 'center'
+            ],
+            [
                 'field' => 'uid',
                 'width' => 100,
                 'title' => '会员ID',
@@ -135,6 +141,12 @@ class RechargeController extends BaseCurlIndexController
             $item->type = $remark['name'] ?? '';
         }
         $item->status = UiService::switchTpl('status', $item,'','完成|未付');
+        $item->forward = match ($item->forward) {
+            'video' => '长视频',
+            'short' => '短视频',
+            'live' => '直播',
+            default => '我的',
+        };
         $item->device_system = $this->deviceSystem[$item->device_system]['name'];
         return $item;
     }
