@@ -43,6 +43,8 @@ class OrderController extends Controller
                 Rule::in(['1', '2','3']),
             ],
             'goods_id' => 'required|string',
+            'forward' => 'nullable',
+            'vid' => 'nullable',
             'time' => 'required|string',
         ])->validate();
         Log::info('order_create_params===',[$params]);//参数日志
@@ -65,9 +67,7 @@ class OrderController extends Controller
         }
         try {
             $number = self::getPayNumber();
-            DB::beginTransaction();
-            // 创建订单
-            $order = Order::query()->create([
+            $createData = [
                 'remark' => json_encode($goodsInfo),
                 'number' => $number,
                 'type' => $params['type'],
@@ -80,9 +80,14 @@ class OrderController extends Controller
                 'uid' => $user->id,
                 'channel_id' => $user->channel_id??0,
                 'status' => 0,
+                'forward' => $params['forward'] ?? '',
+                'vid' => $params['vid'] ?? 0,
                 'created_at' => $now,
                 'updated_at' => $now,
-            ]);
+            ];
+            DB::beginTransaction();
+            // 创建订单
+            $order = Order::query()->create($createData);
             // 准备支付记录
             $pay = PayLog::query()->create([
                 'order_id' => $order->id,
