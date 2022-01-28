@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Jobs\ProcessStatisticsChannelCps;
 use App\Models\Order;
 use App\Services\UiService;
+use App\TraitClass\PayTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class OrderController extends BaseCurlController
 {
+    use PayTrait;
     //设置页面的名称
     public $pageName = '订单';
 
@@ -141,13 +143,12 @@ class OrderController extends BaseCurlController
         } else {
             $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update([$field => $value]);
             if ($r) {
-                $orderInfo = $this->model->whereIn($id, $id_arr)->first();
-                //########渠道CPS日统计########
-                if($orderInfo->status == 1){
-                    ProcessStatisticsChannelCps::dispatchAfterResponse($orderInfo);
-                }
-                //#############################
-                if(($field=='status') && ($value==1)){
+                if($field=='status'){
+                    if($value == 0){
+                        return $this->returnFailApi(lang('订单已手动完成'));
+                    }
+                    $tradeNo = $this->model->whereIn($id, $id_arr)->value('number');
+                    $this->orderUpdate($tradeNo);
                     $this->insertLog($this->getPageName() . lang('手动完成订单成功') . '：' . implode(',', $id_arr));
                 }
                 $this->insertLog($this->getPageName() . lang('成功修改ids') . '：' . implode(',', $id_arr));
