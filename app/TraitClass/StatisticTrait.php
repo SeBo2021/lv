@@ -67,12 +67,12 @@ trait StatisticTrait
 //                $deductionValue = DB::table('channels')->where('id',$channel_id)->value('deduction');
                 $channelInfo = DB::table('channels')->find($channel_id);
                 $insertDeductionData['channel_pid'] = $channelInfo->pid;
-                $statisticTable['channel_name'] = $channelInfo->name;
-                $statisticTable['channel_promotion_code'] = $channelInfo->promotion_code;
-                $statisticTable['channel_code'] = $channelInfo->number;
-                $statisticTable['channel_type'] = $channelInfo->type;
-                $statisticTable['unit_price'] = $channelInfo->unit_price;
-                $statisticTable['share_ratio'] = $channelInfo->share_ratio ?? 0;
+                $insertDeductionData['channel_name'] = $channelInfo->name;
+                $insertDeductionData['channel_promotion_code'] = $channelInfo->promotion_code;
+                $insertDeductionData['channel_code'] = $channelInfo->number;
+                $insertDeductionData['channel_type'] = $channelInfo->type;
+                $insertDeductionData['unit_price'] = $channelInfo->unit_price;
+                $insertDeductionData['share_ratio'] = $channelInfo->share_ratio ?? 0;
                 $deductionValue = $channelInfo->is_deduction==1 ? $channelInfo->deduction :0;
                 $insertDeductionData[$field] = round(1*(1-$deductionValue/10000),2) * 100;
                 //增加真实安装量
