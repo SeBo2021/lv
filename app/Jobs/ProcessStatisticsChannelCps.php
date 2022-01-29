@@ -88,7 +88,7 @@ class ProcessStatisticsChannelCps implements ShouldQueue
                 }
                 $updateData = [
                     'total_amount' => $has->total_amount + $this->orderInfo->amount,
-                    'total_orders' => $has->orders + 1,
+                    'total_orders' => $has->total_orders + 1,
                     'order_index' => $order_index,
                     'last_order_id' => $this->orderInfo->id,
                 ];
