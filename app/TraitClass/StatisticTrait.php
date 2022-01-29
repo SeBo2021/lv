@@ -70,6 +70,8 @@ trait StatisticTrait
                 $statisticTable['channel_name'] = $channelInfo->name;
                 $statisticTable['channel_promotion_code'] = $channelInfo->promotion_code;
                 $statisticTable['channel_code'] = $channelInfo->number;
+                $statisticTable['channel_type'] = $channelInfo->type;
+                $statisticTable['unit_price'] = $channelInfo->unit_price;
                 $statisticTable['share_ratio'] = $channelInfo->share_ratio ?? 0;
                 $deductionValue = $channelInfo->is_deduction==1 ? $channelInfo->deduction :0;
                 $insertDeductionData[$field] = round(1*(1-$deductionValue/10000),2) * 100;
