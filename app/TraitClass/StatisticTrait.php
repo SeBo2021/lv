@@ -75,6 +75,8 @@ trait StatisticTrait
                 }
             }
             unset($insertDeductionData['device_system']);
+            unset($insertDeductionData['at_time']);
+            $insertDeductionData['date_at'] = date('Y-m-d',$dateArr['day_time']);
             DB::beginTransaction();
             DB::table('statistic_day')->insert($insertData);
             DB::table($statisticTable)->insert($insertDeductionData);
