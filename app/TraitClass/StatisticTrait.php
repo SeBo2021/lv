@@ -46,12 +46,12 @@ trait StatisticTrait
                 $stepValue = round(1*(1-$deductionValue/10000),2) * 100;
                 DB::table($statisticTable)
                     ->where('channel_id',$channel_id)
-                    ->where('at_time',$dateArr['day_time'])
+                    ->where('date_at',date('Y-m-d',$dateArr['day_time']))
                     ->increment($field,$stepValue);
                 if($field == 'install'){
                     DB::table($statisticTable)
                         ->where('channel_id',$channel_id)
-                        ->where('at_time',$dateArr['day_time'])
+                        ->where('date_at',date('Y-m-d',$dateArr['day_time']))
                         ->increment('install_real');
                 }
             }
@@ -76,6 +76,8 @@ trait StatisticTrait
             }
             unset($insertDeductionData['device_system']);
             unset($insertDeductionData['at_time']);
+            $insertDeductionData['channel_pid'] = $insertDeductionData['pid'];
+            unset($insertDeductionData['pid']);
             $insertDeductionData['date_at'] = date('Y-m-d',$dateArr['day_time']);
             DB::beginTransaction();
             DB::table('statistic_day')->insert($insertData);
