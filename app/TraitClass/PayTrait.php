@@ -4,7 +4,7 @@ namespace App\TraitClass;
 
 
 use App\Jobs\ProcessMemberCard;
-use App\Jobs\ProcessStatisticsChannelCps;
+use App\Jobs\ProcessStatisticsChannelByDay;
 use App\Models\Gold;
 use App\Models\MemberCard;
 use App\Models\Order;
@@ -165,7 +165,7 @@ trait PayTrait
 
         $orderInfo = $orderModel->firstOrFail();
         //########渠道CPS日统计########
-        ProcessStatisticsChannelCps::dispatchAfterResponse($orderInfo);
+        ProcessStatisticsChannelByDay::dispatchAfterResponse($orderInfo);
         //#############################
         $nowData = date('Y-m-d H:i:s',time());
 
