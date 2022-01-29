@@ -40,7 +40,7 @@ trait StatisticTrait
 
         //总统计
         $statisticTable = 'channel_day_statistics';
-        $hasStatistic = DB::table($statisticTable)->where('channel_id',$channel_id)->where('date_at',date('Y-m-d',$dateArr['day_time']))->first();
+        $hasStatistic = DB::table($statisticTable)->where('channel_id',$channel_id)->where('date_at',date('Y-m-d',$dateArr['day_time']))->first(['id',$field]);
         if($hasStatistic){
             //更新扣量表
             if($channel_id > 0){
