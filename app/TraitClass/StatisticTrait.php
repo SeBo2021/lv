@@ -74,6 +74,7 @@ trait StatisticTrait
                     $insertDeductionData['install_real'] = 1;
                 }
             }
+            unset($insertDeductionData['device_system']);
             DB::beginTransaction();
             DB::table('statistic_day')->insert($insertData);
             DB::table($statisticTable)->insert($insertDeductionData);
