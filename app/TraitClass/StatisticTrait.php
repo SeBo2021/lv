@@ -25,7 +25,7 @@ trait StatisticTrait
             ->where('device_system',$device_system)
             ->where('at_time',$dateArr['day_time']);
         $one = $queryBuild->first(['id',$field]);
-
+        $statisticTable = 'channel_day_statistics';
         if($one){
             $queryBuild->increment($field);
             //更新扣量表
@@ -36,7 +36,7 @@ trait StatisticTrait
                 $deductionValue = $channelInfo->deduction;
                 //是否开启前十个下载扣量
                 if($is_deduction == 1){ //开启
-                    $sumHits = DB::table('statistic_day_deduction')->where('channel_id',$channel_id)->sum('hits');
+                    $sumHits = DB::table($statisticTable)->where('channel_id',$channel_id)->sum('hits');
                     if(($sumHits/100) < 11){ //第一次前十个
                         $deductionValue = 0;
                     }else{ //关闭
@@ -44,15 +44,13 @@ trait StatisticTrait
                     }
                 }
                 $stepValue = round(1*(1-$deductionValue/10000),2) * 100;
-                DB::table('statistic_day_deduction')
+                DB::table($statisticTable)
                     ->where('channel_id',$channel_id)
-                    ->where('device_system',$device_system)
                     ->where('at_time',$dateArr['day_time'])
                     ->increment($field,$stepValue);
                 if($field == 'install'){
-                    DB::table('statistic_day_deduction')
+                    DB::table($statisticTable)
                         ->where('channel_id',$channel_id)
-                        ->where('device_system',$device_system)
                         ->where('at_time',$dateArr['day_time'])
                         ->increment('install_real');
                 }
@@ -75,17 +73,10 @@ trait StatisticTrait
                 if($field == 'install'){
                     $insertDeductionData['install_real'] = 1;
                 }
-                //增加cps安装量
-                if($channelInfo->type == 2){
-                    DB::connection('channel_mysql')->table('channel_cps')
-                        ->where('channel_id',$channel_id)
-                        ->where('date_at',date('Y-m-d'))
-                        ->increment('install');
-                }
             }
             DB::beginTransaction();
             DB::table('statistic_day')->insert($insertData);
-            DB::table('statistic_day_deduction')->insert($insertDeductionData);
+            DB::table($statisticTable)->insert($insertDeductionData);
             DB::commit();
         }
     }

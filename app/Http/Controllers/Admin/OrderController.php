@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Jobs\ProcessStatisticsChannelCps;
+use App\Jobs\ProcessStatisticsChannelByDay;
 use App\Models\Order;
 use App\Services\UiService;
 use App\TraitClass\PayTrait;
