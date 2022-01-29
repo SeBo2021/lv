@@ -25,12 +25,25 @@ trait StatisticTrait
             ->where('device_system',$device_system)
             ->where('at_time',$dateArr['day_time']);
         $one = $queryBuild->first(['id',$field]);
-        $statisticTable = 'channel_day_statistics';
-        if($one){
+        //流量型统计
+        if(!$one){
+            $insertData = [
+                'channel_id' => $channel_id,
+                $field => 1,
+                'device_system' => $device_system,
+                'at_time' => $dateArr['day_time'],
+            ];
+            DB::table('statistic_day')->insert($insertData);
+        }else{
             $queryBuild->increment($field);
+        }
+
+        //总统计
+        $statisticTable = 'channel_day_statistics';
+        $hasStatistic = DB::table($statisticTable)->where('channel_id',$channel_id)->where('date_at',date('Y-m-d',$dateArr['day_time']))->first(['id',$field]);
+        if($hasStatistic){
             //更新扣量表
             if($channel_id > 0){
-//                $deductionValue = DB::table('channels')->where('id',$channel_id)->value('deduction');
                 $channelInfo = DB::table('channels')->find($channel_id);
                 $is_deduction = $channelInfo->is_deduction;
                 $deductionValue = $channelInfo->deduction;
@@ -56,16 +69,12 @@ trait StatisticTrait
                 }
             }
         }else{
-            $insertData = [
-                'channel_id' => $channel_id,
-                $field => 1,
-                'device_system' => $device_system,
-                'at_time' => $dateArr['day_time'],
-            ];
-            $insertDeductionData = $insertData;
+            $insertDeductionData = [];
+            $insertDeductionData[$field] = 1;
+            $insertDeductionData['date_at'] = date('Y-m-d',$dateArr['day_time']);
             if($channel_id > 0){
-//                $deductionValue = DB::table('channels')->where('id',$channel_id)->value('deduction');
                 $channelInfo = DB::table('channels')->find($channel_id);
+                $insertDeductionData['channel_id'] = $channel_id;
                 $insertDeductionData['channel_pid'] = $channelInfo->pid;
                 $insertDeductionData['channel_name'] = $channelInfo->name;
                 $insertDeductionData['channel_promotion_code'] = $channelInfo->promotion_code;
@@ -80,14 +89,7 @@ trait StatisticTrait
                     $insertDeductionData['install_real'] = 1;
                 }
             }
-            unset($insertDeductionData['device_system']);
-            unset($insertDeductionData['at_time']);
-            $insertDeductionData['date_at'] = date('Y-m-d',$dateArr['day_time']);
-
-            DB::beginTransaction();
-            DB::table('statistic_day')->insert($insertData);
             DB::table($statisticTable)->insert($insertDeductionData);
-            DB::commit();
         }
     }
 
