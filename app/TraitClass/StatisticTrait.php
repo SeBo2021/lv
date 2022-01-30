@@ -46,7 +46,7 @@ trait StatisticTrait
             if($channel_id > 0){
                 if($field == 'install'){
                     $channelInfo = DB::table('channels')->find($channel_id);
-                    if($channelInfo->channel_id>0 && $channelInfo->type == 0){ //只cpa扣量
+                    if(($channelInfo->channel_id>0) && ($channelInfo->type == 0)){ //只cpa扣量
                         $is_deduction = $channelInfo->is_deduction;
                         $deductionValue = $channelInfo->deduction;
                         //是否开启前十个下载扣量
@@ -74,7 +74,7 @@ trait StatisticTrait
                     DB::table($statisticTable)
                         ->where('channel_id',$channel_id)
                         ->where('date_at',date('Y-m-d',$dateArr['day_time']))
-                        ->increment($field);
+                        ->increment($field,1);
                 }
 
             }
@@ -96,6 +96,7 @@ trait StatisticTrait
                 $insertDeductionData[$field] = round(1*(1-$deductionValue/10000),2) * 100;
                 //增加真实安装量
                 if($field == 'install'){
+                    $insertDeductionData['install'] = 100;
                     $insertDeductionData['install_real'] = 1;
                 }
             }
