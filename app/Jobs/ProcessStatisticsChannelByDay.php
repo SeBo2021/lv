@@ -102,7 +102,7 @@ class ProcessStatisticsChannelByDay implements ShouldQueue
                     $updateData['orders'] = $has->orders + 1;
                 }
                 DB::table($statisticTable)
-                    ->where('promotion_code',$channelInfo->promotion_code)
+                    ->where('channel_promotion_code',$channelInfo->promotion_code)
                     ->whereDate('date_at',$date_at)
                     ->update($updateData);
             }
