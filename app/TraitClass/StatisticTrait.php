@@ -46,18 +46,22 @@ trait StatisticTrait
             if($channel_id > 0){
                 if($field == 'install'){
                     $channelInfo = DB::table('channels')->find($channel_id);
-                    $is_deduction = $channelInfo->is_deduction;
-                    $deductionValue = $channelInfo->deduction;
-                    //是否开启前十个下载扣量
-                    if($is_deduction == 1){ //开启
-                        $sumHits = DB::table($statisticTable)->where('channel_id',$channel_id)->sum('hits');
-                        if(($sumHits/100) < 11){ //第一次前十个
-                            $deductionValue = 0;
-                        }else{ //关闭
-                            DB::table('channels')->where('id',$channel_id)->update(['is_deduction'=>0]);
+                    if($channelInfo->channel_id>0 && $channelInfo->type == 0){ //只cpa扣量
+                        $is_deduction = $channelInfo->is_deduction;
+                        $deductionValue = $channelInfo->deduction;
+                        //是否开启前十个下载扣量
+                        if($is_deduction == 1){ //开启
+                            $sumHits = DB::table($statisticTable)->where('channel_id',$channel_id)->sum('hits');
+                            if(($sumHits/100) < 11){ //第一次前十个
+                                $deductionValue = 0;
+                            }else{ //关闭
+                                DB::table('channels')->where('id',$channel_id)->update(['is_deduction'=>0]);
+                            }
                         }
+                        $stepValue = round(1*(1-$deductionValue/10000),2) * 100;
+                    }else{
+                        $stepValue = 100;
                     }
-                    $stepValue = round(1*(1-$deductionValue/10000),2) * 100;
                     DB::table($statisticTable)
                         ->where('channel_id',$channel_id)
                         ->where('date_at',date('Y-m-d',$dateArr['day_time']))
