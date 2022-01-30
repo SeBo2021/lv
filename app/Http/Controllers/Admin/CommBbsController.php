@@ -20,6 +20,7 @@ use App\Models\CommCate;
 use App\Models\User;
 use App\Services\UiService;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class CommBbsController extends BaseCurlController
@@ -87,6 +88,13 @@ class CommBbsController extends BaseCurlController
                 'align' => 'center'
             ],
             [
+                'field' => 'video_picture',
+                'minWidth' => 150,
+                'title' => '封面图片',
+                'hide' => true,
+                'align' => 'center'
+            ],
+            [
                 'field' => 'status',
                 'minWidth' => 80,
                 'title' => '审核',
@@ -127,6 +135,94 @@ class CommBbsController extends BaseCurlController
         $this->uiBlade['search'] = $data;
     }
 
+    public function setOutputHandleBtnTpl($shareData)
+    {
+        $data = $this->defaultHandleBtnAddTpl($shareData);
+        if($this->isCanDel()){
+            $data[] = [
+                'class' => 'layui-btn-danger',
+                'name' => '修正封面',
+                'id' => 'btn-updateCover',
+                'data'=>[
+                    'data-type' => "handle",
+                    'data-title' => "确定批量操作吗",
+                    'data-field' => "update_cover",
+                    'data-value' => 0,
+                ]
+            ];
+        }
+        $this->uiBlade['btn'] = $data;
+    }
+    public function editTable(Request $request)
+    {
+        $this->rq = $request;
+        $ids = $request->input('ids'); // 修改的表主键id批量分割字符串
+        //分割ids
+        $id_arr = explode(',', $ids);
+
+        $id_arr = is_array($id_arr) ? $id_arr : [$id_arr];
+
+        if (empty($id_arr)) {
+            return $this->returnFailApi(lang('没有选择数据'));
+        }
+        //表格编辑过滤IDS
+        $id_arr = $this->editTableFilterIds($id_arr);
+
+        $field = $request->input('field'); // 修改哪个字段
+        $value = $request->input('field_value'); // 修改字段值
+
+
+        $id = 'id'; // 表主键id值
+
+        $type_r = $this->editTableTypeEvent($id_arr, $field, $value);
+
+        if ($type_r) {
+            return $type_r;
+        } else {
+            switch ($field){
+                case 'update_cover':
+                    foreach ($id_arr as $primaryKey){
+                        $one = CommBbs::query()->where($id, $primaryKey)->first(['id','video']);
+                        if(!empty($one->video)){
+                            $videos = json_decode($one->video);
+                            $ext = pathinfo($videos[0]);
+                            $coverImg = $ext['dirname'].'/slice/'.$ext['filename'].'jpg';
+                            CommBbs::query()->where($id, $primaryKey)->update(['video_picture'=>json_encode([$coverImg])]);
+                        }
+                    }
+                    $r=true;
+                    break;
+                /*case 'duration_seconds':
+                    $videos = Video::query()->whereIn($id, $id_arr)->get(['id','duration','duration_seconds'])->toArray();
+                    foreach ($videos as $video){
+                        if(!empty($video['duration'])){
+                            if($video['duration_seconds']==0){
+                                $duration_seconds = $this->transferSeconds($video['duration']);
+                                Video::query()->where('id',$video['id'])->update(['duration_seconds' => $duration_seconds]);
+                            }
+                        }else{
+                            if(!empty($video['duration_seconds'])){
+                                $format = $this->formatSeconds($video['duration_seconds']);
+                                Video::query()->where('id',$video['id'])->update(['duration' => $format]);
+                            }
+                        }
+                    }
+                    $r = true;
+                    break;*/
+                default:
+                    $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update([$field => $value]);
+                    break;
+            }
+
+            if ($r) {
+                $this->insertLog($this->getPageName() . lang('成功修改ids') . '：' . implode(',', $id_arr));
+            } else {
+                $this->insertLog($this->getPageName() . lang('失败ids') . '：' . implode(',', $id_arr));
+            }
+            return $this->editTablePutLog($r, $field, $id_arr);
+        }
+
+    }
     //4.编辑和添加页面表单数据
     public function setOutputUiCreateEditForm($show = '')
     {
