@@ -117,10 +117,12 @@ trait StatisticTrait
                 'channel_id' => $channel_id,
                 'device_system' => $device_system,
             ]);
+            $this->saveStatisticByDay('active_users',$channel_id,$device_system);
         }
+        //总统计激活观看人数
 
         //更新统计扣量的表
-        if($channel_id > 0){
+        /*if($channel_id > 0){
             $first = DB::table('statistic_users_day_deduction')
                 ->where('at_time',$at_time)
                 ->where('channel_id',$channel_id)
@@ -144,7 +146,7 @@ trait StatisticTrait
                         ->increment('users',$stepValue);
                 }
             }
-        }
+        }*/
 
 
     }
