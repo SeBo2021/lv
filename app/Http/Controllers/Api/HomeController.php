@@ -45,6 +45,7 @@ class HomeController extends Controller
                 'cid' => 'required|integer'
             ])->validated();
             $cid = $validated['cid'];
+            Log::info('==carouselLog===',[$validated]);
             $data = Carousel::query()
                 ->where('status', 1)
                 ->where('cid', $cid)
