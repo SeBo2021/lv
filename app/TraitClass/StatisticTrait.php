@@ -64,7 +64,7 @@ trait StatisticTrait
             //更新扣量表
             if($field == 'install'){
                 $channelInfo = DB::table('channels')->find($channel_id);
-                if(($channelInfo->type == 0) && ($channel_id>0)){ //只cpa扣量
+                if(($channelInfo->type<2) && ($channel_id>0)){ //只cpa扣量
                     $is_deduction = $channelInfo->is_deduction;
                     $deductionValue = $channelInfo->deduction;
                     //是否开启前十个下载扣量
