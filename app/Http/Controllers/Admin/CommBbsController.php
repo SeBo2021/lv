@@ -192,23 +192,6 @@ class CommBbsController extends BaseCurlController
                     }
                     $r=true;
                     break;
-                /*case 'duration_seconds':
-                    $videos = Video::query()->whereIn($id, $id_arr)->get(['id','duration','duration_seconds'])->toArray();
-                    foreach ($videos as $video){
-                        if(!empty($video['duration'])){
-                            if($video['duration_seconds']==0){
-                                $duration_seconds = $this->transferSeconds($video['duration']);
-                                Video::query()->where('id',$video['id'])->update(['duration_seconds' => $duration_seconds]);
-                            }
-                        }else{
-                            if(!empty($video['duration_seconds'])){
-                                $format = $this->formatSeconds($video['duration_seconds']);
-                                Video::query()->where('id',$video['id'])->update(['duration' => $format]);
-                            }
-                        }
-                    }
-                    $r = true;
-                    break;*/
                 default:
                     $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update([$field => $value]);
                     break;
