@@ -501,7 +501,7 @@ class UserController extends Controller
             }
             DB::table('sms_codes')->where('id',$smsCode->id)->update(['status'=>1]);
             //====
-            $requestUserInfo = $request->user();
+            $requestUser = $request->user();
             $user = User::query()
                 ->where('phone_number',$validated['phone'])
                 ->where('area_number',$smsCode->area_number)
@@ -510,33 +510,33 @@ class UserController extends Controller
                 return response()->json(['state'=>-1, 'msg'=>'该手机没有绑定过帐号,无法找回']);
             }
             //同一账号的情况
-            if($requestUserInfo->account == $user->account){
+            if($requestUser->account == $user->account){
                 return response()->json(['state'=>-1, 'msg'=>'找回账号与此账号是同一账号']);
             }
-            $user->status =1;
-            $user->save();
-            //清除当前用户token和账号禁用
-            Token::query()->where('name',$requestUserInfo->account)->delete();
-            User::query()->where('id',$requestUserInfo->id)->update(['status' => 0]);
+            $requestUser->status = 1;
+            $requestUser->save();
+            //清除原来用户token和账号禁用
+            Token::query()->where('name',$user->account)->delete();
+            User::query()->where('id',$user->id)->update(['status' => 0]);
 
-            $tokenResult = $user->createToken($user->account,['check-user']);
+            $tokenResult = $requestUser->createToken($requestUser->account,['check-user']);
             $token = $tokenResult->token;
             $token->expires_at = Carbon::now()->addDays();
             $token->save();
-            $user = $user->only($this->loginUserFields);
-            if(isset($user['avatar'])){
-                $user['avatar'] += 0;
+            $requestUser = $requestUser->only($this->loginUserFields);
+            if(isset($requestUser['avatar'])){
+                $requestUser['avatar'] += 0;
             }
-            $user['token'] = $tokenResult->accessToken;
-            $user['token_type'] = 'Bearer';
-            $user['expires_at'] = Carbon::parse(
+            $requestUser['token'] = $tokenResult->accessToken;
+            $requestUser['token_type'] = 'Bearer';
+            $requestUser['expires_at'] = Carbon::parse(
                 $tokenResult->token->expires_at
             )->toDateTimeString();
-            $user['expires_at_timestamp'] = strtotime($user['expires_at']);
+            $requestUser['expires_at_timestamp'] = strtotime($user['expires_at']);
             //生成用户专有的客服链接
-            $user = $this->generateChatUrl($user);
+            $requestUser = $this->generateChatUrl($requestUser);
 
-            return response()->json(['state'=>0, 'data'=>$user, 'msg'=>'账号找回成功']);
+            return response()->json(['state'=>0, 'data'=>$requestUser, 'msg'=>'账号找回成功']);
         }
         return [];
     }
