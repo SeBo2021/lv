@@ -39,62 +39,64 @@ trait StatisticTrait
         }
 
         //总统计
-        $statisticTable = 'channel_day_statistics';
-        $hasStatistic = DB::table($statisticTable)->where('channel_id',$channel_id)->where('date_at',date('Y-m-d',$dateArr['day_time']))->first(['id',$field]);
-        if(!$hasStatistic){
-            $insertDeductionData = [];
-            $insertDeductionData[$field] = 1;
-            $insertDeductionData['date_at'] = date('Y-m-d',$dateArr['day_time']);
-            $channelInfo = DB::table('channels')->find($channel_id);
-            $insertDeductionData['channel_id'] = $channel_id;
-            $insertDeductionData['channel_pid'] = $channelInfo->pid;
-            $insertDeductionData['channel_name'] = $channelInfo->name;
-            $insertDeductionData['channel_promotion_code'] = $channelInfo->promotion_code;
-            $insertDeductionData['channel_code'] = $channelInfo->number;
-            $insertDeductionData['channel_type'] = $channelInfo->type;
-            $insertDeductionData['unit_price'] = $channelInfo->unit_price;
-            $insertDeductionData['share_ratio'] = $channelInfo->share_ratio ?? 0;
-            //增加真实安装量
-            if($field == 'install'){
-                $insertDeductionData['install'] = 100;
-                $insertDeductionData['install_real'] = 1;
-            }
-            DB::table($statisticTable)->insert($insertDeductionData);
-        }else{
-            //更新扣量表
-            if($field == 'install'){
-                $channelInfo = DB::table('channels')->find($channel_id);
-                if(($channelInfo->type<2) && ($channel_id>0)){ //只cpa扣量
-                    $is_deduction = $channelInfo->is_deduction;
-                    $deductionValue = $channelInfo->deduction;
-                    //是否开启前十个下载扣量
-                    if($is_deduction == 1){ //开启
-                        $sumHits = DB::table($statisticTable)->where('channel_id',$channel_id)->sum('hits');
-                        if(($sumHits/100) < 11){ //第一次前十个
-                            $deductionValue = 0;
-                        }else{ //关闭
-                            DB::table('channels')->where('id',$channel_id)->update(['is_deduction'=>0]);
-                        }
-                    }
-                    $stepValue = round(1*(1-$deductionValue/10000),2) * 100;
-                }else{
-                    $stepValue = 100;
+        $channelInfo = DB::table('channels')->find($channel_id);
+        if($channelInfo){
+            $statisticTable = 'channel_day_statistics';
+            $hasStatistic = DB::table($statisticTable)->where('channel_id',$channel_id)->where('date_at',date('Y-m-d',$dateArr['day_time']))->first(['id',$field]);
+            if(!$hasStatistic){
+                $insertDeductionData = [];
+                $insertDeductionData[$field] = 1;
+                $insertDeductionData['date_at'] = date('Y-m-d',$dateArr['day_time']);
+                $insertDeductionData['channel_id'] = $channel_id;
+                $insertDeductionData['channel_pid'] = $channelInfo->pid;
+                $insertDeductionData['channel_name'] = $channelInfo->name;
+                $insertDeductionData['channel_promotion_code'] = $channelInfo->promotion_code;
+                $insertDeductionData['channel_code'] = $channelInfo->number;
+                $insertDeductionData['channel_type'] = $channelInfo->type;
+                $insertDeductionData['unit_price'] = $channelInfo->unit_price;
+                $insertDeductionData['share_ratio'] = $channelInfo->share_ratio ?? 0;
+                //增加真实安装量
+                if($field == 'install'){
+                    $insertDeductionData['install'] = 100;
+                    $insertDeductionData['install_real'] = 1;
                 }
-                DB::table($statisticTable)
-                    ->where('channel_id',$channel_id)
-                    ->where('date_at',date('Y-m-d',$dateArr['day_time']))
-                    ->increment('install',$stepValue);
-                DB::table($statisticTable)
-                    ->where('channel_id',$channel_id)
-                    ->where('date_at',date('Y-m-d',$dateArr['day_time']))
-                    ->increment('install_real');
+                DB::table($statisticTable)->insert($insertDeductionData);
             }else{
-                DB::table($statisticTable)
-                    ->where('channel_id',$channel_id)
-                    ->where('date_at',date('Y-m-d',$dateArr['day_time']))
-                    ->increment($field);
+                //更新扣量表
+                if($field == 'install'){
+                    if(($channelInfo->type<2) && ($channel_id>0)){ //只cpa扣量
+                        $is_deduction = $channelInfo->is_deduction;
+                        $deductionValue = $channelInfo->deduction;
+                        //是否开启前十个下载扣量
+                        if($is_deduction == 1){ //开启
+                            $sumHits = DB::table($statisticTable)->where('channel_id',$channel_id)->sum('hits');
+                            if(($sumHits/100) < 11){ //第一次前十个
+                                $deductionValue = 0;
+                            }else{ //关闭
+                                DB::table('channels')->where('id',$channel_id)->update(['is_deduction'=>0]);
+                            }
+                        }
+                        $stepValue = round(1*(1-$deductionValue/10000),2) * 100;
+                    }else{
+                        $stepValue = 100;
+                    }
+                    DB::table($statisticTable)
+                        ->where('channel_id',$channel_id)
+                        ->where('date_at',date('Y-m-d',$dateArr['day_time']))
+                        ->increment('install',$stepValue);
+                    DB::table($statisticTable)
+                        ->where('channel_id',$channel_id)
+                        ->where('date_at',date('Y-m-d',$dateArr['day_time']))
+                        ->increment('install_real');
+                }else{
+                    DB::table($statisticTable)
+                        ->where('channel_id',$channel_id)
+                        ->where('date_at',date('Y-m-d',$dateArr['day_time']))
+                        ->increment($field);
+                }
             }
         }
+
     }
 
     //保存活跃用户数据
