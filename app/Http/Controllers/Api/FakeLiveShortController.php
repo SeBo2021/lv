@@ -13,6 +13,7 @@ use App\Models\VideoShort;
 use App\Models\ViewRecord;
 use App\TraitClass\ApiParamsTrait;
 use App\TraitClass\PHPRedisTrait;
+use App\TraitClass\StatisticTrait;
 use App\TraitClass\VideoTrait;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -25,6 +26,7 @@ class FakeLiveShortController extends Controller
 {
     use VideoTrait;
     use PHPRedisTrait;
+    use StatisticTrait;
 
     /**
      * 读取数据
@@ -178,6 +180,9 @@ class FakeLiveShortController extends Controller
         if($user->long_vedio_times>0){ //有次数也视为VIP
             $isVip = 1;
         }
+        //统计激活视频人数=========
+        $this->saveUsersDay($uid, $user->channel_id, $user->device_system);
+        //============================
         return response()->json([
             'state' => 0,
             'data' => [

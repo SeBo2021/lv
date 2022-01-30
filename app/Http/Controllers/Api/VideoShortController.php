@@ -12,6 +12,7 @@ use App\Models\VideoShort;
 use App\Models\ViewRecord;
 use App\TraitClass\ApiParamsTrait;
 use App\TraitClass\PHPRedisTrait;
+use App\TraitClass\StatisticTrait;
 use App\TraitClass\VideoTrait;
 use App\TraitClass\VipRights;
 use Exception;
@@ -27,6 +28,7 @@ class VideoShortController extends Controller
     use VideoTrait;
     use PHPRedisTrait;
     use VipRights;
+    use StatisticTrait;
 
     private array $mainCateAlias = [
         'short_hot',
@@ -199,6 +201,9 @@ class VideoShortController extends Controller
             }
             $res = $this->items($page, $user, $starId,$cateId,$tagId,$words);
             //Log::info('==ShortVideo==',[$params,$user->id,$res]);
+            //统计激活视频人数===============
+            $this->saveUsersDay($user->id, $user->channel_id, $user->device_system);
+            //============================
             return response()->json([
                 'state' => 0,
                 'data' => $res
