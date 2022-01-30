@@ -183,9 +183,9 @@ class CommBbsController extends BaseCurlController
                 case 'update_cover':
                     foreach ($id_arr as $primaryKey){
                         $one = CommBbs::query()->where($id, $primaryKey)->first(['id','video']);
-                        if(!empty($one->video)){
-                            $videos = json_decode($one->video);
-                            $ext = pathinfo($videos[0]);
+                        $video = json_decode($one->video,true);
+                        if(!empty($video[0])){
+                            $ext = pathinfo($video[0]);
                             $coverImg = $ext['dirname'].'/slice/'.$ext['filename'].'jpg';
                             CommBbs::query()->where($id, $primaryKey)->update(['video_picture'=>json_encode([$coverImg])]);
                         }
