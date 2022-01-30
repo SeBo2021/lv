@@ -45,23 +45,19 @@ trait StatisticTrait
             $insertDeductionData = [];
             $insertDeductionData[$field] = 1;
             $insertDeductionData['date_at'] = date('Y-m-d',$dateArr['day_time']);
-            if($channel_id > 0){
-                $channelInfo = DB::table('channels')->find($channel_id);
-                $insertDeductionData['channel_id'] = $channel_id;
-                $insertDeductionData['channel_pid'] = $channelInfo->pid;
-                $insertDeductionData['channel_name'] = $channelInfo->name;
-                $insertDeductionData['channel_promotion_code'] = $channelInfo->promotion_code;
-                $insertDeductionData['channel_code'] = $channelInfo->number;
-                $insertDeductionData['channel_type'] = $channelInfo->type;
-                $insertDeductionData['unit_price'] = $channelInfo->unit_price;
-                $insertDeductionData['share_ratio'] = $channelInfo->share_ratio ?? 0;
-                $deductionValue = $channelInfo->is_deduction==1 ? $channelInfo->deduction :0;
-                $insertDeductionData[$field] = round(1*(1-$deductionValue/10000),2) * 100;
-                //增加真实安装量
-                if($field == 'install'){
-                    $insertDeductionData['install'] = 100;
-                    $insertDeductionData['install_real'] = 1;
-                }
+            $channelInfo = DB::table('channels')->find($channel_id);
+            $insertDeductionData['channel_id'] = $channel_id;
+            $insertDeductionData['channel_pid'] = $channelInfo->pid;
+            $insertDeductionData['channel_name'] = $channelInfo->name;
+            $insertDeductionData['channel_promotion_code'] = $channelInfo->promotion_code;
+            $insertDeductionData['channel_code'] = $channelInfo->number;
+            $insertDeductionData['channel_type'] = $channelInfo->type;
+            $insertDeductionData['unit_price'] = $channelInfo->unit_price;
+            $insertDeductionData['share_ratio'] = $channelInfo->share_ratio ?? 0;
+            //增加真实安装量
+            if($field == 'install'){
+                $insertDeductionData['install'] = 100;
+                $insertDeductionData['install_real'] = 1;
             }
             DB::table($statisticTable)->insert($insertDeductionData);
         }else{
