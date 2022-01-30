@@ -40,15 +40,15 @@ class ProcessStatisticsChannelByDay implements ShouldQueue
 
         if($channelInfo){
             $date_at = date('Y-m-d');
-            $has = DB::connection('channel_mysql')->table($statisticTable)
-                ->where('channel_promotion_code',$channelInfo->promotion_code)
+            $has = DB::table($statisticTable)
+                ->where('channel_id',$channelInfo->id)
                 ->whereDate('date_at',$date_at)
                 ->first();
             $level_one = explode(',', $channelInfo->level_one);
 
             if(!$has){//是否统计过
                 $isUsage = !in_array(1,$level_one);
-                DB::connection('channel_mysql')->table($statisticTable)->insert([
+                DB::table($statisticTable)->insert([
                     'channel_name' => $channelInfo->name,
                     'channel_promotion_code' => $channelInfo->promotion_code,
                     'channel_id' => $channel_id,
@@ -101,7 +101,7 @@ class ProcessStatisticsChannelByDay implements ShouldQueue
                     $updateData['total_recharge_amount'] = $has->total_recharge_amount + $this->orderInfo->amount;
                     $updateData['orders'] = $has->orders + 1;
                 }
-                DB::connection('channel_mysql')->table($statisticTable)
+                DB::table($statisticTable)
                     ->where('promotion_code',$channelInfo->promotion_code)
                     ->whereDate('date_at',$date_at)
                     ->update($updateData);
