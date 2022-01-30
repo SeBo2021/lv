@@ -514,10 +514,19 @@ class UserController extends Controller
                 return response()->json(['state'=>-1, 'msg'=>'找回账号与此账号是同一账号']);
             }
             $requestUser->status = 1;
+            $requestUser->vip_start_last = $user->vip_start_last;
+            $requestUser->vip_expired = $user->vip_expired;
+            $requestUser->vip = $user->vip;
+            $requestUser->gold = $user->gold;
+            $requestUser->avatar = $user->avatar;
+            $requestUser->promotion_code = $user->promotion_code;
+            $requestUser->member_card_type = $user->member_card_type;
+            $requestUser->balance = $user->balance;
+            $requestUser->channel_id = $user->channel_id;
             $requestUser->save();
             //清除原来用户token和账号禁用
             Token::query()->where('name',$user->account)->delete();
-            User::query()->where('id',$user->id)->update(['status' => 0]);
+            User::query()->where('id',$user->id)->update(['status' => 1,'did'=>$user->did.$user->id]);
 
             $tokenResult = $requestUser->createToken($requestUser->account,['check-user']);
             $token = $tokenResult->token;
