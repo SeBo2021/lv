@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Channel;
 use App\Services\UiService;
+use App\TraitClass\ChannelTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ChannelsController extends BaseCurlController
 {
+    use ChannelTrait;
     public $pageName = '渠道';
 
     public array $isDeduction = [
@@ -290,6 +292,27 @@ class ChannelsController extends BaseCurlController
         $item->status = UiService::switchTpl('status', $item,'');
         $item->type = $this->channelType[$item->type]['name'];
         return $item;
+    }
+
+    public function setOutputSearchFormTpl($shareData)
+    {
+
+        $data = [
+            [
+                'field' => 'query_channel_id',
+                'type' => 'select',
+                'name' => '选择渠道',
+                'data' => $this->getChannelSelectData()
+            ],
+            [
+                'field' => 'query_like_name',//这个搜索写的查询条件在app/TraitClass/QueryWhereTrait.php 里面写
+                'type' => 'text',
+                'name' => '账号',
+            ],
+
+        ];
+        //赋值到ui数组里面必须是`search`的key值
+        $this->uiBlade['search'] = $data;
     }
 
     //表单验证

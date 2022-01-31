@@ -269,7 +269,6 @@ class MemberController extends BaseCurlController
 
     public function setOutputHandleBtnTpl($shareData)
     {
-        $data = [];
         /*if ($this->isCanCreate()) {
 
             $data[] = [
@@ -289,7 +288,7 @@ class MemberController extends BaseCurlController
             ];
         }*/
 
-        return $data;
+        return [];
     }
 
     //弹窗大小
