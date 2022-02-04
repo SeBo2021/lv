@@ -130,6 +130,23 @@ trait QueryWhereTrait
 
     }
 
+    public function whereByQueryCreatedAtDayTime($value)
+    {
+        $dateArr = explode('~',$value);
+        $startTime = strtotime(trim($dateArr[0].' 00:00:00'));
+        $endTime = strtotime(trim($dateArr[1].' 23:59:59'));
+        if(isset($dateArr[0]) && isset($dateArr[1])){
+            $data1 = [
+                'created_at' => [
+                    'type' => 'between',
+                    'value' => [$startTime,$endTime]
+                ],
+            ];
+            $this->addWhere($data1);
+        }
+
+    }
+
     public function whereByQueryLikeAuthor($value)
     {
         $data = [
