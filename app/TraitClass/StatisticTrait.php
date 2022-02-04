@@ -64,7 +64,7 @@ trait StatisticTrait
             }else{
                 //更新扣量表
                 if($field == 'install'){
-                    if(($channelInfo->type<3) && ($channel_id>0)){ //只cpa扣量
+                    if(($channelInfo->type<3) && ($channel_id>0)){ //cpa、cps、包月都支持扣量
                         $is_deduction = $channelInfo->is_deduction;
                         $deductionValue = $channelInfo->deduction;
                         //是否开启前十个下载扣量
