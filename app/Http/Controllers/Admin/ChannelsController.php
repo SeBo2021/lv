@@ -59,6 +59,12 @@ class ChannelsController extends BaseCurlController
                 'align' => 'center'
             ],
             [
+                'field' => 'principal',
+                'minWidth' => 100,
+                'title' => '负责人',
+                'align' => 'center'
+            ],
+            [
                 'field' => 'name',
                 'minWidth' => 100,
                 'title' => '渠道名称',
@@ -128,6 +134,13 @@ class ChannelsController extends BaseCurlController
     public function setOutputUiCreateEditForm($show = '')
     {
         $data = [
+            [
+                'field' => 'principal',
+                'type' => 'text',
+                'name' => '负责人',
+                'must' => 1,
+                'default' => '',
+            ],
             [
                 'field' => 'password',
                 'type' => 'text',
@@ -333,6 +346,7 @@ class ChannelsController extends BaseCurlController
     {
         $data = [
             'name'=>'required|unique:channels,name',
+            'principal'=>'required',
             'promotion_code'=>'required|unique:channels,promotion_code',
         ];
         //$id值存在表示编辑的验证
@@ -347,6 +361,7 @@ class ChannelsController extends BaseCurlController
     public function checkRuleFieldName($id = '')
     {
         return [
+            'principal'=>'负责人',
             'name'=>'渠道名称',
             'promotion_code'=>'推广码',
         ];
