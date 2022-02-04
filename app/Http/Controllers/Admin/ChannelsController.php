@@ -299,16 +299,18 @@ class ChannelsController extends BaseCurlController
 
         $data = [
             [
-                'field' => 'query_channel_id',
+                'field' => 'id',
                 'type' => 'select',
                 'name' => '选择渠道',
                 'data' => $this->getChannelSelectData()
             ],
             [
-                'field' => 'query_like_name',//这个搜索写的查询条件在app/TraitClass/QueryWhereTrait.php 里面写
-                'type' => 'text',
-                'name' => '账号',
-            ],
+                'field' => 'query_status',
+                'type' => 'select',
+                'name' => '是否启用',
+                'default' => '',
+                'data' => $this->uiService->trueFalseData(1)
+            ]
 
         ];
         //赋值到ui数组里面必须是`search`的key值
