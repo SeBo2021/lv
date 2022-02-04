@@ -20,9 +20,9 @@ class LogController extends BaseCurlIndexController
 
 
     //2.首页设置列表显示的信息
-    public function indexCols()
+    public function indexCols(): array
     {
-        $cols = [
+        return [
             [
                 'type' => 'checkbox'
             ],
@@ -74,8 +74,6 @@ class LogController extends BaseCurlIndexController
 
 
         ];
-
-        return $cols;
     }
 
     //3.设置搜索部分
@@ -101,6 +99,13 @@ class LogController extends BaseCurlIndexController
                 'field' => 'ip_int',
                 'type' => 'text',
                 'name' => '操作ip',
+            ],
+            [
+                'field' => 'query_created_at',
+                'type' => 'datetime',
+//                'attr' => 'data-range=true',
+                'attr' => 'data-range=~',//需要特殊分割
+                'name' => '时间范围',
             ],
 
         ];
