@@ -59,6 +59,12 @@ class ChannelsController extends BaseCurlController
                 'align' => 'center'
             ],
             [
+                'field' => 'principal',
+                'minWidth' => 100,
+                'title' => '负责人',
+                'align' => 'center'
+            ],
+            [
                 'field' => 'name',
                 'minWidth' => 100,
                 'title' => '渠道名称',
