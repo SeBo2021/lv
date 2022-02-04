@@ -101,8 +101,8 @@ class LogController extends BaseCurlIndexController
                 'name' => '操作ip',
             ],
             [
-                'field' => 'query_created_at',
-                'type' => 'datetime',
+                'field' => 'query_created_at_day_time',
+                'type' => 'date',
 //                'attr' => 'data-range=true',
                 'attr' => 'data-range=~',//需要特殊分割
                 'name' => '时间范围',
