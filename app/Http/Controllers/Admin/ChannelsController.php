@@ -307,9 +307,20 @@ class ChannelsController extends BaseCurlController
             [
                 'field' => 'query_status',
                 'type' => 'select',
-                'name' => '是否启用',
+                'name' => '状态',
                 'default' => '',
-                'data' => $this->uiService->trueFalseData(1)
+                'data' => [
+                    '' => [
+                        'id'=>'',
+                        'name' => '全部'
+                    ],0 => [
+                        'id'=>0,
+                        'name' => '禁用'
+                    ],1 => [
+                        'id'=>1,
+                        'name' => '启用'
+                    ],
+                ]
             ]
 
         ];
