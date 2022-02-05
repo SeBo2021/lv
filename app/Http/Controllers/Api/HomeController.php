@@ -49,7 +49,7 @@ class HomeController extends Controller
             $data = Carousel::query()
                 ->where('status', 1)
                 ->where('cid', $cid)
-                ->get(['id','title','img','url'])
+                ->get(['id','title','img','url','action_type','vid','end_at'])
                 ->toArray();
             $domain = env('APP_URL');
             foreach ($data as &$item){
