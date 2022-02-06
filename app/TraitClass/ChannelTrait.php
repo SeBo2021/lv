@@ -10,6 +10,7 @@ trait ChannelTrait
         0 => 'default',
         1 => '苹果',
         2 => '安卓',
+        3 => 'ios轻量版',
     ];
 
     public $bindPhoneNumSelectData = [
