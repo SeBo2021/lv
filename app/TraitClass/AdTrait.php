@@ -46,7 +46,7 @@ trait AdTrait
             ->orderBy('sort')
             ->get(['id','sort','name','title','img','position','url','play_url','type','status','action_type','vid','end_at'])
             ->toArray();
-        if($groupByPosition){
+        /*if($groupByPosition){
             $newAds = [];
             $domain = env('APP_URL');
             foreach ($ads as $ad){
@@ -56,7 +56,16 @@ trait AdTrait
                 $newAds[$ad['position']][]= $ad;
             }
             $ads = $newAds;
+        }*/
+        $newAds = [];
+        $domain = env('APP_URL');
+        foreach ($ads as $ad){
+            $ad['img'] = $domain . $ad['img'];
+            $ad['action_type'] = (string)$ad['action_type'];
+            $ad['vid'] = (string)$ad['vid'];
+            $newAds[$ad['position']][]= $ad;
         }
+        $ads = $newAds;
         return !empty($ads) ? $ads : [];
     }
 
