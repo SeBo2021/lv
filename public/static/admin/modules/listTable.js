@@ -514,11 +514,13 @@ layui.define(['utable', 'uform', 'request', 'laypage', 'layer', 'custormEvent'],
   function listSearch(filterName, tableNameId) {
     filterName = filterName || 'LAY-list-search';
     //
-    form.on('select(filter)', function(data){
-      console.log(data.elem.data_union); //得到select原始DOM对象
+    /*form.on('select(filter)', function(data){
+      console.log(data.elem.title); //得到select原始DOM对象
       console.log(data.value); //得到被选中的值
       console.log(data.othis); //得到美化后的DOM对象
-    });
+      $('#input-'+data.elem.title).append('<option value="1" data-value="1">1</option>');
+      form.render('select', data.elem.title);
+    });*/
     form.on('submit(' + filterName + ')', function (data) {
       var field = data.field;
       //执行重载-这样会重复上次的条件

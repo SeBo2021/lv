@@ -38,7 +38,7 @@ trait AdTrait
         return [];
     }
 
-    public static function get($flag='',$groupByPosition=false)
+    public static function get($flag='',$groupByPosition=false): array
     {
         $ads = Ad::query()
             ->where('name',$flag)
@@ -49,7 +49,7 @@ trait AdTrait
         if($groupByPosition){
             $newAds = [];
             $domain = env('APP_URL');
-            foreach ($ads as $ad){
+            foreach ($ads as &$ad){
                 $ad['img'] = $domain . $ad['img'];
                 $ad['action_type'] = (string) $ad['action_type'];
                 $ad['vid'] = (string) $ad['vid'];
