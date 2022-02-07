@@ -12,7 +12,7 @@ trait AdTrait
         $ads = Ad::query()
             ->where('name',$flag)
             ->where('status',1)
-            ->get(['id','name','weight','title','img','position','url','play_url','type','status'])
+            ->get(['id','name','weight','title','img','position','url','play_url','type','status','action_type','vid','end_at'])
             ->toArray();
         $one = [];
 
@@ -31,28 +31,41 @@ trait AdTrait
             }
             $domain = env('APP_URL');
             $one['img'] = $domain . $one['img'];
+            $one['action_type'] = (string) $one['action_type'];
+            $one['vid'] = (string) $one['vid'];
             return [$one];
         }
         return [];
     }
 
-    public static function get($flag='',$groupByPosition=false)
+    public static function get($flag='',$groupByPosition=false): array
     {
         $ads = Ad::query()
             ->where('name',$flag)
             ->where('status',1)
             ->orderBy('sort')
-            ->get(['id','sort','name','title','img','position','url','play_url','type','status'])
+            ->get(['id','sort','name','title','img','position','url','play_url','type','status','action_type','vid','end_at'])
             ->toArray();
-        if($groupByPosition){
+        /*if($groupByPosition){
             $newAds = [];
             $domain = env('APP_URL');
             foreach ($ads as $ad){
                 $ad['img'] = $domain . $ad['img'];
+                $ad['action_type'] = (string)$ad['action_type'];
+                $ad['vid'] = (string)$ad['vid'];
                 $newAds[$ad['position']][]= $ad;
             }
             $ads = $newAds;
+        }*/
+        $newAds = [];
+        $domain = env('APP_URL');
+        foreach ($ads as $ad){
+            $ad['img'] = $domain . $ad['img'];
+            $ad['action_type'] = (string)$ad['action_type'];
+            $ad['vid'] = (string)$ad['vid'];
+            $newAds[$ad['position']][]= $ad;
         }
+        $ads = $newAds;
         return !empty($ads) ? $ads : [];
     }
 
