@@ -6,14 +6,14 @@ use Illuminate\Support\Facades\DB;
 
 trait ChannelTrait
 {
-    public $deviceSystems = [
+    public array $deviceSystems = [
         0 => 'default',
         1 => '苹果',
         2 => '安卓',
         3 => 'ios轻量版',
     ];
 
-    public $bindPhoneNumSelectData = [
+    public array $bindPhoneNumSelectData = [
         '' => [
             'id' =>'',
             'name' => '全部',
