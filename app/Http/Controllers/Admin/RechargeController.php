@@ -184,14 +184,14 @@ class RechargeController extends BaseCurlIndexController
                 'data' => $this->getChannelSelectData()
             ],*/
             [
-                'field' => 'query_channel_id_tree',
+                'field' => 'channel_id_tree',
                 'type' => 'select',
                 'name' => '顶级渠道',
                 'default' => '',
                 'data' => $this->getTopChannels()
             ],
             [
-                'field' => 'query_channel_id',
+                'field' => 'channel_id',
                 'type' => 'select',
                 'name' => '所有渠道',
                 'default' => '',
@@ -232,6 +232,7 @@ class RechargeController extends BaseCurlIndexController
         $type = $this->rq->input('type',null);
         $forward = $this->rq->input('forward',null);
         $channel_id = $this->rq->input('channel_id',null);
+        $topChannelId = $this->rq->input('channel_id_tree',null);
         $created_at = $this->rq->input('created_at',null);
         $page = $this->rq->input('page', 1);
         $pagesize = $this->rq->input('limit', 30);
@@ -243,6 +244,13 @@ class RechargeController extends BaseCurlIndexController
         //dump($channel_id);
         if($channel_id!==null){
             $build = $build->where('recharge.channel_id',$channel_id);
+        }
+        if($topChannelId!==null){
+//            $build = $build->where('recharge.channel_id',$channel_id);
+            $build = $build->where(function ($build) use ($topChannelId){
+                $build->where('recharge.channel_id',$topChannelId)
+                    ->orWhere('recharge.channel_pid',$topChannelId);
+            });
         }
         if($created_at!==null){
             $dateArr = explode('~',$created_at);
