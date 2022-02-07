@@ -160,10 +160,17 @@ class MemberController extends BaseCurlController
     {
 
         $data = [
-            [
+            /*[
                 'field' => 'query_channel_id',
                 'type' => 'select',
                 'name' => '选择渠道',
+                'data' => $this->getChannelSelectData()
+            ],*/
+            [
+                'field' => 'query_channel_id',
+                'type' => 'select',
+                'name' => '选择一级渠道',
+                'filter' => 'filter',
                 'data' => $this->getChannelSelectData()
             ],
             [

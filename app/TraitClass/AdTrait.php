@@ -12,7 +12,7 @@ trait AdTrait
         $ads = Ad::query()
             ->where('name',$flag)
             ->where('status',1)
-            ->get(['id','name','weight','title','img','position','url','play_url','type','status'])
+            ->get(['id','name','weight','title','img','position','url','play_url','type','status','action_type','vid','end_at'])
             ->toArray();
         $one = [];
 
