@@ -87,6 +87,22 @@ trait QueryWhereTrait
 
     }
 
+    public function whereByQueryChannelIdTree($value)
+    {
+        if($value!==''){
+            $data = [
+                'channel_id' => [
+                    'k1' => 'channel_id',
+                    'k2' => 'channel_pid',
+                    'type' => 'mergeAndOr',
+                    'value' => $value
+                ],
+            ];
+            $this->addWhere($data);
+        }
+
+    }
+
     public function whereByQueryChannelId($value)
     {
         if($value!==''){

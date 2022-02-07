@@ -167,24 +167,18 @@ class MemberController extends BaseCurlController
                 'data' => $this->getChannelSelectData()
             ],*/
             [
-                'field' => 'query_channel_id',
+                'field' => 'query_channel_id_tree',
                 'type' => 'select',
-                'name' => '选择一级渠道',
-                'attr' => 'title=channel_pid',
-                'filter' => 'filter',
-                'data' => $this->getChannelSelectData()
+                'name' => '顶级渠道',
+                'default' => '',
+                'data' => $this->getTopChannels()
             ],
             [
-                'field' => 'channel_pid',
+                'field' => 'query_channel_id',
                 'type' => 'select',
-                'filter' => 'channel_pid',
-                'name' => '二级渠道',
-                'data' => [
-                    ''=>[
-                        'id' =>'',
-                        'name' =>'无',
-                    ]
-                ]
+                'name' => '所有渠道',
+                'default' => '',
+                'data' => $this->getAllChannels()
             ],
             [
                 'field' => 'query_phone_number',
