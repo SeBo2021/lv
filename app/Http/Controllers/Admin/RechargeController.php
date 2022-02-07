@@ -177,11 +177,25 @@ class RechargeController extends BaseCurlIndexController
     {
 
         $data = [
-            [
+            /*[
                 'field' => 'channel_id',
                 'type' => 'select',
                 'name' => '选择渠道',
                 'data' => $this->getChannelSelectData()
+            ],*/
+            [
+                'field' => 'query_channel_id_tree',
+                'type' => 'select',
+                'name' => '顶级渠道',
+                'default' => '',
+                'data' => $this->getTopChannels()
+            ],
+            [
+                'field' => 'query_channel_id',
+                'type' => 'select',
+                'name' => '所有渠道',
+                'default' => '',
+                'data' => $this->getAllChannels()
             ],
             [
                 'field' => 'type',
