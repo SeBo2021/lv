@@ -79,6 +79,7 @@ class OrderController extends Controller
                 }],
                 'uid' => $user->id,
                 'channel_id' => $user->channel_id??0,
+                'channel_pid' => $user->channel_pid??0,
                 'status' => 0,
                 'forward' => $params['forward'] ?? '',
                 'vid' => $params['vid'] ?? 0,
