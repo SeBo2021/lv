@@ -93,7 +93,7 @@ trait AdTrait
         unset($k,$v);
         foreach ($res as $k=>$v){
             $cur = ($page-1) * $perPage + $k + 1;
-            if ($position != 0) {
+            if ($position != 0 && $adCount>0) {
                 if (($cur % $position == 0) && ($cur != 0)) {
                     $adsKey = $counter%$adCount;
                     $counter++;
