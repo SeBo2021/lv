@@ -6,27 +6,28 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\UiService;
 use App\TraitClass\ChannelTrait;
+use App\TraitClass\MemberCardTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class MemberController extends BaseCurlController
 {
-    use ChannelTrait;
+    use ChannelTrait,MemberCardTrait;
     //设置页面的名称
     public $pageName = '会员';
 
 //    public $denyCommonBladePathActionName = ['index','create','edit'];
 
     //1.设置模型
-    public function setModel()
+    public function setModel(): User
     {
         return $this->model = new User();
     }
 
-    public function indexCols()
+    public function indexCols(): array
     {
-        $cols = [
+        return [
             [
                 'type' => 'checkbox',
                 'fixed' => 'left'
@@ -92,6 +93,18 @@ class MemberController extends BaseCurlController
                 'align' => 'center',
             ],
             [
+                'field' => 'member_card_type',
+                'minWidth' => 80,
+                'title' => 'VIP',
+                'align' => 'center'
+            ],
+            [
+                'field' => 'gold',
+                'minWidth' => 80,
+                'title' => '金币',
+                'align' => 'center'
+            ],
+            [
                 'field' => 'long_vedio_times',
                 'minWidth' => 80,
                 'title' => '可观看次数',
@@ -152,8 +165,6 @@ class MemberController extends BaseCurlController
                 'align' => 'center'
             ]
         ];
-
-        return $cols;
     }
 
     public function setOutputSearchFormTpl($shareData)
@@ -185,6 +196,55 @@ class MemberController extends BaseCurlController
                 'type' => 'select',
                 'name' => '是否绑定',
                 'data' => $this->bindPhoneNumSelectData
+            ],
+            [
+                'field' => 'query_member_card_type',
+                'type' => 'select',
+                'name' => 'VIP',
+                'data' => $this->getMemberCardList('gold')
+            ],
+            [
+                'field' => 'query_gold',
+                'type' => 'select',
+                'name' => '骚豆',
+                'data' => [
+                    ''=>[
+                        'id' => '',
+                        'name' => '全部',
+                    ],1=>[
+                        'id' => 1,
+                        'name' => '1-99',
+                    ],2=>[
+                        'id' => 2,
+                        'name' => '100-999',
+                    ],3=>[
+                        'id' => 3,
+                        'name' => '1000以上',
+                    ],
+                ]
+            ],
+            [
+                'field' => 'query_long_vedio_times',
+                'type' => 'select',
+                'name' => '可观看次数',
+                'data' => [
+                    ''=>[
+                        'id' => '',
+                        'name' => '全部',
+                    ],0=>[
+                        'id' => 0,
+                        'name' => '0次',
+                    ],1=>[
+                        'id' => 1,
+                        'name' => '1次',
+                    ],2=>[
+                        'id' => 2,
+                        'name' => '2次',
+                    ],3=>[
+                        'id' => 3,
+                        'name' => '3次',
+                    ],
+                ]
             ],
             [
                 'field' => 'id',
@@ -281,7 +341,34 @@ class MemberController extends BaseCurlController
         return $item;
     }
 
-    public function setOutputHandleBtnTpl($shareData)
+    public function handleResultModel($model): array
+    {
+        $memberCards = $this->rq->input('query_member_card_type', null);
+        $viewTimes = $this->rq->input('query_long_vedio_times', null);
+        $reqGolds = $this->rq->input('query_gold', null);
+        if($viewTimes!==null){
+            $model = $model->where('long_vedio_times',$viewTimes);
+        }
+        /*if($memberCards!==null){
+            $model = $model->where('member_card_type',$memberCards);
+        }*/
+        if($reqGolds!==null){
+            switch ($reqGolds){
+                case 1:
+                    $model = $model->whereBetween('gold',[1,99]);
+                    break;
+                case 2:
+                    $model = $model->whereBetween('gold',[100,999]);
+                    break;
+                case 3:
+                    $model = $model->where('gold','>=',1000);
+                    break;
+            }
+        }
+        return parent::handleResultModel($model);
+    }
+
+    public function setOutputHandleBtnTpl($shareData): array
     {
         /*if ($this->isCanCreate()) {
 
