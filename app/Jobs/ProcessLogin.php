@@ -35,6 +35,7 @@ class ProcessLogin implements ShouldQueue
 
     public $code = '';
 
+    public int $device_system = 0;
 
     /**
      * Create a new job instance.
@@ -45,7 +46,7 @@ class ProcessLogin implements ShouldQueue
     {
         //
         $this->code = $loginLogData['promotion_code'];
-        $this->device_system = $loginLogData['device_system'];
+        $this->device_system = (int)$loginLogData['device_system'];
         unset($loginLogData['promotion_code']);
         $this->loginLogData = $loginLogData;
     }
