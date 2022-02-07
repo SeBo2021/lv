@@ -104,13 +104,14 @@ trait MemberCardTrait
         return $num;
     }
 
-    public function getMemberCardList(): array
+    public function getMemberCardList($except=null): array
     {
         $queryBuild = DB::table('member_card');
-        /*if($all===null){
-            $queryBuild = $queryBuild->where('status',1);
-        }*/
-        $items = [ ''=>'全部',0 => '金币'] + $queryBuild->pluck('name','id')->all();
+        if($except=='gold'){
+            $items = [ ''=>'全部'] + $queryBuild->pluck('name','id')->all();
+        }else{
+            $items = [ ''=>'全部',0 => '金币'] + $queryBuild->pluck('name','id')->all();
+        }
         $lists = [];
         foreach ($items as $key => $value){
             $lists[$key] = [
