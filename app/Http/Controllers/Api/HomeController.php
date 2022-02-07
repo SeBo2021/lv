@@ -54,6 +54,8 @@ class HomeController extends Controller
             $domain = env('APP_URL');
             foreach ($data as &$item){
                 $item['img'] = $domain . $item['img'];
+                $item['action_type'] += 0;
+                $item['vid'] += 0;
             }
             return response()->json([
                 'state'=>0,
