@@ -148,6 +148,7 @@ class SearchController extends Controller
                 $res['list'] = $this->handleVideoItems($res['list'],false,$request->user()->id);
                 //广告
                 $res['list'] = AdTrait::insertAds($res['list'],'more_page',true, $page, $perPage);
+                Log::info('==CatList==',$res['list']);
                 $res['hasMorePages'] = $paginator->hasMorePages();
                 return response()->json([
                     'state'=>0,
