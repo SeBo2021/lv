@@ -7,9 +7,12 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Carousel;
 use App\Models\Category;
 use App\Services\UiService;
+use App\TraitClass\CatTrait;
 
 class CarouselController extends BaseCurlController
 {
+    use CatTrait;
+
     public $pageName = '轮播图管理';
 
     public function setModel()
@@ -111,11 +114,11 @@ class CarouselController extends BaseCurlController
             [
                 'field' => 'cid',
                 'type' => 'select',
-                'name' => '分类',
+                'name' => '首页二级分类',
                 'must' => 1,
                 'verify' => 'rq',
                 'default' => 0,
-                'data' => $this->getCateGoryData()
+                'data' => $this->getCatNavData()
             ],
             [
                 'field' => 'title',

@@ -208,22 +208,6 @@ class VideoController extends BaseCurlController
     {
         return array_merge($this->uiService->allDataArr('请选择分类'), $this->uiService->treeData(Category::checked()->get()->toArray(), 0));//树形select
     }*/
-    public function getCatNavData()
-    {
-        $res = Category::query()
-            ->where('is_checked',1)
-            ->where('parent_id',2)
-            ->orderBy('sort')
-            ->get(['id','name']);
-        $data = $this->uiService->allDataArr('请选择分类');
-        foreach ($res as $item) {
-            $data[$item->id] = [
-                'id' => $item->id,
-                'name' => $item->name,
-            ];
-        }
-        return $data;
-    }
 
     public function setOutputUiCreateEditForm($show = '')
     {
