@@ -338,20 +338,21 @@ class MemberController extends BaseCurlController
         $item->area = DB::table('login_log')->where('uid',$item->id)->orderByDesc('id')->value('area');
         $item->status = UiService::switchTpl('status', $item,'');
         $item->phone_number = $item->phone_number>0 ? $item->phone_number : '未绑定';
+        $item->member_card_type = $this->getMemberCardList('gold')[max(explode(',',$item->member_card_type))]['name'];
         return $item;
     }
 
     public function handleResultModel($model): array
     {
-        $memberCards = $this->rq->input('query_member_card_type', null);
+        $memberCard = $this->rq->input('query_member_card_type', null);
         $viewTimes = $this->rq->input('query_long_vedio_times', null);
         $reqGolds = $this->rq->input('query_gold', null);
         if($viewTimes!==null){
             $model = $model->where('long_vedio_times',$viewTimes);
         }
-        /*if($memberCards!==null){
-            $model = $model->where('member_card_type',$memberCards);
-        }*/
+        if($memberCard!==null){
+            $model = $model->where('member_card_type','!=','')->whereRaw('member_card_type' . ' like ?', ["%" . $memberCard]);
+        }
         if($reqGolds!==null){
             switch ($reqGolds){
                 case 1:
