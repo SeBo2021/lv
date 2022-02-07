@@ -170,9 +170,17 @@ class MemberController extends BaseCurlController
                 'field' => 'query_channel_id',
                 'type' => 'select',
                 'name' => '选择一级渠道',
+                'attr' => 'data_union=query_channel_pid',
                 'filter' => 'filter',
                 'data' => $this->getChannelSelectData()
             ],
+            /*[
+                'field' => 'query_channel_id',
+                'type' => 'select',
+                'name' => '选择一级渠道',
+                'filter' => 'filter',
+                'data' => $this->getChannelSelectData()
+            ],*/
             [
                 'field' => 'query_phone_number',
                 'type' => 'select',

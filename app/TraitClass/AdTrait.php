@@ -31,8 +31,8 @@ trait AdTrait
             }
             $domain = env('APP_URL');
             $one['img'] = $domain . $one['img'];
-            $one['action_type'] += 0;
-            $one['vid'] += 0;
+            $one['action_type'] = (string) $one['action_type'];
+            $one['vid'] = (string) $one['vid'];
             return [$one];
         }
         return [];
@@ -51,8 +51,8 @@ trait AdTrait
             $domain = env('APP_URL');
             foreach ($ads as $ad){
                 $ad['img'] = $domain . $ad['img'];
-                $ad['action_type'] += 0;
-                $ad['vid'] += 0;
+                $ad['action_type'] = (string) $ad['action_type'];
+                $ad['vid'] = (string) $ad['vid'];
                 $newAds[$ad['position']][]= $ad;
             }
             $ads = $newAds;
