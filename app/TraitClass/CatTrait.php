@@ -7,6 +7,23 @@ use Illuminate\Support\Facades\Log;
 
 trait CatTrait
 {
+    public function getCatNavData()
+    {
+        $res = Category::query()
+            ->where('is_checked',1)
+            ->where('parent_id',2)
+            ->orderBy('sort')
+            ->get(['id','name']);
+        $data = $this->uiService->allDataArr('请选择分类');
+        foreach ($res as $item) {
+            $data[$item->id] = [
+                'id' => $item->id,
+                'name' => $item->name,
+            ];
+        }
+        return $data;
+    }
+
     public function getCats($parentId = 2)
     {
         $topCat = Category::query()
