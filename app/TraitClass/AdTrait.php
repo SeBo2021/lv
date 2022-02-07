@@ -52,13 +52,13 @@ trait AdTrait
             $ad['action_type'] = (string)$ad['action_type'];
             $ad['vid'] = (string)$ad['vid'];
         }
-        /*if($groupByPosition){ //有位置的多一维
+        if($groupByPosition){ //有位置的多一维
             $newAds = [];
             foreach ($ads as $item){
                 $newAds[$item['position']][]= $item;
             }
             $ads = $newAds;
-        }*/
+        }
         return !empty($ads) ? $ads : [];
     }
 
