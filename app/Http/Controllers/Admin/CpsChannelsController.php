@@ -131,6 +131,11 @@ class CpsChannelsController extends BaseCurlController
         ];
     }
 
+    public function setOutputHandleBtnTpl($shareData): array
+    {
+        return [];
+    }
+
     public function setOutputUiCreateEditForm($show = '')
     {
         $data = [
@@ -360,7 +365,9 @@ class CpsChannelsController extends BaseCurlController
 
     public function handleResultModel($model): array
     {
-        $model = $model->where('status',1)->where('type',2);
+        $model = $model
+            //->where('status',1)
+            ->where('type',2);
         return parent::handleResultModel($model);
     }
 

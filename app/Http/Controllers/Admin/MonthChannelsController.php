@@ -360,7 +360,9 @@ class MonthChannelsController extends BaseCurlController
 
     public function handleResultModel($model): array
     {
-        $model = $model->where('status',1)->where('type',1);
+        $model = $model
+            //->where('status',1)
+            ->where('type',1);
         return parent::handleResultModel($model);
     }
 
