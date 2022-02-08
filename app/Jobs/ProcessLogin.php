@@ -115,7 +115,6 @@ class ProcessLogin implements ShouldQueue
             ->whereDate('created_at','>=', $lastDayDate)
             ->orderByDesc('created_at')
             ->get(['id','channel_id','device_system','ip','agent_info','code','created_at'])->toArray();
-        //$loginAgentInfo = $this->loginLogData['source_info'];
         $nowTime = time();
         $uid = $this->loginLogData['uid'];
         $channel_id = 0;
@@ -124,17 +123,6 @@ class ProcessLogin implements ShouldQueue
             $downLoadTime = strtotime($item->created_at);
             if($downLoadTime < $nowTime){
                 if($this->loginLogData['ip'] == $item->ip){
-                    /*$downloadAgentInfo = $item->agent_info;
-                    $agentListData = explode(" ",$downloadAgentInfo);
-                    $loginAgentData = explode(" ",$loginAgentInfo);
-                    if($agentListData[1]===$loginAgentData[1]
-                       && $agentListData[2]===$loginAgentData[2]
-                       && $agentListData[3]===$loginAgentData[3]
-                       && $agentListData[4]===$loginAgentData[4]
-                    ){
-                       $pid = DB::table('users')->where('promotion_code',$item->code)->value('id');
-                       DB::table('users')->where('id',$uid)->update(['pid'=>$pid]);
-                    }*/
                     $pid = DB::table('users')->where('promotion_code',$item->code)->value('id');
                     $channel_id = $item->channel_id;
                     $channel_pid = DB::table('channels')->where('id',$item->channel_id)->value('pid');
