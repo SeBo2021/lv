@@ -174,7 +174,7 @@ class CpsChannelsController extends BaseCurlController
             [
                 'field' => 'deduction',
                 'type' => 'number',
-                'name' => '扣量(点) (CPA使用)',
+                'name' => '扣量(点)',
                 'value' => ($show && ($show->deduction>0)) ? $show->deduction/100 : 50,
                 'must' => 0,
                 'default' => '50',
@@ -182,13 +182,13 @@ class CpsChannelsController extends BaseCurlController
             [
                 'field' => 'unit_price',
                 'type' => 'text',
-                'name' => '单价 (CPA使用)',
+                'name' => '单价',
                 'must' => 0,
             ],
             [
                 'field' => 'is_deduction',
                 'type' => 'radio',
-                'name' => '前10个下载不扣量 (CPA使用)',
+                'name' => '前10个下载不扣量',
                 'default' => 0,
                 'data' => $this->isDeduction
             ],
@@ -228,6 +228,7 @@ class CpsChannelsController extends BaseCurlController
     {
         $model->status = 1;
         $model->deduction *= 100;
+        $model->type = 2;
         if($id>0){ //编辑
             if($model->deduction>0){
                 $originalDeduction = $model->getOriginal()['deduction'];
@@ -246,16 +247,6 @@ class CpsChannelsController extends BaseCurlController
                 }
             }
         }
-    }
-
-    public function writeChannelDeduction($id, $deduction=5000, $date=null)
-    {
-        $insertData = [
-            'channel_id' => $id,
-            'deduction' => $deduction,
-            'created_at' =>$date ?? date('Y-m-d H:i:s'),
-        ];
-        DB::table('statistic_channel_deduction')->insert($insertData);
     }
 
     public function createChannelAccount($model,$password='')
@@ -367,7 +358,11 @@ class CpsChannelsController extends BaseCurlController
         ];
     }
 
-
+    public function handleResultModel($model): array
+    {
+        $model = $model->where('status',1)->where('type',2);
+        return parent::handleResultModel($model);
+    }
 
     //弹窗大小
     public function layuiOpenWidth(): string

@@ -81,4 +81,14 @@ trait ChannelTrait
         }
         return $this->getChannelSelectData();
     }
+
+    public function writeChannelDeduction($id, $deduction=5000, $date=null)
+    {
+        $insertData = [
+            'channel_id' => $id,
+            'deduction' => $deduction,
+            'created_at' =>$date ?? date('Y-m-d H:i:s'),
+        ];
+        DB::table('statistic_channel_deduction')->insert($insertData);
+    }
 }
