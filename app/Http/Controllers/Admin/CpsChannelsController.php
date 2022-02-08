@@ -231,6 +231,12 @@ class CpsChannelsController extends BaseCurlController
                     $this->writeChannelDeduction($id,$model->deduction);
                 }
             }
+            if($model->share_ratio>0){
+                $originalShareRatio = $model->getOriginal()['share_ratio'];
+                if($originalShareRatio != $model->share_ratio){
+                    DB::table('channel_day_statistics')->update(['share_ratio' => $model->share_ratio]);
+                }
+            }
             $password = $this->rq->input('password');
             if($password){
                 $exists = DB::connection('channel_mysql')->table('admins')->where('account',$model->number)->first();
