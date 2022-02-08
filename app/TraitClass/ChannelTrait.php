@@ -63,8 +63,22 @@ trait ChannelTrait
         return $data;
     }
 
-    public function getAllChannels(): array
+    public function getAllChannels($type=null): array
     {
+        if($type!==null){
+            $queryBuild = DB::table('channels')
+                ->where('status',1)
+                ->where('type',$type);
+            $items = [ ''=>'全部'] + $queryBuild->pluck('name','id')->all();
+            $lists = [];
+            foreach ($items as $key => $value){
+                $lists[$key] = [
+                    'id' => $key,
+                    'name' => $value,
+                ];
+            }
+            return $lists;
+        }
         return $this->getChannelSelectData();
     }
 }
