@@ -91,4 +91,22 @@ trait ChannelTrait
         ];
         DB::table('statistic_channel_deduction')->insert($insertData);
     }
+
+    public function createChannelAccount($model,$password='')
+    {
+        $insertChannelAccount = [
+            'nickname' => $model->name,
+            'account' => $model->number,
+            'password' => $password,
+            'created_at' => time(),
+            'updated_at' => time(),
+        ];
+        $rid = DB::connection('channel_mysql')->table('admins')->insertGetId($insertChannelAccount);
+        DB::connection('channel_mysql')->table('model_has_roles')->insert([
+            'role_id' => 2,
+            'model_id' => $rid,
+            'model_type' => 'admin',
+        ]);
+    }
+
 }
