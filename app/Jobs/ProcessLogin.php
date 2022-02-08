@@ -73,8 +73,7 @@ class ProcessLogin implements ShouldQueue
         if($this->loginLogData['type']==1){
             //统计安装量
             $channel_id = $this->bindChannel();
-            $device_system = $updateData['device_system'] ?? $this->device_system;
-            $this->saveStatisticByDay('install',$channel_id,$device_system);
+            $this->saveStatisticByDay('install',$channel_id,$this->device_system);
         }
         //生成邀请码、更新手机平台、绑定渠道
         $this->updateUserInfo();
