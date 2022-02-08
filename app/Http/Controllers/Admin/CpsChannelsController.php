@@ -125,13 +125,6 @@ class CpsChannelsController extends BaseCurlController
         ];
     }
 
-    public function setOutputHandleBtnTpl($shareData): array
-    {
-        $can = $this->isCanCreate();
-        dump($can);
-        return [];
-    }
-
     public function setOutputUiCreateEditForm($show = '')
     {
         $data = [
