@@ -64,6 +64,7 @@ class OrderController extends Controller
             if($validPeriodTime > time()){
                 $useRealValue = true;
             }
+            Log::info('===memberCard_diff_time==',[$user->created_at,$goodsInfo['expired_hours']*3600,$validPeriodTime,time(),$useRealValue]);
         }
         try {
             $number = self::getPayNumber();
