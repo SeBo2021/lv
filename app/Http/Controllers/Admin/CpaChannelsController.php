@@ -360,7 +360,9 @@ class CpaChannelsController extends BaseCurlController
 
     public function handleResultModel($model): array
     {
-        $model = $model->where('status',1)->where('type',0);
+        $model = $model
+            //->where('status',1)
+            ->where('type',0);
         return parent::handleResultModel($model);
     }
 

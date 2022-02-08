@@ -67,7 +67,7 @@ trait ChannelTrait
     {
         if($type!==null){
             $queryBuild = DB::table('channels')
-                ->where('status',1)
+                //->where('status',1)
                 ->where('type',$type);
             $items = [ ''=>'全部'] + $queryBuild->pluck('name','id')->all();
             $lists = [];

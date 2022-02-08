@@ -51,7 +51,7 @@ $route->middleware(['admin_auth'])->name($route_name)->group(function ($route) {
         'AdminPermissionController',
         'ArticleController',
         'CategoryController',
-        'ChannelsController',
+        //'ChannelsController',
         'CpsChannelsController',
         'CpaChannelsController',
         'MonthChannelsController',
