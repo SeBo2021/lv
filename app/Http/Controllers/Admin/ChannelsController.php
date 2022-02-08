@@ -88,7 +88,6 @@ class ChannelsController extends BaseCurlController
                 'field' => 'number',
                 'minWidth' => 80,
                 'title' => '渠道码',
-//                'hide' => true,
                 'align' => 'center',
             ],
             [
@@ -97,12 +96,12 @@ class ChannelsController extends BaseCurlController
                 'title' => '渠道推广链接',
                 'align' => 'center',
             ],
-            /*[
-                'field' => 'statistic_url',
-                'minWidth' => 80,
-                'title' => '统计链接地址',
-                'align' => 'center',
-            ],*/
+//            [
+//                'field' => 'statistic_url',
+//                'minWidth' => 80,
+//                'title' => '统计链接地址',
+//                'align' => 'center',
+//            ],
             [
                 'field' => 'status',
                 'minWidth' => 80,
