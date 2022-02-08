@@ -162,7 +162,7 @@ class MonthChannelsController extends BaseCurlController
                 'name' => '推广码',
                 'must' => 1,
             ],
-            [
+            /*[
                 'field' => 'type',
                 'type' => 'radio',
                 'name' => '类型',
@@ -191,7 +191,7 @@ class MonthChannelsController extends BaseCurlController
                 'name' => '前10个下载不扣量 (CPA使用)',
                 'default' => 0,
                 'data' => $this->isDeduction
-            ],
+            ],*/
             /*[
                 'field' => 'deduction_period',
                 'type' => 'text',
@@ -201,7 +201,7 @@ class MonthChannelsController extends BaseCurlController
                 'attr' => 'data-format=HH:mm:ss data-range=~',//需要特殊分割
                 'default' => '00:00:00 ~ 23:59:59',
             ],*/
-            [
+            /*[
                 'field' => 'level_one',
                 'type' => 'text',
                 'name' => '一阶 (CPS使用)',
@@ -218,7 +218,7 @@ class MonthChannelsController extends BaseCurlController
                 'type' => 'number',
                 'name' => '分成比例 (CPS使用)',
                 'default' => '',
-            ],
+            ],*/
         ];
         //赋值给UI数组里面,必须是form为key
         $this->uiBlade['form'] = $data;
@@ -228,6 +228,7 @@ class MonthChannelsController extends BaseCurlController
     {
         $model->status = 1;
         $model->deduction *= 100;
+        $model->type = 1;
         if($id>0){ //编辑
             if($model->deduction>0){
                 $originalDeduction = $model->getOriginal()['deduction'];
@@ -246,16 +247,6 @@ class MonthChannelsController extends BaseCurlController
                 }
             }
         }
-    }
-
-    public function writeChannelDeduction($id, $deduction=5000, $date=null)
-    {
-        $insertData = [
-            'channel_id' => $id,
-            'deduction' => $deduction,
-            'created_at' =>$date ?? date('Y-m-d H:i:s'),
-        ];
-        DB::table('statistic_channel_deduction')->insert($insertData);
     }
 
     public function createChannelAccount($model,$password='')
@@ -366,6 +357,13 @@ class MonthChannelsController extends BaseCurlController
             'promotion_code'=>'推广码',
         ];
     }
+
+    public function handleResultModel($model): array
+    {
+        $model = $model->where('status',1)->where('type',1);
+        return parent::handleResultModel($model);
+    }
+
     //弹窗大小
     public function layuiOpenWidth(): string
     {
