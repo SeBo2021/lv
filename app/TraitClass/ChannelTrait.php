@@ -90,6 +90,7 @@ trait ChannelTrait
             'created_at' =>$date ?? date('Y-m-d H:i:s'),
         ];
         DB::table('statistic_channel_deduction')->insert($insertData);
+        DB::table('channel_day_statistics')->whereDate('date_at',date('Y-m-d'))->update(['deduction' => $deduction]);
     }
 
     public function createChannelAccount($model,$password='')
