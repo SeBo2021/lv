@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Channel;
 use App\Services\UiService;
 use App\TraitClass\ChannelTrait;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -226,27 +227,13 @@ class CpaChannelsController extends BaseCurlController
 
     public function beforeSaveEvent($model, $id = '')
     {
-        $model->status = 1;
-        $model->deduction *= 100;
         $model->type = 0;
-        if($id>0){ //编辑
-            if($model->deduction>0){
-                $originalDeduction = $model->getOriginal()['deduction'];
-                if($originalDeduction != $model->deduction){
-                    //dd('修改扣量');
-                    $this->writeChannelDeduction($id,$model->deduction);
-                }
-            }
-            $password = $this->rq->input('password');
-            if($password){
-                $exists = DB::connection('channel_mysql')->table('admins')->where('account',$model->number)->first();
-                if($exists){
-                    DB::connection('channel_mysql')->table('admins')->where('account',$model->number)->update(['password'=>bcrypt($password)]);
-                }else{
-                    $this->createChannelAccount($model,bcrypt($password));
-                }
-            }
-        }
+        $this->beforeSaveEventHandle($model, $id);
+    }
+
+    public function editTable(Request $request)
+    {
+        return $this->editTableHandle($request);
     }
 
     public function afterSaveSuccessEvent($model, $id = '')
@@ -270,6 +257,7 @@ class CpaChannelsController extends BaseCurlController
             $this->createChannelAccount($model,$password);
         }
         $model->save();
+        $this->initStatisticsByDay($model->id);
         return $model;
     }
 

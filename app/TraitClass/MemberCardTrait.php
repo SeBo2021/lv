@@ -108,7 +108,7 @@ trait MemberCardTrait
     {
         $queryBuild = DB::table('member_card');
         if($except=='gold'){
-            $items = [ ''=>'全部'] + $queryBuild->pluck('name','id')->all();
+            $items = [ ''=>''] + $queryBuild->pluck('name','id')->all();
         }else{
             $items = [ ''=>'全部',0 => '金币'] + $queryBuild->pluck('name','id')->all();
         }
