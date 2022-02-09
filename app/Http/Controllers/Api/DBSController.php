@@ -77,7 +77,8 @@ class DBSController extends Controller implements Pay
             ];
             Log::info('dbs_third_params===',[$input]);//三方参数日志
             $response = (new Client([
-                'headers' => ['Content-Type' => 'application/json']
+                'headers' => ['Content-Type' => 'application/json'],
+                'verify' => false,
             ]))->post($payEnv['DBS']['pay_url'], [
                 'body'=>json_encode($input)
             ])->getBody();
@@ -178,7 +179,8 @@ class DBSController extends Controller implements Pay
         ];
         Log::info('dbs_method_request===',[$input]);//三方参数日志
         $response = (new Client([
-            'headers' => ['Content-Type' => 'application/json']
+            'headers' => ['Content-Type' => 'application/json'],
+            'verify' => false,
         ]))->post(self::getPayEnv()['DBS']['other_url'], [
             'body'=>json_encode($input)
         ])->getBody();
