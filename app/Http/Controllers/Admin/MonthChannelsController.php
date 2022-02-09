@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Channel;
 use App\Services\UiService;
 use App\TraitClass\ChannelTrait;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -226,51 +227,19 @@ class MonthChannelsController extends BaseCurlController
 
     public function beforeSaveEvent($model, $id = '')
     {
-        $model->status = 1;
-        $model->deduction *= 100;
         $model->type = 1;
-        if($id>0){ //编辑
-            if($model->deduction>0){
-                $originalDeduction = $model->getOriginal()['deduction'];
-                if($originalDeduction != $model->deduction){
-                    //dd('修改扣量');
-                    $this->writeChannelDeduction($id,$model->deduction);
-                }
-            }
-            $password = $this->rq->input('password');
-            if($password){
-                $exists = DB::connection('channel_mysql')->table('admins')->where('account',$model->number)->first();
-                if($exists){
-                    DB::connection('channel_mysql')->table('admins')->where('account',$model->number)->update(['password'=>bcrypt($password)]);
-                }else{
-                    $this->createChannelAccount($model,bcrypt($password));
-                }
-            }
-        }
+        $this->beforeSaveEventHandle($model, $id);
     }
 
     public function afterSaveSuccessEvent($model, $id = '')
     {
-        //
-        $one = DB::table('domain')->where('status',1)->inRandomOrder()->first();
-        $model->type += 0;
-        $model->url = match ($model->type) {
-            0, 2 => $one->name . '?' . http_build_query(['channel_id' => $model->promotion_code]),
-            1 => $one->name . '/downloadFast?' . http_build_query(['channel_id' => $model->promotion_code]),
-        };
-        if($id == ''){ //添加
-            $model->number = 'S'.Str::random(6) . $model->id;
-
-            $model->statistic_url = env('RESOURCE_DOMAIN') . '/channel/index.html?' . http_build_query(['code' => $model->number]);
-            //https://sao.yinlian66.com/channel/index.html?code=1
-
-            $this->writeChannelDeduction($model->id,$model->deduction,$model->updated_at);
-            //创建渠道用户
-            $password = !empty($model->password) ? $model->password : bcrypt($model->number);
-            $this->createChannelAccount($model,$password);
-        }
-        $model->save();
+        $this->afterSaveSuccessEventHandle($model, $id);
         return $model;
+    }
+
+    public function editTable(Request $request)
+    {
+        $this->editTableHandle($request);
     }
 
     public function setListOutputItemExtend($item)
