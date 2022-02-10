@@ -338,7 +338,7 @@ class CommContentController extends Controller
         $tree = json_decode($this->redis()->get('common_cate'), true) ?? [];
         foreach ($tree as $item) {
             if ($item['id'] == $id) {
-                $data = $item['childs'];
+                $data = $item['childs'] ?? [];
             }
         }
         if ($raw) {
