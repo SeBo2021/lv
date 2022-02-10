@@ -216,6 +216,12 @@ class RechargeController extends BaseCurlIndexController
                 'data' => $this->deviceSystem
             ],
             [
+                'field' => 'query_uid',
+                'type' => 'select',
+                'name' => '手机系统平台',
+                'data' => $this->deviceSystem
+            ],
+            [
                 'field' => 'created_at',
                 'type' => 'datetime',
 //                'attr' => 'data-range=true',
@@ -233,20 +239,22 @@ class RechargeController extends BaseCurlIndexController
         $forward = $this->rq->input('forward',null);
         $channel_id = $this->rq->input('channel_id',null);
         $topChannelId = $this->rq->input('channel_id_tree',null);
+        $queryUid = $this->rq->input('query_uid',0);
         $created_at = $this->rq->input('created_at',null);
+        //
         $page = $this->rq->input('page', 1);
         $pagesize = $this->rq->input('limit', 30);
         $order_by_name = $this->orderByName();
         $order_by_type = $this->orderByType();
         $model = $this->orderBy($model, $order_by_name, $order_by_type);
-//        $build = DB::table('recharge')
         $build = $model->join('orders','recharge.order_id','=','orders.id');
-        //dump($channel_id);
+        if($queryUid>0){
+            $build = $build->where('recharge.uid',$queryUid);
+        }
         if($channel_id!==null){
             $build = $build->where('recharge.channel_id',$channel_id);
         }
         if($topChannelId!==null){
-//            $build = $build->where('recharge.channel_id',$channel_id);
             $build = $build->where(function ($build) use ($topChannelId){
                 $build->where('recharge.channel_id',$topChannelId)
                     ->orWhere('recharge.channel_pid',$topChannelId);
