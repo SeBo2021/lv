@@ -217,9 +217,8 @@ class RechargeController extends BaseCurlIndexController
             ],
             [
                 'field' => 'query_uid',
-                'type' => 'select',
-                'name' => '手机系统平台',
-                'data' => $this->deviceSystem
+                'type' => 'text',
+                'name' => '会员ID',
             ],
             [
                 'field' => 'created_at',
