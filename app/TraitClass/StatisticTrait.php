@@ -49,6 +49,7 @@ trait StatisticTrait
                 $insertDeductionData['date_at'] = date('Y-m-d',$dateArr['day_time']);
                 $insertDeductionData['channel_id'] = $channel_id;
                 $insertDeductionData['channel_pid'] = $channelInfo->pid;
+                $insertDeductionData['channel_status'] = $channelInfo->status;
                 $insertDeductionData['channel_name'] = $channelInfo->name;
                 $insertDeductionData['channel_promotion_code'] = $channelInfo->promotion_code;
                 $insertDeductionData['channel_code'] = $channelInfo->number;
