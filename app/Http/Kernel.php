@@ -54,7 +54,7 @@ class Kernel extends HttpKernel
         ],
 
         'channel' => [
-            'throttle:30,1',
+            'throttle:60,1',
             \App\Http\Middleware\EnableCrossRequestMiddleware::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class
         ]
