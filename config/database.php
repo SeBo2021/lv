@@ -46,11 +46,11 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            // 'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'hg'),
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', 'root'),
+            // 'username' => env('DB_USERNAME', 'root'),
+            // 'password' => env('DB_PASSWORD', 'root'),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
@@ -61,6 +61,16 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
+            'read' => [
+                'host' => env('DB_HOST_READ', '127.0.0.1'),
+                'username' => env('DB_USERNAME_READ', 'forge'),
+                'password' => env('DB_PASSWORD_READ', ''),
+            ],
+            'write' => [
+                'host' => env('DB_HOST_WRITE', '127.0.0.1'),
+                'username' => env('DB_USERNAME_WRITE', 'forge'),
+                'password' => env('DB_PASSWORD_WRITE', ''),
+            ],
         ],
 
         'channel_mysql' => [
