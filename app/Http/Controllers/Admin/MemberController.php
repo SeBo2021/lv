@@ -272,10 +272,8 @@ class MemberController extends BaseCurlController
             ],
             [
                 'field' => 'query_did',
-                'minWidth' => 150,
-                'title' => '机器码',
-                'align' => 'center',
-                'hide' => true
+                'type' => 'text',
+                'name' => '机器码',
             ],
 
         ];
@@ -334,11 +332,11 @@ class MemberController extends BaseCurlController
                 'value' => '',
                 'mark' => $show ? '不填表示不修改密码' : '',
             ],
-            /*[
-                'field' => 'query_did',
+            [
+                'field' => 'did',
                 'type' => 'text',
                 'name' => '设备码',
-            ],*/
+            ],
         ];
         $this->uiBlade['form'] = $data;
     }
@@ -360,9 +358,9 @@ class MemberController extends BaseCurlController
         $viewTimes = $this->rq->input('query_long_vedio_times', null);
         $reqGolds = $this->rq->input('query_gold', null);
         $reqDid = $this->rq->input('query_did', null);
-        /*if($reqDid!==null){
+        if($reqDid!==null){
             $model = $model->where('did',$reqDid);
-        }*/
+        }
         if($viewTimes!==null){
             $model = $model->where('long_vedio_times',$viewTimes);
         }
