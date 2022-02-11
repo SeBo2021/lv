@@ -265,6 +265,8 @@ class ShortController extends BaseCurlController
 
     protected function afterSaveSuccessEvent($model, $id = '')
     {
+        $ids = AdminVideoShort::where('status',1)->pluck('id')->toArray();
+        $this->redis()->set('shortVideoIds',implode(',',$ids));
         //$isVideo = ($_REQUEST['callback_upload']??0);
         try {
 //            $job = new ProcessShort($model,$isVideo);

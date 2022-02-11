@@ -78,6 +78,15 @@ class VideoShortController extends Controller
      */
     private function items($page, $user, $startId,$cateId,$tagId,$words): array
     {
+        if ($page == 1) {
+            $ids = $this->redis()->get('shortVideoIds')?:'';
+            $redisIds = explode(',',$ids);
+            shuffle($redisIds);
+            $newIds = implode(',',$redisIds);
+            $this->redis()->set("newShortVideoByUid_{$user->id}",$newIds);
+        } else {
+            $newIds = $this->redis()->get("newShortVideoByUid_{$user->id}");
+        }
         $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'dash_url', 'hls_url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
         $perPage = 8;
         $model = VideoShort::query()->where('status',1);
@@ -116,7 +125,8 @@ class VideoShortController extends Controller
                     $model = $short_serialize ? unserialize($short_serialize) : $model;
                 }
             }*/
-            $model = $model->orderByDesc('id');
+            // $model = $model->orderByDesc('id');
+            $model = $model->orderByRaw("FIELD(id, {$newIds})");
             $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         }
         $items = $paginator->items();
