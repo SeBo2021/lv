@@ -39,7 +39,8 @@ class AllocateVideoViewTimes extends Command
     public function handle()
     {
         try {
-            $configData = config_cache('app');
+            $configData = config_cache('config');
+            //$this->info(json_encode($configData));
             User::query()->update(['long_vedio_times'=>$configData['free_view_long_video_times']]);
             $this->info('######观看次数分配成功######');
         }catch (\Exception $exception){
