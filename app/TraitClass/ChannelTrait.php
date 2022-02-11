@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 trait ChannelTrait
 {
     public array $deviceSystems = [
-        0 => '默认',
+        0 => '',
         1 => '苹果',
         2 => '安卓',
         3 => 'ios轻量版',
@@ -18,10 +18,6 @@ trait ChannelTrait
         '' => [
             'id' =>'',
             'name' => '全部',
-        ],
-        0 => [
-            'id' => 0,
-            'name' => '默认',
         ],
         1 => [
             'id' => 1,
