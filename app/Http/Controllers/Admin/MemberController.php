@@ -335,7 +335,7 @@ class MemberController extends BaseCurlController
                 'mark' => $show ? '不填表示不修改密码' : '',
             ],
             [
-                'field' => 'did',
+                'field' => 'query_did',
                 'type' => 'text',
                 'name' => '设备码',
             ],
