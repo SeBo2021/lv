@@ -269,7 +269,14 @@ class MemberController extends BaseCurlController
                 'name' => '是否启用',
                 'default' => '',
                 'data' => $this->uiService->trueFalseData(1)
-            ]
+            ],
+            [
+                'field' => 'query_did',
+                'minWidth' => 150,
+                'title' => '机器码',
+                'align' => 'center',
+                'hide' => true
+            ],
 
         ];
         //赋值到ui数组里面必须是`search`的key值
@@ -352,6 +359,10 @@ class MemberController extends BaseCurlController
         $memberCard = $this->rq->input('query_member_card_type', null);
         $viewTimes = $this->rq->input('query_long_vedio_times', null);
         $reqGolds = $this->rq->input('query_gold', null);
+        $reqDid = $this->rq->input('query_did', null);
+        if($reqDid!==null){
+            $model = $model->where('did',$reqDid);
+        }
         if($viewTimes!==null){
             $model = $model->where('long_vedio_times',$viewTimes);
         }
