@@ -247,6 +247,12 @@ class MemberController extends BaseCurlController
                 ]
             ],
             [
+                'field' => 'query_device_system',
+                'type' => 'select',
+                'name' => '客户端来源',
+                'data' => $this->deviceSystemsSelect
+            ],
+            [
                 'field' => 'id',
                 'type' => 'text',
                 'name' => '会员ID',
@@ -358,6 +364,10 @@ class MemberController extends BaseCurlController
         $viewTimes = $this->rq->input('query_long_vedio_times', null);
         $reqGolds = $this->rq->input('query_gold', null);
         $reqDid = $this->rq->input('query_did', null);
+        $reqDeviceSystem = $this->rq->input('query_device_system', null);
+        if($reqDeviceSystem!==null){
+            $model = $model->where('device_system',$reqDeviceSystem);
+        }
         if($reqDid!==null){
             $model = $model->where('did',$reqDid);
         }

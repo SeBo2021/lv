@@ -8,10 +8,33 @@ use Illuminate\Support\Str;
 trait ChannelTrait
 {
     public array $deviceSystems = [
-        0 => 'default',
+        0 => '默认',
         1 => '苹果',
         2 => '安卓',
         3 => 'ios轻量版',
+    ];
+
+    public array $deviceSystemsSelect = [
+        '' => [
+            'id' =>'',
+            'name' => '全部',
+        ],
+        0 => [
+            'id' => 0,
+            'name' => '默认',
+        ],
+        1 => [
+            'id' => 1,
+            'name' => '苹果',
+        ],
+        2 => [
+            'id' => 2,
+            'name' => '安卓',
+        ],
+        3 => [
+            'id' => 3,
+            'name' => 'ios轻量版',
+        ],
     ];
 
     public array $bindPhoneNumSelectData = [
