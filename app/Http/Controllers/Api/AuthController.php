@@ -163,9 +163,9 @@ class AuthController extends Controller
             'source_info'=> $_SERVER['HTTP_USER_AGENT'],
             'device_system'=> $login_info['device_system'] ?? 0,
         ];
-        ProcessLogin::dispatchAfterResponse($login_log_data);
-        /*$job = new ProcessLogin($login_log_data);
-        $this->dispatch($job)*/
+        //ProcessLogin::dispatchAfterResponse($login_log_data);
+        $job = new ProcessLogin($login_log_data);
+        $this->dispatch($job);
         //ProcessLogin::dispatch($login_log_data)->delay(now()->addMinutes(10));
 
         Token::query()->where('name',$login_info['account'])->delete();
