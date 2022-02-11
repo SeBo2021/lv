@@ -84,7 +84,7 @@ class ProcessLogin implements ShouldQueue
         $uid = $this->loginLogData['uid'];
 
         //系统平台
-        if($this->device_system<1){
+        /*if($this->device_system<1){
             //Log::debug('===device_info===',[$this->loginLogData['device_info']]);
             $deviceInfo = json_decode($this->loginLogData['device_info'],true);
             $isAndroid = $deviceInfo['androidId'] ??  false;
@@ -95,7 +95,7 @@ class ProcessLogin implements ShouldQueue
             if($isIos){
                 $updateData['device_system'] = 1;
             }
-        }
+        }*/
         //
         if(!$this->code){
             $invitationCode = Str::random(2).$uid.Str::random(2);
@@ -126,7 +126,13 @@ class ProcessLogin implements ShouldQueue
                     $pid = DB::table('users')->where('promotion_code',$item->code)->value('id');
                     $channel_id = $item->channel_id;
                     $channel_pid = DB::table('channels')->where('id',$item->channel_id)->value('pid');
-                    DB::table('users')->where('id',$uid)->update(['pid'=>$pid,'channel_id'=>$item->channel_id,'channel_pid'=>$channel_pid]);
+                    $this->device_system = $item->device_system;
+                    DB::table('users')->where('id',$uid)->update([
+                        'pid'=>$pid,
+                        'channel_id'=>$item->channel_id,
+                        'device_system'=>$item->device_system,
+                        'channel_pid'=>$channel_pid
+                    ]);
                     break;
                 }
             }
