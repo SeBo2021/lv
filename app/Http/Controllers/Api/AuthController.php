@@ -65,7 +65,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $params = ApiParamsTrait::parse($request->params);
-        //Log::debug('login_request_params_info===',[$params]);//参数日志
+        Log::debug('login_request_params_info===',[$params]);//参数日志
         $validated = Validator::make($params,$this->loginRules)->validated();
         //短时间内禁止同一设备注册多个账号
         $key = $this->apiRedisKey['register_did'].$validated['did'];
