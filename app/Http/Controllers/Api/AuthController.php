@@ -65,7 +65,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $params = ApiParamsTrait::parse($request->params);
-        //Log::debug('login_request_params_info===',[$params]);//参数日志
+        Log::debug('login_request_params_info===',[$params]);//参数日志
         $validated = Validator::make($params,$this->loginRules)->validated();
         //短时间内禁止同一设备注册多个账号
         $key = $this->apiRedisKey['register_did'].$validated['did'];
@@ -163,10 +163,10 @@ class AuthController extends Controller
             'source_info'=> $_SERVER['HTTP_USER_AGENT'],
             'device_system'=> $login_info['device_system'] ?? 0,
         ];
-        //ProcessLogin::dispatchAfterResponse($login_log_data);
+        ProcessLogin::dispatchAfterResponse($login_log_data);
         /*$job = new ProcessLogin($login_log_data);
         $this->dispatch($job)*/
-        ProcessLogin::dispatch($login_log_data)->delay(now()->addMinutes(10));
+        //ProcessLogin::dispatch($login_log_data)->delay(now()->addMinutes(10));
 
         Token::query()->where('name',$login_info['account'])->delete();
         //重新分配token
