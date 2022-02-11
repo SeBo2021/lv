@@ -20,6 +20,7 @@ class EnableCrossRequestMiddleware
         $origin = $request->server('HTTP_ORIGIN') ? $request->server('HTTP_ORIGIN') : '*';
         $allow_origin = [
             'https://sao.yinlian66.com',
+            'https://cdn2.slkks.com',
         ];
         if (in_array($origin, $allow_origin)) {
             $response->header('Access-Control-Allow-Origin', $origin);
