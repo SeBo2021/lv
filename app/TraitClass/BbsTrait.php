@@ -4,16 +4,18 @@ namespace App\TraitClass;
 
 use App\Models\Ad;
 use App\Models\AdSet;
+use Illuminate\Support\Facades\Log;
 
 trait BbsTrait
 {
     /**
      * @param $user
      * @param $list
-     * @return mixed
+     * @return array
      */
-    private function proProcessData($user, $list): mixed
+    private function proProcessData($user, $list): array
     {
+        Log::info('==UserModel==',[$user]);
         $uid = $user->id;
         foreach ($list as $k => $re) {
             if ($this->redis()->get("focus_{$uid}_{$re['uid']}") == 1) {
