@@ -197,10 +197,12 @@ class CommContentController extends Controller
                 ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
                 ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get();
             $user = $request->user();
+            Log::info('==UserModel1==',[$user]);
             $uid = $user->id;
             // 增加点击数
+            Log::info('==UserModel2==',[$user]);
             CommBbs::query()->where('community_bbs.id', $id)->increment('views');
-            $result = $this->proProcessData($user, $list);
+            $result = $this->proProcessData($request->user(), $list);
             // 处理新文章通知
             $redis = $this->redis();
             $mask = $redis->get("c_{$list[0]['category_id']}");
