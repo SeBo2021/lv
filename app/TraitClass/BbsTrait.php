@@ -15,7 +15,7 @@ trait BbsTrait
      */
     private function proProcessData($user, $list): array
     {
-        Log::info('==UserModel==',[$user]);
+        Log::info('==UserModel3==',[$user]);
         $uid = $user->id;
         foreach ($list as $k => $re) {
             if ($this->redis()->get("focus_{$uid}_{$re['uid']}") == 1) {
