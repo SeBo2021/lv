@@ -9,13 +9,14 @@ use Illuminate\Support\Facades\Log;
 trait BbsTrait
 {
     /**
-     * @param $user
+     * @param $uid
      * @param $list
      * @param $user
      * @return array
      */
     private function proProcessData($uid, $list,$user=null): array
     {
+        Log::info('==userLocationName==',[$user]);
         foreach ($list as $k => $re) {
             if ($this->redis()->get("focus_{$uid}_{$re['uid']}") == 1) {
                 $list[$k]['is_focus'] = 1;
@@ -32,10 +33,10 @@ trait BbsTrait
             } else {
                 $list[$k]['is_love'] = 0;
             }
-            /*if ($re['location_name']) {
+            if ($re['location_name']) {
                 $locationRaw = json_decode($re['location_name'],true);
                 $list[$k]['location_name'] = $locationRaw[1]??$locationRaw[0]??'';
-            }*/
+            }
             if($user!==null){
                 $list[$k]['location_name'] = $this->getAreaNameFromUser($user->location_name);
             }
