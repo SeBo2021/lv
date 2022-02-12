@@ -58,8 +58,10 @@ class VideoController extends Controller
             if (!empty($one)) {
                 $one = $this->handleVideoItems([$one], true)[0];
                 $one['limit'] = 0;
-                // 任何类型都有 是否点赞 is_collect 并增加观看记录
-                ProcessViewVideo::dispatchAfterResponse($user, $one);
+                //
+                //ProcessViewVideo::dispatchAfterResponse($user, $one);
+                $job = new ProcessViewVideo($user, $one);
+                $this->dispatch($job);
                 //是否点赞
                 $viewRecord = $this->isLoveOrCollect($user->id,$id);
                 $one['is_love'] = $viewRecord['is_love'] ?? 0;
