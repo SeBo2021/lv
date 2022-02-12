@@ -169,7 +169,10 @@ class CommContentController extends Controller
         $areaInfoMap = array_column($areaInfo, null, 'uid');
         foreach ($data as $k => $v) {
             $rawArea = $areaInfoMap[$v['uid']] ?? [];
-            $data[$k]['location_name'] = $this->getAreaNameFromUser($rawArea['area']);
+            $data[$k]['location_name'] = '未知';
+            if(!empty($rawArea)){
+                $data[$k]['location_name'] = $this->getAreaNameFromUser($rawArea['area']);
+            }
             /*$tmpArea = @json_decode($rawArea['area'] ?? '', true);
             $tmpArea = $tmpArea ?? [];
             $data[$k]['location_name'] = '未知';
@@ -199,6 +202,7 @@ class CommContentController extends Controller
         $uid = $user->id;
         // 增加点击数
         CommBbs::query()->where('community_bbs.id', $id)->increment('views');
+        Log::info('==userLocationName1==',[$user]);
         $result = $this->proProcessData($uid, $list,$user);
         // 处理新文章通知
         $redis = $this->redis();
