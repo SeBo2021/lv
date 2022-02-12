@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 trait BbsTrait
 {
+    use UserTrait;
     /**
      * @param $uid
      * @param $list
