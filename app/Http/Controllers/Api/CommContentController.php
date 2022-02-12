@@ -9,6 +9,7 @@ use App\Models\LoginLog;
 use App\TraitClass\ApiParamsTrait;
 use App\TraitClass\BbsTrait;
 use App\TraitClass\PHPRedisTrait;
+use App\TraitClass\UserTrait;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -22,6 +23,7 @@ class CommContentController extends Controller
 {
     use PHPRedisTrait;
     use BbsTrait;
+    use UserTrait;
 
     /**
      * 文章发表
@@ -167,12 +169,13 @@ class CommContentController extends Controller
         $areaInfoMap = array_column($areaInfo, null, 'uid');
         foreach ($data as $k => $v) {
             $rawArea = $areaInfoMap[$v['uid']] ?? [];
-            $tmpArea = @json_decode($rawArea['area'] ?? '', true);
+            $data[$k]['location_name'] = $this->getAreaNameFromUser($rawArea['area']);
+            /*$tmpArea = @json_decode($rawArea['area'] ?? '', true);
             $tmpArea = $tmpArea ?? [];
             $data[$k]['location_name'] = '未知';
             if(!empty($tmpArea)){
                 $data[$k]['location_name'] = $tmpArea[2] ?: ($tmpArea[1] ?: ($tmpArea[0]));
-            }
+            }*/
         }
     }
 
@@ -193,10 +196,11 @@ class CommContentController extends Controller
                 ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
                 ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
                 ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get();
-            $uid = $request->user()->id;
+            $user = $request->user();
+            $uid = $user->id;
             // 增加点击数
             CommBbs::query()->where('community_bbs.id', $id)->increment('views');
-            $result = $this->proProcessData($uid, $list);
+            $result = $this->proProcessData($user, $list);
             // 处理新文章通知
             $redis = $this->redis();
             $mask = $redis->get("c_{$list[0]['category_id']}");
