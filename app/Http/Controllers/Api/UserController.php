@@ -105,6 +105,7 @@ class UserController extends Controller
                 'member_card' => $member_card,
                 // 'saol_gold' => $user->gold ? number_format($user->gold/100, 2, '.') : 0,
                 'saol_gold' => $user->gold ?:0,
+                'video_times' => $user->long_vedio_times ??0,
             ] ;
             return response()->json([
                 'state'=>0,

@@ -186,9 +186,9 @@ class FakeLiveShortController extends Controller
         $startSecond = $durationSeconds - ($durationSeconds - (time() % $durationSeconds));
 
         $isVip = $user->vip>0 ? 1 : 0;
-        if($user->long_vedio_times>0){ //有次数也视为VIP
+        /*if($user->long_vedio_times>0){ //有次数也视为VIP
             $isVip = 1;
-        }
+        }*/
         //统计激活视频人数=========
         $this->saveUsersDay($uid, $user->channel_id, $user->device_system);
         //============================

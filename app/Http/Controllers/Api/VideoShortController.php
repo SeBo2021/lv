@@ -163,11 +163,16 @@ class VideoShortController extends Controller
      */
     public function viewLimit($one, $user): mixed
     {
-        if($user->long_vedio_times<1){
+        /*if($user->long_vedio_times<1){ //没有免费观看次数再限制
             if ($one['restricted'] == 1) {
                 if ((!$user->member_card_type) && (time() - $user->vip_expired > $user->vip_start_last)) {
                     $one['limit'] = 1;
                 }
+            }
+        }*/
+        if ($one['restricted'] == 1) {
+            if ((!$user->member_card_type) && (time() - $user->vip_expired > $user->vip_start_last)) {
+                $one['limit'] = 1;
             }
         }
         return $one;
