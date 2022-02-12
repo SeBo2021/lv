@@ -52,8 +52,9 @@ class CommHomeController extends Controller
             ->simplePaginate($perPage, ['*'], '', $page);
         $secondCateList = $paginator->toArray();
         $data = $secondCateList['data'];
-        $uid = $request->user()->id;
-        $result = $this->proProcessData($uid, $data);
+        $user = $request->user();
+        $uid = $user->id;
+        $result = $this->proProcessData($uid, $data, $user);
         //加入视频列表
         $res['hasMorePages'] = $paginator->hasMorePages();
         $userInfo = User::query()

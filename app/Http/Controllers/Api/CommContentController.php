@@ -202,7 +202,7 @@ class CommContentController extends Controller
         $uid = $user->id;
         // 增加点击数
         CommBbs::query()->where('community_bbs.id', $id)->increment('views');
-        Log::info('==userLocationName1==',[$user]);
+        //Log::info('==userLocationName1==',[$user]);
         $result = $this->proProcessData($uid, $list,$user);
         // 处理新文章通知
         $redis = $this->redis();
