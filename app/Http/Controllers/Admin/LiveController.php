@@ -239,6 +239,8 @@ class LiveController extends BaseCurlController
 
     protected function afterSaveSuccessEvent($model, $id = '')
     {
+        $ids = Live::where('status',1)->pluck('id')->toArray();
+        $this->redis()->set('fakeLiveIds',implode(',',$ids));
         if( isset($_REQUEST['callback_upload']) && ($_REQUEST['callback_upload']==1)){
             try {
                 $job = new ProcessLive($model);
