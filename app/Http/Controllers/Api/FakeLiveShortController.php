@@ -39,9 +39,18 @@ class FakeLiveShortController extends Controller
      */
     private function items($page, $uid, $startId,$cateId,$tagId): array
     {
+        if ($page == 1) {
+            $ids = $this->redis()->get('fakeLiveIds')?:'';
+            $redisIds = explode(',',$ids);
+            shuffle($redisIds);
+            $newIds = implode(',',$redisIds);
+            $this->redis()->set("newLiveByUid_{$uid}",$newIds);
+        } else {
+            $newIds = $this->redis()->get("newLiveByUid_{$uid}");
+        }
         $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'duration_seconds', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at','intro','age', 'hls_url', 'dash_url'];
         $perPage = 8;
-        $model = Live::query();
+        $model = Live::query()->orderByRaw("FIELD(id, {$newIds})");
         $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         $items = $paginator->items();
         $data = [];
