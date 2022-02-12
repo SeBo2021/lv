@@ -8,12 +8,13 @@ use App\Models\AdSet;
 trait BbsTrait
 {
     /**
-     * @param $uid
+     * @param $user
      * @param $list
      * @return mixed
      */
-    private function proProcessData($uid, $list): mixed
+    private function proProcessData($user, $list): mixed
     {
+        $uid = $user->id;
         foreach ($list as $k => $re) {
             if ($this->redis()->get("focus_{$uid}_{$re['uid']}") == 1) {
                 $list[$k]['is_focus'] = 1;
@@ -30,10 +31,11 @@ trait BbsTrait
             } else {
                 $list[$k]['is_love'] = 0;
             }
-            if ($re['location_name']) {
+            /*if ($re['location_name']) {
                 $locationRaw = json_decode($re['location_name'],true);
                 $list[$k]['location_name'] = $locationRaw[1]??$locationRaw[0]??'';
-            }
+            }*/
+            $list[$k]['location_name'] = $this->getAreaNameFromUser($user->location_name);
             $thumbsRaw = json_decode($re['thumbs'],true);
             $thumbs = [];
             foreach ($thumbsRaw as $itemP) {
