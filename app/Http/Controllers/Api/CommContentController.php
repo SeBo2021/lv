@@ -186,42 +186,43 @@ class CommContentController extends Controller
      */
     public function detail(Request $request): JsonResponse|array
     {
-        try {
-            $params = ApiParamsTrait::parse($request->params);
-            Validator::make($params, [
-                'id' => 'integer',
-            ])->validate();
-            $id = $params['id'] ?? 0;
-            $list = CommBbs::query()
-                ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
-                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
-                ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get();
-            $user = $request->user();
-            Log::info('==UserModel1==',[$user]);
-            $uid = $user->id;
-            // 增加点击数
-            Log::info('==UserModel2==',[$user]);
-            CommBbs::query()->where('community_bbs.id', $id)->increment('views');
-            $result = $this->proProcessData($request->user(), $list);
-            // 处理新文章通知
-            $redis = $this->redis();
-            $mask = $redis->get("c_{$list[0]['category_id']}");
-            if ($mask == 'focus') {
-                $keyMe = "status_me_focus_{$list[0]['user_id']}";
-            } else {
-                $keyMe = "status_me_{$mask}_$uid";
-            }
-            $redis->del($keyMe);
-            return response()->json([
-                'state' => 0,
-                'data' => $result[0] ?? []
-            ]);
+        $params = ApiParamsTrait::parse($request->params);
+        Validator::make($params, [
+            'id' => 'integer',
+        ])->validate();
+        $id = $params['id'] ?? 0;
+        $list = CommBbs::query()
+            ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
+            ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
+            ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get();
+        $user = $request->user();
+        Log::info('==UserModel1==',[$user]);
+        $uid = $user->id;
+        // 增加点击数
+        Log::info('==UserModel2==',[$user]);
+        CommBbs::query()->where('community_bbs.id', $id)->increment('views');
+        $result = $this->proProcessData($request->user(), $list);
+        // 处理新文章通知
+        $redis = $this->redis();
+        $mask = $redis->get("c_{$list[0]['category_id']}");
+        if ($mask == 'focus') {
+            $keyMe = "status_me_focus_{$list[0]['user_id']}";
+        } else {
+            $keyMe = "status_me_{$mask}_$uid";
+        }
+        $redis->del($keyMe);
+        return response()->json([
+            'state' => 0,
+            'data' => $result[0] ?? []
+        ]);
+        /*try {
+
         } catch (Exception $e) {
             return response()->json([
                 'state' => -1,
                 'msg' => $e->getMessage()
             ]);
-        }
+        }*/
     }
 
     /**
