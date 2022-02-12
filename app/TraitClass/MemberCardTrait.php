@@ -107,11 +107,11 @@ trait MemberCardTrait
     public function getMemberCardList($except=null): array
     {
         $queryBuild = DB::table('member_card');
-        if($except=='gold'){
-            $items = [ ''=>''] + $queryBuild->pluck('name','id')->all();
-        }else{
-            $items = [ ''=>'全部',0 => '金币'] + $queryBuild->pluck('name','id')->all();
-        }
+        $items = match ($except) {
+            'gold' => ['' => ''] + $queryBuild->pluck('name', 'id')->all(),
+            'default' => $queryBuild->pluck('name', 'id')->all(),
+            default => ['' => '全部', 0 => '金币'] + $queryBuild->pluck('name', 'id')->all(),
+        };
         $lists = [];
         foreach ($items as $key => $value){
             $lists[$key] = [

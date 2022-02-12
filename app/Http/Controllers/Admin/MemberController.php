@@ -7,13 +7,14 @@ use App\Models\User;
 use App\Services\UiService;
 use App\TraitClass\ChannelTrait;
 use App\TraitClass\MemberCardTrait;
+use App\TraitClass\PayTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class MemberController extends BaseCurlController
 {
-    use ChannelTrait,MemberCardTrait;
+    use ChannelTrait,MemberCardTrait,PayTrait;
     //设置页面的名称
     public $pageName = '会员';
 
@@ -315,6 +316,19 @@ class MemberController extends BaseCurlController
                 'type' => 'number',
                 'name' => '可观看次数',
             ],
+            /*[
+                'field' => 'member_card_type',
+                'type' => 'text',
+                'name' => '会员卡',
+            ],*/
+            [
+                'field' => 'vipCards',
+                'type' => 'checkbox',
+                'name' => '会员卡',
+                'verify' => '',
+                'value' => ($show && ($show->member_card_type)) ? explode(',',$show->member_card_type) : [],
+                'data' => $this->getMemberCardList('default')
+            ],
             [
                 'field' => 'is_office',
                 'type' => 'radio',
@@ -356,6 +370,23 @@ class MemberController extends BaseCurlController
         $item->phone_number = $item->phone_number>0 ? $item->phone_number : '未绑定';
         $item->member_card_type = $this->getMemberCardList('gold')[max(explode(',',$item->member_card_type))]['name'];
         return $item;
+    }
+
+    public function beforeSaveEvent($model, $id = '')
+    {
+        $cards = $this->rq->input('vipCards',[]);
+        $model->member_card_type = implode(',',$cards);
+    }
+
+    public function afterSaveSuccessEvent($model, $id)
+    {
+        $cards = $this->rq->input('vipCards',null);
+        if ($cards!==null) {
+            foreach ($cards as $cardId){
+                $this->buyVip($cardId,$model->id);
+            }
+        }
+        return $model;
     }
 
     public function handleResultModel($model): array
