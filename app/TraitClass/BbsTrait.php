@@ -14,7 +14,7 @@ trait BbsTrait
      * @param $user
      * @return array
      */
-    private function proProcessData($uid, $list,$user): array
+    private function proProcessData($uid, $list,$user=null): array
     {
         foreach ($list as $k => $re) {
             if ($this->redis()->get("focus_{$uid}_{$re['uid']}") == 1) {
@@ -36,7 +36,9 @@ trait BbsTrait
                 $locationRaw = json_decode($re['location_name'],true);
                 $list[$k]['location_name'] = $locationRaw[1]??$locationRaw[0]??'';
             }*/
-            $list[$k]['location_name'] = $this->getAreaNameFromUser($user->location_name);
+            if($user!==null){
+                $list[$k]['location_name'] = $this->getAreaNameFromUser($user->location_name);
+            }
             $thumbsRaw = json_decode($re['thumbs'],true);
             $thumbs = [];
             foreach ($thumbsRaw as $itemP) {
