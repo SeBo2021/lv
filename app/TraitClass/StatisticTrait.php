@@ -65,6 +65,7 @@ trait StatisticTrait
             }else{
                 //更新扣量表
                 if($field == 'install'){
+                    $stepValue = 100;
                     if(($channelInfo->type<3) && ($channel_id>0)){ //cpa、cps、包月都支持扣量
                         $is_deduction = $channelInfo->is_deduction;
                         $deductionValue = $channelInfo->deduction;
@@ -72,19 +73,20 @@ trait StatisticTrait
                         if($is_deduction == 1){ //开启
                             $sumHits = DB::table($statisticTable)->where('channel_id',$channel_id)->sum('hits');
                             if(($sumHits/100) < 11){ //第一次前十个
-                                $deductionValue = 0;
+                                $stepValue = 0;
                             }else{ //关闭
+                                $stepValue = round(1*(1-$deductionValue/10000),2) * 100;
                                 DB::table('channels')->where('id',$channel_id)->update(['is_deduction'=>0]);
                             }
                         }
-                        $stepValue = round(1*(1-$deductionValue/10000),2) * 100;
-                    }else{
-                        $stepValue = 100;
                     }
-                    DB::table($statisticTable)
-                        ->where('channel_id',$channel_id)
-                        ->where('date_at',date('Y-m-d',$dateArr['day_time']))
-                        ->increment('install',$stepValue);
+                    if($stepValue>0){
+                        DB::table($statisticTable)
+                            ->where('channel_id',$channel_id)
+                            ->where('date_at',date('Y-m-d',$dateArr['day_time']))
+                            ->increment('install',$stepValue);
+                    }
+
                     DB::table($statisticTable)
                         ->where('channel_id',$channel_id)
                         ->where('date_at',date('Y-m-d',$dateArr['day_time']))
