@@ -153,6 +153,7 @@ trait ChannelTrait
                     'channel_promotion_code' => $channel->promotion_code,
                     'channel_code' => $channel->number,
                     'channel_status' => 1,
+                    'unit_price' => $channel->unit_price,
                     'share_ratio' => $channel->share_ratio,
                     'total_recharge_amount' => 0,
                     'total_amount' => 0,
