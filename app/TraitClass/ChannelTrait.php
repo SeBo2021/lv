@@ -141,7 +141,7 @@ trait ChannelTrait
         }else{
             $query = $query->where('status',1);
         }
-        $channels = $query->get(['id','pid','name','promotion_code','number','share_ratio']);
+        $channels = $query->get();
 
         foreach ($channels as $channel) {
             $exists = DB::table($statistic_table)->where('channel_id', $channel->id)->where('date_at', $currentDate)->exists();
