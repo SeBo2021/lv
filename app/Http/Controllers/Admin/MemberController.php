@@ -391,24 +391,24 @@ class MemberController extends BaseCurlController
 
     public function handleResultModel($model): array
     {
-        $memberCard = $this->rq->input('query_member_card_type', null);
-        $viewTimes = $this->rq->input('query_long_vedio_times', null);
-        $reqGolds = $this->rq->input('query_gold', null);
-        $reqDid = $this->rq->input('query_did', null);
-        $reqDeviceSystem = $this->rq->input('query_device_system', null);
-        if($reqDeviceSystem!==null){
+        $memberCard = $this->rq->input('query_member_card_type', "");
+        $viewTimes = $this->rq->input('query_long_vedio_times', "");
+        $reqGolds = $this->rq->input('query_gold', "");
+        $reqDid = $this->rq->input('query_did', "");
+        $reqDeviceSystem = $this->rq->input('query_device_system', "");
+        if($reqDeviceSystem!==""){
             $model = $model->where('device_system',$reqDeviceSystem);
         }
-        if($reqDid!==null){
+        if($reqDid!==""){
             $model = $model->where('did',$reqDid);
         }
-        if($viewTimes!==null){
+        if($viewTimes!==""){
             $model = $model->where('long_vedio_times',$viewTimes);
         }
-        if($memberCard!==null){
+        if($memberCard!==""){
             $model = $model->where('member_card_type','!=','')->whereRaw('member_card_type' . ' like ?', ["%" . $memberCard]);
         }
-        if($reqGolds!==null){
+        if($reqGolds!==""){
             switch ($reqGolds){
                 case 1:
                     $model = $model->whereBetween('gold',[1,99]);

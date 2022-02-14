@@ -126,7 +126,7 @@ class CommContentController extends Controller
         if (in_array($help, ['focus', 'hot'])) {
             $res = $this->$help($uid, $locationName, 6, $page);
         } else {
-            $res = $this->other($request->user()->id, $locationName, $cid1, $cid2, 6, $page);
+            $res = $this->other($uid, $locationName, $cid1, $cid2, 6, $page);
         }
         //Log::info('===CommContent===',[$res['bbs_list']]);
         $this->processArea($res['bbs_list']);

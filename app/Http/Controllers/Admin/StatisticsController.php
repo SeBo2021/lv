@@ -187,7 +187,7 @@ class StatisticsController extends BaseCurlController
                     ->distinct()
                     ->get();
 
-                $system = [0=>'all',1=>'ios',2=>'android'];
+                $system = [0=>'all',1=>'ios',2=>'android',3 => 'ios轻量版'];
                 $json['android'] = [];
                 $json['ios'] = [];
                 $ips = [];
