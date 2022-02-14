@@ -258,7 +258,7 @@ class CpsChannelsController extends BaseCurlController
                 'field' => 'query_status',
                 'type' => 'select',
                 'name' => '状态',
-                'default' => '',
+                'default' => 1,
                 'data' => [
                     '' => [
                         'id'=>'',
@@ -306,9 +306,10 @@ class CpsChannelsController extends BaseCurlController
 
     public function handleResultModel($model): array
     {
-        $model = $model
-            //->where('status',1)
-            ->where('type',2);
+        $model = $model->where('type',2);
+        if(!isset($_REQUEST['query_status'])){
+            $model = $model->where('status',1);
+        }
         return parent::handleResultModel($model);
     }
 
