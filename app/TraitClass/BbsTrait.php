@@ -13,9 +13,9 @@ trait BbsTrait
      * @param $uid
      * @param $list
      * @param $user
-     * @return array
+     * @return mixed
      */
-    private function proProcessData($uid, $list, $user=null): array
+    private function proProcessData($uid, $list, $user=null)
     {
         //Log::info('==userLocationName==',[$user]);
         foreach ($list as $k => $re) {
