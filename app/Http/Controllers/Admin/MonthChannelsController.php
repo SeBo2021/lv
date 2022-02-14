@@ -264,7 +264,7 @@ class MonthChannelsController extends BaseCurlController
                 'field' => 'query_status',
                 'type' => 'select',
                 'name' => '状态',
-                'default' => '',
+                'default' => 1,
                 'data' => [
                     '' => [
                         'id'=>'',
@@ -312,9 +312,10 @@ class MonthChannelsController extends BaseCurlController
 
     public function handleResultModel($model): array
     {
-        $model = $model
-            //->where('status',1)
-            ->where('type',1);
+        $model = $model->where('type',1);
+        if(!isset($_REQUEST['query_status'])){
+            $model = $model->where('status',1);
+        }
         return parent::handleResultModel($model);
     }
 
