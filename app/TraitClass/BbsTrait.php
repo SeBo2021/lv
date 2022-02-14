@@ -11,11 +11,11 @@ trait BbsTrait
     use UserTrait;
     /**
      * @param $uid
-     * @param array $list
+     * @param $list
      * @param $user
      * @return array
      */
-    private function proProcessData($uid, array $list=[], $user=null): array
+    private function proProcessData($uid, $list, $user=null): array
     {
         //Log::info('==userLocationName==',[$user]);
         foreach ($list as $k => $re) {
