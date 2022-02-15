@@ -118,34 +118,6 @@ trait StatisticTrait
             ]);
             $this->saveStatisticByDay('active_users',$channel_id,$device_system);
         }
-        //总统计激活观看人数
-
-        //更新统计扣量的表
-        /*if($channel_id > 0){
-            $first = DB::table('statistic_users_day_deduction')
-                ->where('at_time',$at_time)
-                ->where('channel_id',$channel_id)
-                ->where('device_system',$device_system)
-                ->first(['id']);
-            $deductionValue = DB::table('channels')->where('id',$channel_id)->value('deduction');
-            $stepValue = round(1*(1-$deductionValue/10000),2) * 100;
-            if(!$first){
-                DB::table('statistic_users_day_deduction')->insert([
-                        'users' => $stepValue,
-                        'at_time' => $at_time,
-                        'channel_id' => $channel_id,
-                        'device_system' => $device_system,
-                    ]);
-            }else{
-                if(!$userHadCome){
-                    DB::table('statistic_users_day_deduction')
-                        ->where('at_time',$at_time)
-                        ->where('channel_id',$channel_id)
-                        ->where('device_system',$device_system)
-                        ->increment('users',$stepValue);
-                }
-            }
-        }*/
 
 
     }

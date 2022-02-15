@@ -21,6 +21,10 @@ class ProcessViewVideo implements ShouldQueue
 
     public $video;
 
+    public $tries = 1;
+
+    public $maxExceptions = 1;
+
     /**
      * Create a new job instance.
      *
