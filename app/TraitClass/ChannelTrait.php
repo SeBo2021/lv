@@ -150,6 +150,7 @@ trait ChannelTrait
                     'channel_name' => $channel->name,
                     'channel_id' => $channel->id,
                     'channel_pid' => $channel->pid,
+                    'channel_type' => $channel->type,
                     'channel_promotion_code' => $channel->promotion_code,
                     'channel_code' => $channel->number,
                     'channel_status' => 1,
