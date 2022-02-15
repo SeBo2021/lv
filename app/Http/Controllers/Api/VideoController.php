@@ -41,72 +41,73 @@ class VideoController extends Controller
             ]);
         }
         // 业务逻辑
-        try {
-            $params = ApiParamsTrait::parse($request->params);
-            $validated = Validator::make($params, [
-                'id' => 'required|integer||min:1',
-                'use_gold' => [
-                    'nullable',
-                    'string',
-                    Rule::in(['1', '0']),
-                ],
-            ])->validated();
-            $id = $validated['id'];
-            $useGold = $validated['use_gold'] ?? "1";
-            $videoField = ['id', 'name', 'cid', 'cat', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'hls_url', 'dash_url', 'type', 'cover_img', 'views', 'likes', 'comments','updated_at'];
-            $one = Video::query()->find($id, $videoField)?->toArray();
-            if (!empty($one)) {
-                $one = $this->handleVideoItems([$one], true)[0];
-                $one['limit'] = 0;
-                //
-                //ProcessViewVideo::dispatchAfterResponse($user, $one);
-                $job = new ProcessViewVideo($user, $one);
-                $this->dispatch($job);
-                //是否点赞
-                $viewRecord = $this->isLoveOrCollect($user->id,$id);
-                $one['is_love'] = $viewRecord['is_love'] ?? 0;
-                //是否收藏
-                $one['is_collect'] = $viewRecord['is_collect'] ?? 0;
+        $params = ApiParamsTrait::parse($request->params);
+        $validated = Validator::make($params, [
+            'id' => 'required|integer||min:1',
+            'use_gold' => [
+                'nullable',
+                'string',
+                Rule::in(['1', '0']),
+            ],
+        ])->validated();
+        $id = $validated['id'];
+        $useGold = $validated['use_gold'] ?? "1";
+        $videoField = ['id', 'name', 'cid', 'cat', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'hls_url', 'dash_url', 'type', 'cover_img', 'views', 'likes', 'comments','updated_at'];
+        $one = Video::query()->find($id, $videoField)?->toArray();
+        if (!empty($one)) {
+            $one = $this->handleVideoItems([$one], true)[0];
+            $one['limit'] = 0;
+            //
+            //ProcessViewVideo::dispatchAfterResponse($user, $one);
+            $job = new ProcessViewVideo($user, $one);
+            $this->dispatch($job);
+            //是否点赞
+            $viewRecord = $this->isLoveOrCollect($user->id,$id);
+            $one['is_love'] = $viewRecord['is_love'] ?? 0;
+            //是否收藏
+            $one['is_collect'] = $viewRecord['is_collect'] ?? 0;
 
-                if ($one['restricted'] != 0) {
-                    //是否有观看次数
-                    if ($viewLongVideoTimes <= 0) {
-                        $one['restricted'] += 0;
-                        /*if ($user->phone_number > 0) {*/
-                            // unset($one['preview_hls_url'], $one['preview_dash_url']);
-                            $one = $this->vipOrGold($one, $user);
-                            if ($useGold && $one['limit'] == 2) {
-                                // 如果金币则尝试购买
-                                $buy = $this->useGold($one, $user);
-                                $buy && ($one['limit'] = 0);
-                            }
-                            return response()->json([
-                                'state' => 0,
-                                'data' => $one
-                            ]);
-                        /*} else {
-                            // unset($one['hls_url']);
-                            // unset($one['dash_url']);
-                            return response()->json([
-                                'state' => -1,
-                                'data' => $one,
-                                'msg' => "绑定手机可全站免费观看",
-                            ]);
-                        }*/
-
-
+            if ($one['restricted'] != 0) {
+                //是否有观看次数
+                if ($viewLongVideoTimes <= 0) {
+                    $one['restricted'] += 0;
+                    /*if ($user->phone_number > 0) {*/
+                    // unset($one['preview_hls_url'], $one['preview_dash_url']);
+                    $one = $this->vipOrGold($one, $user);
+                    if ($useGold && $one['limit'] == 2) {
+                        // 如果金币则尝试购买
+                        $buy = $this->useGold($one, $user);
+                        $buy && ($one['limit'] = 0);
                     }
+                    return response()->json([
+                        'state' => 0,
+                        'data' => $one
+                    ]);
+                    /*} else {
+                        // unset($one['hls_url']);
+                        // unset($one['dash_url']);
+                        return response()->json([
+                            'state' => -1,
+                            'data' => $one,
+                            'msg' => "绑定手机可全站免费观看",
+                        ]);
+                    }*/
+
+
                 }
             }
-            return response()->json([
-                'state' => 0,
-                'data' => $one
-            ]);
+        }
+        return response()->json([
+            'state' => 0,
+            'data' => $one
+        ]);
+        /*try {
+
         } catch (Exception $exception) {
             $msg = $exception->getMessage();
             Log::error("actionView", [$msg]);
         }
-        return 0;
+        return 0;*/
     }
 
     //点赞
