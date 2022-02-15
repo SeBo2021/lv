@@ -74,10 +74,11 @@ trait StatisticTrait
                             $sumHits = DB::table($statisticTable)->where('channel_id',$channel_id)->sum('hits');
                             if(($sumHits/100) < 11){ //第一次前十个
                                 $stepValue = 0;
+                            }else{
+                                DB::table('channels')->where('id',$channel_id)->update(['is_deduction'=>0]);
                             }
                         }else{ //关闭
                             $stepValue = round(1*(1-$deductionValue/10000),2) * 100;
-                            DB::table('channels')->where('id',$channel_id)->update(['is_deduction'=>0]);
                         }
                     }
                     if($stepValue>0){
