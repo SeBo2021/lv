@@ -65,7 +65,11 @@ class RechargeController extends BaseCurlIndexController
         2=>[
             'id'=>2,
             'name'=>'安卓'
-        ]
+        ],
+        3=>[
+            'id'=>3,
+            'name'=>'ios轻量版'
+        ],
     ];
 
     public function setModel()
