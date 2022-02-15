@@ -19,13 +19,23 @@ class ProcessViewVideo implements ShouldQueue
 
     public $userModel;
 
-    public $timeout = 60;
+    public $timeout = 5;
 
     public $video;
 
     public $tries = 0;
 
     public $maxExceptions = 1;
+
+    /**
+     * 确定任务应该超时的时间
+     *
+     * @return \DateTime
+     */
+    public function retryUntil()
+    {
+        return now()->addSeconds(5);
+    }
 
     /**
      * Create a new job instance.
