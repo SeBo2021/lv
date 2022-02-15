@@ -19,9 +19,11 @@ class ProcessViewVideo implements ShouldQueue
 
     public $userModel;
 
+    public $timeout = 60;
+
     public $video;
 
-    public $tries = 1;
+    public $tries = 0;
 
     public $maxExceptions = 1;
 
