@@ -227,8 +227,7 @@ class MonthChannelsController extends BaseCurlController
 
     public function beforeSaveEvent($model, $id = '')
     {
-        $model->type = 1;
-        $this->beforeSaveEventHandle($model, $id);
+        $this->beforeSaveEventHandle($model, $id, 1);
     }
 
     public function afterSaveSuccessEvent($model, $id = '')

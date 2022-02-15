@@ -157,7 +157,7 @@ class CpsChannelsController extends BaseCurlController
                 'name' => '推广码',
                 'must' => 1,
             ],
-            [
+            /*[
                 'field' => 'type',
                 'type' => 'radio',
                 'name' => '类型',
@@ -165,7 +165,7 @@ class CpsChannelsController extends BaseCurlController
                 'default' => 0,
                 'verify' => 'rq',
                 'data' => $this->channelType
-            ],
+            ],*/
             [
                 'field' => 'deduction',
                 'type' => 'number',
@@ -221,8 +221,7 @@ class CpsChannelsController extends BaseCurlController
 
     public function beforeSaveEvent($model, $id = '')
     {
-        $model->type = 2;
-        $this->beforeSaveEventHandle($model, $id);
+        $this->beforeSaveEventHandle($model, $id, 2);
     }
 
     public function afterSaveSuccessEvent($model, $id = '')
