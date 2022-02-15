@@ -168,11 +168,11 @@ trait ChannelTrait
         }
     }
 
-    public function beforeSaveEventHandle($model, $id = '')
+    public function beforeSaveEventHandle($model, $id = '', $type=0)
     {
         $model->status = 1;
         $model->deduction *= 100;
-        //$model->type = 2;
+        $model->type = $type;
         if($id>0){ //编辑
             if($model->deduction>0){
                 $originalDeduction = $model->getOriginal()['deduction'];

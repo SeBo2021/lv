@@ -227,7 +227,6 @@ class CpaChannelsController extends BaseCurlController
 
     public function beforeSaveEvent($model, $id = '')
     {
-        $model->type = 0;
         $this->beforeSaveEventHandle($model, $id);
     }
 
