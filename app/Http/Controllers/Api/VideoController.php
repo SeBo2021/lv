@@ -59,9 +59,9 @@ class VideoController extends Controller
                 $one = $this->handleVideoItems([$one], true)[0];
                 $one['limit'] = 0;
                 //
-                //ProcessViewVideo::dispatchAfterResponse($user, $one);
-                $job = new ProcessViewVideo($user, $one);
-                $this->dispatch($job);
+                ProcessViewVideo::dispatchAfterResponse($user, $one);
+                /*$job = new ProcessViewVideo($user, $one);
+                $this->dispatch($job);*/
                 //是否点赞
                 $viewRecord = $this->isLoveOrCollect($user->id,$id);
                 $one['is_love'] = $viewRecord['is_love'] ?? 0;
