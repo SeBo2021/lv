@@ -51,9 +51,9 @@ class ProcessViewVideo implements ShouldQueue
     /**
      * Execute the job.
      *
-     * @return void
+     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $vid = $this->video['id'];
         $uid = $this->userModel->id;
@@ -73,5 +73,6 @@ class ProcessViewVideo implements ShouldQueue
         }
         //
         $this->saveUsersDay($uid, $this->userModel->channel_id, $this->userModel->device_system);
+        return 0;
     }
 }
