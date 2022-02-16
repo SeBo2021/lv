@@ -150,6 +150,7 @@ class ProcessVideoShort implements ShouldQueue
         $content = Storage::get($mp4_path);
         $videoName = sprintf("/short/video/%s/", date('Ymd')) . $this->row->url;
         $upload = Storage::disk('sftp')->put($videoName, $content);
+        //删除mp4文件
         if ($upload) {
             Storage::delete($mp4_path);
         }
@@ -161,10 +162,6 @@ class ProcessVideoShort implements ShouldQueue
         $updateData['cover_img'] = self::get_slice_url($videoName,'cover');
 
         DB::table('video_short')->where('id',$this->row->id)->update($updateData);
-        //删除mp4文件
-        /*if($del!==false){
-            Storage::delete($mp4_path);
-        }*/
     }
 
 }
