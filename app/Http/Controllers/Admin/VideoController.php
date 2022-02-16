@@ -113,6 +113,13 @@ class VideoController extends BaseCurlController
                 'hide' => true,
             ],
             [
+                'field' => 'views',
+                'minWidth' => 150,
+                'title' => '播放次数',
+                'align' => 'center',
+                'hide' => true,
+            ],
+            [
                 'field' => 'cover_img',
                 'minWidth' => 150,
                 'title' => '封面图',
@@ -369,8 +376,9 @@ class VideoController extends BaseCurlController
 
             try {
                 //$job = new VideoSlice($model);
-                $job = new ProcessVideoSlice($model);
-                $this->dispatch($job)->onQueue('video_slice');
+                /*$job = new ProcessVideoSlice($model);
+                $this->dispatch($job);*/
+                ProcessVideoSlice::dispatch($model)->onQueue('video_slice');
                 //ProcessVideoSlice::dispatchSync($model);
             }catch (\Exception $e){
                 Log::error($e->getMessage());
