@@ -270,9 +270,8 @@ class ShortController extends BaseCurlController
         //$isVideo = ($_REQUEST['callback_upload']??0);
         try {
 //            $job = new ProcessShort($model,$isVideo);
-            /*$job = new ProcessVideoShort($model);
-            $this->dispatch($job)->onQueue('short_video_slice');*/
-            ProcessVideoShort::dispatch('short_video_slice')->onQueue('short_video_slice');
+            $job = new ProcessVideoShort($model);
+            $this->dispatch($job)->onQueue('short_video_slice');
             // app(Dispatcher::class)->dispatchNow($job);
         }catch (\Exception $e){
             Log::error($e->getMessage());
