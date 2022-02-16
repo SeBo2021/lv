@@ -27,7 +27,7 @@ class CategoryController extends BaseCurlController
 
     public $denyCommonBladePathActionName = ['index','create','edit'];
 
-    public $appModuleStyle = [
+    public array $appModuleStyle = [
         0 => [
             'id' => 0,
             'name' => '无'
@@ -419,7 +419,7 @@ class CategoryController extends BaseCurlController
     protected function afterSaveSuccessEvent($model, $id = '')
     {
         $redis = $this->redis();
-        if ($model->parent_id != 0) {
+        if ($model->parent_id > 0) {
             //上级
             $parent = $this->model->find($model->parent_id);
             $next = $parent->path_level;
