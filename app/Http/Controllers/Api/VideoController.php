@@ -59,9 +59,8 @@ class VideoController extends Controller
             $one['limit'] = 0;
             //
 //            ProcessViewVideo::dispatchAfterResponse($user, $one);
-            //$job = new ProcessViewVideo($user, $one);
-            //$this->dispatch($job);
-            ProcessViewVideo::dispatch($user, $one)->onQueue('view_video');
+            $job = new ProcessViewVideo($user, $one);
+            $this->dispatch($job);
             //是否点赞
             $viewRecord = $this->isLoveOrCollect($user->id,$id);
             $one['is_love'] = $viewRecord['is_love'] ?? 0;

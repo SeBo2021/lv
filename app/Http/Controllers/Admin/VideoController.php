@@ -376,9 +376,8 @@ class VideoController extends BaseCurlController
 
             try {
                 //$job = new VideoSlice($model);
-                /*$job = new ProcessVideoSlice($model);
-                $this->dispatch($job);*/
-                ProcessVideoSlice::dispatch($model)->onQueue('video_slice');
+                $job = new ProcessVideoSlice($model);
+                $this->dispatch($job);
                 //ProcessVideoSlice::dispatchSync($model);
             }catch (\Exception $e){
                 Log::error($e->getMessage());
