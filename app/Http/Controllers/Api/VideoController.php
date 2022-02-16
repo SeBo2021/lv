@@ -60,7 +60,7 @@ class VideoController extends Controller
             //
             //ProcessViewVideo::dispatchAfterResponse($user, $one);
             $job = new ProcessViewVideo($user, $one);
-            $this->dispatch($job);
+            $this->dispatch($job)->onQueue('view_video');
             //是否点赞
             $viewRecord = $this->isLoveOrCollect($user->id,$id);
             $one['is_love'] = $viewRecord['is_love'] ?? 0;
