@@ -116,8 +116,8 @@ class VideoController extends BaseCurlController
                 'field' => 'views',
                 'minWidth' => 150,
                 'title' => '播放次数',
+                'sort' => 1,
                 'align' => 'center',
-                'hide' => true,
             ],
             [
                 'field' => 'cover_img',

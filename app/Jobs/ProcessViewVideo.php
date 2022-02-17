@@ -57,7 +57,7 @@ class ProcessViewVideo implements ShouldQueue
         $uid = $this->userModel->id;
         Video::query()->where('id',$vid)->increment('views'); //增加该视频播放次数
         //插入历史记录
-        DB::table('view_history')->insertOrIgnore(['uid'=>$uid,'vid'=>$vid]);
+        DB::table('view_history')->insertOrIgnore(['uid'=>$uid,'vid'=>$vid,'time_at'=>time()]);
 
         if($this->userModel->long_vedio_times>0){
             //统计激活
