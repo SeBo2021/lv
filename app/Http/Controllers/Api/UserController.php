@@ -25,7 +25,7 @@ use \App\TraitClass\PHPRedisTrait;
 
 class UserController extends Controller
 {
-    use MemberCardTrait,SmsTrait,LoginTrait,VideoTrait,PHPRedisTrait;
+    use MemberCardTrait,SmsTrait,LoginTrait,VideoTrait,PHPRedisTrait,IpTrait;
 
     public function set(Request $request): JsonResponse|array
     {
@@ -402,7 +402,7 @@ class UserController extends Controller
                 'areaNum' => 'required|integer',
             ])->validated();
 
-            $ip = IpTrait::getRealIp();
+            $ip = $this->getRealIp();
 
             $smsId = DB::table('sms_codes')
                 ->where('phone',$validated['phone'])

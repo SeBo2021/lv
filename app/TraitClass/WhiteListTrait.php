@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Log;
 
 trait WhiteListTrait
 {
+    use IpTrait;
     public function whitelistPolice(): bool
     {
-        $ip = \request()->getClientIp();
-        //$ip = IpTrait::getRealIp();
+        $ip = $this->getRealIp();
         //白名单
         $whiteList = WhiteList::query()
             ->where('status',1)
