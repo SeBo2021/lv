@@ -120,7 +120,7 @@ class LoginController extends BaseController
         //更新session_key
         $admin = admin();
         $admin->session_token = Session::getId();
-        $admin->last_ip = IpTrait::getRealIp();
+        $admin->last_ip = $this->getRealIp();
         $admin->login_numbers += 1;
         $admin->save();
         $url = route('admin.index');
