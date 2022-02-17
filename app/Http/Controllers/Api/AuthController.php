@@ -76,12 +76,8 @@ class AuthController extends Controller
         $deviceInfo = !is_string($validated['dev']) ? json_encode($validated['dev']) : $validated['dev'] ;
         $appInfo = !is_string($validated['env']) ? json_encode($validated['env']) : $validated['env'] ;
 
-        //$ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $request->getClientIp();
-        //$ip = $this->forceToIpV4($ip);
-        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $request->getClientIp();
-        /*$HTTP_X_REAL_IP = $_SERVER['HTTP_X_REAL_IP'] ?? '';
-        $HTTP_X_FORWARDED_FOR = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';*/
-        //Log::debug('login_SEVER_info===',$_SERVER);//参数日志
+        $ip = $this->getRealIp();
+
         $test = $validated['test'] ?? false;
 
         $user = new User();
