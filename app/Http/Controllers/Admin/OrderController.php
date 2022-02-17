@@ -158,4 +158,39 @@ class OrderController extends BaseCurlController
         }
 
     }
+
+    public function setOutputSearchFormTpl($shareData)
+    {
+
+        $data = [
+            [
+                'field' => 'query_status',
+                'type' => 'select',
+                'name' => '状态',
+                'default' => '',
+                'data' => [
+                    ''=>[
+                        'id'=>'',
+                        'name'=>'全部',
+                    ],0=>[
+                        'id'=>0,
+                        'name'=>'未付',
+                    ],1=>[
+                        'id'=>1,
+                        'name'=>'完成',
+                    ],
+                ]
+            ],
+            [
+                'field' => 'query_created_at',
+                'type' => 'datetime',
+//                'attr' => 'data-range=true',
+                'attr' => 'data-range=~',//需要特殊分割
+                'name' => '时间范围',
+            ],
+        ];
+        //赋值到ui数组里面必须是`search`的key值
+        $this->uiBlade['search'] = $data;
+    }
+
 }

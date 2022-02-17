@@ -88,7 +88,7 @@ class LogController extends BaseCurlIndexController
             [
                 'field' => 'query_like_admin_name',
                 'type' => 'text',
-                'name' => '账号',
+                'name' => '昵称',
             ],
             [
                 'field' => 'query_like_url',
