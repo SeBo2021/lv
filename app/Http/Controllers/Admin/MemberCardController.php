@@ -51,6 +51,12 @@ class MemberCardController extends BaseCurlController
                 'align' => 'center',
             ],
             [
+                'field' => 'status',
+                'minWidth' => 100,
+                'title' => '状态',
+                'align' => 'center',
+            ],
+            [
                 'field' => 'name',
                 'minWidth' => 100,
                 'title' => '卡名',
@@ -185,6 +191,7 @@ class MemberCardController extends BaseCurlController
     public function setListOutputItemExtend($item)
     {
         $item->rights = $this->getRightsName($item->rights);
+        $item->status = UiService::switchTpl('status', $item,'');
         return $item;
     }
 

@@ -142,18 +142,24 @@ class RechargeController extends BaseCurlIndexController
                 'align' => 'center'
             ],
             [
+                'field' => 'register_at',
+                'width' => 150,
+                'title' => '会员注册时间',
+                'align' => 'center'
+            ],
+            [
                 'field' => 'created_at',
                 'minWidth' => 150,
                 'title' => '创建时间',
                 'align' => 'center'
             ],
-            [
+
+            /*[
                 'field' => 'handle',
                 'minWidth' => 150,
                 'title' => '操作',
-//                'fixed' => 'right',
                 'align' => 'center'
-            ]
+            ]*/
         ];
     }
 
@@ -238,6 +244,11 @@ class RechargeController extends BaseCurlIndexController
 
     public function handleResultModel($model)
     {
+        $field = ['recharge.id','recharge.amount','recharge.uid','recharge.order_id','orders.status',
+            'recharge.channel_id','recharge.device_system','recharge.created_at','users.created_at as register_at','orders.type','orders.forward','orders.vid','orders.type_id','orders.remark'];
+        $raw = implode(',',$field);
+        $model = $model->select(DB::raw($raw));
+
         $type = $this->rq->input('type',null);
         $forward = $this->rq->input('forward',null);
         $channel_id = $this->rq->input('channel_id',null);
@@ -250,7 +261,10 @@ class RechargeController extends BaseCurlIndexController
         $order_by_name = $this->orderByName();
         $order_by_type = $this->orderByType();
         $model = $this->orderBy($model, $order_by_name, $order_by_type);
-        $build = $model->join('orders','recharge.order_id','=','orders.id');
+        $build = $model
+            ->join('orders','recharge.order_id','=','orders.id')
+            ->join('users','recharge.uid','=','users.id')
+        ;
         if($queryUid>0){
             $build = $build->where('recharge.uid',$queryUid);
         }
@@ -283,15 +297,13 @@ class RechargeController extends BaseCurlIndexController
                 3 => $build->where('orders.forward', 'short'),
                 2 => $build->where('orders.forward', 'video'),
                 1 => $build->where('orders.forward', '')
-                //default => $build->where('orders.forward', ''),
             };
         }
 
         $totalAmount = $build->sum('recharge.amount');
 
         $total = $build->count();
-        $field = ['recharge.id','recharge.amount','recharge.uid','recharge.order_id','orders.status',
-            'recharge.channel_id','recharge.device_system','recharge.created_at','orders.type','orders.forward','orders.vid','orders.type_id','orders.remark'];
+
         $currentPageData = $build->forPage($page, $pagesize)->get($field);
         $this->listOutputJson($total, $currentPageData, 0);
         return [
