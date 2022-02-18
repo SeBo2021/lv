@@ -171,7 +171,8 @@ class VideoShortController extends Controller
             }
         }*/
         if ($one['restricted'] == 1) {
-            if ((!$user->member_card_type) && (time() - $user->vip_expired > $user->vip_start_last)) {
+            $diffTime = ($user->vip_expired?:0) - (time()-($user->vip_start_last?:time()));
+            if ((!$user->member_card_type) || ($diffTime<0)) {
                 $one['limit'] = 1;
             }
         }
