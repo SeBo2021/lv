@@ -100,13 +100,14 @@ class HomeController extends Controller
             foreach ($data as &$item)
             {
                 //获取模块数据
-                $queryBuild = DB::table('cid_vid')->join('video','cid_vid.vid','=','video.id')
+                $queryBuild = DB::table('cid_vid')
+                    ->join('video','cid_vid.vid','=','video.id')
                     ->where('cid_vid.cid',$item['id'])
                     ->where('video.status',1);
                 if($item['is_rand']==1){
                     $queryBuild = $queryBuild->inRandomOrder();
                 }else{
-                    $queryBuild = $queryBuild->orderBy('video.id','desc');
+                    $queryBuild = $queryBuild->orderByRaw('video.is_top DESC,video.updated_at DESC,video.id DESC');
                 }
                 $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
                 $videoList = $queryBuild->limit($limit)->get($this->videoFields)->toArray();
@@ -121,10 +122,10 @@ class HomeController extends Controller
             $res['hasMorePages'] = $paginator->hasMorePages();
             $res['list'] = $data;
             /*//广告
-            $res['list'] = AdTrait::insertAds($res['list'],'home_page',true,$page,$perPage);*/
+            //$res['list'] = AdTrait::insertAds($res['list'],'home_page',true,$page,$perPage);*/
             //存入redis
             $redis->set($sectionKey,json_encode($res,JSON_UNESCAPED_UNICODE));
-            $redis->expire($sectionKey,$this->redisExpiredTime);
+            //$redis->expire($sectionKey,$this->redisExpiredTime);
         }else{
             $res = json_decode($res,true);
         }

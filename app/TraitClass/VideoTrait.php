@@ -19,7 +19,7 @@ trait VideoTrait
 
     public object $row;
 
-    public array $videoFields = ['video.id','name','gold','cat','sync','title','dash_url','hls_url','duration','type','restricted','cover_img','views','updated_at'];
+    public array $videoFields = ['video.id','video.is_top','name','gold','cat','sync','title','dash_url','hls_url','duration','type','restricted','cover_img','views','updated_at'];
 
     public string $coverImgDir = 'coverImg';
 

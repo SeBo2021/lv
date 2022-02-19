@@ -181,6 +181,12 @@ class VideoController extends BaseCurlController
                 'title' => '是否上架',
                 'align' => 'center',
             ],
+            [
+                'field' => 'is_top',
+                'minWidth' => 80,
+                'title' => '是否置顶',
+                'align' => 'center',
+            ],
             /*[
                 'field' => 'is_recommend',
                 'minWidth' => 80,
@@ -362,7 +368,8 @@ class VideoController extends BaseCurlController
         $item->category_name = $this->getCatName($item->cat);
         $item->tag_name = $this->getTagName($item->tag);
         $item->status = UiService::switchTpl('status', $item,'','上架|下架');
-        $item->is_recommend = UiService::switchTpl('is_recommend', $item,'','是|否');
+        //$item->is_recommend = UiService::switchTpl('is_recommend', $item,'','是|否');
+        $item->is_top = UiService::switchTpl('is_top', $item,'','置顶|取消');
         $item->sync = UiService::switchTpl('sync', $item,'','是|否');
         $item->type = UiService::switchTpl('type', $item,'','长|短');
         $item->restricted = $this->restrictedType[$item->restricted]['name'];
@@ -396,6 +403,19 @@ class VideoController extends BaseCurlController
         $model->author = admin('nickname');
         $model->gold = $this->rq->input('gold',0);
         $model->gold *= $this->goldUnit;
+        if($id > 0){
+            $originalData = $model->getOriginal();
+            if($model->status != $originalData['status']){
+                $model->is_top = 0;
+            }
+            $originalCat = json_decode($originalData['cat'],true);
+            if($originalCat!=$cats){
+                $model->is_top = 0;
+            }
+            if($model->status==0){
+                $model->is_top = 0;
+            }
+        }
         if(isset($model->url)){
             $model->dash_url = self::get_slice_url($model->url);
             $model->hls_url = self::get_slice_url($model->url,'hls');
@@ -417,6 +437,8 @@ class VideoController extends BaseCurlController
                 $model->tag = json_encode($tagArr);
             }
         }
+        //清除缓存
+        $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
 
     }
 
@@ -755,7 +777,7 @@ class VideoController extends BaseCurlController
                 case 'cat':
                     $value_arr = explode(',',$value);
                     $buildQueryVideo = Video::query()->whereIn($id, $id_arr);
-                    $buildQueryVideo->update(['cat'=>json_encode($value_arr)]);
+                    $buildQueryVideo->update(['cat'=>json_encode($value_arr),'is_top'=>0]);
                     //队列执行更新版块中间表
                     ProcessSyncMiddleSectionTable::dispatchAfterResponse();
                     $r=true;
@@ -805,6 +827,13 @@ class VideoController extends BaseCurlController
                         }
                     }
                     $r = true;
+                    break;
+                case 'status':
+                    if($value==0){
+                        $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update(['status' => $value,'is_top'=>0]);
+                    }else{
+                        $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update(['status' => $value]);
+                    }
                     break;
                 default:
                     $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update([$field => $value]);
