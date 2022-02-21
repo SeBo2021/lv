@@ -63,6 +63,12 @@ class MemberCardController extends BaseCurlController
                 'align' => 'center'
             ],
             [
+                'field' => 'show_user',
+                'minWidth' => 100,
+                'title' => '用户群体',
+                'align' => 'center'
+            ],
+            [
                 'field' => 'name_day',
                 'minWidth' => 100,
                 'title' => '天数解释',
@@ -137,6 +143,15 @@ class MemberCardController extends BaseCurlController
                 'data' => $this->cardRights
             ],
             [
+                'field' => 'show_user',
+                'type' => 'select',
+                'name' => '用户群体',
+                'must' => 1,
+                'verify' => 'rq',
+                'default' => 0,
+                'data' => $this->show_user
+            ],
+            [
                 'field' => 'expired_hours',
                 'type' => 'text',
                 'name' => '过期时间周期(小时):不填或填0为永久',
@@ -192,6 +207,7 @@ class MemberCardController extends BaseCurlController
     {
         $item->rights = $this->getRightsName($item->rights);
         $item->status = UiService::switchTpl('status', $item,'');
+        $item->show_user = $this->show_user[$item->show_user]['name'];
         return $item;
     }
 

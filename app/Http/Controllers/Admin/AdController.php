@@ -15,7 +15,7 @@ class AdController extends BaseCurlController
 
     public $pageName = '广告';
 
-    public function setModel()
+    public function setModel(): Ad
     {
         return $this->model = new Ad();
     }

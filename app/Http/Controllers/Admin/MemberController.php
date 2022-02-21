@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\MemberCard;
 use App\Models\User;
 use App\Services\UiService;
 use App\TraitClass\ChannelTrait;
@@ -98,6 +99,20 @@ class MemberController extends BaseCurlController
                 'minWidth' => 80,
                 'title' => 'VIP',
                 'align' => 'center'
+            ],
+            [
+                'field' => 'vip_start_last',
+                'minWidth' => 80,
+                'title' => 'vip最近开通时间',
+                'align' => 'center',
+                'hide' => true
+            ],
+            [
+                'field' => 'vip_expired',
+                'minWidth' => 80,
+                'title' => 'vip过期时间',
+                'align' => 'center',
+                'hide' => true
             ],
             [
                 'field' => 'gold',
@@ -369,16 +384,28 @@ class MemberController extends BaseCurlController
         $item->status = UiService::switchTpl('status', $item,'');
         $item->phone_number = $item->phone_number>0 ? $item->phone_number : '未绑定';
         $item->member_card_type = $this->getMemberCardList('gold')[max(explode(',',$item->member_card_type))]['name'];
+        $item->vip_start_last = date('Y-m-d H:i:s',$item->vip_start_last);
+        $item->vip_expired = $item->vip_expired>0 ? round($item->vip_expired/(3600*24)).'小时' :0;
         return $item;
     }
 
     public function beforeSaveEvent($model, $id = '')
     {
-        $cards = $this->rq->input('vipCards',[]);
-        $model->member_card_type = implode(',',$cards);
+        if($id > 0){
+            $cards = $this->rq->input('vipCards',[]);
+            $member_card_type = implode(',',$cards);
+            $originalData = $model->getOriginal();
+            if($member_card_type != $originalData['member_card_type']){ //如果有变更会员卡信息
+                $model->member_card_type = $member_card_type;
+                //dump($member_card_type);
+                $model->vip_start_last = time();
+                $model->vip_expired = MemberCard::query()->whereIn('id',$cards)->sum('expired_hours')*3600;
+                //$model->vip = 1;
+            }
+        }
     }
 
-    public function afterSaveSuccessEvent($model, $id)
+    /*public function afterSaveSuccessEvent($model, $id)
     {
         $cards = $this->rq->input('vipCards',null);
         if ($cards!==null) {
@@ -387,7 +414,7 @@ class MemberController extends BaseCurlController
             }
         }
         return $model;
-    }
+    }*/
 
     public function handleResultModel($model): array
     {

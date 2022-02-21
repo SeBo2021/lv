@@ -6,6 +6,25 @@ use Illuminate\Support\Facades\DB;
 
 trait MemberCardTrait
 {
+    public array $show_user = [
+        0 => [
+            'id' => 0,
+            'name' => '全部'
+        ],
+        1 => [
+            'id' => 1,
+            'name' => '新用户'
+        ],
+        2 => [
+            'id' => 2,
+            'name' => '老用户'
+        ],
+        3 => [
+            'id' => 3,
+            'name' => 'VIP用户低于7天的用户'
+        ],
+    ];
+
     public array $cardRights = [
         1 => [
             'id' => 1,
