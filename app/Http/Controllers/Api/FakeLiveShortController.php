@@ -54,6 +54,7 @@ class FakeLiveShortController extends Controller
         $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         $items = $paginator->items();
         $data = [];
+        $_v = time();
         foreach ($items as $one) {
             //  $one = $this->handleShortVideoItems([$one], true)[0];
             $one['limit'] = 0;
@@ -68,7 +69,10 @@ class FakeLiveShortController extends Controller
 
 
             $domainSync = VideoTrait::getDomain($one['sync']);
-            $one['cover_img'] = $domainSync . $one['cover_img'];
+            //$one['cover_img'] = $domainSync . $one['cover_img'];
+            $fileInfo = pathinfo($one['cover_img']);
+            $one['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext=jpg&_v='.$_v;
+
             $one['gold'] = $one['gold'] / $this->goldUnit;
             $one['views'] = $one['views'] > 0 ? $this->generateRandViews($one['views']) : $this->generateRandViews(rand(5, 9));
             $one['hls_url'] = $domainSync . $one['hls_url'];

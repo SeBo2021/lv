@@ -132,19 +132,23 @@ class VideoShortController extends Controller
         $items = $paginator->items();
 
         $data = [];
+        $resourceDomain = env('RESOURCE_DOMAIN');
+        $_v = time();
         foreach ($items as $one) {
             //  $one = $this->handleShortVideoItems([$one], true)[0];
             $one['limit'] = 0;
             $one = $this->viewLimit($one, $user);
             $viewRecord = $this->isShortLoveOrCollect($user->id, $one['id']);
             $one['is_love'] = intval($viewRecord['is_love']) ?? 0;
-            $resourceDomain = env('RESOURCE_DOMAIN');
+
             //是否收藏
             $one['is_collect'] = intval($viewRecord['is_collect']) ?? 0;
             $one['url'] = $resourceDomain  .$one['url'];
             $one['hls_url'] = $resourceDomain  .$one['hls_url'];
             $one['dash_url'] = $resourceDomain  .$one['dash_url'];
-            $one['cover_img'] = $resourceDomain . $one['cover_img'];
+            //$one['cover_img'] = $resourceDomain . $one['cover_img'];
+            $fileInfo = pathinfo($one['cover_img']);
+            $one['cover_img'] = $resourceDomain . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext=jpg&_v='.$_v;
 
             $data[] = $one;
         }
