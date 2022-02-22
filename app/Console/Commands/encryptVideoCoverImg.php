@@ -41,7 +41,7 @@ class encryptVideoCoverImg extends Command
      */
     public function handle()
     {
-        $table = 'videos';
+        $table = 'video';
         $items = DB::table($table)
             //->whereIn('id',['7261','7260'])
             ->get(['id','cover_img','sync']);
