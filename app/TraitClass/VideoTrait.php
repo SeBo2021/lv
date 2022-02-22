@@ -354,6 +354,13 @@ trait VideoTrait
         $_v = time();
         foreach ($lists as &$list){
             $list = (array)$list;
+
+            $domainSync = VideoTrait::getDomain($list['sync']);
+            //$list['cover_img'] = $domainSync . $list['cover_img'];
+            $fileInfo = pathinfo($list['cover_img']);
+            //$image_info = getimagesize($domainSync . $list['cover_img']);
+            //$list['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext='.$image_info['mime'].'&_v='.$_v;
+            $list['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext=jpg&_v='.$_v;
             if (($list['usage']??1) == 2) {
                 /// 重置信息
                 $list['id'] = $list['vs_id'] ;
@@ -372,14 +379,6 @@ trait VideoTrait
                 $list['hls_url'] = $list['vs_hls_url'] ;
                 $list['dash_url'] = $list['vs_dash_url'] ;
 
-                $domainSync = VideoTrait::getDomain($list['sync']);
-
-                //$list['cover_img'] = $domainSync . $list['cover_img'];
-                $fileInfo = pathinfo($list['cover_img']);
-                //$image_info = getimagesize($domainSync . $list['cover_img']);
-                //$list['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext='.$image_info['mime'].'&_v='.$_v;
-                $list['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext=jpg&_v='.$_v;
-
                 $list['gold'] = $list['gold'] / $this->goldUnit;
                 $list['views'] = $list['views'] > 0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5, 9));
                 $list['hls_url'] = '';
@@ -393,7 +392,7 @@ trait VideoTrait
                 $list['url'] = env('RESOURCE_DOMAIN_DEV') . '/' .$list['url'];
             } else {
                 $domainSync = VideoTrait::getDomain($list['sync']);
-                $list['cover_img'] = $domainSync . $list['cover_img'];
+                //$list['cover_img'] = $domainSync . $list['cover_img'];
                 $list['gold'] = $list['gold'] / $this->goldUnit;
                 $list['views'] = $list['views'] > 0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5, 9));
                 $list['hls_url'] = $domainSync . $list['hls_url'];
