@@ -351,6 +351,7 @@ trait VideoTrait
 
     public function handleVideoItems($lists,$display_url=false,$uid = 0,$processSort = false)
     {
+        $_v = time();
         foreach ($lists as &$list){
             $list = (array)$list;
             if (($list['usage']??1) == 2) {
@@ -375,7 +376,9 @@ trait VideoTrait
 
                 //$list['cover_img'] = $domainSync . $list['cover_img'];
                 $fileInfo = pathinfo($list['cover_img']);
-                $list['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext=.jpg';
+                //$image_info = getimagesize($domainSync . $list['cover_img']);
+                //$list['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext='.$image_info['mime'].'&_v='.$_v;
+                $list['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext=jpg&_v='.$_v;
 
                 $list['gold'] = $list['gold'] / $this->goldUnit;
                 $list['views'] = $list['views'] > 0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5, 9));

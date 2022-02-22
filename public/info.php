@@ -41,6 +41,8 @@ curl_close($ch);
 $image_info = getimagesize($image_file);
 //var_dump($image_info);
 //$imgCode = 'data:' . $image_info['mime'] . ';base64,'. base64_encode($dataBlock);
+
+//$dataBlock = file_get_contents('https://sao.yinlian66.com/upload/images/20220217/e4aff1c5602d6a9e4711ce81d41d128738003.htm');
 $imgCode = 'data:.jpg;base64,'. base64_encode($dataBlock);
 
 //$imgCode = base64_encode($imgCode);
