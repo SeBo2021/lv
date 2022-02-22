@@ -51,7 +51,7 @@ class encryptVideoCoverImg extends Command
             $content = $this->getImgBlockData($imgUrl);
             $fileInfo = pathinfo($item->cover_img);
             $encryptFile = $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm';
-            Log::info('===encryptImg===',[$encryptFile,$content]);
+            //Log::info('===encryptImg===',[$encryptFile,$content]);
             Storage::disk('sftp')->put($encryptFile,$content);
         }
         $this->info('######视频封面图加密成功######');
