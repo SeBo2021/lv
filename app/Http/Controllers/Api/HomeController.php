@@ -137,4 +137,21 @@ class HomeController extends Controller
         ]);
     }
 
+    //充值活动
+    /*public function rechargeActivity(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $user = $request->user();
+        $data = AdTrait::get('activity');
+        $domain = env('APP_URL');
+        foreach ($data as &$item){
+            $item['img'] = $domain . $item['img'];
+            $item['action_type'] = (string) $item['action_type'];
+            $item['vid'] = (string) $item['vid'];
+        }
+        return response()->json([
+            'state'=>0,
+            'data'=>$data
+        ]);
+    }*/
+
 }
