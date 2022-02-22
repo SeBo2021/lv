@@ -52,7 +52,10 @@ class encryptVideoCoverImg extends Command
             $fileInfo = pathinfo($item->cover_img);
             $encryptFile = $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm';
             //Log::info('===encryptImg===',[$encryptFile,$content]);
-            Storage::disk('sftp')->put($encryptFile,$content);
+            $bool = Storage::disk('sftp')->put($encryptFile,$content);
+            if($bool==true){
+                $this->info('######视频ID:'.$item->id.' 封面图加密成功######');
+            }
         }
         $this->info('######视频封面图加密成功######');
         return 0;
@@ -62,7 +65,7 @@ class encryptVideoCoverImg extends Command
     {
         $ch = curl_init($url);
         // 超时设置
-        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
         // 取前面 168 个字符 通过四张测试图读取宽高结果都没有问题,若获取不到数据可适当加大数值
         curl_setopt($ch, CURLOPT_RANGE, '0-1024000');
         // 跟踪301跳转
