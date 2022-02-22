@@ -46,13 +46,29 @@ class encryptVideoCoverImg extends Command
             //->whereIn('id',['7261','7260'])
             ->get(['id','cover_img','sync']);
         $domain =str_replace('https','http',env('RESOURCE_DOMAIN'));
-        foreach ($items as $item){
+        end($domain);
+        $last = key($items);
+        foreach ($items as $index => $item){
             $imgUrl = $domain.$item->cover_img;
-            $content = $this->getImgBlockData($imgUrl);
+            //$content = $this->getImgBlockData($imgUrl);
+            $ch = curl_init($imgUrl);
+            // 超时设置
+            curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+            // 取前面 168 个字符 通过四张测试图读取宽高结果都没有问题,若获取不到数据可适当加大数值
+            curl_setopt($ch, CURLOPT_RANGE, '0-1024000');
+            // 跟踪301跳转
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+            // 返回结果
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+            $dataBlock = curl_exec($ch);
+            if($last==$index){
+                curl_close($ch);
+            }
             $fileInfo = pathinfo($item->cover_img);
             $encryptFile = $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm';
             //Log::info('===encryptImg===',[$encryptFile,$content]);
-            $bool = Storage::disk('sftp')->put($encryptFile,$content);
+            $bool = Storage::disk('sftp')->put($encryptFile,$dataBlock);
             if($bool==true){
                 $this->info('######视频ID:'.$item->id.' 封面图加密成功######');
             }
@@ -61,11 +77,11 @@ class encryptVideoCoverImg extends Command
         return 0;
     }
 
-    public function getImgBlockData($url)
+    /*public function getImgBlockData($url)
     {
         $ch = curl_init($url);
         // 超时设置
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
         // 取前面 168 个字符 通过四张测试图读取宽高结果都没有问题,若获取不到数据可适当加大数值
         curl_setopt($ch, CURLOPT_RANGE, '0-1024000');
         // 跟踪301跳转
@@ -77,5 +93,5 @@ class encryptVideoCoverImg extends Command
         //echo $dataBlock;
         curl_close($ch);
         return $dataBlock ?? '';
-    }
+    }*/
 }
