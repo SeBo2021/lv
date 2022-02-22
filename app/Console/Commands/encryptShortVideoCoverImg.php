@@ -46,7 +46,7 @@ class encryptShortVideoCoverImg extends Command
             //->whereIn('id',['7261','7260'])
             ->get(['id','cover_img']);
         $domain =str_replace('https','http',env('RESOURCE_DOMAIN'));
-        end($domain);
+        end($items);
         $last = key($items);
         foreach ($items as $index => $item){
             $imgUrl = $domain.$item->cover_img;
