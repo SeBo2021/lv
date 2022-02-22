@@ -45,7 +45,7 @@ class encryptVideoCoverImg extends Command
         $items = DB::table($table)
             //->whereIn('id',['7261','7260'])
             ->get(['id','cover_img','sync']);
-        $domain = env('RESOURCE_DOMAIN');
+        $domain =str_replace('https','http',env('RESOURCE_DOMAIN'));
         foreach ($items as $item){
             $imgUrl = $domain.$item->cover_img;
             $content = $this->getImgBlockData($imgUrl);
