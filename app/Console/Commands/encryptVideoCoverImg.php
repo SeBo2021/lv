@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\TraitClass\VideoTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class encryptVideoCoverImg extends Command
@@ -40,14 +41,17 @@ class encryptVideoCoverImg extends Command
      */
     public function handle()
     {
-        $table = 'video';
-        $items = DB::table($table)->whereIn('id',['7261','7260'])->get(['id','cover_img','sync']);
+        $table = 'videos';
+        $items = DB::table($table)
+            //->whereIn('id',['7261','7260'])
+            ->get(['id','cover_img','sync']);
         $domain = env('RESOURCE_DOMAIN');
         foreach ($items as $item){
             $imgUrl = $domain.$item->cover_img;
             $content = $this->getImgBlockData($imgUrl);
-            $fileInfo = pathinfo($imgUrl);
+            $fileInfo = pathinfo($item->cover_img);
             $encryptFile = $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm';
+            Log::info('===encryptImg===',[$encryptFile,$content]);
             Storage::disk('sftp')->put($encryptFile,$content);
         }
         $this->info('######视频封面图加密成功######');
