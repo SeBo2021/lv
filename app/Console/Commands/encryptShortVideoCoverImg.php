@@ -70,10 +70,10 @@ class encryptShortVideoCoverImg extends Command
             //Log::info('===encryptImg===',[$encryptFile,$content]);
             $bool = Storage::disk('sftp')->put($encryptFile,$dataBlock);
             if($bool==true){
-                $this->info('######视频ID:'.$item->id.' 封面图加密成功######');
+                $this->info('######短视频ID:'.$item->id.' 封面图加密成功######');
             }
         }
-        $this->info('######视频封面图加密成功######');
+        $this->info('######短视频封面图加密成功######');
         return 0;
     }
 
