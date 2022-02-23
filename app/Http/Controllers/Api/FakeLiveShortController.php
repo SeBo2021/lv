@@ -76,6 +76,8 @@ class FakeLiveShortController extends Controller
             $one['gold'] = $one['gold'] / $this->goldUnit;
             $one['views'] = $one['views'] > 0 ? $this->generateRandViews($one['views']) : $this->generateRandViews(rand(5, 9));
             $one['hls_url'] = $domainSync . $one['hls_url'];
+            $hlsInfo = pathinfo($one['hls_url']);
+            $one['hls_url'] = $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'_0_1000.vid?id='.$one['id'].'&_v='.$_v;
             $one['preview_hls_url'] = $this->getPreviewPlayUrl($one['hls_url']);
             $one['dash_url'] = $domainSync . $one['dash_url'];
             $one['preview_dash_url'] = $this->getPreviewPlayUrl($one['dash_url'], 'dash');

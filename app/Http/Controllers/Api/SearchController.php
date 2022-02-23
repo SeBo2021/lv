@@ -75,8 +75,7 @@ class SearchController extends Controller
                 $model->orderBy($order,'desc');
             }
             // 标签 预留
-            $paginator =$model
-                ->simplePaginate($perPage, 'searchPage', $page);
+            $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
             $paginatorArr = $paginator->toArray()['data'];
 
             //$client = ClientBuilder::create()->build();
@@ -246,24 +245,15 @@ class SearchController extends Controller
     private function getOrderColumn($sort = 'id'): string
     {
         if ($sort = $validated['page']??'id') {
-            switch ($sort) {
-                case '0': // hot
-                    $order = 'views';
-                    break;
-                case '1': //new
-                    $order = 'id';
-                    break;
-                case '2': //favor
-                    $order = 'favor';
-                    break;
-                case '3': // like
-                    $order = 'likes';
-                    break;
-                default:
-                    $order = '';
-            }
-            return $order;
+            return match ($sort) {
+                '0' => 'views',
+                '1' => 'id',
+                '2' => 'favor',
+                '3' => 'likes',
+                default => '',
+            };
         }
+        return '';
     }
 
     /**
