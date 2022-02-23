@@ -384,7 +384,6 @@ trait VideoTrait
                 }
                 $list['url'] = env('RESOURCE_DOMAIN_DEV') . '/' .$list['url'];
             } else {
-                $domainSync = VideoTrait::getDomain($list['vs_sync']);
                 $list['cover_img'] = $domainSync . $list['cover_img'];
                 $list['gold'] = $list['gold'] / $this->goldUnit;
                 $list['views'] = $list['views'] > 0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5, 9));
