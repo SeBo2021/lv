@@ -79,6 +79,8 @@ class FakeLiveShortController extends Controller
             $hlsInfo = pathinfo($one['hls_url']);
             $one['hls_url'] = $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'_0_1000.vid?id='.$one['id'].'&_v='.$_v;
             $one['preview_hls_url'] = $this->getPreviewPlayUrl($one['hls_url']);
+            $previewHlsInfo = pathinfo($one['preview_hls_url']);
+            $one['preview_hls_url'] = $previewHlsInfo['dirname'].'/'.$previewHlsInfo['filename'].'_0_1000.vid?id='.$one['id'].'&_v='.$_v;
             $one['dash_url'] = $domainSync . $one['dash_url'];
             $one['preview_dash_url'] = $this->getPreviewPlayUrl($one['dash_url'], 'dash');
             $data[] = $one;
