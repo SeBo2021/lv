@@ -408,9 +408,10 @@ trait VideoTrait
                 unset($list['vs_id'], $list['vs_name'], $list['vs_gold'], $list['vs_cat'], $list['vs_sync'], $list['vs_title'], $list['vs_duration'], $list['vs_type'], $list['vs_restricted'], $list['vs_cover_img'], $list['vs_views'], $list['vs_updated_at'], $list['vs_hls_url'], $list['vs_dash_url'], $list['vs_url']);
             }
             //hls处理
-            $hlsInfo = pathinfo($list['hls_url']);
-            $list['hls_url'] = $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'_0_1000.vid?id='.$list['id'].'&_v='.$_v;
-
+            if(isset($list['hls_url'])){
+                $hlsInfo = pathinfo($list['hls_url']);
+                $list['hls_url'] = $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'_0_1000.vid?id='.$list['id'].'&_v='.$_v;
+            }
             //是否点赞
             $viewRecord = $this->isLoveOrCollect($uid,$list['id']);
             $list['is_love'] = $viewRecord['is_love'] ?? 0;
