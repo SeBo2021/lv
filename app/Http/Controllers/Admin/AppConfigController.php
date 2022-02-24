@@ -126,6 +126,14 @@ class AppConfigController extends BaseCurlController
                         'must' => 1,
                         'verify' => '',
                     ],
+                    [
+                        'field' => 'pay_method',
+                        'type' => 'select',
+                        'name' => '支付方式',
+                        'must' => 1,
+                        'default' => '1',
+                        'data' => [['id' => '1', 'name' => '大白鲨支付'],['id' => '2', 'name' => '长江支付']]
+                    ],
                 ]
             ]
         ];

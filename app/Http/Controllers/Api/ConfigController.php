@@ -31,6 +31,7 @@ class ConfigController extends Controller
             $activityAds = AdTrait::weightGet('activity');
             $res['open_screen_ads'] = $ads;
             $res['activity_ads'] = $activityAds;
+            $res['pay_method'] = $appConfig['pay_method']??1;
             return response()->json([
                 'state'=>0,
                 'data'=>$res

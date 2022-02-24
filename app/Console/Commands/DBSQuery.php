@@ -64,6 +64,7 @@ class DBSQuery extends Command
                 if ($orderId) {
                     $query->where(['id' => $orderId]);
                 }
+                $query->where(['pay_method' => 1]);
             })->orderBy('id')
                 ->get()?->toArray();
             array_map(function ($payInfo) use ($process) {
