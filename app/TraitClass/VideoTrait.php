@@ -384,7 +384,7 @@ trait VideoTrait
                 }
                 $list['url'] = env('RESOURCE_DOMAIN_DEV') . '/' .$list['url'];
             } else {
-                $list['cover_img'] = $domainSync . $list['cover_img'];
+                //$list['cover_img'] = $domainSync . $list['cover_img'];
                 $list['gold'] = $list['gold'] / $this->goldUnit;
                 $list['views'] = $list['views'] > 0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5, 9));
                 $list['hls_url'] = $domainSync . $list['hls_url'];
@@ -413,7 +413,7 @@ trait VideoTrait
                 $list['hls_url'] = $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'_0_1000.vid?id='.$list['id'].'&_v='.$_v;
             }
             $previewHlsInfo = pathinfo($list['preview_hls_url']);
-            $list['preview_hls_url'] = $previewHlsInfo['dirname'].'/'.$previewHlsInfo['filename'].'_0_1000.vid?id='.$list['id'].'&_v='.$_v;
+            $list['preview_hls_url'] = $previewHlsInfo['dirname'].'/'.$previewHlsInfo['filename'].'.vid?id='.$list['id'].'&_v='.$_v;
             //是否点赞
             $viewRecord = $this->isLoveOrCollect($uid,$list['id']);
             $list['is_love'] = $viewRecord['is_love'] ?? 0;
