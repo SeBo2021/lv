@@ -398,7 +398,8 @@ class MemberController extends BaseCurlController
             if($member_card_type != $originalData['member_card_type']){ //如果有变更会员卡信息
                 $model->member_card_type = $member_card_type;
                 $model->vip_start_last = $member_card_type ? time() : 0;
-                $model->vip_expired = MemberCard::query()->whereIn('id',$cards)->sum('expired_hours')*3600;
+                $model->vip_expired = MemberCard::query()->select(DB::raw('SUM(IF(expired_hours>0,expired_hours,10*365*24)) as expired_hours'))->whereIn('id',$cards)->value('expired_hours') *3600;
+                $model->vip = !empty($cards) ? max($cards) : 0;
             }
         }
     }
