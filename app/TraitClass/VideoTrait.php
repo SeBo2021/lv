@@ -118,7 +118,8 @@ trait VideoTrait
             if($put){
                 $fileInfo = pathinfo($img);
                 $encryptFile = str_replace('/storage','/public',$fileInfo['dirname']).'/'.$fileInfo['filename'].'.htm';
-                Storage::disk('sftp')->put($encryptFile,$content);
+                $r = Storage::disk('sftp')->put($encryptFile,$content);
+                Log::info('==encryptImg==',[$encryptFile,$r]);
             }
         }
     }
