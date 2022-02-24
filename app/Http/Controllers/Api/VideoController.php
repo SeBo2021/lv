@@ -249,9 +249,9 @@ class VideoController extends Controller
      * 花费金豆
      * @param $one
      * @param $user
-     * @return mixed
+     * @return bool
      */
-    public function useGold($one, $user): mixed
+    public function useGold($one, $user): bool
     {
         // 扣除金币
         $redisHashKey = $this->apiRedisKey['user_gold_video'] . $user->id;
