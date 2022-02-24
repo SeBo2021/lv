@@ -8,14 +8,17 @@ use App\Models\Ad;
 use App\Models\AdSet;
 use App\Services\UiService;
 use App\TraitClass\PHPRedisTrait;
+use App\TraitClass\VideoTrait;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class AdController extends BaseCurlController
 {
-    use PHPRedisTrait;
+    use PHPRedisTrait,VideoTrait;
 
     public $pageName = '广告';
 
-    public function setModel()
+    public function setModel(): Ad
     {
         return $this->model = new Ad();
     }
@@ -272,8 +275,9 @@ class AdController extends BaseCurlController
         $model->name = AdSet::query()->where('id',$model->flag_id)->value('flag');
     }
 
-    public function afterSaveEvent($model, $id = '')
+    public function afterSaveSuccessEvent($model, $id = '')
     {
+        $this->syncUpload($model->img);
         //清除首页列表缓存
         $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
     }

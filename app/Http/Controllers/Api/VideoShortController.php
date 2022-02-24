@@ -11,6 +11,7 @@ use App\Models\Video;
 use App\Models\VideoShort;
 use App\Models\ViewRecord;
 use App\TraitClass\ApiParamsTrait;
+use App\TraitClass\MemberCardTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\StatisticTrait;
 use App\TraitClass\VideoTrait;
@@ -29,6 +30,7 @@ class VideoShortController extends Controller
     use PHPRedisTrait;
     use VipRights;
     use StatisticTrait;
+    use MemberCardTrait;
 
     private array $mainCateAlias = [
         'short_hot',
@@ -132,20 +134,26 @@ class VideoShortController extends Controller
         $items = $paginator->items();
 
         $data = [];
+        $resourceDomain = env('RESOURCE_DOMAIN');
+        $_v = time();
         foreach ($items as $one) {
             //  $one = $this->handleShortVideoItems([$one], true)[0];
             $one['limit'] = 0;
             $one = $this->viewLimit($one, $user);
             $viewRecord = $this->isShortLoveOrCollect($user->id, $one['id']);
             $one['is_love'] = intval($viewRecord['is_love']) ?? 0;
-            $resourceDomain = env('RESOURCE_DOMAIN');
+
             //是否收藏
             $one['is_collect'] = intval($viewRecord['is_collect']) ?? 0;
             $one['url'] = $resourceDomain  .$one['url'];
             $one['hls_url'] = $resourceDomain  .$one['hls_url'];
             $one['dash_url'] = $resourceDomain  .$one['dash_url'];
-            $one['cover_img'] = $resourceDomain . $one['cover_img'];
-
+            //$one['cover_img'] = $resourceDomain . $one['cover_img'];
+            $fileInfo = pathinfo($one['cover_img']);
+            $one['cover_img'] = $resourceDomain . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext=jpg&id='.$one['id'].'&_v='.$_v;
+            //hls处理
+            $hlsInfo = pathinfo($one['hls_url']);
+            $one['hls_url'] = $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'_0_1000.vid?id='.$one['id'].'&_v='.$_v;
             $data[] = $one;
         }
 
@@ -170,11 +178,8 @@ class VideoShortController extends Controller
                 }
             }
         }*/
-        if ($one['restricted'] == 1) {
-            $diffTime = ($user->vip_expired?:0) - (time()-($user->vip_start_last?:time()));
-            if ((!$user->member_card_type) || ($diffTime<0)) {
-                $one['limit'] = 1;
-            }
+        if ($one['restricted'] == 1  && (!$this->isVip($user))) {
+            $one['limit'] = 1;
         }
         return $one;
     }

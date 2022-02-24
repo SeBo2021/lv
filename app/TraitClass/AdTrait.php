@@ -29,7 +29,7 @@ trait AdTrait
                 $key = array_rand($ads);
                 $one = $ads[$key];
             }
-            $domain = env('APP_URL');
+            $domain = env('RESOURCE_DOMAIN');
             $one['img'] = $domain . $one['img'];
             $one['action_type'] = (string) $one['action_type'];
             $one['vid'] = (string) $one['vid'];
@@ -46,7 +46,7 @@ trait AdTrait
             ->orderBy('sort')
             ->get(['id','sort','name','title','img','position','url','play_url','type','status','action_type','vid','end_at'])
             ->toArray();
-        $domain = env('APP_URL');
+        $domain = env('RESOURCE_DOMAIN');
         foreach ($ads as &$ad){
             $ad['img'] = $domain . $ad['img'];
             $ad['action_type'] = (string)$ad['action_type'];

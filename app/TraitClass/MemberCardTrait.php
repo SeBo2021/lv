@@ -6,6 +6,25 @@ use Illuminate\Support\Facades\DB;
 
 trait MemberCardTrait
 {
+    public array $show_user = [
+        0 => [
+            'id' => 0,
+            'name' => '全部'
+        ],
+        1 => [
+            'id' => 1,
+            'name' => '新用户'
+        ],
+        2 => [
+            'id' => 2,
+            'name' => '老用户'
+        ],
+        3 => [
+            'id' => 3,
+            'name' => 'VIP用户低于7天的用户'
+        ],
+    ];
+
     public array $cardRights = [
         1 => [
             'id' => 1,
@@ -120,6 +139,39 @@ trait MemberCardTrait
             ];
         }
         return $lists;
+    }
+
+    public function isForeverCard($memberCardTypeId): bool
+    {
+        $hasMemberCards = DB::table('member_card')->get(['id','name','value','expired_hours']);
+        $forever = false;
+        foreach ($hasMemberCards as $memberCard){
+            if($memberCard->id == $memberCardTypeId){
+                if($memberCard->expired_hours == 0){ //永久卡
+                    $forever = true;
+                }
+                break;
+            }
+        }
+        return $forever;
+    }
+
+    public function isVip($user): bool
+    {
+        $isVip = true;
+        $types = explode(',',$user->member_card_type);
+        if(!empty($types)){
+            $memberCardTypeId = $types[0];
+            $forever = $this->isForeverCard($memberCardTypeId);
+            if(!$forever){
+                if(time() - $user->vip_expired > $user->vip_start_last){
+                    $isVip = false;
+                }
+            }
+        }else{
+            $isVip = false;
+        }
+        return $isVip;
     }
 
 }

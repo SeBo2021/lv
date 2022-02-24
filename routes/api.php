@@ -53,6 +53,7 @@ Route::group([
     Route::get('searchRecommend', 'SearchController@recommend'); //推荐
     Route::get('searchCat', 'SearchController@cat');    //分类搜索-更多
     Route::post('lists', 'HomeController@lists');      //列表
+    Route::get('rechargeActivity', 'HomeController@rechargeActivity'); //充值活动
     Route::get('category', 'HomeController@category'); //分类
     Route::get('carousel', 'HomeController@carousel'); //轮播
     Route::post('commentList', 'CommentController@lists');      //评论列表

@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Video;
 use App\Models\ViewRecord;
 use App\TraitClass\ApiParamsTrait;
+use App\TraitClass\MemberCardTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
 use App\TraitClass\VipRights;
@@ -27,6 +28,7 @@ class VideoController extends Controller
     use VideoTrait;
     use PHPRedisTrait;
     use VipRights;
+    use MemberCardTrait;
 
     //播放
     public function actionView(Request $request)
@@ -97,6 +99,7 @@ class VideoController extends Controller
                 }
             }
         }
+        //Log::info('==Limit==',[$one]);
         return response()->json([
             'state' => 0,
             'data' => $one
@@ -227,7 +230,7 @@ class VideoController extends Controller
     {
         switch ($one['restricted']) {
             case 1:
-                if ((!$user->member_card_type) && (time() - $user->vip_expired > $user->vip_start_last)) {
+                if(!$this->isVip($user)){
                     $one['limit'] = 1;
                 }
                 break;
@@ -246,9 +249,9 @@ class VideoController extends Controller
      * 花费金豆
      * @param $one
      * @param $user
-     * @return mixed
+     * @return bool
      */
-    public function useGold($one, $user): mixed
+    public function useGold($one, $user): bool
     {
         // 扣除金币
         $redisHashKey = $this->apiRedisKey['user_gold_video'] . $user->id;

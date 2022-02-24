@@ -12,6 +12,7 @@ use App\Models\Video;
 use App\Models\VideoShort;
 use App\Models\ViewRecord;
 use App\TraitClass\ApiParamsTrait;
+use App\TraitClass\MemberCardTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\StatisticTrait;
 use App\TraitClass\VideoTrait;
@@ -27,6 +28,7 @@ class FakeLiveShortController extends Controller
     use VideoTrait;
     use PHPRedisTrait;
     use StatisticTrait;
+    use MemberCardTrait;
 
     /**
      * 读取数据
@@ -54,6 +56,7 @@ class FakeLiveShortController extends Controller
         $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         $items = $paginator->items();
         $data = [];
+        $_v = time();
         foreach ($items as $one) {
             //  $one = $this->handleShortVideoItems([$one], true)[0];
             $one['limit'] = 0;
@@ -68,11 +71,18 @@ class FakeLiveShortController extends Controller
 
 
             $domainSync = VideoTrait::getDomain($one['sync']);
-            $one['cover_img'] = $domainSync . $one['cover_img'];
+            //$one['cover_img'] = $domainSync . $one['cover_img'];
+            $fileInfo = pathinfo($one['cover_img']);
+            $one['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext=jpg&_v='.$_v;
+
             $one['gold'] = $one['gold'] / $this->goldUnit;
             $one['views'] = $one['views'] > 0 ? $this->generateRandViews($one['views']) : $this->generateRandViews(rand(5, 9));
             $one['hls_url'] = $domainSync . $one['hls_url'];
+            $hlsInfo = pathinfo($one['hls_url']);
+            $one['hls_url'] = $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'_0_1000.vid?id='.$one['id'].'&_v='.$_v;
             $one['preview_hls_url'] = $this->getPreviewPlayUrl($one['hls_url']);
+            $previewHlsInfo = pathinfo($one['preview_hls_url']);
+            $one['preview_hls_url'] = $previewHlsInfo['dirname'].'/'.$previewHlsInfo['filename'].'.vid?id='.$one['id'].'&_v='.$_v;
             $one['dash_url'] = $domainSync . $one['dash_url'];
             $one['preview_dash_url'] = $this->getPreviewPlayUrl($one['dash_url'], 'dash');
             $data[] = $one;
@@ -185,7 +195,12 @@ class FakeLiveShortController extends Controller
 
         $startSecond = $durationSeconds - ($durationSeconds - (time() % $durationSeconds));
 
-        $isVip = $user->vip>0 ? 1 : 0;
+        $isVip = (int)$this->isVip($user);
+        /*$isVip = 1;
+        if(!$user->member_card_type || (time() - $user->vip_expired > $user->vip_start_last)){
+            $isVip = 0;
+        }*/
+        //$isVip = $user->vip>0 ? 1 : 0;
         /*if($user->long_vedio_times>0){ //有次数也视为VIP
             $isVip = 1;
         }*/

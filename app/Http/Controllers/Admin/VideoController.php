@@ -796,7 +796,7 @@ class VideoController extends BaseCurlController
                     foreach ($videos as $video){
                         $tagIds = [];
                         $tagArr = @json_decode($video['tag'],true);
-                        if(empty($tagArr) || !$tagArr){
+                        if(empty($tagArr)){
                             foreach ($tags as $tag) {
                                 $pos = strpos($video['name'], $tag['name']);
                                 if($pos){
