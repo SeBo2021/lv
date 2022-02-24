@@ -148,7 +148,7 @@ class VideoShortController extends Controller
             $one['dash_url'] = $resourceDomain  .$one['dash_url'];
             //$one['cover_img'] = $resourceDomain . $one['cover_img'];
             $fileInfo = pathinfo($one['cover_img']);
-            $one['cover_img'] = $resourceDomain . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext=jpg&_v='.$_v;
+            $one['cover_img'] = $resourceDomain . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext=jpg&id='.$one['id'].'&_v='.$_v;
             //hls处理
             $hlsInfo = pathinfo($one['hls_url']);
             $one['hls_url'] = $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'_0_1000.vid?id='.$one['id'].'&_v='.$_v;

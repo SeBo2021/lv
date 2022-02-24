@@ -66,7 +66,7 @@ class encryptShortVideoCoverImg extends Command
                 curl_close($ch);
             }
             $fileInfo = pathinfo($item->cover_img);
-            $encryptFile = $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm';
+            $encryptFile = '/public/slice/coverImg/'.$fileInfo['filename'].'.htm';
             //Log::info('===encryptImg===',[$encryptFile,$content]);
             $bool = Storage::disk('sftp')->put($encryptFile,$dataBlock);
             if($bool==true){
