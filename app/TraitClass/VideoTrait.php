@@ -113,7 +113,13 @@ trait VideoTrait
         $abPath = public_path().$img;
         if(file_exists($abPath) && is_file($abPath)){
             $content = file_get_contents($abPath);
-            Storage::disk('sftp')->put($img,$content);
+            $put = Storage::disk('sftp')->put($img,$content);
+            //加密
+            if($put){
+                $fileInfo = pathinfo($img);
+                $encryptFile = str_replace('/storage','/public',$fileInfo['dirname']).'/'.$fileInfo['filename'].'.htm';
+                Storage::disk('sftp')->put($encryptFile,$content);
+            }
         }
     }
 
