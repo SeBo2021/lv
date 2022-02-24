@@ -193,7 +193,11 @@ class FakeLiveShortController extends Controller
 
         $startSecond = $durationSeconds - ($durationSeconds - (time() % $durationSeconds));
 
-        $isVip = $user->vip>0 ? 1 : 0;
+        $isVip = 0;
+        if(!$user->member_card_type || (time() - $user->vip_expired > $user->vip_start_last)){
+            $isVip = 1;
+        }
+        //$isVip = $user->vip>0 ? 1 : 0;
         /*if($user->long_vedio_times>0){ //有次数也视为VIP
             $isVip = 1;
         }*/
