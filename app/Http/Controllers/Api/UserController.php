@@ -60,7 +60,7 @@ class UserController extends Controller
         return [];
     }
 
-    public function extendInfo(Request $request): JsonResponse|array
+    public function extendInfo(Request $request): JsonResponse
     {
         $user = $request->user();
         if(!empty($user)){
@@ -73,27 +73,30 @@ class UserController extends Controller
                 'vip_expired' => '',
             ];
             if($memberCardTypeId>0){
-                $memberCardInfo = DB::table('member_card')->find($memberCardTypeId,['id','name','value','expired_hours']);
-                $expired_at = DB::table('orders')
-                    ->where('type',1)
-                    ->where('type_id',$memberCardTypeId)
-                    ->where('status',1)
-                    ->orderBy('id')
-                    ->value('expired_at');
-                $expired_time = $memberCardInfo->expired_hours>0 ? $expired_at : '';
-
+                $expired_time = '';
+                $memberCardName = '';
                 $calc = ($user->vip_expired?:0) - (time()-($user->vip_start_last?:time()));
+                $vipDay = ceil((($calc>0)?$calc:0)/(24*60*60));
                 $isVip = 0;
                 if ($calc >= 0) {
                     $isVip = 1;
                 }
-                if (in_array(8,$types)) {
-                    $vipDay = -1;
-                } else {
-                    $vipDay = ceil((($calc>0)?$calc:0)/(24*60*60));
+                $hasMemberCards = DB::table('member_card')->whereIn('id',$types)->get(['id','name','value','expired_hours']);
+                foreach ($hasMemberCards as $memberCard){
+                    if($memberCard->id == $memberCardTypeId){
+                        $expired_at = date('Y-m-d H:i:s',$user->vip_start_last+$memberCard->expired_hours*3600);
+                        $expired_time = $memberCard->expired_hours>0 ? $expired_at : '';
+                        $memberCardName = $memberCard->name;
+                        if($memberCard->expired_hours == 0){ //永久卡
+                            $vipDay = -1;
+                            $isVip = 1;
+                        }
+                        break;
+                    }
                 }
+
                 $member_card = [
-                    'name' => $memberCardInfo->name,
+                    'name' => $memberCardName,
                     'expired_time' => $expired_time,
                     'is_vip' => $isVip,
                     'vip_expired' => date('Y-m-d',time() + $calc),
@@ -103,7 +106,6 @@ class UserController extends Controller
 
             $res=[
                 'member_card' => $member_card,
-                // 'saol_gold' => $user->gold ? number_format($user->gold/100, 2, '.') : 0,
                 'saol_gold' => $user->gold ?:0,
                 'video_times' => $user->long_vedio_times ??0,
             ] ;
@@ -112,7 +114,7 @@ class UserController extends Controller
                 'data'=>$res
             ]);
         }
-        return [];
+        return response()->json([]);
     }
 
     /*public function videoList(Request $request)
