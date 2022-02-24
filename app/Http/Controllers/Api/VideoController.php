@@ -97,6 +97,7 @@ class VideoController extends Controller
                 }
             }
         }
+        //Log::info('==Limit==',[$one]);
         return response()->json([
             'state' => 0,
             'data' => $one
@@ -227,7 +228,9 @@ class VideoController extends Controller
     {
         switch ($one['restricted']) {
             case 1:
-                if ((!$user->member_card_type) && (time() - $user->vip_expired > $user->vip_start_last)) {
+                if(!$user->member_card_type){
+                    $one['limit'] = 1;
+                }elseif (time() - $user->vip_expired > $user->vip_start_last){
                     $one['limit'] = 1;
                 }
                 break;
