@@ -141,4 +141,37 @@ trait MemberCardTrait
         return $lists;
     }
 
+    public function isForeverCard($memberCardTypeId): bool
+    {
+        $hasMemberCards = DB::table('member_card')->get(['id','name','value','expired_hours']);
+        $forever = false;
+        foreach ($hasMemberCards as $memberCard){
+            if($memberCard->id == $memberCardTypeId){
+                if($memberCard->expired_hours == 0){ //永久卡
+                    $forever = true;
+                }
+                break;
+            }
+        }
+        return $forever;
+    }
+
+    public function isVip($user): bool
+    {
+        $isVip = true;
+        $types = explode(',',$user->member_card_type);
+        if(!empty($types)){
+            $memberCardTypeId = $types[0];
+            $forever = $this->isForeverCard($memberCardTypeId);
+            if(!$forever){
+                if(time() - $user->vip_expired > $user->vip_start_last){
+                    $isVip = false;
+                }
+            }
+        }else{
+            $isVip = false;
+        }
+        return $isVip;
+    }
+
 }

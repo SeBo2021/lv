@@ -81,18 +81,10 @@ class UserController extends Controller
                 if ($calc >= 0) {
                     $isVip = 1;
                 }
-                $hasMemberCards = DB::table('member_card')->whereIn('id',$types)->get(['id','name','value','expired_hours']);
-                foreach ($hasMemberCards as $memberCard){
-                    if($memberCard->id == $memberCardTypeId){
-                        $expired_at = date('Y-m-d H:i:s',$user->vip_start_last+$memberCard->expired_hours*3600);
-                        $expired_time = $memberCard->expired_hours>0 ? $expired_at : '';
-                        $memberCardName = $memberCard->name;
-                        if($memberCard->expired_hours == 0){ //永久卡
-                            $vipDay = -1;
-                            $isVip = 1;
-                        }
-                        break;
-                    }
+                
+                if($this->isForeverCard($memberCardTypeId)){
+                    $vipDay = -1;
+                    $isVip = 1;
                 }
 
                 $member_card = [

@@ -11,6 +11,7 @@ use App\Models\Video;
 use App\Models\VideoShort;
 use App\Models\ViewRecord;
 use App\TraitClass\ApiParamsTrait;
+use App\TraitClass\MemberCardTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\StatisticTrait;
 use App\TraitClass\VideoTrait;
@@ -29,6 +30,7 @@ class VideoShortController extends Controller
     use PHPRedisTrait;
     use VipRights;
     use StatisticTrait;
+    use MemberCardTrait;
 
     private array $mainCateAlias = [
         'short_hot',
@@ -176,11 +178,8 @@ class VideoShortController extends Controller
                 }
             }
         }*/
-        if ($one['restricted'] == 1) {
-            $diffTime = ($user->vip_expired?:0) - (time()-($user->vip_start_last?:time()));
-            if ((!$user->member_card_type) || ($diffTime<0)) {
-                $one['limit'] = 1;
-            }
+        if ($one['restricted'] == 1  && (!$this->isVip($user))) {
+            $one['limit'] = 1;
         }
         return $one;
     }
