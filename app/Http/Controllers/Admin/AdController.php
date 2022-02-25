@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Ad;
 use App\Models\AdSet;
 use App\Services\UiService;
+use App\TraitClass\AboutEncryptTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
 use Illuminate\Support\Facades\Log;
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
 
 class AdController extends BaseCurlController
 {
-    use PHPRedisTrait,VideoTrait;
+    use PHPRedisTrait,AboutEncryptTrait;
 
     public $pageName = '广告';
 

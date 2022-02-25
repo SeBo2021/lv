@@ -5,6 +5,7 @@ namespace App\TraitClass;
 use AetherUpload\Util;
 use App\Models\ViewRecord;
 use Exception;
+use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
 use FFMpeg\Format\Video\X264;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -12,10 +13,11 @@ use Illuminate\Http\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use ProtoneMedia\LaravelFFMpeg\Exporters\HLSExporter;
 
 trait VideoTrait
 {
-    use GoldTrait;
+    use GoldTrait,AboutEncryptTrait;
 
     public object $row;
 
@@ -51,6 +53,12 @@ trait VideoTrait
     public function getMp4Path(): string
     {
         $resource = Util::getResource($this->row->url);
+        return $resource->path;
+    }
+
+    public function getMp4FilePath($url): string
+    {
+        $resource = Util::getResource($url);
         return $resource->path;
     }
 
@@ -108,21 +116,6 @@ trait VideoTrait
         }
     }
 
-    public function syncUpload($img)
-    {
-        $abPath = public_path().$img;
-        if(file_exists($abPath) && is_file($abPath)){
-            $content = file_get_contents($abPath);
-            $put = Storage::disk('sftp')->put($img,$content);
-            //加密
-            if($put){
-                $fileInfo = pathinfo($img);
-                $encryptFile = str_replace('/storage','/public',$fileInfo['dirname']).'/'.$fileInfo['filename'].'.htm';
-                Storage::disk('sftp')->put($encryptFile,$content);
-            }
-        }
-    }
-
     /**
      * @throws FileNotFoundException
      */
@@ -130,10 +123,10 @@ trait VideoTrait
     {
         $dir_name = pathinfo($preview->url,PATHINFO_FILENAME);
         $slice_dir = env('SLICE_DIR','/slice');
-        $dash_directory = '/public'.$slice_dir.'/dash/'.$dir_name;
+        //$dash_directory = '/public'.$slice_dir.'/dash/'.$dir_name;
         $hls_directory = '/public'.$slice_dir.'/hls/'.$dir_name;
         //dash预览
-        $dash_play_file = $dash_directory .'/'. $dir_name.'.mpd';
+        /*$dash_play_file = $dash_directory .'/'. $dir_name.'.mpd';
         $exists_dash = Storage::disk('sftp')->exists($dash_play_file);
         if($exists_dash){
             $content_dash = Storage::disk('sftp')->get($dash_play_file);
@@ -144,7 +137,7 @@ trait VideoTrait
                 $dash_file = $dash_directory.'/preview.mpd';
                 Storage::disk('sftp')->put($dash_file,$xml_content);
             }
-        }
+        }*/
 
         //hls预览
         $hls_play_file = $hls_directory . '/' . $dir_name.'.m3u8';
@@ -357,7 +350,7 @@ trait VideoTrait
 
     public function handleVideoItems($lists,$display_url=false,$uid = 0,$processSort = false)
     {
-        $_v = time();
+        $_v = date('Ymd');
         $domainSync = VideoTrait::getDomain(1);
         foreach ($lists as &$list){
             $list = (array)$list;
@@ -406,10 +399,7 @@ trait VideoTrait
                 }
             }
             //封面图处理
-            $fileInfo = pathinfo($list['cover_img']);
-            //$image_info = getimagesize($domainSync . $list['cover_img']);
-            //$list['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext='.$image_info['mime'].'&_v='.$_v;
-            $list['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext=jpg&id='.$list['id'].'&_v='.$_v;
+            $list['cover_img'] = $this->transferImgOut($domainSync,$list['cover_img'],$_v);
             if ($list['usage']??false) {
                 unset($list['vs_id'], $list['vs_name'], $list['vs_gold'], $list['vs_cat'], $list['vs_sync'], $list['vs_title'], $list['vs_duration'], $list['vs_type'], $list['vs_restricted'], $list['vs_cover_img'], $list['vs_views'], $list['vs_updated_at'], $list['vs_hls_url'], $list['vs_dash_url'], $list['vs_url']);
             }
@@ -467,4 +457,103 @@ trait VideoTrait
         return $one;
     }
 
+    public function getLocalSliceDir($pathInfo): string
+    {
+        return $pathInfo['dirname'].env('SLICE_DIR','/slice').'/'.$pathInfo['filename'];
+    }
+
+
+    /**
+     * 同步封面
+     * @param $img
+     */
+    public function syncCoverImg($coverImgPath)
+    {
+        $content = Storage::get($coverImgPath);
+        $result = Storage::disk('sftp')->put($coverImgPath, $content);
+        //
+        $fileInfo = pathinfo($coverImgPath);
+        $encryptFile = str_replace('/storage','/public',$fileInfo['dirname']).'/'.$fileInfo['filename'].'.htm';
+        $r = Storage::disk('sftp')->put($encryptFile,$content);
+        Log::info('==VideoEncryptImg==',[$encryptFile,$result,$r]);
+    }
+
+    /**
+     * 截取视频封面
+     * @return string
+     * @throws Exception
+     */
+    public function generalCoverImgAtSliceDir($mp4FileName): string
+    {
+        $file_name = pathinfo($mp4FileName,PATHINFO_FILENAME);
+        $format = new X264();
+        $format->setAdditionalParameters(['-vcodec', 'copy', '-acodec', 'copy']); //跳过编码
+        //$format = $format->setAdditionalParameters(['-hwaccels', 'cuda']);//GPU高效转码
+        $model = \ProtoneMedia\LaravelFFMpeg\Support\FFMpeg::fromDisk("local") //在storage/app的位置
+        ->open($mp4FileName);
+        $video = $model->export()->toDisk("local")->inFormat($format);
+        //done 生成截图
+        $frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1));
+        $sliceDir = 'public'.env('SLICE_DIR','/slice');
+        $cover_path = $sliceDir.'/'.$this->coverImgDir.'/'.$file_name.'/'.$file_name.'.jpg';
+        $frame->save($cover_path);
+        return $cover_path;
+    }
+
+    public function comHlsSlice($relativeStorageFilePath, $mp4_path, $delMp4=false): \ProtoneMedia\LaravelFFMpeg\MediaOpener
+    {
+        //创建对应的切片目录
+        $pathInfo = pathinfo($relativeStorageFilePath);
+        $tmp_path = $this->getLocalSliceDir($pathInfo);
+        $dirname = storage_path('app/').$tmp_path;
+
+        if(!is_dir($dirname)){
+            mkdir($dirname, 0755, true);
+        }
+
+        $m3u8_path = $tmp_path.'/'.$pathInfo['filename'].'.m3u8';
+
+        $format = new \FFMpeg\Format\Video\X264();
+        //增加commads的参数,使用ffmpeg -hwaccels命令查看支持的硬件加速选项
+        $segmentLength = 1;
+        $format->setAdditionalParameters([
+            '-hls_list_size',0, //设置播放列表保存的最多条目，设置为0会保存有所片信息，默认值为5
+            '-vcodec', 'copy','-acodec', 'copy', //跳过编码
+        ]);
+        $video = \ProtoneMedia\LaravelFFMpeg\Support\FFMpeg::fromDisk("local") //在storage/app的位置
+        ->open($mp4_path);
+
+        $encryptKey = HLSExporter::generateEncryptionKey();
+        Storage::disk('local')->put($tmp_path.'/secret.key',$encryptKey);
+        $MediaOpener = $video->exportForHLS()
+            ->withEncryptionKey($encryptKey)
+            ->setSegmentLength($segmentLength)//默认值是10
+            ->toDisk("local")
+            ->addFormat($format)
+            ->save($m3u8_path);
+
+        //删除mp4文件
+        if($delMp4!==false){
+            Storage::delete($mp4_path);
+        }
+        return $MediaOpener;
+    }
+
+    public function comSyncSlice($relativeStorageFilePath,$delLocalSlice=false)
+    {
+        //$this->syncSlice();
+        $pathInfo = pathinfo($relativeStorageFilePath);
+        $localSliceDir = $this->getLocalSliceDir($pathInfo);
+        $sliceDir = storage_path('app/').$localSliceDir;
+        Log::info('==testSliceDir===',[$sliceDir]);
+        $sliceFiles = Storage::files($localSliceDir);
+        Log::info('==sliceFiles===',[$sliceFiles]);
+        foreach ($sliceFiles as $file){
+            $content = Storage::get($file);
+            Storage::disk('sftp')->put($file,$content);
+        }
+        if($delLocalSlice!==false){
+            Storage::deleteDirectory($localSliceDir);
+        }
+    }
 }

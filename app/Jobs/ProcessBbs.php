@@ -13,6 +13,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 
@@ -108,6 +109,10 @@ class ProcessBbs implements ShouldQueue
         if (($this->isVideo) && ($this->mp4Path)) {
             $cover = $this->capture();
             $this->syncCover($cover);
+            //切片
+            $videoName = $this->uniVideoPath . $this->originName;
+            $this->comHlsSlice($videoName,$this->mp4Path,true);
+            $this->comSyncSlice($videoName,true);
             // 上传视频
             $this->syncMp4($this->originName);
         }
@@ -122,6 +127,11 @@ class ProcessBbs implements ShouldQueue
         $coverName = $this->uniVideoPath . $img;
         $content = Storage::get($this->coverImage);
         $result = Storage::disk('sftp')->put($coverName, $content);
+        //
+        $fileInfo = pathinfo($coverName);
+        $encryptFile = str_replace('/storage','/public',$fileInfo['dirname']).'/'.$fileInfo['filename'].'.htm';
+        $r = Storage::disk('sftp')->put($encryptFile,$content);
+        Log::info('==encryptImg==',[$encryptFile,$r]);
         if ($result) {
             DB::table('community_bbs')->where('id', $this->row->id)->update([
                 'video_picture' => json_encode([$coverName])
@@ -191,6 +201,7 @@ class ProcessBbs implements ShouldQueue
         $video = $model->export()
             ->toDisk("local")
             ->inFormat($format);
+
         //done 生成截图
         $frame = $video->frame(TimeCode::fromSeconds(1));
         $pathInfo = pathinfo($this->originName, PATHINFO_FILENAME);
