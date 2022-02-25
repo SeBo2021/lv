@@ -11,8 +11,8 @@ trait AboutEncryptTrait
     {
         $fileInfo = pathinfo($img);
         if($fixType == 'auto'){
-            $image_info = getimagesize($domain . $img);
-            $fixType = $image_info['mime'];
+            $image_info = @getimagesize($domain . $img);
+            $fixType = $image_info['mime'] ?? 'jpg';
         }
         return $domain . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext='.$fixType.'&_v='.$_v;
     }
