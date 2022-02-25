@@ -503,6 +503,7 @@ class VideoController extends BaseCurlController
                     $result = $this->getSearchCheckboxResult($items,$cat,'cat');
                 }
             }
+            $result = (array)$result ?? [];
             $total = count($result);
             //获取当前页数据
             $offset = ($page-1)*$pagesize;

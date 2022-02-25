@@ -34,7 +34,7 @@ trait AdTrait
             $domain = env('RESOURCE_DOMAIN');
             //$one['img'] = $domain . $one['img'];
             //图片处理
-            $_v = time();
+            $_v = date('Ymd');
             $one['img'] = $this->transferImgOut($domain,$one['img'],$_v,'auto');
             $one['action_type'] = (string) $one['action_type'];
             $one['vid'] = (string) $one['vid'];
@@ -52,7 +52,7 @@ trait AdTrait
             ->get(['id','sort','name','title','img','position','url','play_url','type','status','action_type','vid','end_at'])
             ->toArray();
         $domain = env('RESOURCE_DOMAIN');
-        $_v = time();
+        $_v = date('Ymd');
         foreach ($ads as &$ad){
             //$ad['img'] = $domain . $ad['img'];
             //图片处理

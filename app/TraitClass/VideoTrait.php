@@ -12,6 +12,7 @@ use Illuminate\Http\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use ProtoneMedia\LaravelFFMpeg\Exporters\HLSExporter;
 
 trait VideoTrait
 {
@@ -342,7 +343,7 @@ trait VideoTrait
 
     public function handleVideoItems($lists,$display_url=false,$uid = 0,$processSort = false)
     {
-        $_v = time();
+        $_v = date('Ymd');
         $domainSync = VideoTrait::getDomain(1);
         foreach ($lists as &$list){
             $list = (array)$list;
@@ -449,4 +450,64 @@ trait VideoTrait
         return $one;
     }
 
+    public function getLocalSliceDir($pathInfo): string
+    {
+        return $pathInfo['dirname'].env('SLICE_DIR','/slice').'/'.$pathInfo['filename'];
+    }
+
+    public function comHlsSlice($relativeStorageFilePath, $mp4_path, $delMp4=false)
+    {
+        //创建对应的切片目录
+        $pathInfo = pathinfo($relativeStorageFilePath);
+        $tmp_path = $this->getLocalSliceDir($pathInfo);
+        $dirname = storage_path('app/').$tmp_path;
+
+        if(!is_dir($dirname)){
+            mkdir($dirname, 0755, true);
+        }
+
+        $m3u8_path = $tmp_path.'/'.$pathInfo['filename'].'.m3u8';
+
+        $format = new \FFMpeg\Format\Video\X264();
+        //增加commads的参数,使用ffmpeg -hwaccels命令查看支持的硬件加速选项
+        $segmentLength = 1;
+        $format->setAdditionalParameters([
+            '-hls_list_size',0, //设置播放列表保存的最多条目，设置为0会保存有所片信息，默认值为5
+            '-vcodec', 'copy','-acodec', 'copy', //跳过编码
+        ]);
+        $video = \ProtoneMedia\LaravelFFMpeg\Support\FFMpeg::fromDisk("local") //在storage/app的位置
+        ->open($mp4_path);
+
+        $encryptKey = HLSExporter::generateEncryptionKey();
+        Storage::disk('local')->put($tmp_path.'/secret.key',$encryptKey);
+        $video->exportForHLS()
+            ->withEncryptionKey($encryptKey)
+            ->setSegmentLength($segmentLength)//默认值是10
+            ->toDisk("local")
+            ->addFormat($format)
+            ->save($m3u8_path);
+
+        //删除mp4文件
+        if($delMp4!==false){
+            Storage::delete($mp4_path);
+        }
+    }
+
+    public function comSyncSlice($relativeStorageFilePath,$delLocalSlice=false)
+    {
+        //$this->syncSlice();
+        $pathInfo = pathinfo($relativeStorageFilePath);
+        $localSliceDir = $this->getLocalSliceDir($pathInfo);
+        $sliceDir = storage_path('app/').$localSliceDir;
+        Log::info('==testSliceDir===',[$sliceDir]);
+        $sliceFiles = Storage::files($localSliceDir);
+        Log::info('==sliceFiles===',[$sliceFiles]);
+        foreach ($sliceFiles as $file){
+            $content = Storage::get($file);
+            Storage::disk('sftp')->put($file,$content);
+        }
+        if($delLocalSlice!==false){
+            Storage::deleteDirectory($localSliceDir);
+        }
+    }
 }

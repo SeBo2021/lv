@@ -96,7 +96,8 @@ class ProcessVideoSlice implements ShouldQueue
         ->export()
         ->toDisk("local")
         ->inFormat($format);
-        $video->save($mpd_path);
+        //切片保存
+        //$video->save($mpd_path);
         //done 生成截图
         $frame = $video->frame(TimeCode::fromSeconds(1));
         $cover_path = $sliceDir.'/'.$this->coverImgDir.'/'.$file_name.'/'.$file_name.'.jpg';

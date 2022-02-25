@@ -135,7 +135,7 @@ class VideoShortController extends Controller
 
         $data = [];
         $resourceDomain = env('RESOURCE_DOMAIN');
-        $_v = time();
+        $_v = date('Ymd');
         foreach ($items as $one) {
             //  $one = $this->handleShortVideoItems([$one], true)[0];
             $one['limit'] = 0;
@@ -149,8 +149,7 @@ class VideoShortController extends Controller
             $one['hls_url'] = $resourceDomain  .$one['hls_url'];
             $one['dash_url'] = $resourceDomain  .$one['dash_url'];
             //$one['cover_img'] = $resourceDomain . $one['cover_img'];
-            $fileInfo = pathinfo($one['cover_img']);
-            $one['cover_img'] = $resourceDomain . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext=jpg&id='.$one['id'].'&_v='.$_v;
+            $one['cover_img'] = $this->transferImgOut($resourceDomain,$one['cover_img'],$_v);
             //hls处理
             $hlsInfo = pathinfo($one['hls_url']);
             $one['hls_url'] = $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'_0_1000.vid?id='.$one['id'].'&_v='.$_v;
