@@ -14,6 +14,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use ProtoneMedia\LaravelFFMpeg\Exporters\HLSExporter;
 
 class ProcessLive implements ShouldQueue
 {
@@ -44,7 +45,7 @@ class ProcessLive implements ShouldQueue
     {
         //
         $this->row = $row;
-        $this->mp4Path = $this->getMp4Path();
+        $this->mp4Path = $this->getMp4FilePath($row->url);
     }
 
     /**
@@ -52,20 +53,23 @@ class ProcessLive implements ShouldQueue
      *
      * @return void
      * @throws FileNotFoundException
+     * @throws \Exception
      */
     public function handle()
     {
-        $this->dash_slice($this->row);
+        $file_name = pathinfo($this->row->url,PATHINFO_FILENAME);
+        $mp4_path = $this->transcodeMp4($this->mp4Path,$file_name);
+        //封面
+        $sliceCoverImg = $this->generalCoverImgAtSliceDir($mp4_path);
+        $this->syncCoverImg($sliceCoverImg);
+
         $this->hls_slice($this->row,true);
 
         //todo 更新状态值表示任务执行完成
         \AetherUpload\Util::deleteResource($this->row->url); //删除对应的资源文件
         \AetherUpload\Util::deleteRedisSavedPath($this->row->url); //删除对应的redis秒传记录
-        // 同步到资源站
+        //同步到资源站
         $this->syncSlice($this->row->url,true);
-        $this->syncUpload($this->row->cover_img);
-        //生成预览
-       // $this->generatePreview($this->row);
     }
 
     /**
@@ -138,7 +142,10 @@ class ProcessLive implements ShouldQueue
         $video = \ProtoneMedia\LaravelFFMpeg\Support\FFMpeg::fromDisk("local") //在storage/app的位置
         ->open($mp4_path);
 
+        $encryptKey = HLSExporter::generateEncryptionKey();
+        Storage::disk('local')->put($tmp_path.'/secret.key',$encryptKey);
         $result = $video->exportForHLS()
+            ->withEncryptionKey($encryptKey)
             ->setSegmentLength($segmentLength)//默认值是10
             ->toDisk("local")
             ->addFormat($format)

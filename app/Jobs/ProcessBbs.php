@@ -114,7 +114,7 @@ class ProcessBbs implements ShouldQueue
             $this->comHlsSlice($videoName,$this->mp4Path,true);
             $this->comSyncSlice($videoName,true);
             // 上传视频
-            $this->syncMp4($this->originName);
+            //$this->syncMp4($this->originName);
         }
     }
 
