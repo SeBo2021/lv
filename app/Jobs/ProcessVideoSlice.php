@@ -61,7 +61,9 @@ class ProcessVideoSlice implements ShouldQueue
         //封面
         $sliceCoverImg = $this->generalCoverImgAtSliceDir($mp4_path);
         $this->syncCoverImg($sliceCoverImg);
+        //切片
         $this->hlsSlice($mp4_path,true);
+        //同步切片到资源
         $this->syncSlice($this->row->url,true);
 
         //todo 更新状态值表示任务执行完成
@@ -69,7 +71,6 @@ class ProcessVideoSlice implements ShouldQueue
         \AetherUpload\Util::deleteRedisSavedPath($this->row->url); //删除对应的redis秒传记录
         //生成预览
         $this->generatePreview($this->row);
-//        $this->comHlsSlice('public',$this->mp4Path);
         /*
         $this->dash_slice($this->row);
 
