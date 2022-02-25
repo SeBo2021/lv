@@ -119,9 +119,9 @@ trait VideoTrait
     /**
      * @throws FileNotFoundException
      */
-    public function generatePreview($preview)
+    public function generatePreview($url)
     {
-        $dir_name = pathinfo($preview->url,PATHINFO_FILENAME);
+        $dir_name = pathinfo($url,PATHINFO_FILENAME);
         $slice_dir = env('SLICE_DIR','/slice');
         //$dash_directory = '/public'.$slice_dir.'/dash/'.$dir_name;
         $hls_directory = '/public'.$slice_dir.'/hls/'.$dir_name;
@@ -140,20 +140,24 @@ trait VideoTrait
         }*/
 
         //hls预览
-        $hls_play_file = $hls_directory . '/' . $dir_name.'.m3u8';
-        $hls_handle_play_file = Storage::disk('sftp')->exists($hls_play_file);
-        if($hls_handle_play_file){
-            $lines = explode("\n",Storage::disk('sftp')->get($hls_play_file));
+        //$hls_play_file = $hls_directory . '/' . $dir_name.'.m3u8';
+        //$hls_handle_play_file = Storage::disk('sftp')->exists($hls_play_file);
+        if(true){
+            /*$lines = explode("\n",Storage::disk('sftp')->get($hls_play_file));
+            Log::info('==lines==',[$lines]);
             $initHlsFile = '';
             foreach ($lines as $line) {
                 if(str_contains($line, '.m3u8')){
                     $initHlsFile = $hls_directory . '/' . $line;
                 }
             }
+            Log::info('==hls_handle_init_file==',[$initHlsFile]);*/
+            $initHlsFile = $hls_directory . '/' . $dir_name.'_0_1000.m3u8';
             $hls_handle_init_file = Storage::disk('sftp')->exists($initHlsFile);
             if($hls_handle_init_file){
                 $hls_file = $hls_directory . '/preview.m3u8';
                 $trimmed = explode("\n",Storage::disk('sftp')->get($initHlsFile));
+                Log::info('==trimmed==',[$trimmed]);
                 $second = 0;
                 $breakLineNum = -1;
                 $hlsContentLines = '';

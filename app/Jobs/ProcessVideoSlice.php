@@ -25,7 +25,7 @@ class ProcessVideoSlice implements ShouldQueue
      *
      * @var int
      */
-    //public $tries = 3;
+    public $tries = 1;
 
     public int $timeout = 180000; //默认60秒超时
     //跳跃式延迟执行
@@ -63,19 +63,16 @@ class ProcessVideoSlice implements ShouldQueue
         $this->syncCoverImg($sliceCoverImg);
         //切片
         $this->hlsSlice($mp4_path,true);
-        //同步切片到资源
+        //同步到资源站
         $this->syncSlice($this->row->url,true);
 
         //todo 更新状态值表示任务执行完成
         \AetherUpload\Util::deleteResource($this->row->url); //删除对应的资源文件
         \AetherUpload\Util::deleteRedisSavedPath($this->row->url); //删除对应的redis秒传记录
         //生成预览
-        $this->generatePreview($this->row);
+        $this->generatePreview($this->row->url);
         /*
         $this->dash_slice($this->row);
-
-        // 同步到资源站
-
         */
     }
 
