@@ -20,7 +20,7 @@ use Illuminate\Validation\ValidationException;
 
 class HomeController extends Controller
 {
-    use PHPRedisTrait, GoldTrait, VideoTrait;
+    use PHPRedisTrait, GoldTrait, VideoTrait, AdTrait;
 
     public function category(Request $request)
     {
@@ -122,7 +122,7 @@ class HomeController extends Controller
             $res['hasMorePages'] = $paginator->hasMorePages();
             $res['list'] = $data;
             /*//广告
-            //$res['list'] = AdTrait::insertAds($res['list'],'home_page',true,$page,$perPage);*/
+            //$res['list'] = $this->insertAds($res['list'],'home_page',true,$page,$perPage);*/
             //存入redis
             $redis->set($sectionKey,json_encode($res,JSON_UNESCAPED_UNICODE));
             //$redis->expire($sectionKey,$this->redisExpiredTime);
@@ -130,7 +130,7 @@ class HomeController extends Controller
             $res = json_decode($res,true);
         }
         //广告
-        $res['list'] = AdTrait::insertAds($res['list'],'home_page',true,$page,$perPage);
+        $res['list'] = $this->insertAds($res['list'],'home_page',true,$page,$perPage);
         return response()->json([
             'state'=>0,
             'data'=>$res
@@ -141,7 +141,7 @@ class HomeController extends Controller
     /*public function rechargeActivity(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
-        $data = AdTrait::get('activity');
+        $data = $this->get('activity');
         $domain = env('APP_URL');
         foreach ($data as &$item){
             $item['img'] = $domain . $item['img'];

@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
 
 trait VideoTrait
 {
-    use GoldTrait;
+    use GoldTrait,AboutEncryptTrait;
 
     public object $row;
 
@@ -105,22 +105,6 @@ trait VideoTrait
         if($del!==false){
             Storage::deleteDirectory($dash_directory);
             Storage::deleteDirectory($hls_directory);
-        }
-    }
-
-    public function syncUpload($img)
-    {
-        $abPath = public_path().$img;
-        if(file_exists($abPath) && is_file($abPath)){
-            $content = file_get_contents($abPath);
-            $put = Storage::disk('sftp')->put($img,$content);
-            //加密
-            if($put){
-                $fileInfo = pathinfo($img);
-                $encryptFile = str_replace('/storage','/public',$fileInfo['dirname']).'/'.$fileInfo['filename'].'.htm';
-                $r = Storage::disk('sftp')->put($encryptFile,$content);
-                Log::info('==encryptImg==',[$encryptFile,$r]);
-            }
         }
     }
 
@@ -407,10 +391,7 @@ trait VideoTrait
                 }
             }
             //封面图处理
-            $fileInfo = pathinfo($list['cover_img']);
-            //$image_info = getimagesize($domainSync . $list['cover_img']);
-            //$list['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext='.$image_info['mime'].'&_v='.$_v;
-            $list['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext=jpg&id='.$list['id'].'&_v='.$_v;
+            $list['cover_img'] = $this->transferImgOut($domainSync,$list['cover_img'],$_v);
             if ($list['usage']??false) {
                 unset($list['vs_id'], $list['vs_name'], $list['vs_gold'], $list['vs_cat'], $list['vs_sync'], $list['vs_title'], $list['vs_duration'], $list['vs_type'], $list['vs_restricted'], $list['vs_cover_img'], $list['vs_views'], $list['vs_updated_at'], $list['vs_hls_url'], $list['vs_dash_url'], $list['vs_url']);
             }

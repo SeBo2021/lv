@@ -7,7 +7,9 @@ use App\Models\AdSet;
 
 trait AdTrait
 {
-    public static function weightGet($flag='')
+    use AboutEncryptTrait;
+
+    public function weightGet($flag=''): array
     {
         $ads = Ad::query()
             ->where('name',$flag)
@@ -38,7 +40,7 @@ trait AdTrait
         return [];
     }
 
-    public static function get($flag='',$groupByPosition=false): array
+    public function get($flag='',$groupByPosition=false): array
     {
         $ads = Ad::query()
             ->where('name',$flag)
@@ -47,8 +49,11 @@ trait AdTrait
             ->get(['id','sort','name','title','img','position','url','play_url','type','status','action_type','vid','end_at'])
             ->toArray();
         $domain = env('RESOURCE_DOMAIN');
+        $_v = time();
         foreach ($ads as &$ad){
-            $ad['img'] = $domain . $ad['img'];
+            //$ad['img'] = $domain . $ad['img'];
+            //图片处理
+            $ad['img'] = $this->transferImgOut($domain,$ad['img'],$_v,'auto');
             $ad['action_type'] = (string)$ad['action_type'];
             $ad['vid'] = (string)$ad['vid'];
         }
@@ -62,7 +67,7 @@ trait AdTrait
         return !empty($ads) ? $ads : [];
     }
 
-    public static function insertAds($data, $flag='', $usePage=false, $page=1, $perPage=6)
+    public function insertAds($data, $flag='', $usePage=false, $page=1, $perPage=6): array
     {
         $adSet = cache()->get('ad_set');
         if (!$adSet) {
@@ -72,14 +77,14 @@ trait AdTrait
         $res = $data;
         $rawPos = $adSet[$flag]['position'];
         if ($rawPos == 0) {
-            $ads = self::get($flag,$usePage);
+            $ads = $this->get($flag,$usePage);
             foreach ($res as $k=>$v){
                 $tmpK = $usePage ? (($page-1) * $perPage + $k) : $k;
                 $res[$k]['ad_list'] = $ads[$tmpK] ?? [];
             }
             return $res;
         } else {
-            $ads = self::get($flag,false);
+            $ads = $this->get($flag);
         }
         $position = explode(':',$rawPos);
         $adCount = count($ads);
