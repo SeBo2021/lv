@@ -119,7 +119,7 @@ trait VideoTrait
         $dash_directory = '/public'.$slice_dir.'/dash/'.$dir_name;
         $hls_directory = '/public'.$slice_dir.'/hls/'.$dir_name;
         //dash预览
-        $dash_play_file = $dash_directory .'/'. $dir_name.'.mpd';
+        /*$dash_play_file = $dash_directory .'/'. $dir_name.'.mpd';
         $exists_dash = Storage::disk('sftp')->exists($dash_play_file);
         if($exists_dash){
             $content_dash = Storage::disk('sftp')->get($dash_play_file);
@@ -130,7 +130,7 @@ trait VideoTrait
                 $dash_file = $dash_directory.'/preview.mpd';
                 Storage::disk('sftp')->put($dash_file,$xml_content);
             }
-        }
+        }*/
 
         //hls预览
         $hls_play_file = $hls_directory . '/' . $dir_name.'.m3u8';

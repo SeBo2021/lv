@@ -14,6 +14,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use ProtoneMedia\LaravelFFMpeg\Exporters\HLSExporter;
 
 class ProcessVideoSlice implements ShouldQueue
 {
@@ -139,7 +140,10 @@ class ProcessVideoSlice implements ShouldQueue
         $video = \ProtoneMedia\LaravelFFMpeg\Support\FFMpeg::fromDisk("local") //在storage/app的位置
         ->open($mp4_path);
 
+        $encryptKey = HLSExporter::generateEncryptionKey();
+        Storage::disk('local')->put($tmp_path.'/secret.key',$encryptKey);
         $result = $video->exportForHLS()
+            ->withEncryptionKey($encryptKey)
             ->setSegmentLength($segmentLength)//默认值是10
             ->toDisk("local")
             ->addFormat($format)
