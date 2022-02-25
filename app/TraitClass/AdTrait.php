@@ -32,7 +32,10 @@ trait AdTrait
                 $one = $ads[$key];
             }
             $domain = env('RESOURCE_DOMAIN');
-            $one['img'] = $domain . $one['img'];
+            //$one['img'] = $domain . $one['img'];
+            //图片处理
+            $_v = time();
+            $ad['img'] = $this->transferImgOut($domain,$one['img'],$_v,'auto');
             $one['action_type'] = (string) $one['action_type'];
             $one['vid'] = (string) $one['vid'];
             return [$one];
