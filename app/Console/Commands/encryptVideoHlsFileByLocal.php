@@ -45,22 +45,27 @@ class encryptVideoHlsFileByLocal extends Command
     public function handle()
     {
         $table = 'video';
-        $items = DB::table($table)
+        /*$items = DB::table($table)
             //->whereIn('id',['61'])
-            ->whereIn('id',['61'])
-            ->get(['id','hls_url','sync']);
+            ->whereIn('id',['8868'])
+            ->get(['id','hls_url']);*/
         //$domain =str_replace('https','http',env('RESOURCE_DOMAIN'));
-        
+        $items =  [
+            0=>(object)[
+                'id'=>8868,
+                'hls_url'=> "/storage/slice/hls/file_202111_150df7984046478d1dfefe29c47b409b/file_202111_150df7984046478d1dfefe29c47b409b.m3u8"
+            ],
+        ];
         foreach ($items as $item)
         {
             $pathInfo = pathinfo($item->hls_url);
             $fileDirname = str_replace('/storage','/public',$pathInfo['dirname']);
-            //$previewFile = $fileDirname.'/preview.m3u8';
-            /*if(Storage::disk('sftp')->exists($previewFile)){
+            /*$previewFile = $fileDirname.'/preview.m3u8';
+            if(Storage::disk('sftp')->exists($previewFile)){
                 Storage::disk('sftp')->delete($previewFile);
-            }*/
+            }
             $allFiles = Storage::disk('local')->files($fileDirname);
-            /*foreach ($allFiles as $hlsFile){
+            foreach ($allFiles as $hlsFile){
                 $content = Storage::disk('sftp')->get($hlsFile);
                 Storage::disk('local')->put($hlsFile,$content);
                 //$this->info($hlsFile);
