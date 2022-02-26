@@ -17,6 +17,10 @@ class ProcessEncryptVideo implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, VideoTrait, PHPRedisTrait;
 
+    public $tries = 1;
+
+    public int $timeout = 180000; //默认60秒超时
+
     public $item;
 
     /**
@@ -34,6 +38,7 @@ class ProcessEncryptVideo implements ShouldQueue
      * Execute the job.
      *
      * @return void
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function handle()
     {

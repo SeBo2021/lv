@@ -48,6 +48,8 @@ class encryptVideoHlsFile extends Command
         $table = 'video';
         $items = DB::table($table)
             ->whereIn('id',['3'])
+//            ->where('id','>',5)
+//            ->where('id','<',15)
             ->get(['id','hls_url','url']);
         //$domain =str_replace('https','http',env('RESOURCE_DOMAIN'));
         
