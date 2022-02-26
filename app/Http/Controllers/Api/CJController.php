@@ -100,10 +100,10 @@ class CJController extends Controller implements Pay
             if ($resJson['code'] == 1) {
                 $return = $this->format(0, $resJson, '取出成功');
             } else {
-                $return = $this->format($resJson['code'], [], $response);
+                $return = $this->format($resJson['code'],new \StdClass(), $response);
             }
         } catch (Exception | InvalidArgumentException $e) {
-            $return = $this->format($e->getCode(), [], $e->getMessage());
+            $return = $this->format($e->getCode(), new \StdClass(), $e->getMessage());
         }
         return response()->json($return);
     }
