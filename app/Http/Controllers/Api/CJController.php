@@ -52,7 +52,7 @@ class CJController extends Controller implements Pay
             'type' => [
                 'required',
                 'string',
-                Rule::in(['zfbwap', 'alipay', '102']),
+                Rule::in(['zfbwap', 'wxwap', '102']),
             ],
         ])->validate();
         Log::info('cj_pay_params===', [$params]);//参数日志
