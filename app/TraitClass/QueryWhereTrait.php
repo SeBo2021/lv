@@ -131,6 +131,20 @@ trait QueryWhereTrait
 
     }
 
+    public function whereByQueryPayMethod($value)
+    {
+        if($value){
+            $data = [
+                'pay_method' => [
+                    'type' => '=',
+                    'value' => $value
+                ]
+            ];
+            $this->addWhere($data);
+        }
+
+    }
+
     public function whereByQueryCreatedAt($value)
     {
         $dateArr = explode('~',$value);
