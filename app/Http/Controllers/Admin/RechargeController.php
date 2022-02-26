@@ -142,6 +142,12 @@ class RechargeController extends BaseCurlIndexController
                 'align' => 'center'
             ],
             [
+                'field' => 'pay_method_name',
+                'minWidth' => 100,
+                'title' => '充值类型',
+                'align' => 'center'
+            ],
+            [
                 'field' => 'register_at',
                 'width' => 150,
                 'title' => '会员注册时间',
@@ -180,6 +186,11 @@ class RechargeController extends BaseCurlIndexController
             default => '我的',
         };
         $item->device_system = $this->deviceSystem[$item->device_system]['name'];
+        $item->pay_method_name = match (intval($item->pay_method)) {
+            2 => '长江支付',
+            1 => '大白鲨支付',
+            default => '大白鲨支付',
+        };
         return $item;
     }
 
@@ -229,6 +240,13 @@ class RechargeController extends BaseCurlIndexController
                 'field' => 'query_uid',
                 'type' => 'text',
                 'name' => '会员ID',
+            ],
+            [
+                'field' => 'query_pay_method',
+                'type' => 'select',
+                'name' => '支付渠道',
+                'default' => '',
+                'data' => [['id' => '0', 'name' => '全部'],['id' => '1', 'name' => '大白鲨支付'],['id' => '2', 'name' => '长江支付'],]
             ],
             [
                 'field' => 'created_at',
