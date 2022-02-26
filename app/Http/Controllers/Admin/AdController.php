@@ -8,6 +8,7 @@ use App\Models\Ad;
 use App\Models\AdSet;
 use App\Services\UiService;
 use App\TraitClass\AboutEncryptTrait;
+use App\TraitClass\MemberCardTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Storage;
 
 class AdController extends BaseCurlController
 {
-    use PHPRedisTrait,AboutEncryptTrait;
+    use PHPRedisTrait,AboutEncryptTrait,MemberCardTrait;
 
     public $pageName = '广告';
 
@@ -48,6 +49,13 @@ class AdController extends BaseCurlController
                 'minWidth' => 150,
                 'title' => '广告位置',
                 'align' => 'center',
+            ],
+            [
+                'field' => 'card_id',
+                'minWidth' => 150,
+                'title' => '会员卡',
+                'align' => 'center',
+                'hide' => true
             ],
             [
                 'field' => 'name',
@@ -179,6 +187,14 @@ class AdController extends BaseCurlController
                 'data' => $adFlags
             ],
             [
+                'field' => 'card_id',
+                'type' => 'select',
+                'name' => '会员卡设置',
+                'must' => 0,
+                'default' => '',
+                'data' => $this->getMemberCardList('gold')
+            ],
+            [
                 'field' => 'title',
                 'type' => 'text',
                 'name' => '标题',
@@ -232,7 +248,7 @@ class AdController extends BaseCurlController
                 'type' => 'radio',
                 'name' => '是否启用',
                 'verify' => '',
-                'default' => 1,
+                'default' => 0,
                 'data' => $this->uiService->trueFalseData()
             ],
             [

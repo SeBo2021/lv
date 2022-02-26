@@ -143,25 +143,25 @@ class MemberCardController extends BaseCurlController
                 'data' => $this->cardRights
             ],
             [
-                'field' => 'show_user',
-                'type' => 'select',
-                'name' => '用户群体',
-                'must' => 1,
-                'verify' => 'rq',
-                'default' => 0,
-                'data' => $this->show_user
-            ],
-            [
                 'field' => 'expired_hours',
                 'type' => 'text',
                 'name' => '过期时间周期(小时):不填或填0为永久',
                 'must' => 0,
                 'tips' => '单位(小时)',
             ],
+            /*[
+                'field' => 'show_user',
+                'type' => 'checkbox',
+                'name' => '优惠用户群体',
+                'must' => 0,
+                'verify' => 'rq',
+                'default' => 0,
+                'data' => $this->show_user
+            ],*/
             [
                 'field' => 'hours',
                 'type' => 'text',
-                'name' => '优惠活动时间周期(单位:小时)',
+                'name' => '优惠活动注册时间周期(单位:小时)',
                 'must' => 0,
                 'tips' => '单位(小时)',
             ],
