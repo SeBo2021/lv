@@ -48,8 +48,8 @@ class OrderController extends Controller
             'time' => 'required|string',
             'pay_method' => [
                 'nullable',
-                'string',
-                Rule::in(['1', '2']),
+                'integer',
+                Rule::in([1, 2]),
             ],
         ])->validate();
         Log::info('order_create_params===',[$params]);//参数日志
@@ -153,6 +153,11 @@ class OrderController extends Controller
         Validator::make($params, [
             'order_id' => 'required|string',
             'time' => 'required|string',
+            'pay_method' => [
+                'nullable',
+                'integer',
+                Rule::in([1, 2]),
+            ],
         ])->validate();
         Log::info('order_pay_params===',[$params]);//参数日志
         try {
@@ -181,6 +186,7 @@ class OrderController extends Controller
                     'status' => 0,
                     'created_at' => $now,
                     'updated_at' => $now,
+                    'pay_method' => $params['pay_method']??1,
                 ]);
                 $payId = $payNew['id'];
             }
