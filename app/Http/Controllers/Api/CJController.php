@@ -74,7 +74,7 @@ class CJController extends Controller implements Pay
             $notifyUrl = env('APP_URL') . $payEnv['CJ']['notify_url'];
             $input = [
                 'merId' => $mercId,               //商户号
-                'orderId' => $params['pay_id'],            //订单号，值允许英文数字
+                'orderId' => strval($payInfo->number),           //订单号，值允许英文数字
                 'orderAmt' => strval($orderInfo->amount??0),              //订单金额,单位元保留两位小数
                 'channel' => $params['type'],            //支付通道编码
                 'desc' => '正常充值',           //简单描述，只允许英文数字 最大64
