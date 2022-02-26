@@ -40,7 +40,7 @@ class ProcessPreviewVideo implements ShouldQueue
     {
         foreach ($this->rows as $preview){
             if(!empty($preview->url)){
-                $this->generatePreview($preview);
+                $this->generatePreview($preview->url);
             }else{
                 Log::debug('previewVideo===',[$preview]);
             }
