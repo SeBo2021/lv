@@ -88,8 +88,6 @@ class CJController extends Controller implements Pay
             ];
             //生成签名 请求参数按照Ascii编码排序
             //私钥签名
-            var_dump($md5Key);
-            var_dump($privateKey);
             $input['sign'] = $this->sign($input, $md5Key, $privateKey);
 
             Log::info('cj_third_params===', [$input]);//三方参数日志
@@ -102,7 +100,7 @@ class CJController extends Controller implements Pay
             if ($resJson['code'] == 1) {
                 $return = $this->format(0, $resJson, '取出成功');
             } else {
-                $return = $this->format($resJson['code'], [], $resJson['err']);
+                $return = $this->format($resJson['code'], [], $response);
             }
         } catch (Exception | InvalidArgumentException $e) {
             $return = $this->format($e->getCode(), [], $e->getMessage());
