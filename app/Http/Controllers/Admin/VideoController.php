@@ -3,7 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Jobs\ProcessPreviewVideo;
 use App\Jobs\ProcessSyncMiddleTable;
-use App\Jobs\ProcessSyncMiddleSectionTable;
+use App\Jobs\ProcessEncryptVideo;
 use App\Jobs\ProcessSyncMiddleTagTable;
 use App\Jobs\ProcessVideoShortMod;
 use App\Jobs\ProcessVideoSlice;
@@ -758,7 +758,7 @@ class VideoController extends BaseCurlController
                     $r=true;
                     break;
                 case 'cid_vid':
-                    ProcessSyncMiddleSectionTable::dispatchAfterResponse();
+                    ProcessEncryptVideo::dispatchAfterResponse();
                     $r=true;
                     break;
                 case 'cover_img':
@@ -780,7 +780,7 @@ class VideoController extends BaseCurlController
                     $buildQueryVideo = Video::query()->whereIn($id, $id_arr);
                     $buildQueryVideo->update(['cat'=>json_encode($value_arr),'is_top'=>0]);
                     //队列执行更新版块中间表
-                    ProcessSyncMiddleSectionTable::dispatchAfterResponse();
+                    ProcessEncryptVideo::dispatchAfterResponse();
                     $r=true;
                     break;
                 case 'tag':

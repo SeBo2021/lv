@@ -51,14 +51,14 @@ class encryptVideoHlsFileByLocal extends Command
             ->get(['id','hls_url']);*/
         //$domain =str_replace('https','http',env('RESOURCE_DOMAIN'));
         $items =  [
-            0=>(object)[
+            0=>[
                 'id'=>8868,
                 'hls_url'=> "/storage/slice/hls/file_202111_150df7984046478d1dfefe29c47b409b/file_202111_150df7984046478d1dfefe29c47b409b.m3u8"
             ],
         ];
         foreach ($items as $item)
         {
-            $pathInfo = pathinfo($item->hls_url);
+            $pathInfo = pathinfo($item['hls_url']);
             $fileDirname = str_replace('/storage','/public',$pathInfo['dirname']);
             /*$previewFile = $fileDirname.'/preview.m3u8';
             if(Storage::disk('sftp')->exists($previewFile)){
@@ -81,14 +81,14 @@ class encryptVideoHlsFileByLocal extends Command
             $initHlsFile = $fileDirname.'/'.$pathInfo['filename'].'.m3u8';
             $video = \ProtoneMedia\LaravelFFMpeg\Support\FFMpeg::fromDisk("local") //在storage/app的位置
             ->open($initHlsFile);
-            $video->exportForHLS()
+            /*$video->exportForHLS()
                 ->withEncryptionKey($encryptKey)
                 ->setSegmentLength(1)//默认值是10
                 ->toDisk("local")
                 ->addFormat($format)
                 ->save($initHlsFile);
-            $this->generatePreview($item->url);
-            $this->info('######视频ID：'.$item->id.'执行成功######');
+            $this->generatePreview($item['hls_url']);*/
+            $this->info('######视频ID：'.$item['id'].'执行成功######');
         }
 
         $this->info('######执行成功######');
