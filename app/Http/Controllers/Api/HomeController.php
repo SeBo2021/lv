@@ -10,6 +10,7 @@ use App\Models\Video;
 use App\TraitClass\AdTrait;
 use App\TraitClass\ApiParamsTrait;
 use App\TraitClass\GoldTrait;
+use App\TraitClass\MemberCardTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ use Illuminate\Validation\ValidationException;
 
 class HomeController extends Controller
 {
-    use PHPRedisTrait, GoldTrait, VideoTrait, AdTrait;
+    use PHPRedisTrait, GoldTrait, VideoTrait, AdTrait, MemberCardTrait;
 
     public function category(Request $request)
     {
@@ -140,11 +141,13 @@ class HomeController extends Controller
     //充值活动
     /*public function rechargeActivity(Request $request): \Illuminate\Http\JsonResponse
     {
+        $data = [
+            'is_pop' => 0,
+        ];
         $user = $request->user();
-        $data = $this->get('activity');
-        $domain = env('APP_URL');
-        foreach ($data as &$item){
-            $item['img'] = $domain . $item['img'];
+        $ads = $this->getAds('recharge_activity');
+        $MemberCards = DB::table('member_card')->get(['id','name','value','expired_hours']);
+        foreach ($ads as $item){
             $item['action_type'] = (string) $item['action_type'];
             $item['vid'] = (string) $item['vid'];
         }
