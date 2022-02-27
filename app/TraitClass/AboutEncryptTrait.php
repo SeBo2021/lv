@@ -21,6 +21,7 @@ trait AboutEncryptTrait
 
     public function syncUpload($img)
     {
+        $img = str_replace('/dash','/coverImg',$img);
         $abPath = public_path().$img;
         if(file_exists($abPath) && is_file($abPath)){
             $content = @file_get_contents($abPath);
