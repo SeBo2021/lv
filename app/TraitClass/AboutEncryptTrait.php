@@ -19,12 +19,17 @@ trait AboutEncryptTrait
         return $domain . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext='.$fixType.'&_v='.$_v;
     }
 
+    /**
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
     public function syncUpload($img)
     {
-        $img = str_replace('/dash','/coverImg',$img);
         $abPath = public_path().$img;
-        if(file_exists($abPath) && is_file($abPath)){
+        if((file_exists($abPath) && is_file($abPath)) || Storage::disk('sftp')->exists(str_replace('/storage','/public',$img))){
             $content = @file_get_contents($abPath);
+            if(!$content){
+                $content = @file_get_contents(env('RESOURCE_DOMAIN').$img);
+            }
             $put = Storage::disk('sftp')->put($img,$content);
             //加密
             if($put){
