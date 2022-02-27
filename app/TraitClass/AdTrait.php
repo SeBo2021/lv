@@ -35,7 +35,7 @@ trait AdTrait
             //$one['img'] = $domain . $one['img'];
             //图片处理
             $_v = date('Ymd');
-            $one['img'] = $this->transferImgOut($domain,$one['img'],$_v,'auto');
+            $one['img'] = $this->transferImgOut($one['img'],$domain,$_v,'auto');
             $one['action_type'] = (string) $one['action_type'];
             $one['vid'] = (string) $one['vid'];
             return [$one];
@@ -56,7 +56,7 @@ trait AdTrait
         foreach ($ads as &$ad){
             //$ad['img'] = $domain . $ad['img'];
             //图片处理
-            $ad['img'] = $this->transferImgOut($domain,$ad['img'],$_v,'auto');
+            $ad['img'] = $this->transferImgOut($ad['img'],$domain,$_v,'auto');
             $ad['action_type'] = (string)$ad['action_type'];
             $ad['vid'] = (string)$ad['vid'];
         }
@@ -83,7 +83,7 @@ trait AdTrait
         foreach ($ads as &$ad){
             //$ad['img'] = $domain . $ad['img'];
             //图片处理
-            $ad['img'] = $this->transferImgOut($domain,$ad['img'],$_v,'auto');
+            $ad['img'] = $this->transferImgOut($ad['img'],$domain,$_v,'auto');
             $ad['action_type'] = (string)$ad['action_type'];
             $ad['vid'] = (string)$ad['vid'];
         }

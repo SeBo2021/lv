@@ -58,9 +58,11 @@ class ProcessVideoSlice implements ShouldQueue
     {
         $file_name = pathinfo($this->row->url,PATHINFO_FILENAME);
         $mp4_path = $this->transcodeMp4($this->mp4Path,$file_name);
-        //封面
+        //自动截图封面
         $sliceCoverImg = $this->generalCoverImgAtSliceDir($mp4_path);
         $this->syncCoverImg($sliceCoverImg);
+        //自定义上传封面
+        $this->syncUpload($this->row->cover_img);
         //切片
         $this->hlsSlice($mp4_path,true);
         //同步到资源站

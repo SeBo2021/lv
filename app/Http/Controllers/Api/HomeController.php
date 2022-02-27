@@ -69,7 +69,7 @@ class HomeController extends Controller
     /**
      * @throws ValidationException
      */
-    public function lists(Request $request)
+    public function lists(Request $request): \Illuminate\Http\JsonResponse
     {
         if(isset($request->params)){
             $params = ApiParamsTrait::parse($request->params);
@@ -80,7 +80,7 @@ class HomeController extends Controller
             $cid = $validated['cid'];
             $page = $validated['page'];
         }else{
-            return [];
+            return response()->json([]);
         }
         $redis = $this->redis();
         $sectionKey = ($this->apiRedisKey['home_lists']).$cid.'-'.$page;
