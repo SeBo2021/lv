@@ -403,7 +403,7 @@ trait VideoTrait
                 }
             }
             //封面图处理
-            $list['cover_img'] = $this->transferImgOut($domainSync,$list['cover_img'],$_v);
+            $list['cover_img'] = $this->transferImgOut($list['cover_img'],$domainSync,$_v);
             if ($list['usage']??false) {
                 unset($list['vs_id'], $list['vs_name'], $list['vs_gold'], $list['vs_cat'], $list['vs_sync'], $list['vs_title'], $list['vs_duration'], $list['vs_type'], $list['vs_restricted'], $list['vs_cover_img'], $list['vs_views'], $list['vs_updated_at'], $list['vs_hls_url'], $list['vs_dash_url'], $list['vs_url']);
             }

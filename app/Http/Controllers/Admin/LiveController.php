@@ -181,6 +181,7 @@ class LiveController extends BaseCurlController
                 'field' => 'cover_img',
                 'type' => 'img',
                 'name' => '封面图片',
+                'value' => ($show && ($show->cover_img)) ? $this->getOriginEncImg($show->cover_img) : ''
             ],
             [
                 'field' => 'url',
