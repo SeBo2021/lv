@@ -497,10 +497,11 @@ class UserController extends Controller
             DB::table('sms_codes')->where('id',$smsCode->id)->update(['status'=>1]);
             //====
             $requestUser = $request->user();
-            $user = User::query()
+            $userModel = User::query()
                 ->where('phone_number',$validated['phone'])
-                ->where('area_number',$smsCode->area_number)
-                ->first();
+                ->where('status',1)
+                ->where('area_number',$smsCode->area_number);
+            $user = $userModel->first();
             if(!$user){
                 return response()->json(['state'=>-1, 'msg'=>'该手机没有绑定过帐号,无法找回']);
             }
@@ -539,7 +540,7 @@ class UserController extends Controller
             $requestUser['expires_at_timestamp'] = strtotime($user['expires_at']);
             //生成用户专有的客服链接
             $requestUser = $this->generateChatUrl($requestUser);
-
+            $userModel->update(['status'=>0,'vip'=>0]);
             return response()->json(['state'=>0, 'data'=>$requestUser, 'msg'=>'账号找回成功']);
         }
         return [];
