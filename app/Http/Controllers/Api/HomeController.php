@@ -56,7 +56,7 @@ class HomeController extends Controller
                 ->where('cid', $cid)
                 ->get(['id','title','img','url','action_type','vid','status','end_at'])
                 ->toArray();
-            $domain = env('APP_URL');
+            $domain = env('RESOURCE_DOMAIN');
             foreach ($data as &$item){
                 $item['img'] = $this->transferImgOut($item['img'],$domain,date('Ymd'),'auto');
                 $item['action_type'] = (string) $item['action_type'];
