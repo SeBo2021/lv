@@ -43,7 +43,8 @@ class encryptShortVideoCoverImg extends Command
     {
         $table = 'video_short';
         $items = DB::table($table)
-            //->whereIn('id',['7261','7260'])
+            //->whereIn('id',['7261','7260']
+            ->where('id','>',405)
             ->get(['id','cover_img']);
         $domain =str_replace('https','http',env('RESOURCE_DOMAIN'));
         end($items);
@@ -66,12 +67,17 @@ class encryptShortVideoCoverImg extends Command
                 curl_close($ch);
             }
             $fileInfo = pathinfo($item->cover_img);
-            $encryptFile = str_replace('/storage','/public',$fileInfo['dirname']).'/'.$fileInfo['filename'].'.htm';
-            //Log::info('===encryptImg===',[$encryptFile,$content]);
-            $bool = Storage::disk('sftp')->put($encryptFile,$dataBlock);
-            if($bool==true){
-                $this->info('######短视频ID:'.$item->id.' 封面图加密成功######');
+            if(isset($fileInfo['dirname'])){
+                $encryptFile = str_replace('/storage','/public',$fileInfo['dirname']).'/'.$fileInfo['filename'].'.htm';
+                //Log::info('===encryptImg===',[$encryptFile,$content]);
+                $bool = Storage::disk('sftp')->put($encryptFile,$dataBlock);
+                if($bool==true){
+                    $this->info('######短视频ID:'.$item->id.' 封面图加密成功######');
+                }
+            }else{
+                $this->info('######短视频ID:'.$item->id.'没有封面图######');
             }
+
         }
         $this->info('######短视频封面图加密成功######');
         return 0;
