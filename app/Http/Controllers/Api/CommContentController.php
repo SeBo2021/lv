@@ -128,8 +128,10 @@ class CommContentController extends Controller
         } else {
             $res = $this->other($uid, $locationName, $cid1, $cid2, 6, $page);
         }
-        //Log::info('===CommContent===',[$res['bbs_list']]);
-        $this->processArea($res['bbs_list']);
+        if(isset($res['bbs_list']) && !empty($res['bbs_list'])){
+            Log::info('===CommContent===',[$res['bbs_list']]);
+            $this->processArea($res['bbs_list']);
+        }
         return response()->json([
             'state' => 0,
             'data' => $res

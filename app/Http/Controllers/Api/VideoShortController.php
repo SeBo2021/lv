@@ -128,7 +128,9 @@ class VideoShortController extends Controller
                 }
             }*/
             // $model = $model->orderByDesc('id');
-            $model = $model->orderByRaw("FIELD(id, {$newIds})");
+            if($newIds){
+                $model = $model->orderByRaw("FIELD(id, {$newIds})");
+            }
             $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         }
         $items = $paginator->items();
