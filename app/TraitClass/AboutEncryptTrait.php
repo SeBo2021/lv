@@ -32,7 +32,7 @@ trait AboutEncryptTrait
         if(!isset($hlsInfo['dirname'])){
             return '';
         }
-        return $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'_0_1000.vid?id='.$id.'&_v='.$_v;
+        return $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'.vid?id='.$id.'&_v='.$_v;
     }
 
     /**
