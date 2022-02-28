@@ -22,6 +22,16 @@ trait AboutEncryptTrait
         return $domain . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext='.$fixType.'&_v='.$_v;
     }
 
+    public function transferHlsUrl($url,$id=null,$_v=null): string
+    {
+        $_v = $_v ?? 1;
+        $hlsInfo = pathinfo($url);
+        if(!isset($hlsInfo['dirname'])){
+            return '';
+        }
+        return $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'_0_1000.vid?id='.$id.'&_v='.$_v;
+    }
+
     /**
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
