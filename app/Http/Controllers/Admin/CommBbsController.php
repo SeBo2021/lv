@@ -209,7 +209,7 @@ class CommBbsController extends BaseCurlController
     public function setOutputUiCreateEditForm($show = '')
     {
         if ($show && ($show->video??false) && $show->video != '[]') {
-            $show->url = env('RESOURCE_DOMAIN').json_decode($show->video)[0];
+            $show->url = json_decode($show->video)[0];
         }
         $data = [
             [

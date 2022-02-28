@@ -155,7 +155,7 @@ class ProcessBbs implements ShouldQueue
             if ($exist) {
                 continue;
             }
-            $content = file_get_contents($file);
+            $content = @file_get_contents($file);
             $upload = Storage::disk('sftp')->put($pic, $content);
             if ($upload) {
                 Storage::delete($this->mp4Path);

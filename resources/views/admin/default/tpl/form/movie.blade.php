@@ -32,7 +32,7 @@
 
 @if(!empty($form_item['value']))
     <script>
-        var real_use_url = "{{ env('RESOURCE_DOMAIN').json_decode($show->video)[0]??'' }}";
+        var real_use_url = "{{ env('RESOURCE_DOMAIN').$form_item['value'] }}";
         console.log(real_use_url);
         if(Hls.isSupported()) {
             var video = document.getElementById('dashjs');
