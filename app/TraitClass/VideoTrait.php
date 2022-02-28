@@ -412,7 +412,9 @@ trait VideoTrait
                 $hlsInfo = pathinfo($list['hls_url']);
                 $list['hls_url'] = $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'_0_1000.vid?id='.$list['id'].'&_v='.$_v;
             }*/
-            $list['hls_url'] = $this->transferHlsUrl($list['hls_url']);
+            if(isset($list['hls_url'])){
+                $list['hls_url'] = $this->transferHlsUrl($list['hls_url']);
+            }
             $previewHlsInfo = pathinfo($list['preview_hls_url']);
             $list['preview_hls_url'] = $previewHlsInfo['dirname'].'/'.$previewHlsInfo['filename'].'.vid?id='.$list['id'].'&_v='.$_v;
             //是否点赞
