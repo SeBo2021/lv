@@ -209,7 +209,7 @@ class CommBbsController extends BaseCurlController
     public function setOutputUiCreateEditForm($show = '')
     {
         if ($show && ($show->video??false) && $show->video != '[]') {
-            $show->url = json_decode($show->video)[0];
+            $show->url = env('RESOURCE_DOMAIN').json_decode($show->video)[0];
         }
         $data = [
             [
@@ -252,7 +252,7 @@ class CommBbsController extends BaseCurlController
                 'name' => '视频',
                 'sync' =>  $show ? $show->sync : 0,
                 'url' => $show ? $show->url : '',
-                // 'value' => $show ? \App\Jobs\VideoSlice::getOrigin($show->sync,$show->url) :''
+//                 'value' => $show ? \App\Jobs\VideoSlice::getOrigin($show->sync,$show->url) :''
                 'value' => $show ? $show->url :''
             ],
         ];

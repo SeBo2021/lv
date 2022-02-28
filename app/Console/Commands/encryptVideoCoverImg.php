@@ -53,7 +53,7 @@ class encryptVideoCoverImg extends Command
             //$content = $this->getImgBlockData($imgUrl);
             $ch = curl_init($imgUrl);
             // 超时设置
-            curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 36000000);
             // 取前面 168 个字符 通过四张测试图读取宽高结果都没有问题,若获取不到数据可适当加大数值
             curl_setopt($ch, CURLOPT_RANGE, '0-1024000');
             // 跟踪301跳转
