@@ -15,6 +15,9 @@ trait AboutEncryptTrait
         $domain = $domain ?? env('RESOURCE_DOMAIN');
         $_v = $_v ?? 1;
         $fileInfo = pathinfo($img);
+        if(!isset($fileInfo['dirname'])){
+            return '';
+        }
         if($fixType == 'auto'){
             $image_info = @getimagesize($domain . $img);
             $fixType = $image_info['mime'] ?? 'jpg';
