@@ -193,6 +193,7 @@ trait PayTrait
             'channel_id' => $orderInfo->channel_id,
             'channel_pid' => $orderInfo->channel_pid ?? 0,
             'order_id' => $orderInfo->id,
+            'pay_method' => $payInfo->pay_method??1,
             'created_at' => $nowData,
             'updated_at' => $nowData,
         ];

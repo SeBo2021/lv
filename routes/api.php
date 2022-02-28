@@ -32,6 +32,7 @@ Route::group([
         Route::post('aes_de', 'TestController@aes_de');
     }
     Route::post('callbackDbs', 'DBSController@callback');  //大白鲨支付回调
+    Route::post('callbackCJ', 'CJController@callback');  //长江支付回调
 });
 
 Route::group([
@@ -81,6 +82,9 @@ Route::group([
     Route::post('payDbs', 'DBSController@pay');  //大白鲨支付动作
     Route::post('queryDbs', 'DBSController@query');  //大白鲨支付查询
     Route::post('methodDbs', 'DBSController@method');  //大白鲨支付方式
+
+    /// 长江支付相关接口
+    Route::post('payCJ', 'CJController@pay');  //长江支付动作
     /// 订单相关接口
     Route::post('oderCreate', 'OrderController@create');  //订单创建接口
     Route::get('orderQuery', 'OrderController@query');  //订单查询接口

@@ -126,6 +126,14 @@ class AppConfigController extends BaseCurlController
                         'must' => 1,
                         'verify' => '',
                     ],
+                    [
+                        'field' => 'pay_method',
+                        'type' => 'textarea',
+                        'name' => '支付方式',
+                        'must' => 1,
+                        'default' => '',
+                        'tips' => '配置json,开发用'
+                    ],
                 ]
             ]
         ];
@@ -147,6 +155,7 @@ class AppConfigController extends BaseCurlController
         $config_values = $request->except(['_token','s']);
         config_cache($config_name, $config_values);
         //
+        cache()->delete('payEnv');
         $this->insertLog(lang('系统配置成功'));
         return $this->returnSuccessApi('设置成功');
 

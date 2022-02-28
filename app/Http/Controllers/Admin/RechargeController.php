@@ -142,6 +142,12 @@ class RechargeController extends BaseCurlIndexController
                 'align' => 'center'
             ],
             [
+                'field' => 'pay_method_name',
+                'minWidth' => 100,
+                'title' => '充值类型',
+                'align' => 'center'
+            ],
+            [
                 'field' => 'register_at',
                 'width' => 150,
                 'title' => '会员注册时间',
@@ -180,6 +186,11 @@ class RechargeController extends BaseCurlIndexController
             default => '我的',
         };
         $item->device_system = $this->deviceSystem[$item->device_system]['name'];
+        $item->pay_method_name = match (strval($item->pay_method)) {
+            '2' => '长江支付',
+            '1' => '大白鲨支付',
+            default => '大白鲨支付',
+        };
         return $item;
     }
 
@@ -231,6 +242,13 @@ class RechargeController extends BaseCurlIndexController
                 'name' => '会员ID',
             ],
             [
+                'field' => 'query_pay_method',
+                'type' => 'select',
+                'name' => '支付渠道',
+                'default' => '',
+                'data' => [['id' => '0', 'name' => '全部'],['id' => '1', 'name' => '大白鲨支付'],['id' => '2', 'name' => '长江支付'],]
+            ],
+            [
                 'field' => 'created_at',
                 'type' => 'datetime',
 //                'attr' => 'data-range=true',
@@ -245,7 +263,7 @@ class RechargeController extends BaseCurlIndexController
     public function handleResultModel($model)
     {
         $field = ['recharge.id','recharge.amount','recharge.uid','recharge.order_id','orders.status',
-            'recharge.channel_id','recharge.device_system','recharge.created_at','users.created_at as register_at','orders.type','orders.forward','orders.vid','orders.type_id','orders.remark'];
+            'recharge.channel_id','recharge.device_system','recharge.created_at','users.created_at as register_at','orders.type','orders.forward','orders.vid','orders.type_id','orders.remark','recharge.pay_method'];
         $raw = implode(',',$field);
         $model = $model->select(DB::raw($raw));
 

@@ -46,6 +46,11 @@ class OrderController extends Controller
             'forward' => 'nullable',
             'vid' => 'nullable',
             'time' => 'required|string',
+            'pay_method' => [
+                'nullable',
+                'integer',
+                Rule::in([1, 2]),
+            ],
         ])->validate();
         Log::info('order_create_params===',[$params]);//参数日志
         $goodsMethod = match ($params['type']) {
@@ -101,6 +106,7 @@ class OrderController extends Controller
                 'status' => 0,
                 'device_system' => $request->user()->device_system??1,
                 'created_at' => $now,
+                'pay_method' => $params['pay_method']??1,
                 'updated_at' => $now,
             ]);
             DB::commit();
@@ -147,6 +153,11 @@ class OrderController extends Controller
         Validator::make($params, [
             'order_id' => 'required|string',
             'time' => 'required|string',
+            'pay_method' => [
+                'nullable',
+                'integer',
+                Rule::in([1, 2]),
+            ],
         ])->validate();
         Log::info('order_pay_params===',[$params]);//参数日志
         try {
@@ -175,6 +186,7 @@ class OrderController extends Controller
                     'status' => 0,
                     'created_at' => $now,
                     'updated_at' => $now,
+                    'pay_method' => $params['pay_method']??1,
                 ]);
                 $payId = $payNew['id'];
             }
