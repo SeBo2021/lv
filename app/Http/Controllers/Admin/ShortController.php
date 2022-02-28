@@ -108,13 +108,13 @@ class ShortController extends BaseCurlController
                 'align' => 'center',
                 'hide' => false
             ],
-            [
+            /*[
                 'field' => 'dash_url',
                 'minWidth' => 80,
                 'title' => 'dash地址',
                 'align' => 'center',
                 'hide' => false
-            ],
+            ],*/
             [
                 'field' => 'cover_img',
                 'minWidth' => 80,
@@ -177,7 +177,7 @@ class ShortController extends BaseCurlController
             ],
             [
                 'field' => 'url',
-                'type' => 'movie',
+                'type' => 'video',
                 'name' => '视频',
                 'sync' =>  $show ? $show->sync : 0,
                 'url' => $show ? $show->url : '',
