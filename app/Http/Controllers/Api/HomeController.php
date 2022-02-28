@@ -38,7 +38,11 @@ class HomeController extends Controller
     }
 
     //轮播
-    public function carousel(Request $request)
+
+    /**
+     * @throws ValidationException
+     */
+    public function carousel(Request $request): \Illuminate\Http\JsonResponse
     {
         if(isset($request->params)){
             $params = ApiParamsTrait::parse($request->params);
@@ -54,7 +58,7 @@ class HomeController extends Controller
                 ->toArray();
             $domain = env('APP_URL');
             foreach ($data as &$item){
-                $item['img'] = $domain . $item['img'];
+                $item['img'] = $this->transferImgOut($item['img'],$domain,date('Ymd'),'auto');
                 $item['action_type'] = (string) $item['action_type'];
                 $item['vid'] = (string) $item['vid'];
             }
@@ -63,7 +67,7 @@ class HomeController extends Controller
                 'data'=>$data
             ]);
         }
-        return [];
+        return response()->json([]);
     }
 
     /**
