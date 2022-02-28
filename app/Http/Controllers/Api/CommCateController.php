@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\TraitClass\CommTrait;
 use App\TraitClass\GoldTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
@@ -12,7 +13,7 @@ use Illuminate\Http\Request;
 
 class CommCateController extends Controller
 {
-    use PHPRedisTrait, GoldTrait, VideoTrait;
+    use PHPRedisTrait, GoldTrait, VideoTrait, CommTrait;
 
     /**
      * 板块数据
@@ -22,9 +23,10 @@ class CommCateController extends Controller
     public function info(Request $request): JsonResponse
     {
         $user = $request->user();
-        $raw = $this->redis()->get('common_cate');
+        /*$raw = $this->redis()->get('common_cate');
         $data = @json_decode($raw, true);
-        $data = $data ?? [];
+        $data = $data ?? [];*/
+        $data = $this->getCommCate();
         foreach ($data as $k => $datum) {
             if ($datum['mark'] == 'focus') {
                 $data[$k]['have_new'] = $this->checkFocusNew($user->id);
