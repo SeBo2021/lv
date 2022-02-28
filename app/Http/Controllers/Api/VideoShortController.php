@@ -153,8 +153,7 @@ class VideoShortController extends Controller
             //$one['cover_img'] = $resourceDomain . $one['cover_img'];
             $one['cover_img'] = $this->transferImgOut($one['cover_img'],$resourceDomain,$_v);
             //hls处理
-            $hlsInfo = pathinfo($one['hls_url']);
-            $one['hls_url'] = $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'_0_1000.vid?id='.$one['id'].'&_v='.$_v;
+            $one['hls_url'] = $this->transferHlsUrl($one['hls_url'],$one['id'],$_v);
             $data[] = $one;
         }
 
