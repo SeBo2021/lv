@@ -1,5 +1,5 @@
 <script src="/player/spark-md5.min.js"></script>
-<script src="/player/dash.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/hls.js/latest/hls.min.js"></script>
 {{--<script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>--}}
 {{--<script src="https://cdn.jsdelivr.net/npm/spark-md5@3.0.1/spark-md5.min.js"></script>--}}
 <div class="upload-area" id="aetherupload-wrapper">
@@ -32,16 +32,17 @@
 
 @if(!empty($form_item['value']))
     <script>
-        var real_use_url = "{{ \App\Jobs\VideoSlice::get_slice_url($form_item['value'],'dash',$form_item['sync']) }}";
+        var real_use_url = "{{ env('RESOURCE_DOMAIN').$form_item['value'] }}";
         console.log(real_use_url);
-        // $("#videoIframe").attr('src',real_use_url);
-        //=====================以上打印出同步资源地址======================
-        var url = "{{ \App\Jobs\VideoSlice::getDomain($form_item['sync']). $form_item['url'] }}";
-        var playerElement = $('#dashjs');
-        playerElement.show();
-        var player = dashjs.MediaPlayer().create();
-        $('#dashjs').attr('src',real_use_url);
-        player.initialize(document.querySelector('#dashjs'), real_use_url, false); //true 为自动播放
+        if(Hls.isSupported()) {
+            var video = document.getElementById('dashjs');
+            var hls = new Hls();
+            hls.loadSource(real_use_url);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED,function() {
+                video.play();
+            });
+        }
     </script>
 @endif
 <script>

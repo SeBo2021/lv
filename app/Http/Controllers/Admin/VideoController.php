@@ -2,8 +2,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Jobs\ProcessPreviewVideo;
-use App\Jobs\ProcessSyncMiddleTable;
 use App\Jobs\ProcessSyncMiddleSectionTable;
+use App\Jobs\ProcessSyncMiddleTable;
 use App\Jobs\ProcessSyncMiddleTagTable;
 use App\Jobs\ProcessVideoShortMod;
 use App\Jobs\ProcessVideoSlice;
@@ -269,7 +269,7 @@ class VideoController extends BaseCurlController
                 'field' => 'cover_img',
                 'type' => 'img',
                 'name' => '封面图片',
-//                'value' => $show ? : ''
+                'value' => ($show && ($show->cover_img)) ? $this->getOriginEncImg($show->cover_img) : ''
 //                'verify' => 'img'
             ],
             [
@@ -503,6 +503,7 @@ class VideoController extends BaseCurlController
                     $result = $this->getSearchCheckboxResult($items,$cat,'cat');
                 }
             }
+            $result = (array)$result ?? [];
             $total = count($result);
             //获取当前页数据
             $offset = ($page-1)*$pagesize;
@@ -757,6 +758,7 @@ class VideoController extends BaseCurlController
                     $r=true;
                     break;
                 case 'cid_vid':
+                    //队列执行更新版块中间表
                     ProcessSyncMiddleSectionTable::dispatchAfterResponse();
                     $r=true;
                     break;

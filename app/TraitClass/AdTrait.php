@@ -7,7 +7,9 @@ use App\Models\AdSet;
 
 trait AdTrait
 {
-    public static function weightGet($flag='')
+    use AboutEncryptTrait;
+
+    public function weightGet($flag=''): array
     {
         $ads = Ad::query()
             ->where('name',$flag)
@@ -30,7 +32,10 @@ trait AdTrait
                 $one = $ads[$key];
             }
             $domain = env('RESOURCE_DOMAIN');
-            $one['img'] = $domain . $one['img'];
+            //$one['img'] = $domain . $one['img'];
+            //图片处理
+            $_v = date('Ymd');
+            $one['img'] = $this->transferImgOut($one['img'],$domain,$_v,'auto');
             $one['action_type'] = (string) $one['action_type'];
             $one['vid'] = (string) $one['vid'];
             return [$one];
@@ -38,7 +43,7 @@ trait AdTrait
         return [];
     }
 
-    public static function get($flag='',$groupByPosition=false): array
+    /*public function get($flag='',$groupByPosition=false): array
     {
         $ads = Ad::query()
             ->where('name',$flag)
@@ -47,8 +52,38 @@ trait AdTrait
             ->get(['id','sort','name','title','img','position','url','play_url','type','status','action_type','vid','end_at'])
             ->toArray();
         $domain = env('RESOURCE_DOMAIN');
+        $_v = date('Ymd');
         foreach ($ads as &$ad){
-            $ad['img'] = $domain . $ad['img'];
+            //$ad['img'] = $domain . $ad['img'];
+            //图片处理
+            $ad['img'] = $this->transferImgOut($ad['img'],$domain,$_v,'auto');
+            $ad['action_type'] = (string)$ad['action_type'];
+            $ad['vid'] = (string)$ad['vid'];
+        }
+        if($groupByPosition){ //有位置的多一维
+            $newAds = [];
+            foreach ($ads as $item){
+                $newAds[$item['position']][]= $item;
+            }
+            $ads = $newAds;
+        }
+        return !empty($ads) ? $ads : [];
+    }*/
+
+    public function getAds($flag='',$groupByPosition=false): array
+    {
+        $ads = Ad::query()
+            ->where('name',$flag)
+            ->where('status',1)
+            ->orderBy('sort')
+            ->get(['id','sort','name','title','img','position','url','play_url','type','status','action_type','vid','end_at'])
+            ->toArray();
+        $domain = env('RESOURCE_DOMAIN');
+        $_v = date('Ymd');
+        foreach ($ads as &$ad){
+            //$ad['img'] = $domain . $ad['img'];
+            //图片处理
+            $ad['img'] = $this->transferImgOut($ad['img'],$domain,$_v,'auto');
             $ad['action_type'] = (string)$ad['action_type'];
             $ad['vid'] = (string)$ad['vid'];
         }
@@ -62,7 +97,7 @@ trait AdTrait
         return !empty($ads) ? $ads : [];
     }
 
-    public static function insertAds($data, $flag='', $usePage=false, $page=1, $perPage=6)
+    public function insertAds($data, $flag='', $usePage=false, $page=1, $perPage=6): array
     {
         $adSet = cache()->get('ad_set');
         if (!$adSet) {
@@ -72,14 +107,14 @@ trait AdTrait
         $res = $data;
         $rawPos = $adSet[$flag]['position'];
         if ($rawPos == 0) {
-            $ads = self::get($flag,$usePage);
+            $ads = $this->getAds($flag,$usePage);
             foreach ($res as $k=>$v){
                 $tmpK = $usePage ? (($page-1) * $perPage + $k) : $k;
                 $res[$k]['ad_list'] = $ads[$tmpK] ?? [];
             }
             return $res;
         } else {
-            $ads = self::get($flag,false);
+            $ads = $this->getAds($flag);
         }
         $position = explode(':',$rawPos);
         $adCount = count($ads);

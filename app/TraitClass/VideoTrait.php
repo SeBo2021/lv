@@ -5,6 +5,7 @@ namespace App\TraitClass;
 use AetherUpload\Util;
 use App\Models\ViewRecord;
 use Exception;
+use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
 use FFMpeg\Format\Video\X264;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -12,10 +13,11 @@ use Illuminate\Http\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use ProtoneMedia\LaravelFFMpeg\Exporters\HLSExporter;
 
 trait VideoTrait
 {
-    use GoldTrait;
+    use GoldTrait,AboutEncryptTrait;
 
     public object $row;
 
@@ -51,6 +53,12 @@ trait VideoTrait
     public function getMp4Path(): string
     {
         $resource = Util::getResource($this->row->url);
+        return $resource->path;
+    }
+
+    public function getMp4FilePath($url): string
+    {
+        $resource = Util::getResource($url);
         return $resource->path;
     }
 
@@ -108,32 +116,17 @@ trait VideoTrait
         }
     }
 
-    public function syncUpload($img)
-    {
-        $abPath = public_path().$img;
-        if(file_exists($abPath) && is_file($abPath)){
-            $content = file_get_contents($abPath);
-            $put = Storage::disk('sftp')->put($img,$content);
-            //加密
-            if($put){
-                $fileInfo = pathinfo($img);
-                $encryptFile = str_replace('/storage','/public',$fileInfo['dirname']).'/'.$fileInfo['filename'].'.htm';
-                Storage::disk('sftp')->put($encryptFile,$content);
-            }
-        }
-    }
-
     /**
      * @throws FileNotFoundException
      */
-    public function generatePreview($preview)
+    public function generatePreview($url)
     {
-        $dir_name = pathinfo($preview->url,PATHINFO_FILENAME);
+        $dir_name = pathinfo($url,PATHINFO_FILENAME);
         $slice_dir = env('SLICE_DIR','/slice');
-        $dash_directory = '/public'.$slice_dir.'/dash/'.$dir_name;
+        //$dash_directory = '/public'.$slice_dir.'/dash/'.$dir_name;
         $hls_directory = '/public'.$slice_dir.'/hls/'.$dir_name;
         //dash预览
-        $dash_play_file = $dash_directory .'/'. $dir_name.'.mpd';
+        /*$dash_play_file = $dash_directory .'/'. $dir_name.'.mpd';
         $exists_dash = Storage::disk('sftp')->exists($dash_play_file);
         if($exists_dash){
             $content_dash = Storage::disk('sftp')->get($dash_play_file);
@@ -144,23 +137,27 @@ trait VideoTrait
                 $dash_file = $dash_directory.'/preview.mpd';
                 Storage::disk('sftp')->put($dash_file,$xml_content);
             }
-        }
+        }*/
 
         //hls预览
-        $hls_play_file = $hls_directory . '/' . $dir_name.'.m3u8';
-        $hls_handle_play_file = Storage::disk('sftp')->exists($hls_play_file);
-        if($hls_handle_play_file){
-            $lines = explode("\n",Storage::disk('sftp')->get($hls_play_file));
+        //$hls_play_file = $hls_directory . '/' . $dir_name.'.m3u8';
+        //$hls_handle_play_file = Storage::disk('sftp')->exists($hls_play_file);
+        if(true){
+            /*$lines = explode("\n",Storage::disk('sftp')->get($hls_play_file));
+            Log::info('==lines==',[$lines]);
             $initHlsFile = '';
             foreach ($lines as $line) {
                 if(str_contains($line, '.m3u8')){
                     $initHlsFile = $hls_directory . '/' . $line;
                 }
             }
+            Log::info('==hls_handle_init_file==',[$initHlsFile]);*/
+            $initHlsFile = $hls_directory . '/' . $dir_name.'_0_1000.m3u8';
             $hls_handle_init_file = Storage::disk('sftp')->exists($initHlsFile);
             if($hls_handle_init_file){
                 $hls_file = $hls_directory . '/preview.m3u8';
                 $trimmed = explode("\n",Storage::disk('sftp')->get($initHlsFile));
+                Log::info('==trimmed==',[$trimmed]);
                 $second = 0;
                 $breakLineNum = -1;
                 $hlsContentLines = '';
@@ -357,7 +354,7 @@ trait VideoTrait
 
     public function handleVideoItems($lists,$display_url=false,$uid = 0,$processSort = false)
     {
-        $_v = time();
+        $_v = date('Ymd');
         $domainSync = VideoTrait::getDomain(1);
         foreach ($lists as &$list){
             $list = (array)$list;
@@ -406,20 +403,17 @@ trait VideoTrait
                 }
             }
             //封面图处理
-            $fileInfo = pathinfo($list['cover_img']);
-            //$image_info = getimagesize($domainSync . $list['cover_img']);
-            //$list['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext='.$image_info['mime'].'&_v='.$_v;
-            $list['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext=jpg&id='.$list['id'].'&_v='.$_v;
+            $list['cover_img'] = $this->transferImgOut($list['cover_img'],$domainSync,$_v);
             if ($list['usage']??false) {
                 unset($list['vs_id'], $list['vs_name'], $list['vs_gold'], $list['vs_cat'], $list['vs_sync'], $list['vs_title'], $list['vs_duration'], $list['vs_type'], $list['vs_restricted'], $list['vs_cover_img'], $list['vs_views'], $list['vs_updated_at'], $list['vs_hls_url'], $list['vs_dash_url'], $list['vs_url']);
             }
-            //hls处理
+            //hls播放地址处理
             if(isset($list['hls_url'])){
-                $hlsInfo = pathinfo($list['hls_url']);
-                $list['hls_url'] = $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'_0_1000.vid?id='.$list['id'].'&_v='.$_v;
+                $list['hls_url'] = $this->transferHlsUrl($list['hls_url']);
             }
-            $previewHlsInfo = pathinfo($list['preview_hls_url']);
-            $list['preview_hls_url'] = $previewHlsInfo['dirname'].'/'.$previewHlsInfo['filename'].'.vid?id='.$list['id'].'&_v='.$_v;
+            $list['preview_hls_url'] = $this->transferHlsUrl($list['preview_hls_url']);
+            /*$previewHlsInfo = pathinfo($list['preview_hls_url']);
+            $list['preview_hls_url'] = $previewHlsInfo['dirname'].'/'.$previewHlsInfo['filename'].'.vid?id='.$list['id'].'&_v='.$_v;*/
             //是否点赞
             $viewRecord = $this->isLoveOrCollect($uid,$list['id']);
             $list['is_love'] = $viewRecord['is_love'] ?? 0;
@@ -465,6 +459,49 @@ trait VideoTrait
         //是否收藏
         $one['is_collect'] = $viewRecord['is_collect'] ?? 0;
         return $one;
+    }
+
+    public function getLocalSliceDir($pathInfo): string
+    {
+        return $pathInfo['dirname'].env('SLICE_DIR','/slice').'/'.$pathInfo['filename'];
+    }
+
+
+    /**
+     * 同步封面
+     * @param $img
+     */
+    public function syncCoverImg($coverImgPath)
+    {
+        $content = Storage::get($coverImgPath);
+        $result = Storage::disk('sftp')->put($coverImgPath, $content);
+        //
+        $fileInfo = pathinfo($coverImgPath);
+        $encryptFile = str_replace('/storage','/public',$fileInfo['dirname']).'/'.$fileInfo['filename'].'.htm';
+        $r = Storage::disk('sftp')->put($encryptFile,$content);
+        Log::info('==VideoEncryptImg==',[$encryptFile,$result,$r]);
+    }
+
+    /**
+     * 截取视频封面
+     * @return string
+     * @throws Exception
+     */
+    public function generalCoverImgAtSliceDir($mp4FileName): string
+    {
+        $file_name = pathinfo($mp4FileName,PATHINFO_FILENAME);
+        $format = new X264();
+        $format->setAdditionalParameters(['-vcodec', 'copy', '-acodec', 'copy']); //跳过编码
+        //$format = $format->setAdditionalParameters(['-hwaccels', 'cuda']);//GPU高效转码
+        $model = \ProtoneMedia\LaravelFFMpeg\Support\FFMpeg::fromDisk("local") //在storage/app的位置
+        ->open($mp4FileName);
+        $video = $model->export()->toDisk("local")->inFormat($format);
+        //done 生成截图
+        $frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1));
+        $sliceDir = 'public'.env('SLICE_DIR','/slice');
+        $cover_path = $sliceDir.'/'.$this->coverImgDir.'/'.$file_name.'/'.$file_name.'.jpg';
+        $frame->save($cover_path);
+        return $cover_path;
     }
 
 }

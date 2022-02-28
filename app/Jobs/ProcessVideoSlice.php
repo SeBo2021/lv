@@ -14,6 +14,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use ProtoneMedia\LaravelFFMpeg\Exporters\HLSExporter;
 
 class ProcessVideoSlice implements ShouldQueue
 {
@@ -24,7 +25,7 @@ class ProcessVideoSlice implements ShouldQueue
      *
      * @var int
      */
-    //public $tries = 3;
+    public $tries = 1;
 
     public int $timeout = 180000; //默认60秒超时
     //跳跃式延迟执行
@@ -43,7 +44,7 @@ class ProcessVideoSlice implements ShouldQueue
     {
         //
         $this->row = $row;
-        $this->mp4Path = $this->getMp4Path();
+        $this->mp4Path = $this->getMp4FilePath($row->url);
     }
 
     /**
@@ -51,33 +52,40 @@ class ProcessVideoSlice implements ShouldQueue
      *
      * @return void
      * @throws FileNotFoundException
+     * @throws \Exception
      */
     public function handle()
     {
-        //
-        $this->dash_slice($this->row);
-        $this->hls_slice($this->row,true);
+        $file_name = pathinfo($this->row->url,PATHINFO_FILENAME);
+        $mp4_path = $this->transcodeMp4($this->mp4Path,$file_name);
+        //自动截图封面
+        $sliceCoverImg = $this->generalCoverImgAtSliceDir($mp4_path);
+        $this->syncCoverImg($sliceCoverImg);
+        //自定义上传封面
+        $this->syncUpload($this->row->cover_img);
+        //切片
+        $this->hlsSlice($mp4_path,true);
+        //同步到资源站
+        $this->syncSlice($this->row->url,true);
 
         //todo 更新状态值表示任务执行完成
         \AetherUpload\Util::deleteResource($this->row->url); //删除对应的资源文件
         \AetherUpload\Util::deleteRedisSavedPath($this->row->url); //删除对应的redis秒传记录
-        // 同步到资源站
-        $this->syncSlice($this->row->url,true);
-        $this->syncUpload($this->row->cover_img);
         //生成预览
-        $this->generatePreview($this->row);
+        $this->generatePreview($this->row->url);
+        /*
+        $this->dash_slice($this->row);
+        */
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function dash_slice($row)
+
+    /*public function dash_slice($row)
     {
         //切片转码成m4s格式文件
         $mp4_path = $this->getMp4Path();
         $file_name = pathinfo($row->url,PATHINFO_FILENAME);
         //不是mp4格式转mp4
-        $mp4_path = $this->transcodeMp4($mp4_path,$file_name);
+        //$mp4_path = $this->transcodeMp4($mp4_path,$file_name);
         //创建对应的切片目录
         $sliceDir = 'public'.env('SLICE_DIR','/slice');
         $tmp_path = $sliceDir.'/dash/'.$file_name.'/';
@@ -96,20 +104,18 @@ class ProcessVideoSlice implements ShouldQueue
         ->export()
         ->toDisk("local")
         ->inFormat($format);
-        $video->save($mpd_path);
+        //切片保存
+        //$video->save($mpd_path);
         //done 生成截图
         $frame = $video->frame(TimeCode::fromSeconds(1));
         $cover_path = $sliceDir.'/'.$this->coverImgDir.'/'.$file_name.'/'.$file_name.'.jpg';
         $frame->save($cover_path);
 
-    }
+    }*/
 
-    public function hls_slice($row, $del=false)
+    public function hlsSlice($mp4Path, $delMp4=false)
     {
-        $mp4_path = $this->getMp4Path();
-        $file_name = pathinfo($row->url,PATHINFO_FILENAME);
-        //不是mp4格式转mp4
-        $mp4_path = $this->transcodeMp4($mp4_path,$file_name);
+        $file_name = pathinfo($this->row->url,PATHINFO_FILENAME);
         //创建对应的切片目录
         $tmp_path = 'public'.env('SLICE_DIR','/slice').'/hls/'.$file_name.'/';
         $dirname = storage_path('app/').$tmp_path;
@@ -136,9 +142,12 @@ class ProcessVideoSlice implements ShouldQueue
         //$highBitrate = (new FFMpeg\Format\Video\X264('aac', 'libx264'))->setKiloBitrate(1000);
 
         $video = \ProtoneMedia\LaravelFFMpeg\Support\FFMpeg::fromDisk("local") //在storage/app的位置
-        ->open($mp4_path);
+        ->open($mp4Path);
 
+        $encryptKey = HLSExporter::generateEncryptionKey();
+        Storage::disk('local')->put($tmp_path.'/secret.key',$encryptKey);
         $result = $video->exportForHLS()
+            ->withEncryptionKey($encryptKey)
             ->setSegmentLength($segmentLength)//默认值是10
             ->toDisk("local")
             ->addFormat($format)
@@ -151,8 +160,8 @@ class ProcessVideoSlice implements ShouldQueue
         $updateData['duration'] = $this->formatSeconds($durationSeconds);
         DB::table('video')->where('id',$this->row->id)->update($updateData);
         //删除mp4文件
-        if($del!==false){
-            Storage::delete($mp4_path);
+        if($delMp4!==false){
+            Storage::delete($mp4Path);
         }
     }
 

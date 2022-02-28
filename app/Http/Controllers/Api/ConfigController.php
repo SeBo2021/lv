@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class ConfigController extends Controller
 {
-    use PHPRedisTrait;
+    use PHPRedisTrait,AdTrait;
 
     public function ack()
     {
@@ -27,8 +27,8 @@ class ConfigController extends Controller
             $res['kf_url'] = $appConfig['kf_url'];
             $res['send_sms_intervals'] = (int)$appConfig['send_sms_intervals'];
             //广告部分
-            $ads = AdTrait::weightGet('open_screen');
-            $activityAds = AdTrait::weightGet('activity');
+            $ads = $this->weightGet('open_screen');
+            $activityAds = $this->weightGet('activity');
             $res['open_screen_ads'] = $ads;
             $res['activity_ads'] = $activityAds;
 

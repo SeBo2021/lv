@@ -14,6 +14,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use ProtoneMedia\LaravelFFMpeg\Exporters\HLSExporter;
 
 class ProcessVideoShort implements ShouldQueue
 {
@@ -43,7 +44,7 @@ class ProcessVideoShort implements ShouldQueue
     {
         //
         $this->row = $row;
-        $this->mp4Path = $this->getMp4Path();
+        $this->mp4Path = $this->getMp4FilePath($row->url);
     }
 
     /**
@@ -51,56 +52,24 @@ class ProcessVideoShort implements ShouldQueue
      *
      * @return void
      * @throws FileNotFoundException
+     * @throws \Exception
      */
     public function handle()
     {
-        //
-        $this->dash_slice($this->row);
+        $file_name = pathinfo($this->row->url,PATHINFO_FILENAME);
+        $mp4_path = $this->transcodeMp4($this->mp4Path,$file_name);
+        //封面
+        $sliceCoverImg = $this->generalCoverImgAtSliceDir($mp4_path);
+        $this->syncCoverImg($sliceCoverImg);
+        //自定义上传封面
+        $this->syncUpload($this->row->cover_img);
         $this->hls_slice($this->row,true);
 
         //todo 更新状态值表示任务执行完成
         \AetherUpload\Util::deleteResource($this->row->url); //删除对应的资源文件
         \AetherUpload\Util::deleteRedisSavedPath($this->row->url); //删除对应的redis秒传记录
-        // 同步到资源站
+        //同步到资源站
         $this->syncSlice($this->row->url,true);
-        $this->syncUpload($this->row->cover_img);
-        //生成预览
-        //$this->generatePreview($this->row);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function dash_slice($row)
-    {
-        //切片转码成m4s格式文件
-        $mp4_path = $this->getMp4Path();
-        $file_name = pathinfo($row->url,PATHINFO_FILENAME);
-        //不是mp4格式转mp4
-        $mp4_path = $this->transcodeMp4($mp4_path,$file_name);
-        //创建对应的切片目录
-        $sliceDir = 'public'.env('SLICE_DIR','/slice');
-        $tmp_path = $sliceDir.'/dash/'.$file_name.'/';
-        $dirname = storage_path('app/').$tmp_path;
-        if(!is_dir($dirname)){
-            mkdir($dirname, 0755, true);
-        }
-
-        $mpd_path = $tmp_path.$file_name.'.mpd';
-
-        $format = new \FFMpeg\Format\Video\X264();
-        $format->setAdditionalParameters(['-vcodec', 'copy','-acodec', 'copy']); //跳过编码
-        //$format = $format->setAdditionalParameters(['-hwaccels', 'cuda']);//GPU高效转码
-        $video = \ProtoneMedia\LaravelFFMpeg\Support\FFMpeg::fromDisk("local") //在storage/app的位置
-        ->open($mp4_path)
-        ->export()
-        ->toDisk("local")
-        ->inFormat($format);
-        $video->save($mpd_path);
-        //done 生成截图
-        $frame = $video->frame(TimeCode::fromSeconds(1));
-        $cover_path = $sliceDir.'/'.$this->coverImgDir.'/'.$file_name.'/'.$file_name.'.jpg';
-        $frame->save($cover_path);
 
     }
 
@@ -137,8 +106,10 @@ class ProcessVideoShort implements ShouldQueue
 
         $video = \ProtoneMedia\LaravelFFMpeg\Support\FFMpeg::fromDisk("local") //在storage/app的位置
         ->open($mp4_path);
-
+        $encryptKey = HLSExporter::generateEncryptionKey();
+        Storage::disk('local')->put($tmp_path.'/secret.key',$encryptKey);
         $result = $video->exportForHLS()
+            ->withEncryptionKey($encryptKey)
             ->setSegmentLength($segmentLength)//默认值是10
             ->toDisk("local")
             ->addFormat($format)

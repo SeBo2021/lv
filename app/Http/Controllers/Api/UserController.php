@@ -282,7 +282,7 @@ class UserController extends Controller
         return [];
     }
 
-    public function viewHistory(Request $request): JsonResponse|array
+    public function viewHistory(Request $request): JsonResponse
     {
         if(isset($request->params)){
             $perPage = 10;
@@ -315,6 +315,7 @@ class UserController extends Controller
             $paginator = DB::table('video')
                 ->join('view_history','video.id','=','view_history.vid')
                 ->where('view_history.uid',$user->id)
+                ->orderByDesc('view_history.time_at')
                 ->simplePaginate($perPage,$this->videoFields,'viewHistory',$page);
             //路径处理
             $res['list'] = $this->handleVideoItems($paginator->items());
@@ -326,7 +327,7 @@ class UserController extends Controller
                 'data'=>$res
             ]);
         }
-        return [];
+        return response()->json([]);
     }
 
     public static function transferSeconds($lists)

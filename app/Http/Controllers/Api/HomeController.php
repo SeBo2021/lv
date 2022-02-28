@@ -10,6 +10,7 @@ use App\Models\Video;
 use App\TraitClass\AdTrait;
 use App\TraitClass\ApiParamsTrait;
 use App\TraitClass\GoldTrait;
+use App\TraitClass\MemberCardTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ use Illuminate\Validation\ValidationException;
 
 class HomeController extends Controller
 {
-    use PHPRedisTrait, GoldTrait, VideoTrait;
+    use PHPRedisTrait, GoldTrait, VideoTrait, AdTrait, MemberCardTrait;
 
     public function category(Request $request)
     {
@@ -37,7 +38,11 @@ class HomeController extends Controller
     }
 
     //轮播
-    public function carousel(Request $request)
+
+    /**
+     * @throws ValidationException
+     */
+    public function carousel(Request $request): \Illuminate\Http\JsonResponse
     {
         if(isset($request->params)){
             $params = ApiParamsTrait::parse($request->params);
@@ -51,9 +56,9 @@ class HomeController extends Controller
                 ->where('cid', $cid)
                 ->get(['id','title','img','url','action_type','vid','status','end_at'])
                 ->toArray();
-            $domain = env('APP_URL');
+            $domain = env('RESOURCE_DOMAIN');
             foreach ($data as &$item){
-                $item['img'] = $domain . $item['img'];
+                $item['img'] = $this->transferImgOut($item['img'],$domain,date('Ymd'),'auto');
                 $item['action_type'] = (string) $item['action_type'];
                 $item['vid'] = (string) $item['vid'];
             }
@@ -62,13 +67,13 @@ class HomeController extends Controller
                 'data'=>$data
             ]);
         }
-        return [];
+        return response()->json([]);
     }
 
     /**
      * @throws ValidationException
      */
-    public function lists(Request $request)
+    public function lists(Request $request): \Illuminate\Http\JsonResponse
     {
         if(isset($request->params)){
             $params = ApiParamsTrait::parse($request->params);
@@ -79,7 +84,7 @@ class HomeController extends Controller
             $cid = $validated['cid'];
             $page = $validated['page'];
         }else{
-            return [];
+            return response()->json([]);
         }
         $redis = $this->redis();
         $sectionKey = ($this->apiRedisKey['home_lists']).$cid.'-'.$page;
@@ -122,7 +127,7 @@ class HomeController extends Controller
             $res['hasMorePages'] = $paginator->hasMorePages();
             $res['list'] = $data;
             /*//广告
-            //$res['list'] = AdTrait::insertAds($res['list'],'home_page',true,$page,$perPage);*/
+            //$res['list'] = $this->insertAds($res['list'],'home_page',true,$page,$perPage);*/
             //存入redis
             $redis->set($sectionKey,json_encode($res,JSON_UNESCAPED_UNICODE));
             //$redis->expire($sectionKey,$this->redisExpiredTime);
@@ -130,7 +135,7 @@ class HomeController extends Controller
             $res = json_decode($res,true);
         }
         //广告
-        $res['list'] = AdTrait::insertAds($res['list'],'home_page',true,$page,$perPage);
+        $res['list'] = $this->insertAds($res['list'],'home_page',true,$page,$perPage);
         return response()->json([
             'state'=>0,
             'data'=>$res
@@ -140,11 +145,13 @@ class HomeController extends Controller
     //充值活动
     /*public function rechargeActivity(Request $request): \Illuminate\Http\JsonResponse
     {
+        $data = [
+            'is_pop' => 0,
+        ];
         $user = $request->user();
-        $data = AdTrait::get('activity');
-        $domain = env('APP_URL');
-        foreach ($data as &$item){
-            $item['img'] = $domain . $item['img'];
+        $ads = $this->getAds('recharge_activity');
+        $MemberCards = DB::table('member_card')->get(['id','name','value','expired_hours']);
+        foreach ($ads as $item){
             $item['action_type'] = (string) $item['action_type'];
             $item['vid'] = (string) $item['vid'];
         }

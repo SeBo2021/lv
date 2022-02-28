@@ -29,7 +29,7 @@ use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 class SearchController extends Controller
 {
-    use VideoTrait,PHPRedisTrait;
+    use VideoTrait,PHPRedisTrait,AdTrait;
 
     /**
      * 搜索功能
@@ -146,7 +146,7 @@ class SearchController extends Controller
                 $res['list'] = $paginatorArr['data'];
                 $res['list'] = $this->handleVideoItems($res['list'],false,$request->user()->id);
                 //广告
-                $res['list'] = AdTrait::insertAds($res['list'],'more_page',true, $page, $perPage);
+                $res['list'] = $this->insertAds($res['list'],'more_page',true, $page, $perPage);
                 //Log::info('==CatList==',$res['list']);
                 $res['hasMorePages'] = $paginator->hasMorePages();
                 return response()->json([
@@ -185,7 +185,7 @@ class SearchController extends Controller
                 if(!empty($paginatorArr)){
                     $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
                     //广告
-                    $res['list'] = AdTrait::insertAds($res['list'],'recommend',1);
+                    $res['list'] = $this->insertAds($res['list'],'recommend',1);
                     $res['hasMorePages'] = $paginator->hasMorePages();
                     return response()->json([
                         'state'=>0,

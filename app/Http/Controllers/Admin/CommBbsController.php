@@ -31,16 +31,17 @@ class CommBbsController extends BaseCurlController
     public $pageName = '帖子记录';
 
     //1.设置模型
-    public function setModel()
+    public function setModel(): CommBbs
     {
         return $this->model = new CommBbs();
     }
 
     //2.首页的数据表格数组
-    public function indexCols()
+    public function indexCols(): array
     {
         //这里99%跟layui的表格设置参数一样
-        $data = [
+        //要返回给数组
+        return [
             [
                 'type' => 'checkbox'
             ],
@@ -107,8 +108,6 @@ class CommBbsController extends BaseCurlController
                 'align' => 'center'
             ]
         ];
-        //要返回给数组
-        return $data;
     }
 
 
@@ -253,7 +252,7 @@ class CommBbsController extends BaseCurlController
                 'name' => '视频',
                 'sync' =>  $show ? $show->sync : 0,
                 'url' => $show ? $show->url : '',
-                // 'value' => $show ? \App\Jobs\VideoSlice::getOrigin($show->sync,$show->url) :''
+//                 'value' => $show ? \App\Jobs\VideoSlice::getOrigin($show->sync,$show->url) :''
                 'value' => $show ? $show->url :''
             ],
         ];

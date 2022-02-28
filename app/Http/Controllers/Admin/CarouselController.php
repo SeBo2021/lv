@@ -7,20 +7,21 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Carousel;
 use App\Models\Category;
 use App\Services\UiService;
+use App\TraitClass\AboutEncryptTrait;
 use App\TraitClass\CatTrait;
 
 class CarouselController extends BaseCurlController
 {
-    use CatTrait;
+    use CatTrait, AboutEncryptTrait;
 
     public $pageName = '轮播图管理';
 
-    public function setModel()
+    public function setModel(): Carousel
     {
         return $this->model = new Carousel();
     }
 
-    public function getCateGoryData()
+    public function getCateGoryData(): array
     {
         return array_merge($this->uiService->allDataArr('请选择分类'), $this->uiService->treeData(Category::checked()->get()->toArray(), 0));//树形select
     }
@@ -184,6 +185,11 @@ class CarouselController extends BaseCurlController
             $model->start_at = $startTime;
             $model->end_at = $endTime;
         }
+    }
+
+    public function afterSaveSuccessEvent($model, $id = '')
+    {
+        $this->syncUpload($model->img);
     }
 
     public function setListOutputItemExtend($item)
