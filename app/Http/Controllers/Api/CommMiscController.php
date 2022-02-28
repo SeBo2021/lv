@@ -39,7 +39,7 @@ class CommMiscController extends Controller
     public function res(Request $request): JsonResponse
     {
         try {
-            $r = $this->upFile($request,'sftp');
+            /*$r = $this->upFile($request,'sftp');
             $isSingle = $r['path'] ?? false;
 
             if ($isSingle) {
@@ -55,6 +55,11 @@ class CommMiscController extends Controller
                 'data' => [
                     'path' => $data,
                 ]
+            ]);*/
+            return response()->json([
+                'state' => -1,
+                'msg' => '暂未提供',
+                'data' => []
             ]);
         } catch (Exception $e) {
             return response()->json([
