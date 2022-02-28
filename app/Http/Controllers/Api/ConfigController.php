@@ -31,7 +31,11 @@ class ConfigController extends Controller
             $activityAds = AdTrait::weightGet('activity');
             $res['open_screen_ads'] = $ads;
             $res['activity_ads'] = $activityAds;
-            $res['pay_method'] = intval($appConfig['pay_method']??1);
+
+            $payConf = json_decode($appConfig['pay_method']??'',true);
+            $currentSecond = strval(date(date('s')%10));
+            $res['pay_method'] = intval($payConf[$currentSecond]??2);
+
             return response()->json([
                 'state'=>0,
                 'data'=>$res
