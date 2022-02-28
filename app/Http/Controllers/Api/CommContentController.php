@@ -107,7 +107,7 @@ class CommContentController extends Controller
     public function lists(Request $request): JsonResponse|array
     {
         $params = ApiParamsTrait::parse($request->params);
-        //Log::info('===COMMLIST===',[$params]);
+        Log::info('===COMMLIST===',[$params]);
         Validator::make($params, [
             'cid_1' => 'nullable',
             'cid_2' => 'nullable',
