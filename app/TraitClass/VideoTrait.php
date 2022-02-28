@@ -411,8 +411,9 @@ trait VideoTrait
             if(isset($list['hls_url'])){
                 $list['hls_url'] = $this->transferHlsUrl($list['hls_url']);
             }
-            $previewHlsInfo = pathinfo($list['preview_hls_url']);
-            $list['preview_hls_url'] = $previewHlsInfo['dirname'].'/'.$previewHlsInfo['filename'].'.vid?id='.$list['id'].'&_v='.$_v;
+            $list['preview_hls_url'] = $this->transferHlsUrl($list['preview_hls_url']);
+            /*$previewHlsInfo = pathinfo($list['preview_hls_url']);
+            $list['preview_hls_url'] = $previewHlsInfo['dirname'].'/'.$previewHlsInfo['filename'].'.vid?id='.$list['id'].'&_v='.$_v;*/
             //是否点赞
             $viewRecord = $this->isLoveOrCollect($uid,$list['id']);
             $list['is_love'] = $viewRecord['is_love'] ?? 0;
