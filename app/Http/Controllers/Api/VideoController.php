@@ -31,7 +31,7 @@ class VideoController extends Controller
     use MemberCardTrait;
 
     //播放
-    public function actionView(Request $request)
+    public function actionView(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
         $viewLongVideoTimes = $user->long_vedio_times; //观看次数

@@ -2,7 +2,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Jobs\ProcessShort;
-use App\Jobs\ProcessEncryptVideo;
 use App\Jobs\ProcessSyncMiddleTagTable;
 use App\Jobs\ProcessVideoShort;
 use App\Jobs\ProcessVideoShortMod;
@@ -350,6 +349,7 @@ class ShortController extends BaseCurlController
                     $result = $this->getSearchCheckboxResult($items,$cat,'cat');
                 }
             }
+            $result = (array)$result ?? [];
             $total = count($result);
             //获取当前页数据
             $offset = ($page-1)*$pagesize;
@@ -535,16 +535,12 @@ class ShortController extends BaseCurlController
                     $value_arr = explode(',',$value);
                     $buildQueryVideo = VideoShort::query()->whereIn($id, $id_arr);
                     $buildQueryVideo->update(['cat'=>json_encode($value_arr)]);
-                    //队列执行更新版块中间表
-                    ProcessEncryptVideo::dispatchAfterResponse();
                     $r=true;
                     break;
                 case 'tag':
                     $value_arr = explode(',',$value);
                     $buildQueryVideo = VideoShort::query()->whereIn($id, $id_arr);
                     $buildQueryVideo->update(['tag'=>json_encode($value_arr)]);
-                    //更新标签中间表
-                    ProcessSyncMiddleTagTable::dispatchAfterResponse();
                     $r=true;
                     break;
                 case 'duration_seconds':

@@ -9,6 +9,9 @@ trait AboutEncryptTrait
 {
     public function transferImgOut($img,$domain=null,$_v=null,$fixType='jpg'): string
     {
+        if(!$img){
+            return '';
+        }
         $domain = $domain ?? env('RESOURCE_DOMAIN');
         $_v = $_v ?? 1;
         $fileInfo = pathinfo($img);
