@@ -133,6 +133,7 @@ class CarouselController extends BaseCurlController
                 'type' => 'img',
                 'name' => '图片',
                 'must' => 1,
+                'value' => ($show && ($show->img)) ? $this->getOriginEncImg($show->img) : ''
             ],
             [
                 'field' => 'action_type',
