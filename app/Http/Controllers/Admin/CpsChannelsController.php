@@ -99,6 +99,12 @@ class CpsChannelsController extends BaseCurlController
                 'align' => 'center',
             ],
             [
+                'field' => 'fast_url',
+                'minWidth' => 150,
+                'title' => '渠道直推下载安装链接',
+                'align' => 'center',
+            ],
+            [
                 'field' => 'status',
                 'minWidth' => 80,
                 'title' => '状态',
