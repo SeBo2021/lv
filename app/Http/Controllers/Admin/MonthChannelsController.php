@@ -98,6 +98,12 @@ class MonthChannelsController extends BaseCurlController
                 'title' => '渠道推广链接',
                 'align' => 'center',
             ],
+            [
+                'field' => 'fast_url',
+                'minWidth' => 150,
+                'title' => '渠道直推下载安装链接',
+                'align' => 'center',
+            ],
             /*[
                 'field' => 'statistic_url',
                 'minWidth' => 80,

@@ -99,6 +99,12 @@ class CpsChannelsController extends BaseCurlController
                 'align' => 'center',
             ],
             [
+                'field' => 'fast_url',
+                'minWidth' => 150,
+                'title' => '渠道直推下载安装链接',
+                'align' => 'center',
+            ],
+            [
                 'field' => 'status',
                 'minWidth' => 80,
                 'title' => '状态',
@@ -170,9 +176,9 @@ class CpsChannelsController extends BaseCurlController
                 'field' => 'deduction',
                 'type' => 'number',
                 'name' => '扣量(点)',
-                'value' => ($show && ($show->deduction>0)) ? $show->deduction/100 : 50,
+                'value' => ($show && ($show->deduction>0)) ? $show->deduction/100 : 0,
                 'must' => 0,
-                'default' => '50',
+                'default' => 50,
             ],
             [
                 'field' => 'unit_price',
@@ -184,7 +190,7 @@ class CpsChannelsController extends BaseCurlController
                 'field' => 'is_deduction',
                 'type' => 'radio',
                 'name' => '前10个下载不扣量',
-                'default' => 0,
+                'default' => 1,
                 'data' => $this->isDeduction
             ],
             /*[

@@ -98,6 +98,12 @@ class CpaChannelsController extends BaseCurlController
                 'title' => '渠道推广链接',
                 'align' => 'center',
             ],
+            [
+                'field' => 'fast_url',
+                'minWidth' => 150,
+                'title' => '渠道直推下载安装链接',
+                'align' => 'center',
+            ],
             /*[
                 'field' => 'statistic_url',
                 'minWidth' => 80,
@@ -176,9 +182,9 @@ class CpaChannelsController extends BaseCurlController
                 'field' => 'deduction',
                 'type' => 'number',
                 'name' => '扣量(点) (CPA使用)',
-                'value' => ($show && ($show->deduction>0)) ? $show->deduction/100 : 50,
+                'value' => ($show && ($show->deduction>0)) ? $show->deduction/100 : 0,
                 'must' => 0,
-                'default' => '50',
+                'default' => 50,
             ],
             [
                 'field' => 'unit_price',
@@ -190,7 +196,7 @@ class CpaChannelsController extends BaseCurlController
                 'field' => 'is_deduction',
                 'type' => 'radio',
                 'name' => '前10个下载不扣量 (CPA使用)',
-                'default' => 0,
+                'default' => 1,
                 'data' => $this->isDeduction
             ],
             /*[
@@ -238,25 +244,7 @@ class CpaChannelsController extends BaseCurlController
     public function afterSaveSuccessEvent($model, $id = '')
     {
         //
-        $one = DB::table('domain')->where('status',1)->inRandomOrder()->first();
-        $model->type += 0;
-        $model->url = match ($model->type) {
-            0, 2 => $one->name . '?' . http_build_query(['channel_id' => $model->promotion_code]),
-            1 => $one->name . '/downloadFast?' . http_build_query(['channel_id' => $model->promotion_code]),
-        };
-        if($id == ''){ //添加
-            $model->number = 'S'.Str::random(6) . $model->id;
-
-            $model->statistic_url = env('RESOURCE_DOMAIN') . '/channel/index.html?' . http_build_query(['code' => $model->number]);
-            //https://sao.yinlian66.com/channel/index.html?code=1
-
-            $this->writeChannelDeduction($model->id,$model->deduction,$model->updated_at);
-            //创建渠道用户
-            $password = !empty($model->password) ? $model->password : bcrypt($model->number);
-            $this->createChannelAccount($model,$password);
-        }
-        $model->save();
-        $this->initStatisticsByDay($model->id);
+        $this->afterSaveSuccessEventHandle($model, $id);
         return $model;
     }
 
