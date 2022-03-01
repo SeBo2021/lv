@@ -383,7 +383,7 @@ class MemberController extends BaseCurlController
         //$item->area = DB::table('login_log')->where('uid',$item->id)->orderByDesc('id')->value('area');
         $item->status = UiService::switchTpl('status', $item,'');
         $item->phone_number = $item->phone_number>0 ? $item->phone_number : '未绑定';
-        $item->member_card_type = $this->getMemberCardList('gold')[max(explode(',',$item->member_card_type))]['name'];
+        $item->member_card_type = $this->getMemberCardList('gold')[max(explode(',',$item->member_card_type))]['name'] ?? '';
         $item->vip_start_last = date('Y-m-d H:i:s',$item->vip_start_last);
         $item->vip_expired = $item->vip_expired>0 ? round($item->vip_expired/(3600*24)).'小时' :0;
         return $item;
