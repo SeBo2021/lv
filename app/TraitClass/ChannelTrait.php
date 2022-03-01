@@ -204,10 +204,8 @@ trait ChannelTrait
     {
         $one = DB::table('domain')->where('status',1)->inRandomOrder()->first();
         $model->type += 0;
-        $model->url = match ($model->type) {
-            0, 2 => $one->name . '?' . http_build_query(['channel_id' => $model->promotion_code]),
-            1 => $one->name . '/downloadFast?' . http_build_query(['channel_id' => $model->promotion_code]),
-        };
+        $model->url = $one->name . '?' . http_build_query(['channel_id' => $model->promotion_code]);
+        $model->fast_url = $one->name . '/downloadFast?' . http_build_query(['channel_id' => $model->promotion_code]);
         if($id == ''){ //添加
             $model->number = 'S'.Str::random(6) . $model->id;
 
