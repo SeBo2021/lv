@@ -45,9 +45,10 @@ class encryptVideoCoverImg extends Command
         $items = DB::table($table)
             //->whereIn('id',['4'])
             //->where('id','<',10001)
-            ->where('id','<',1824)
+            //->where('id','<',686)
+            ->where('id','>',3700)
 //            ->where('id','>',4)
-            ->orderByDesc('id')
+            //->orderByDesc('id')
             ->get(['id','cover_img','sync']);
         $domain =str_replace('https','http',env('RESOURCE_DOMAIN'));
         end($items);

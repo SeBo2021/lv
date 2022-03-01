@@ -63,8 +63,11 @@ trait AboutEncryptTrait
         $url = $this->transferImgOut($img, $domain,$_v,'auto');
         //dump($url);
         $imgData = @file_get_contents($url);
-        parse_str(parse_url($url)['query'],$query_arr);
-        $ext = $query_arr['ext'];
-        return "data:." . $ext . ";base64," . base64_encode($imgData);
+        if($imgData){
+            parse_str(parse_url($url)['query'],$query_arr);
+            $ext = $query_arr['ext'];
+            return "data:." . $ext . ";base64," . base64_encode($imgData);
+        }
+        return '';
     }
 }
