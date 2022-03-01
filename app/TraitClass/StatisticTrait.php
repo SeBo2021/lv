@@ -70,12 +70,15 @@ trait StatisticTrait
                         $is_deduction = $channelInfo->is_deduction;
                         $deductionValue = $channelInfo->deduction;
                         //是否开启前十个下载扣量
-                        $stepValue = round(1*(1-$deductionValue/10000),2) * 100;
                         if($is_deduction == 1){ //开启
-                            $sumHits = DB::table($statisticTable)->where('channel_id',$channel_id)->where('date_at',date('Y-m-d'))->sum('install_real');
+                            $sumHits = DB::table($statisticTable)->where('channel_id',$channel_id)->sum('hits');
                             if(($sumHits/100) < 11){ //第一次前十个
                                 $stepValue = 0;
+                            }else{
+                                DB::table('channels')->where('id',$channel_id)->update(['is_deduction'=>0]);
                             }
+                        }else{ //关闭
+                            $stepValue = round(1*(1-$deductionValue/10000),2) * 100;
                         }
                     }
                     if($stepValue>0){
