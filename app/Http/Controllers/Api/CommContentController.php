@@ -163,7 +163,7 @@ class CommContentController extends Controller
         }
         $lastLoginIds = array_column($lastLogin, 'max_id');
         $areaInfo = LoginLog::query()->whereIn('id', $lastLoginIds)
-            ->groupBy('uid')
+           // ->groupBy('uid')
             ->get()->toArray();
         if (!$areaInfo) {
             return;
