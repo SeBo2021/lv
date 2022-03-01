@@ -62,7 +62,8 @@ return [
         'redis' => [
             'driver' => 'redis',
             'connection' => 'default',
-            'queue' => env('REDIS_QUEUE', 'default'),
+            //'queue' => env('REDIS_QUEUE', 'default'),
+            'queue' => '{default}',
 //            'retry_after' => 90,
             'retry_after' => 36000, //最长耗时时间(单位:秒)
             'block_for' => 30,

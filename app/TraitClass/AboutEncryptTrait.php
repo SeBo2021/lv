@@ -59,7 +59,7 @@ trait AboutEncryptTrait
 
     public function getOriginEncImg($img,$domain=null): string
     {
-        $_v = date('YmdHis');
+        $_v = date('Ymd');
         $url = $this->transferImgOut($img, $domain,$_v,'auto');
         //dump($url);
         $imgData = @file_get_contents($url);
