@@ -74,7 +74,7 @@ trait StatisticTrait
                         if($is_deduction == 1){ //开启
                             $sumHits = DB::table($statisticTable)->where('channel_id',$channel_id)->where('date_at',date('Y-m-d'))->sum('install_real');
                             if(($sumHits/100) < 11){ //第一次前十个
-                                $stepValue = 0;
+                                $stepValue = 100;
                             }
                         }
                     }

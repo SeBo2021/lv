@@ -93,6 +93,8 @@ class AuthController extends Controller
                 $user->gold = 0;
                 $user->balance = 0;
                 $user->sex = 0;
+                $user->member_card_type = 0;
+                $user->vip_start_last = '';
                 //分配默认相关设置
                 $configData = config_cache('app');
                 $user->long_vedio_times = $configData['free_view_long_video_times'] ?? 0;
