@@ -270,7 +270,7 @@ class ShortController extends BaseCurlController
         try {
 //            $job = new ProcessShort($model,$isVideo);
             $job = new ProcessVideoShort($model);
-            $this->dispatch($job);
+            $this->dispatch($job->onQueue('high'));
             // app(Dispatcher::class)->dispatchNow($job);
         }catch (\Exception $e){
             Log::error($e->getMessage());

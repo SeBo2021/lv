@@ -332,7 +332,7 @@ class CommBbsController extends BaseCurlController
         $isVideo = ($_REQUEST['callback_upload'] ?? 0);
         try {
             $job = new ProcessBbs($model, 1, $isVideo);
-            $this->dispatch($job);
+            $this->dispatch($job->onQueue('high'));
             // app(Dispatcher::class)->dispatchNow($job);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
