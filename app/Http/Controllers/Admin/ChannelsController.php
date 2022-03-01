@@ -96,6 +96,12 @@ class ChannelsController extends BaseCurlController
                 'title' => '渠道推广链接',
                 'align' => 'center',
             ],
+            [
+                'field' => 'fast_url',
+                'minWidth' => 150,
+                'title' => '渠道直推下载安装链接',
+                'align' => 'center',
+            ],
 //            [
 //                'field' => 'statistic_url',
 //                'minWidth' => 80,
@@ -279,10 +285,12 @@ class ChannelsController extends BaseCurlController
         //
         $one = DB::table('domain')->where('status',1)->inRandomOrder()->first();
         $model->type += 0;
-        $model->url = match ($model->type) {
+        /*$model->url = match ($model->type) {
             0, 2 => $one->name . '?' . http_build_query(['channel_id' => $model->promotion_code]),
             1 => $one->name . '/downloadFast?' . http_build_query(['channel_id' => $model->promotion_code]),
-        };
+        };*/
+        $model->url = $one->name . '?' . http_build_query(['channel_id' => $model->promotion_code]);
+        $model->fast_url = $one->name . '/downloadFast?' . http_build_query(['channel_id' => $model->promotion_code]);
         if($id == ''){ //添加
             $model->number = 'S'.Str::random(6) . $model->id;
 
