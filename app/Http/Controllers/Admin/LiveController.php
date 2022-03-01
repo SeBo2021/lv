@@ -245,7 +245,7 @@ class LiveController extends BaseCurlController
         if( isset($_REQUEST['callback_upload']) && ($_REQUEST['callback_upload']==1)){
             try {
                 $job = new ProcessLive($model);
-                $this->dispatch($job);
+                $this->dispatch($job->onQueue('high'));
                 // app(Dispatcher::class)->dispatchNow($job);
             }catch (\Exception $e){
                 Log::error($e->getMessage());
