@@ -72,8 +72,8 @@ trait StatisticTrait
                         //是否开启前十个下载扣量
                         $stepValue = round(1*(1-$deductionValue/10000),2) * 100;
                         if($is_deduction == 1){ //开启
-                            $sumHits = DB::table($statisticTable)->where('channel_id',$channel_id)->where('date_at',date('Y-m-d'))->sum('install_real');
-                            if(($sumHits/100) < 11){ //第一次前十个
+                            $install_real = DB::table($statisticTable)->where('channel_id',$channel_id)->where('date_at',date('Y-m-d'))->sum('install_real');
+                            if($install_real < 11){ //第一次前十个
                                 $stepValue = 100;
                             }
                         }
