@@ -12,6 +12,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, SearchScopeTrait;
 
+    protected $connection = 'master_mysql';
 
     protected $guarded = [];
 

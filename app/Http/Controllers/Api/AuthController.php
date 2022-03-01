@@ -161,6 +161,8 @@ class AuthController extends Controller
             'source_info'=> $_SERVER['HTTP_USER_AGENT'],
             'device_system'=> $login_info['device_system'] ?? 0,
         ];
+        Log::debug('login_log_data===',[$login_log_data]);
+
         ProcessLogin::dispatchAfterResponse($login_log_data);
         /*$job = new ProcessLogin($login_log_data);
         $this->dispatch($job);*/
