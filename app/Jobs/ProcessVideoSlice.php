@@ -61,8 +61,6 @@ class ProcessVideoSlice implements ShouldQueue
         //自动截图封面
         $sliceCoverImg = $this->generalCoverImgAtSliceDir($mp4_path);
         $this->syncCoverImg($sliceCoverImg);
-        //自定义上传封面
-        $this->syncUpload($this->row->cover_img);
         //切片
         $this->hlsSlice($mp4_path,true);
         //同步到资源站
