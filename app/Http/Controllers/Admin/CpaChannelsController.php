@@ -182,9 +182,9 @@ class CpaChannelsController extends BaseCurlController
                 'field' => 'deduction',
                 'type' => 'number',
                 'name' => '扣量(点) (CPA使用)',
-                'value' => ($show && ($show->deduction>0)) ? $show->deduction/100 : 50,
+                'value' => ($show && ($show->deduction>0)) ? $show->deduction/100 : 0,
                 'must' => 0,
-                'default' => '50',
+                'default' => 50,
             ],
             [
                 'field' => 'unit_price',
@@ -196,7 +196,7 @@ class CpaChannelsController extends BaseCurlController
                 'field' => 'is_deduction',
                 'type' => 'radio',
                 'name' => '前10个下载不扣量 (CPA使用)',
-                'default' => 0,
+                'default' => 1,
                 'data' => $this->isDeduction
             ],
             /*[
