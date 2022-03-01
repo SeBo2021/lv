@@ -8,14 +8,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-class encryptVideoCoverImg extends Command
+class encryptCarouselsCoverImg extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'encrypt:coverImg';
+    protected $signature = 'encrypt:carouselsCoverImg';
 
     /**
      * The console command description.
