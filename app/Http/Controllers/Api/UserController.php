@@ -542,7 +542,7 @@ class UserController extends Controller
             $requestUser['expires_at_timestamp'] = strtotime($user['expires_at']);
             //生成用户专有的客服链接
             $requestUser = $this->generateChatUrl($requestUser);
-            User::query()->where('id',$user->id)->update(['vip'=>0,'member_card_type'=>'','phone_number'=>0]);
+            User::query()->where('id',$user->id)->update(['vip'=>0,'member_card_type'=>'','phone_number'=>0,'gold'=>0]);
             return response()->json(['state'=>0, 'data'=>$requestUser, 'msg'=>'账号找回成功']);
         }
         return response()->json([]);
