@@ -62,9 +62,6 @@ class ProcessLive implements ShouldQueue
         //封面
         $sliceCoverImg = $this->generalCoverImgAtSliceDir($mp4_path);
         $this->syncCoverImg($sliceCoverImg);
-        //自定义上传封面
-        $this->syncUpload($this->row->cover_img);
-
         $this->hls_slice($this->row,true);
 
         //todo 更新状态值表示任务执行完成

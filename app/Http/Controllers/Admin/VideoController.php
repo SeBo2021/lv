@@ -377,6 +377,9 @@ class VideoController extends BaseCurlController
         return $item;
     }
 
+    /**
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
     protected function afterSaveSuccessEvent($model, $id = '')
     {
         if( isset($_REQUEST['callback_upload']) && ($_REQUEST['callback_upload']==1)){
@@ -389,6 +392,10 @@ class VideoController extends BaseCurlController
             }catch (\Exception $e){
                 Log::error($e->getMessage());
             }
+        }
+        //自定义上传封面
+        if($model->cover_img){
+            $this->syncUpload($model->cover_img);
         }
         //ProcessSyncMiddleTable::dispatchAfterResponse('video');
         return $model;

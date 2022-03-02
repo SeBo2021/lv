@@ -93,6 +93,8 @@ class AuthController extends Controller
                 $user->gold = 0;
                 $user->balance = 0;
                 $user->sex = 0;
+                $user->member_card_type = 0;
+                $user->vip_start_last = '';
                 //分配默认相关设置
                 $configData = config_cache('app');
                 $user->long_vedio_times = $configData['free_view_long_video_times'] ?? 0;
@@ -159,6 +161,8 @@ class AuthController extends Controller
             'source_info'=> $_SERVER['HTTP_USER_AGENT'],
             'device_system'=> $login_info['device_system'] ?? 0,
         ];
+        Log::debug('login_log_data===',[$login_log_data]);
+
         ProcessLogin::dispatchAfterResponse($login_log_data);
         /*$job = new ProcessLogin($login_log_data);
         $this->dispatch($job);*/

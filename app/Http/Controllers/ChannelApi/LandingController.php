@@ -36,7 +36,7 @@ class LandingController extends Controller
             'created_at' => $request->input('created_at',$dateArr['at']),
         ];
         $insert['channel_id'] = $this->getChannelId($request->input('channel_id',0));
-        //Log::debug('===landingPageChannel===',$insert);
+        Log::debug('===landingPageChannel===',$insert);
         DB::table('app_download')->insertOrIgnore($insert);
         //统计点击量
         $this->saveStatisticByDay('hits',$insert['channel_id'],$insert['device_system'],$dateArr);
