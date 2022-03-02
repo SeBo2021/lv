@@ -127,7 +127,7 @@ class ProcessLogin implements ShouldQueue
                     $channel_id = $item->channel_id;
                     $channel_pid = DB::table('channels')->where('id',$item->channel_id)->value('pid');
                     $this->device_system = $item->device_system;
-                    DB::table('users')->where('id',$uid)->update([
+                    DB::connection('master_mysql')->table('users')->where('id',$uid)->update([
                         'pid'=>$pid,
                         'channel_id'=>$item->channel_id,
                         'device_system'=>$item->device_system,
