@@ -540,7 +540,7 @@ class UserController extends Controller
             $requestUser['expires_at'] = Carbon::parse(
                 $tokenResult->token->expires_at
             )->toDateTimeString();
-            $requestUser['expires_at_timestamp'] = strtotime($user['expires_at']);
+            $requestUser['expires_at_timestamp'] = strtotime($requestUser['expires_at']);
             //生成用户专有的客服链接
             $requestUser = $this->generateChatUrl($requestUser);
             User::query()->where('id',$user->id)->update([
