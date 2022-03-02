@@ -519,11 +519,12 @@ class UserController extends Controller
             $requestUser->promotion_code = $user->promotion_code;
             $requestUser->member_card_type = $user->member_card_type;
             $requestUser->balance = $user->balance;
+            $requestUser->phone_number = $user->phone_number;
             $requestUser->channel_id = $user->channel_id;
             $requestUser->save();
             //清除原来用户token和账号禁用
-            Token::query()->where('name',$user->account)->delete();
-            User::query()->where('id',$user->id)->update(['status' => 1,'did'=>$user->did.$user->id]);
+            //Token::query()->where('name',$user->account)->delete();
+            //User::query()->where('id',$user->id)->update(['status' => 1,'did'=>$user->did.$user->id]);
 
             $tokenResult = $requestUser->createToken($requestUser->account,['check-user']);
             $token = $tokenResult->token;
@@ -541,10 +542,10 @@ class UserController extends Controller
             $requestUser['expires_at_timestamp'] = strtotime($user['expires_at']);
             //生成用户专有的客服链接
             $requestUser = $this->generateChatUrl($requestUser);
-            $userModel->update(['vip'=>0,'member_card_type'=>'']);
+            User::query()->where('id',$user->id)->update(['vip'=>0,'member_card_type'=>'','phone_number'=>0]);
             return response()->json(['state'=>0, 'data'=>$requestUser, 'msg'=>'账号找回成功']);
         }
-        return [];
+        return response()->json([]);
     }
 
 }
