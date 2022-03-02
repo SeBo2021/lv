@@ -165,6 +165,7 @@ class StatisticsController extends BaseCurlController
                     0 => '其它',
                     1 => '苹果(IOS)',
                     2 => '安卓(Android)',
+                    3 => '苹果(轻量版)',
                 ];
                 foreach ($json as &$item){
                     $item->name = $systemName[$item->device_system];

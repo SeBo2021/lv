@@ -110,7 +110,7 @@ class ProcessLogin implements ShouldQueue
     {
         //绑定渠道推广
         $lastDayDate = date('Y-m-d H:i:s',strtotime('-1 day'));
-        $downloadInfo = DB::table('app_download')
+        $downloadInfo = DB::connection('master_mysql')->table('app_download')
             ->where('status',0)
             ->whereDate('created_at','>=', $lastDayDate)
             ->orderByDesc('created_at')
@@ -127,12 +127,14 @@ class ProcessLogin implements ShouldQueue
                     $channel_id = $item->channel_id;
                     $channel_pid = DB::table('channels')->where('id',$item->channel_id)->value('pid');
                     $this->device_system = $item->device_system;
-                    DB::table('users')->where('id',$uid)->update([
+                    $updateData = [
                         'pid'=>$pid,
                         'channel_id'=>$item->channel_id,
                         'device_system'=>$item->device_system,
                         'channel_pid'=>$channel_pid
-                    ]);
+                    ];
+                    User::query()->where('id',$uid)->update($updateData);
+                    Log::info('==BindChannelUser==',$updateData);
                     break;
                 }
             }

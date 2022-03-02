@@ -251,6 +251,10 @@ class LiveController extends BaseCurlController
                 Log::error($e->getMessage());
             }
         }
+        //自定义上传封面
+        if($model->cover_img){
+            $this->syncUpload($model->cover_img);
+        }
         return $model;
     }
 
