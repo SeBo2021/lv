@@ -522,7 +522,7 @@ class UserController extends Controller
             $requestUser->channel_id = $user->channel_id;
             $requestUser->save();
             //清除原来用户token和账号禁用
-            Token::query()->where('name',$user->account)->delete();
+            //Token::query()->where('name',$user->account)->delete();
             User::query()->where('id',$user->id)->update(['status' => 1,'did'=>$user->did.$user->id]);
 
             $tokenResult = $requestUser->createToken($requestUser->account,['check-user']);
