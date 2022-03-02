@@ -473,7 +473,7 @@ class UserController extends Controller
             DB::table('users')->where('id',$user->id)->update(['phone_number'=>$validated['phone'],'area_number'=>$smsCode->area_number]);
             DB::commit();
             //统计注册量
-            ProcessStatistic::dispatchAfterResponse($user);
+            //ProcessStatistic::dispatchAfterResponse($user);
             return response()->json(['state'=>0, 'msg'=>'绑定成功']);
         }
         return [];
