@@ -231,7 +231,7 @@ class RechargeController extends BaseCurlIndexController
                 'data' => $this->forward,
             ],
             [
-                'field' => 'query_device_system',
+                'field' => 'device_system',
                 'type' => 'select',
                 'name' => '手机系统平台',
                 'data' => $this->deviceSystem
@@ -273,6 +273,7 @@ class RechargeController extends BaseCurlIndexController
         $topChannelId = $this->rq->input('channel_id_tree',null);
         $queryUid = $this->rq->input('query_uid',0);
         $created_at = $this->rq->input('created_at',null);
+        $deviceSystem = $this->rq->input('device_system',null);
         //
         $page = $this->rq->input('page', 1);
         $pagesize = $this->rq->input('limit', 30);
@@ -288,6 +289,9 @@ class RechargeController extends BaseCurlIndexController
         }
         if($channel_id!==null){
             $build = $build->where('recharge.channel_id',$channel_id);
+        }
+        if($deviceSystem!==null){
+            $build = $build->where('recharge.device_system',$deviceSystem);
         }
         if($topChannelId!==null){
             $build = $build->where(function ($build) use ($topChannelId){
