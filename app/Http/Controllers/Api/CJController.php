@@ -83,7 +83,7 @@ class CJController extends Controller implements Pay
                 'userId' => '',                 //用于识别用户绑卡信息，仅快捷接口可用。
                 'ip' => $this->getRealIp(),          //用户的ip地址必传，风控需要
                 'notifyUrl' => $notifyUrl,   //异步返回地址
-                'returnUrl' => $request->getSchemeAndHttpHost() . '/my',     //同步返回地址
+                'returnUrl' => 'https://dl.yinlian66.com',     //同步返回地址
                 'nonceStr' => Random::alnum('32')   //随机字符串不超过32位
             ];
             //生成签名 请求参数按照Ascii编码排序
