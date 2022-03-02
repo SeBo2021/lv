@@ -520,6 +520,7 @@ class UserController extends Controller
             $requestUser->member_card_type = $user->member_card_type;
             $requestUser->balance = $user->balance;
             $requestUser->phone_number = $user->phone_number;
+            $requestUser->area_number = $user->area_number;
             $requestUser->channel_id = $user->channel_id;
             $requestUser->save();
             //清除原来用户token和账号禁用
