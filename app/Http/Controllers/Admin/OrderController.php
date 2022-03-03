@@ -164,6 +164,11 @@ class OrderController extends BaseCurlController
 
         $data = [
             [
+                'field' => 'query_uid',
+                'type' => 'text',
+                'name' => '会员ID',
+            ],
+            [
                 'field' => 'query_status',
                 'type' => 'select',
                 'name' => '状态',
