@@ -17,7 +17,7 @@ class OrderController extends BaseCurlController
     public $pageName = '订单';
 
     //1.设置模型
-    public function setModel()
+    public function setModel(): Order
     {
         return $this->model = new Order();
     }
@@ -198,4 +198,12 @@ class OrderController extends BaseCurlController
         $this->uiBlade['search'] = $data;
     }
 
+    public function handleResultModel($model): array
+    {
+        $queryUid = $this->rq->input('query_uid',0);
+        if($queryUid>0){
+            $model = $model->where('uid',$queryUid);
+        }
+        return parent::handleResultModel($model);
+    }
 }
