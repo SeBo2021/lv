@@ -352,7 +352,7 @@ trait VideoTrait
         return $h*3600 + $i*60 + $s;
     }
 
-    public function handleVideoItems($lists,$display_url=false,$uid = 0,$processSort = false)
+    public function handleVideoItems($lists,$display_url=false,$uid = 0)
     {
         $_v = date('Ymd');
         $domainSync = VideoTrait::getDomain(1);
@@ -441,10 +441,10 @@ trait VideoTrait
     /**
      * 判断是否收藏或喜欢
      * @param int $uid
-     * @param $vid
+     * @param int $vid
      * @return int[]
      */
-    public function isLoveOrCollect($uid = 0,$vid = 0): array
+    public function isLoveOrCollect(int $uid = 0, int $vid = 0): array
     {
         $one = [
             'is_love'=>0,

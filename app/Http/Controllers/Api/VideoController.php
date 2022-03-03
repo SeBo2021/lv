@@ -61,7 +61,7 @@ class VideoController extends Controller
         $videoField = ['id', 'name', 'cid', 'cat', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'hls_url', 'dash_url', 'type', 'cover_img', 'views', 'likes', 'comments','updated_at'];
         $one = Video::query()->find($id, $videoField)->toArray();
         if (!empty($one)) {
-            $one = $this->handleVideoItems([$one], true)[0];
+            $one = $this->handleVideoItems([$one], true,$user->id)[0];
             $one['limit'] = 0;
             //
             ProcessViewVideo::dispatchAfterResponse($user, $one);
