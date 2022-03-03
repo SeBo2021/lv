@@ -124,6 +124,10 @@ class SearchController extends Controller
     }
 
     //更多
+
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
     public function cat(Request $request): JsonResponse|array
     {
         if(isset($request->params)){
@@ -139,6 +143,7 @@ class SearchController extends Controller
                 ->join('video','cid_vid.vid','=','video.id')
                 ->where('cid_vid.cid',$cid)
                 ->where('video.status',1)
+                ->orderByDesc('video.updated_at')
                 ->simplePaginate($perPage,$this->videoFields,'cat',$page);
             //$client = ClientBuilder::create()->build();
             $paginatorArr = $paginator->toArray();
