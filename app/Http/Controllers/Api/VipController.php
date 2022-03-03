@@ -20,15 +20,17 @@ class VipController extends \App\Http\Controllers\Controller
             ->get(['id','name','sort','bg_img','remark','value','rights','hours','real_value','status','name_day','remain_hours'])
             ->toArray();
         $ascItem = [];
+        $registerTime = strtotime($user->created_at);
+        $nowTime = time();
+        $userExpiredTime =  $user->vip_start_last + $user->vip_expired;
+        $diffTime = $userExpiredTime-$nowTime;
         foreach ($memberCard as $index => &$item)
         {
             $item = (array)$item;
             $rights = $this->numToRights($item['rights']);
             $rights_list = [];
-            $registerTime = strtotime($user->created_at);
-            $nowTime = time();
-            $userExpiredTime =  $user->vip_start_last + $user->vip_expired;
-            $diffTime = $userExpiredTime-$nowTime;
+
+            Log::info('==memberCard_diff_time===',[$userExpiredTime,$diffTime]);
             foreach ($rights as $right)
             {
                 $rights_list[] = $this->cardRights[$right];
@@ -49,18 +51,18 @@ class VipController extends \App\Http\Controllers\Controller
             //
             if($registerTime+$item['hours']*3600 > $nowTime){
                 $ascItem[] = $item;
-                if($user->vip==0){
-                    unset($item);
-                }else{
-                    if($diffTime>0 && ($diffTime/3600 <$item['remain_hours'])){
-                        $ascItem[] = $item;
-                        unset($item);
-                    }
+                unset($memberCard[$index]);
+            }
+            if(isset($memberCard[$index])){
+                if($diffTime>0 && ($diffTime/3600 < $item['remain_hours'])){
+                    $ascItem[] = $item;
+                    unset($memberCard[$index]);
                 }
             }
 
         }
         array_unshift($memberCard,...$ascItem);
+        Log::info('memberCard===',$memberCard);
         $res['list'] = $memberCard;
         return response()->json([
             'state'=>0,
