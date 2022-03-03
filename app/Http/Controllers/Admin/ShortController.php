@@ -210,14 +210,14 @@ class ShortController extends BaseCurlController
                 'default' => 0,
                 'data' => $this->uiService->trueFalseData()
             ],
-            [
+            /*[
                 'field' => 'sync',
                 'type' => 'radio',
                 'name' => '启用专线',
                 'verify' => '',
                 'default' => 1,
                 'data' => $this->uiService->trueFalseData()
-            ],
+            ],*/
 
         ];
         //赋值给UI数组里面,必须是form为key
@@ -291,6 +291,7 @@ class ShortController extends BaseCurlController
         $model->author = admin('nickname');
         $model->gold = $this->rq->input('gold',0);
         $model->gold *= $this->goldUnit;
+        $model->sync = env('SFTP_SYNC',1);
         if(isset($model->url)){
             $model->dash_url = self::get_slice_url($model->url);
             $model->hls_url = self::get_slice_url($model->url,'hls');

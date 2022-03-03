@@ -72,16 +72,16 @@ return [
 
         'sftp' => [
             'driver' => 'sftp',
-            'host' => '192.74.243.238',
-            'username' => 'yluser',
-            'password' => 'os67C#qoQYx?SM?8',
+            'host' => env('SFTP_HOST',''),
+            'username' => env('SFTP_USERNAME',''),
+            'password' => env('SFTP_PASSWORD',''),
 
             // Settings for SSH key based authentication...
             // 'privateKey' => '/path/to/privateKey',
             // 'password' => 'encryption-password',
 
             // Optional SFTP Settings...
-            // 'port' => 22,
+             'port' => 22,
             // 'root' => '',
             'timeout' => 3600,
             'visibility' => 'public',

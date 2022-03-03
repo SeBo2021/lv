@@ -181,7 +181,7 @@ class LiveController extends BaseCurlController
                 'field' => 'cover_img',
                 'type' => 'img',
                 'name' => '封面图片',
-                'value' => ($show && ($show->cover_img)) ? $this->getOriginEncImg($show->cover_img) : ''
+                'value' => ($show && ($show->cover_img)) ? self::getDomain($show->sync).$show->cover_img: ''
             ],
             [
                 'field' => 'url',
@@ -197,14 +197,14 @@ class LiveController extends BaseCurlController
                 'default' => 0,
                 'data' => $this->uiService->trueFalseData()
             ],
-            [
+            /*[
                 'field' => 'sync',
                 'type' => 'radio',
                 'name' => '启用专线',
                 'verify' => '',
                 'default' => 1,
                 'data' => $this->uiService->trueFalseData()
-            ],
+            ],*/
 
         ];
         $this->uiBlade['form'] = $data;
@@ -264,6 +264,7 @@ class LiveController extends BaseCurlController
         $model->cat = json_encode([]);
         $model->tag = json_encode([]);
         $model->gold = 0;
+        $model->sync = env('SFTP_SYNC',1);
         if(isset($model->url)){
             $model->dash_url = self::get_slice_url($model->url);
             $model->hls_url = self::get_slice_url($model->url,'hls');

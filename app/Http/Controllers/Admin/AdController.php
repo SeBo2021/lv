@@ -207,6 +207,7 @@ class AdController extends BaseCurlController
                 'type' => 'img',
                 'name' => '图片',
                 'must' => 1,
+                'value' => ($show && ($show->img)) ? VideoTrait::getDomain(1).$show->img: ''
             ],
             [
                 'field' => 'url',
