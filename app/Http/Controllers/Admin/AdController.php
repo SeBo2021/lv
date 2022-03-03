@@ -186,14 +186,14 @@ class AdController extends BaseCurlController
                 'default' => '',
                 'data' => $adFlags
             ],
-            [
+            /*[
                 'field' => 'card_id',
                 'type' => 'select',
                 'name' => '会员卡设置',
                 'must' => 0,
                 'default' => '',
                 'data' => $this->getMemberCardList('gold')
-            ],
+            ],*/
             [
                 'field' => 'title',
                 'type' => 'text',

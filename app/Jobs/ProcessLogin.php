@@ -26,12 +26,12 @@ class ProcessLogin implements ShouldQueue
      *
      * @var int
      */
-    public $tries = 3;
+    public int $tries = 1;
 
     //跳跃式延迟执行
-    public $backoff = [60,180];
+    //public $backoff = [60,180];
 
-    public $loginLogData=[];
+    public array $loginLogData=[];
 
     public $code = '';
 

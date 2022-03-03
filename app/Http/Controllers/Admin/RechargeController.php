@@ -175,7 +175,7 @@ class RechargeController extends BaseCurlIndexController
         if($item->type!=1){
             $item->type = '金币';
         }else{
-            $remark = json_decode($item->remark,true);
+            $remark = @json_decode($item->remark,true);
             $item->type = $remark['name'] ?? '';
         }
         $item->status = UiService::switchTpl('status', $item,'','完成|未付');

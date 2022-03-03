@@ -10,35 +10,22 @@ use Illuminate\Support\Facades\Log;
 class VipController extends \App\Http\Controllers\Controller
 {
     use MemberCardTrait;
-    /*public function openVip(Request $request)
+
+    public function memberCards(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
-        if(!empty($user)){
-            $res=[
-                'member_card_type' => $user->member_card_type ?? 0,
-                'saol_gold' => $user->gold ?? 0,
-            ];
-            return response()->json([
-                'state'=>0,
-                'data'=>$res
-            ]);
-        }
-        return [];
-    }*/
-
-    public function memberCards(Request $request)
-    {
         $memberCard = DB::table('member_card')
             ->where('status',1)
             ->orderBy('sort')
             ->get(['id','name','sort','bg_img','remark','value','rights','hours','real_value','status','name_day'])
             ->toArray();
-        foreach ($memberCard as &$item)
+        $ascItem = [];
+        foreach ($memberCard as $index => &$item)
         {
             $item = (array)$item;
             $rights = $this->numToRights($item['rights']);
             $rights_list = [];
-            $registerTime = strtotime($request->user()->created_at);
+            $registerTime = strtotime($user->created_at);
             $nowTime = time();
             foreach ($rights as $right)
             {
@@ -57,15 +44,30 @@ class VipController extends \App\Http\Controllers\Controller
             }
             $item['rights_list'] = $rights_list;
             unset($item['rights']);
+            //
+            if($registerTime+$item['hours']*3600 > $nowTime){
+                $ascItem[] = $item;
+                if($user->vip==0){
+                    unset($item);
+                }else{
+                    $userExpiredTime =  $user->vip_start_last + $user->vip_expired;
+                    $diffTime = $userExpiredTime-$nowTime;
+                    if($diffTime>0 && ($diffTime/3600 <$item['remain_hours'])){
+                        $ascItem[] = $item;
+                        unset($item);
+                    }
+                }
+            }
+
         }
-        $res['list'] = $memberCard;
+        $res['list'] = !empty($ascItem) ? array_unshift($memberCard,...$ascItem) : $memberCard;
         return response()->json([
             'state'=>0,
             'data'=>$res
         ]);
     }
 
-    public function gold()
+    public function gold(): \Illuminate\Http\JsonResponse
     {
         $gold = DB::table('gold')
             ->where('status',1)
