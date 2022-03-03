@@ -17,7 +17,7 @@ class VipController extends \App\Http\Controllers\Controller
         $memberCard = DB::table('member_card')
             ->where('status',1)
             ->orderBy('sort')
-            ->get(['id','name','sort','bg_img','remark','value','rights','hours','real_value','status','name_day'])
+            ->get(['id','name','sort','bg_img','remark','value','rights','hours','real_value','status','name_day','remain_hours'])
             ->toArray();
         $ascItem = [];
         foreach ($memberCard as $index => &$item)
