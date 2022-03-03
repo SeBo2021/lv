@@ -115,7 +115,8 @@ class ProcessBbs implements ShouldQueue
             $hlsPath = $this->comHlsSlice($videoName,$this->mp4Path,true);
             //保存切片地址
             DB::table('community_bbs')->where('id',$this->row->id)->update([
-                'video' => json_encode([$hlsPath])
+                'video' => json_encode([$hlsPath]),
+                'video_picture' => json_encode([$videoName]),
             ]);
             $this->comSyncSlice($videoName,true);
             // 上传视频

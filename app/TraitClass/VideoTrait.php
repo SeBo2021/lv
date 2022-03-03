@@ -256,7 +256,13 @@ trait VideoTrait
 
     public static function getDomain($sync)
     {
-        return $sync==1 ? env('RESOURCE_DOMAIN') : env('SLICE_DOMAIN');
+        return match ($sync) {
+            0 => env('SLICE_DOMAIN'),
+            1 => env('RESOURCE_DOMAIN'),
+            2 => env('RESOURCE_DOMAIN2'),
+            default => '',
+        };
+        //return $sync==1 ? env('RESOURCE_DOMAIN') : env('SLICE_DOMAIN');
     }
 
     public static function getOrigin($sync,$pathName = '',$simple = false)

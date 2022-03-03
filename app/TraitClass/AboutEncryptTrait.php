@@ -57,18 +57,4 @@ trait AboutEncryptTrait
         }
     }
 
-    public function getOriginEncImg($img,$domain=null): string
-    {
-        /*$_v = date('Ymd');
-        $url = $this->transferImgOut($img, $domain,$_v,'auto');
-        //dump($url);
-        $imgData = @file_get_contents($url);
-        if($imgData){
-            parse_str(parse_url($url)['query'],$query_arr);
-            $ext = $query_arr['ext'];
-            return "data:." . $ext . ";base64," . base64_encode($imgData);
-        }
-        return '';*/
-        return env('RESOURCE_DOMAIN').$img;
-    }
 }

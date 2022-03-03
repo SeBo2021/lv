@@ -186,14 +186,14 @@ class AdController extends BaseCurlController
                 'default' => '',
                 'data' => $adFlags
             ],
-            [
+            /*[
                 'field' => 'card_id',
                 'type' => 'select',
                 'name' => '会员卡设置',
                 'must' => 0,
                 'default' => '',
                 'data' => $this->getMemberCardList('gold')
-            ],
+            ],*/
             [
                 'field' => 'title',
                 'type' => 'text',
@@ -207,6 +207,7 @@ class AdController extends BaseCurlController
                 'type' => 'img',
                 'name' => '图片',
                 'must' => 1,
+                'value' => ($show && ($show->img)) ? VideoTrait::getDomain(1).$show->img: ''
             ],
             [
                 'field' => 'url',

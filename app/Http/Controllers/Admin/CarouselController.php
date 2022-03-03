@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Services\UiService;
 use App\TraitClass\AboutEncryptTrait;
 use App\TraitClass\CatTrait;
+use App\TraitClass\VideoTrait;
 
 class CarouselController extends BaseCurlController
 {
@@ -133,7 +134,7 @@ class CarouselController extends BaseCurlController
                 'type' => 'img',
                 'name' => '图片',
                 'must' => 1,
-                'value' => ($show && ($show->img)) ? $this->getOriginEncImg($show->img) : ''
+                'value' => ($show && ($show->img)) ? VideoTrait::getDomain(1).$show->img: ''
             ],
             [
                 'field' => 'action_type',

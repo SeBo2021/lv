@@ -159,6 +159,13 @@ class MemberCardController extends BaseCurlController
                 'data' => $this->show_user
             ],*/
             [
+                'field' => 'remain_hours',
+                'type' => 'text',
+                'name' => '能优惠的VIP剩余时间内(单位:小时)',
+                'must' => 0,
+                'tips' => '单位(小时)',
+            ],
+            [
                 'field' => 'hours',
                 'type' => 'text',
                 'name' => '优惠活动注册时间周期(单位:小时)',

@@ -385,7 +385,7 @@ class MemberController extends BaseCurlController
         $item->phone_number = $item->phone_number>0 ? $item->phone_number : '未绑定';
         $item->member_card_type = $this->getMemberCardList('gold')[max(explode(',',$item->member_card_type))]['name'] ?? '';
         $item->vip_start_last = date('Y-m-d H:i:s',$item->vip_start_last);
-        $item->vip_expired = $item->vip_expired>0 ? round($item->vip_expired/(3600*24)).'小时' :0;
+        $item->vip_expired = $item->vip_expired>0 ? round($item->vip_expired/3600).'小时' :0;
         return $item;
     }
 
