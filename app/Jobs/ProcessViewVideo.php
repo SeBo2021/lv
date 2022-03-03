@@ -67,7 +67,7 @@ class ProcessViewVideo implements ShouldQueue
                 $this->saveStatisticByDay('active_view_users',$this->userModel->channel_id,$this->userModel->device_system);
             }
             //
-            User::query()->where('id',$uid)->decrement('long_vedio_times'); //当日观看次数减一
+            DB::table('users')->where('id',$uid)->decrement('long_vedio_times'); //当日观看次数减一
         }
         //
         $this->saveUsersDay($uid, $this->userModel->channel_id, $this->userModel->device_system);
