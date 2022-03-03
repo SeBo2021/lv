@@ -60,7 +60,8 @@ class VipController extends \App\Http\Controllers\Controller
             }
 
         }
-        $res['list'] = !empty($ascItem) ? array_unshift($memberCard,...$ascItem) : $memberCard;
+        array_unshift($memberCard,...$ascItem);
+        $res['list'] = $memberCard;
         return response()->json([
             'state'=>0,
             'data'=>$res
