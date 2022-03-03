@@ -96,7 +96,7 @@ class VideoController extends BaseCurlController
             [
                 'field' => 'sync',
                 'minWidth' => 80,
-                'title' => '专线',
+                'title' => '线路',
                 'align' => 'center',
                 'hide' => true
             ],
@@ -270,7 +270,7 @@ class VideoController extends BaseCurlController
                 'field' => 'cover_img',
                 'type' => 'img',
                 'name' => '封面图片',
-                'value' => ($show && ($show->cover_img)) ? $this->getOriginEncImg($show->cover_img) : ''
+                'value' => ($show && ($show->cover_img)) ? self::getDomain($show->sync).$show->cover_img: ''
 //                'verify' => 'img'
             ],
             [
@@ -319,14 +319,14 @@ class VideoController extends BaseCurlController
                 'default' => 0,
                 'data' => $this->uiService->trueFalseData()
             ],*/
-            [
+            /*[
                 'field' => 'sync',
                 'type' => 'radio',
                 'name' => '启用专线',
                 'verify' => '',
                 'default' => 1,
                 'data' => $this->uiService->trueFalseData()
-            ],
+            ],*/
 
         ];
         //赋值给UI数组里面,必须是form为key
@@ -371,7 +371,7 @@ class VideoController extends BaseCurlController
         $item->status = UiService::switchTpl('status', $item,'','上架|下架');
         //$item->is_recommend = UiService::switchTpl('is_recommend', $item,'','是|否');
         $item->is_top = UiService::switchTpl('is_top', $item,'','置顶|取消');
-        $item->sync = UiService::switchTpl('sync', $item,'','是|否');
+        //$item->sync = UiService::switchTpl('sync', $item,'','是|否');
         $item->type = UiService::switchTpl('type', $item,'','长|短');
         $item->restricted = $this->restrictedType[$item->restricted]['name'];
         $item->gold = $item->gold/$this->goldUnit;
@@ -411,6 +411,7 @@ class VideoController extends BaseCurlController
         $model->author = admin('nickname');
         $model->gold = $this->rq->input('gold',0);
         $model->gold *= $this->goldUnit;
+        $model->sync = env('SFTP_SYNC',1);
         if($id > 0){
             $originalData = $model->getOriginal();
             if($model->status != $originalData['status']){
