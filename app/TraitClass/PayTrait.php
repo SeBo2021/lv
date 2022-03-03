@@ -124,12 +124,19 @@ trait PayTrait
         $updateMember = implode(',',$member_card_type);
 
         $vipExpired = MemberCard::query()->select(DB::raw('SUM(IF(expired_hours>0,expired_hours,10*365*24)) as expired_hours'))->whereIn('id',$member_card_type)->value('expired_hours') *3600;
-        User::query()->where('id',$uid)->update([
+        $r = User::query()->where('id',$uid)->update([
             'member_card_type' => $updateMember,
             'vip'=>$vip,
             'vip_start_last' => time(), // 最后vip开通时间
             'vip_expired' => $vipExpired
         ]);
+
+        Log::info('cj_vip_update===', [[$user->id,$user->member_card_type],[
+            'member_card_type' => $updateMember,
+            'vip'=>$vip,
+            'vip_start_last' => time(), // 最后vip开通时间
+            'vip_expired' => $vipExpired
+        ],$r]);//vip更新日志
         //队列执行
         /*if($cardInfo->expired_hours >= 0) {
             $job = new ProcessMemberCard($user->id,$cardInfo->id,($cardInfo->expired_hours?:10*365*34)*60*60);
