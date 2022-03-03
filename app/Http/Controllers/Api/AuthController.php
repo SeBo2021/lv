@@ -62,7 +62,7 @@ class AuthController extends Controller
      * @return [string] token_type
      * @return [string] expires_at
      */
-    public function login(Request $request)
+    public function login(Request $request): \Illuminate\Http\JsonResponse
     {
         $params = ApiParamsTrait::parse($request->params);
         //Log::debug('login_request_params_info===',[$params]);//参数日志
@@ -83,6 +83,7 @@ class AuthController extends Controller
         $user = new User();
         $member = $user::query()->where('did',$validated['did'])->where('status',1)->orderByDesc('created_at')->first($this->loginUserFields);
         $loginType = !$member ? 1 : 2;
+        $login_info = [];
         switch ($loginType){
             case 1:
                 //创建新用户
@@ -163,10 +164,10 @@ class AuthController extends Controller
         ];
         Log::debug('login_log_data===',[$login_log_data]);
 
-        ProcessLogin::dispatchAfterResponse($login_log_data);
+        //ProcessLogin::dispatchAfterResponse($login_log_data);
         /*$job = new ProcessLogin($login_log_data);
         $this->dispatch($job);*/
-        //ProcessLogin::dispatch($login_log_data)->delay(now()->addMinutes(10));
+        ProcessLogin::dispatch($login_log_data)->delay(now()->addMinutes());
 
         Token::query()->where('name',$login_info['account'])->delete();
         //重新分配token
