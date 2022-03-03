@@ -131,7 +131,7 @@ trait PayTrait
             'vip_expired' => $vipExpired
         ]);
 
-        Log::info('cj_vip_update===', [$user,[
+        Log::info('cj_vip_update===', [[$user->id,$user->member_card_type],[
             'member_card_type' => $updateMember,
             'vip'=>$vip,
             'vip_start_last' => time(), // 最后vip开通时间
