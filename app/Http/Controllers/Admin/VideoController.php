@@ -83,6 +83,7 @@ class VideoController extends BaseCurlController
                 'minWidth' => 100,
                 'title' => '所需骚豆',
                 'edit' => 1,
+                'sort' => 1,
                 'align' => 'center',
             ],
             [
