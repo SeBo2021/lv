@@ -31,6 +31,10 @@ class VideoController extends Controller
     use MemberCardTrait;
 
     //播放
+
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
     public function actionView(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
@@ -62,13 +66,9 @@ class VideoController extends Controller
             //
             ProcessViewVideo::dispatchAfterResponse($user, $one);
             /*$job = new ProcessViewVideo($user, $one);
-            $this->dispatch($job);*/
-            //是否点赞
-            $viewRecord = $this->isLoveOrCollect($user->id,$id);
-            $one['is_love'] = $viewRecord['is_love'] ?? 0;
-            //是否收藏
-            $one['is_collect'] = $viewRecord['is_collect'] ?? 0;
+            $this->dispatchSync($job);*/
 
+            //观看限制
             if ($one['restricted'] != 0) {
                 //是否有观看次数
                 if ($viewLongVideoTimes <= 0) {
@@ -85,16 +85,6 @@ class VideoController extends Controller
                         'state' => 0,
                         'data' => $one
                     ]);
-                    /*} else {
-                        // unset($one['hls_url']);
-                        // unset($one['dash_url']);
-                        return response()->json([
-                            'state' => -1,
-                            'data' => $one,
-                            'msg' => "绑定手机可全站免费观看",
-                        ]);
-                    }*/
-
 
                 }
             }
