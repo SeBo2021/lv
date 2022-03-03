@@ -27,11 +27,13 @@ class VipController extends \App\Http\Controllers\Controller
             $rights_list = [];
             $registerTime = strtotime($user->created_at);
             $nowTime = time();
+            $userExpiredTime =  $user->vip_start_last + $user->vip_expired;
+            $diffTime = $userExpiredTime-$nowTime;
             foreach ($rights as $right)
             {
                 $rights_list[] = $this->cardRights[$right];
                 if(($item['hours']>0) && ($item['real_value']>0)){
-                    if($nowTime < ($registerTime+$item['hours']*3600)){
+                    if($nowTime < ($registerTime+$item['hours']*3600) || ($diffTime>0 && ($diffTime/3600 <$item['remain_hours']))){
                         $item['valid_period'] = $registerTime+$item['hours']*3600-$nowTime;
                     }else{
                         $item['valid_period'] = 0;
@@ -50,8 +52,6 @@ class VipController extends \App\Http\Controllers\Controller
                 if($user->vip==0){
                     unset($item);
                 }else{
-                    $userExpiredTime =  $user->vip_start_last + $user->vip_expired;
-                    $diffTime = $userExpiredTime-$nowTime;
                     if($diffTime>0 && ($diffTime/3600 <$item['remain_hours'])){
                         $ascItem[] = $item;
                         unset($item);
