@@ -95,7 +95,8 @@ class ProcessLogin implements ShouldQueue
     public function bindChannel(): int
     {
         //绑定渠道推广
-        $lastTime = strtotime('-1 day');
+        //$lastTime = strtotime('-1 day');
+        $lastTime = strtotime('-4 hour');
         $lastDayDate = date('Y-m-d H:i:s',$lastTime);
         $device_system = $this->loginLogData['device_system'];
         $channel_id = 0;
