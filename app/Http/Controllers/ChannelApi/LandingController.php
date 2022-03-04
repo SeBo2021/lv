@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ChannelApi;
 
 use App\Http\Controllers\Controller;
+use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\StatisticTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 
 class LandingController extends Controller
 {
-    use StatisticTrait;
+    use StatisticTrait,PHPRedisTrait;
 
     public function test(Request $request)
     {
@@ -36,8 +37,10 @@ class LandingController extends Controller
             'created_at' => $request->input('created_at',$dateArr['at']),
         ];
         $insert['channel_id'] = $this->getChannelId($request->input('channel_id',0));
-        Log::debug('===landingPageChannel===',$insert);
+        //Log::debug('===landingPageChannel===',$insert);
         DB::table('app_download')->insertOrIgnore($insert);
+        $this->redis()->lPush($this->apiRedisKey['app_download'],serialize($insert));
+        $this->redis()->expire($this->apiRedisKey['app_download'],3600*24);
         //统计点击量
         $this->saveStatisticByDay('hits',$insert['channel_id'],$insert['device_system'],$dateArr);
         return response()->json($insert);
