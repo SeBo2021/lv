@@ -101,7 +101,6 @@ class ProcessLogin implements ShouldQueue
         $downloadInfoArr = $this->redis()->lRange($this->apiRedisKey['app_download'],0,-1);
 
         if(!empty($downloadInfoArr)){
-            $this->redis()->expire($this->apiRedisKey['app_download'],3600*4);
             $downloadInfo = $downloadInfoArr;
         }else{
             $downloadInfo = DB::connection('master_mysql')->table('app_download')
