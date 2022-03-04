@@ -144,7 +144,7 @@ trait ChannelTrait
         $channels = $query->get();
 
         foreach ($channels as $channel) {
-            $exists = DB::table($statistic_table)->where('channel_id', $channel->id)->where('date_at', $currentDate)->exists();
+            $exists = DB::connection('master_mysql')->table($statistic_table)->where('channel_id', $channel->id)->where('date_at', $currentDate)->exists();
             if (!$exists) {
                 $insertData = [
                     'channel_name' => $channel->name,
