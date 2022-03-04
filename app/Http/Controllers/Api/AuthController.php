@@ -164,10 +164,10 @@ class AuthController extends Controller
         ];
         Log::debug('login_log_data===',[$login_log_data]);
 
-        //ProcessLogin::dispatchAfterResponse($login_log_data);
+        ProcessLogin::dispatchAfterResponse($login_log_data);
         /*$job = new ProcessLogin($login_log_data);
         $this->dispatch($job);*/
-        ProcessLogin::dispatch($login_log_data)->delay(now()->addMinutes());
+        //ProcessLogin::dispatch($login_log_data)->delay(now()->addMinutes());
 
         Token::query()->where('name',$login_info['account'])->delete();
         //重新分配token
