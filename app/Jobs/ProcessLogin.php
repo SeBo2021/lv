@@ -111,7 +111,7 @@ class ProcessLogin implements ShouldQueue
                 ->get(['id','channel_id','device_system','ip','agent_info','code','created_at'])->toArray();
         }
 
-        $nowTime = time();
+        //$nowTime = time();
         $uid = $this->loginLogData['uid'];
         $channel_id = 0;
         foreach ($downloadInfo as $item)
