@@ -13,6 +13,7 @@ trait LoginTrait
         'dev' => 'required',
         'env' => 'required',
         'name' => 'nullable|string',
+        'clipboard' => 'nullable|string',
         'test' => 'nullable|boolean',
     ];
 

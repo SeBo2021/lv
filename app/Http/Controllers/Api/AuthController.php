@@ -159,6 +159,7 @@ class AuthController extends Controller
             'account'=>$login_info['account'],
             'nickname'=>$login_info['nickname'],
             'device_info'=> $deviceInfo,
+            'clipboard'=> $validated['clipboard'] ?? '',
             'source_info'=> $_SERVER['HTTP_USER_AGENT'],
             'device_system'=> $login_info['device_system'] ?? 0,
         ];
