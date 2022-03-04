@@ -96,12 +96,12 @@ class ProcessLogin implements ShouldQueue
     public function bindChannel(): int
     {
         //绑定渠道推广
-        $lastDayDate = date('Y-m-d H:i:s',strtotime('-1 day'));
+        $lastTime = strtotime('-1 day');
+        $lastDayDate = date('Y-m-d H:i:s',$lastTime);
 
         $downloadInfoArr = $this->redis()->lRange($this->apiRedisKey['app_download'],0,-1);
 
         if(!empty($downloadInfoArr)){
-            $this->redis()->expire($this->apiRedisKey['app_download'],3600*4);
             $downloadInfo = $downloadInfoArr;
         }else{
             $downloadInfo = DB::connection('master_mysql')->table('app_download')
@@ -111,29 +111,36 @@ class ProcessLogin implements ShouldQueue
                 ->get(['id','channel_id','device_system','ip','agent_info','code','created_at'])->toArray();
         }
 
-        $nowTime = time();
+        //$nowTime = time();
         $uid = $this->loginLogData['uid'];
         $channel_id = 0;
         foreach ($downloadInfo as $item)
         {
-            $item = !empty($downloadInfoArr) ? unserialize($item) : (array)$item ;
-            $downLoadTime = strtotime($item['created_at']);
-            if($downLoadTime < $nowTime){
-                if($this->loginLogData['ip'] == $item['ip']){
-                    $pid = DB::table('users')->where('promotion_code',$item['code'])->value('id');
-                    $channel_id = $item['channel_id'];
-                    $channel_pid = DB::table('channels')->where('id',$item['channel_id'])->value('pid');
-                    $this->device_system = $item['device_system'];
-                    $updateData = [
-                        'pid'=>$pid,
-                        'channel_id'=>$item['channel_id'],
-                        'device_system'=>$item['device_system'],
-                        'channel_pid'=>$channel_pid
-                    ];
-                    User::query()->where('id',$uid)->update($updateData);
-                    Log::info('==BindChannelUser==',$updateData);
-                    break;
+            if(!empty($downloadInfoArr)){
+                $tmpItem = $item;
+                $item = unserialize($item);
+                $downLoadTime = strtotime($item['created_at']);
+                if($downLoadTime < $lastTime){
+                    $this->redis()->lRem($this->apiRedisKey['app_download'],$tmpItem,1);
                 }
+            }else{
+                $item = (array)$item ;
+            }
+
+            if($this->loginLogData['ip'] == $item['ip']){
+                $pid = DB::table('users')->where('promotion_code',$item['code'])->value('id');
+                $channel_id = $item['channel_id'];
+                $channel_pid = DB::table('channels')->where('id',$item['channel_id'])->value('pid');
+                $this->device_system = $item['device_system'];
+                $updateData = [
+                    'pid'=>$pid,
+                    'channel_id'=>$item['channel_id'],
+                    'device_system'=>$item['device_system'],
+                    'channel_pid'=>$channel_pid
+                ];
+                User::query()->where('id',$uid)->update($updateData);
+                Log::info('==BindChannelUser==',$updateData);
+                break;
             }
         }
         return $channel_id;
