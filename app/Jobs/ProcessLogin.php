@@ -96,7 +96,7 @@ class ProcessLogin implements ShouldQueue
     {
         //绑定渠道推广
         //$lastTime = strtotime('-1 day');
-        $lastTime = strtotime('-4 hour');
+        $lastTime = strtotime('-2 hour');
         $lastDayDate = date('Y-m-d H:i:s',$lastTime);
         $device_system = $this->loginLogData['device_system'];
         $channel_id = 0;
@@ -104,6 +104,7 @@ class ProcessLogin implements ShouldQueue
         if(!empty($clipboard)){
             $channel_id = DB::table('channels')->where('promotion_code',$this->loginLogData['clipboard'])->value('id');
             $channel_pid = DB::table('channels')->where('id',$channel_id)->value('pid');
+            Log::info('==BindChannelUserClipboard==',[$clipboard,$channel_id]);
         }else{
             $downloadInfoArr = $this->redis()->lRange($this->apiRedisKey['app_download'],0,-1);
 
@@ -151,6 +152,7 @@ class ProcessLogin implements ShouldQueue
         $uid = $this->loginLogData['uid'];
         User::query()->where('id',$uid)->update($updateData);
         Log::info('==BindChannelUser==',$updateData);
+        $channel_id += 0;
         return $channel_id;
     }
 }
