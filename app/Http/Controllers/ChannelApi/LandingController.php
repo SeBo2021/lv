@@ -40,7 +40,6 @@ class LandingController extends Controller
         //Log::debug('===landingPageChannel===',$insert);
         DB::table('app_download')->insertOrIgnore($insert);
         $this->redis()->lPush($this->apiRedisKey['app_download'],serialize($insert));
-        $this->redis()->expire($this->apiRedisKey['app_download'],3600*24);
         //统计点击量
         $this->saveStatisticByDay('hits',$insert['channel_id'],$insert['device_system'],$dateArr);
         return response()->json($insert);
