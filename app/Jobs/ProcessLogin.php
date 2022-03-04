@@ -64,11 +64,10 @@ class ProcessLogin implements ShouldQueue
         // 冗余最后一次登录地理信息
         $area = Ip::find($this->loginLogData['ip']);
         $areaJson = json_encode($area,JSON_UNESCAPED_UNICODE);
-//        User::query()->where('id',$uid)->update(['location_name'=>$areaJson]);
-        User::query()->where('id',$uid)->increment('login_numbers',1,['location_name'=>$areaJson]);
+
         if($this->loginLogData['type']==1){
-            $channel_id = $this->bindChannel();
-            $this->saveStatisticByDay('install',$channel_id,$this->device_system);
+            $updateData = $this->bindChannel();
+            $this->saveStatisticByDay('install',$updateData['channel_id'],$this->device_system);
         }
         //记录登录日志
         $this->loginLogData['area'] = $areaJson;
@@ -76,23 +75,15 @@ class ProcessLogin implements ShouldQueue
             unset($this->loginLogData['clipboard']);
         }
         LoginLog::query()->create($this->loginLogData);
-        $this->updateUserInfo();
-    }
-
-    public function updateUserInfo()
-    {
-        $uid = $this->loginLogData['uid'];
-        //
+        $updateData['location_name'] = $areaJson;
         if(!$this->code){
             $invitationCode = Str::random(2).$uid.Str::random(2);
             $updateData['promotion_code'] = $invitationCode;
         }
-        if(!empty($updateData)){
-            User::query()->where('id',$uid)->update($updateData);
-        }
+        DB::table('users')->where('id',$uid)->increment('login_numbers',1,$updateData);
     }
 
-    public function bindChannel(): int
+    public function bindChannel()
     {
         //绑定渠道推广
         //$lastTime = strtotime('-1 day');
@@ -117,8 +108,6 @@ class ProcessLogin implements ShouldQueue
                     ->orderByDesc('created_at')
                     ->get(['id','channel_id','device_system','ip','agent_info','code','created_at'])->toArray();
             }
-
-            //$nowTime = time();
 
             foreach ($downloadInfo as $item)
             {
@@ -149,10 +138,7 @@ class ProcessLogin implements ShouldQueue
             'device_system'=>$device_system ?? 0,
             'channel_pid'=>$channel_pid ?? 0
         ];
-        $uid = $this->loginLogData['uid'];
-        User::query()->where('id',$uid)->update($updateData);
         Log::info('==BindChannelUser==',$updateData);
-        $channel_id += 0;
-        return $channel_id;
+        return $updateData;
     }
 }

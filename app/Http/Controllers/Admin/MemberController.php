@@ -36,7 +36,7 @@ class MemberController extends BaseCurlController
             ],
             [
                 'field' => 'id',
-                'minWidth' => 80,
+                'minWidth' => 100,
                 'title' => '编号',
                 'sort' => 1,
                 'align' => 'center'
@@ -152,15 +152,14 @@ class MemberController extends BaseCurlController
                 'minWidth' => 150,
                 'title' => '手机系统平台',
                 'align' => 'center',
-
             ],
-            /*[
-                'field' => 'token',
-                'minWidth' => 150,
-                'title' => 'token',
+            [
+                'field' => 'login_numbers',
+                'minWidth' => 80,
+                'title' => '登录次数',
                 'align' => 'center',
                 'hide' => true
-            ],*/
+            ],
             [
                 'field' => 'status',
                 'minWidth' => 80,
@@ -169,7 +168,7 @@ class MemberController extends BaseCurlController
             ],
             [
                 'field' => 'created_at',
-                'minWidth' => 150,
+                'minWidth' => 170,
                 'title' => '创建时间',
                 'align' => 'center'
             ],
