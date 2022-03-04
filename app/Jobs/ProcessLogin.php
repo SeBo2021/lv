@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\LoginLog;
 use App\Models\User;
+use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\StatisticTrait;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -19,7 +20,7 @@ use Illuminate\Support\Str;
 
 class ProcessLogin implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, StatisticTrait;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, StatisticTrait, PHPRedisTrait;
 
     /**
      * 任务尝试次数
@@ -68,8 +69,8 @@ class ProcessLogin implements ShouldQueue
         //增加登录次数
         $uid = $this->loginLogData['uid'];
         // 冗余最后一次登录地理信息
-        User::query()->where('id',$uid)->update(['location_name'=>$areaJson]);
-        User::query()->where('id',$uid)->increment('login_numbers');
+//        User::query()->where('id',$uid)->update(['location_name'=>$areaJson]);
+        User::query()->where('id',$uid)->increment('login_numbers',1,['location_name'=>$areaJson]);
         if($this->loginLogData['type']==1){
             //统计安装量
             $channel_id = $this->bindChannel();
@@ -82,20 +83,6 @@ class ProcessLogin implements ShouldQueue
     public function updateUserInfo()
     {
         $uid = $this->loginLogData['uid'];
-
-        //系统平台
-        /*if($this->device_system<1){
-            //Log::debug('===device_info===',[$this->loginLogData['device_info']]);
-            $deviceInfo = json_decode($this->loginLogData['device_info'],true);
-            $isAndroid = $deviceInfo['androidId'] ??  false;
-            $isIos = isset($deviceInfo['platform']) && ($deviceInfo['platform']=="ios");
-            if($isAndroid!==false){
-                $updateData['device_system'] = 2;
-            }
-            if($isIos){
-                $updateData['device_system'] = 1;
-            }
-        }*/
         //
         if(!$this->code){
             $invitationCode = Str::random(2).$uid.Str::random(2);
@@ -110,27 +97,37 @@ class ProcessLogin implements ShouldQueue
     {
         //绑定渠道推广
         $lastDayDate = date('Y-m-d H:i:s',strtotime('-1 day'));
-        $downloadInfo = DB::connection('master_mysql')->table('app_download')
-            ->where('status',0)
-            ->whereDate('created_at','>=', $lastDayDate)
-            ->orderByDesc('created_at')
-            ->get(['id','channel_id','device_system','ip','agent_info','code','created_at'])->toArray();
+
+        $downloadInfoArr = $this->redis()->lRange($this->apiRedisKey['app_download'],0,-1);
+
+        if(!empty($downloadInfoArr)){
+            $this->redis()->expire($this->apiRedisKey['app_download'],3600*4);
+            $downloadInfo = $downloadInfoArr;
+        }else{
+            $downloadInfo = DB::connection('master_mysql')->table('app_download')
+                ->where('status',0)
+                ->whereDate('created_at','>=', $lastDayDate)
+                ->orderByDesc('created_at')
+                ->get(['id','channel_id','device_system','ip','agent_info','code','created_at'])->toArray();
+        }
+
         $nowTime = time();
         $uid = $this->loginLogData['uid'];
         $channel_id = 0;
         foreach ($downloadInfo as $item)
         {
-            $downLoadTime = strtotime($item->created_at);
+            $item = !empty($downloadInfoArr) ? unserialize($item) : (array)$item ;
+            $downLoadTime = strtotime($item['created_at']);
             if($downLoadTime < $nowTime){
-                if($this->loginLogData['ip'] == $item->ip){
-                    $pid = DB::table('users')->where('promotion_code',$item->code)->value('id');
-                    $channel_id = $item->channel_id;
-                    $channel_pid = DB::table('channels')->where('id',$item->channel_id)->value('pid');
-                    $this->device_system = $item->device_system;
+                if($this->loginLogData['ip'] == $item['ip']){
+                    $pid = DB::table('users')->where('promotion_code',$item['code'])->value('id');
+                    $channel_id = $item['channel_id'];
+                    $channel_pid = DB::table('channels')->where('id',$item['channel_id'])->value('pid');
+                    $this->device_system = $item['device_system'];
                     $updateData = [
                         'pid'=>$pid,
-                        'channel_id'=>$item->channel_id,
-                        'device_system'=>$item->device_system,
+                        'channel_id'=>$item['channel_id'],
+                        'device_system'=>$item['device_system'],
                         'channel_pid'=>$channel_pid
                     ];
                     User::query()->where('id',$uid)->update($updateData);
