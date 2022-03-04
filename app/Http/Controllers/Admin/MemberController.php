@@ -331,11 +331,11 @@ class MemberController extends BaseCurlController
                 'type' => 'number',
                 'name' => '可观看次数',
             ],
-            /*[
-                'field' => 'member_card_type',
-                'type' => 'text',
-                'name' => '会员卡',
-            ],*/
+            [
+                'field' => 'gold',
+                'type' => 'number',
+                'name' => '骚豆',
+            ],
             [
                 'field' => 'vipCards',
                 'type' => 'checkbox',
