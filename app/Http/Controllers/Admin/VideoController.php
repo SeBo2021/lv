@@ -141,13 +141,13 @@ class VideoController extends BaseCurlController
                 'align' => 'center',
                 'hide' => true
             ],
-            [
+            /*[
                 'field' => 'dash_url',
                 'minWidth' => 80,
                 'title' => 'dash地址',
                 'align' => 'center',
                 'hide' => true
-            ],
+            ],*/
             [
                 'field' => 'type',
                 'minWidth' => 80,
@@ -414,7 +414,7 @@ class VideoController extends BaseCurlController
         $model->gold *= $this->goldUnit;
         $model->sync = env('SFTP_SYNC',1);
         $model->updated_at = date('Y-m-d H:i:s');
-        if($id > 0){
+        if($id > 0){ //编辑
             $originalData = $model->getOriginal();
             if($model->status != $originalData['status']){
                 $model->is_top = 0;
@@ -428,7 +428,7 @@ class VideoController extends BaseCurlController
             }
         }
         if(isset($model->url)){
-            $model->dash_url = self::get_slice_url($model->url);
+            //$model->dash_url = self::get_slice_url($model->url);
             $model->hls_url = self::get_slice_url($model->url,'hls');
             if(isset($model->cover_img) && (!$model->cover_img)){
                 $model->cover_img = self::get_slice_url($model->url,'cover');
