@@ -384,19 +384,20 @@ class VideoController extends BaseCurlController
     protected function afterSaveSuccessEvent($model, $id = '')
     {
         if( isset($_REQUEST['callback_upload']) && ($_REQUEST['callback_upload']==1)){
-
             try {
-                //$job = new VideoSlice($model);
                 $job = new ProcessVideoSlice($model);
                 $this->dispatch($job->onQueue('high'));
-                //ProcessVideoSlice::dispatchSync($model);
             }catch (\Exception $e){
                 Log::error($e->getMessage());
             }
         }
+
         //自定义上传封面
         if($model->cover_img){
-            $this->syncUpload($model->cover_img);
+            $coverImg = str_replace(self::getDomain($model->sync),"",$model->cover_img);
+            $model->cover_img = $coverImg;
+            $model->save();
+            $this->syncUpload($coverImg);
         }
         //ProcessSyncMiddleTable::dispatchAfterResponse('video');
         return $model;
