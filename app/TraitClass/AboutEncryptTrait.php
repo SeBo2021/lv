@@ -12,8 +12,7 @@ trait AboutEncryptTrait
         if(!$img){
             return '';
         }
-        //$domain = $domain ?? env('RESOURCE_DOMAIN');
-        $domain = $domain ?? VideoTrait::getDomain();
+        $domain = $domain ?? env('RESOURCE_DOMAIN');
         $_v = $_v ?? 1;
         $fileInfo = pathinfo($img);
         if(!isset($fileInfo['dirname'])){
