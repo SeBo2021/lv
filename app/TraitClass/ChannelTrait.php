@@ -223,7 +223,7 @@ trait ChannelTrait
             'unit_price' => $model->unit_price,
             'channel_code' => $model->number,
         ];
-        DB::table('channel_day_statistics')->whereDate('date_at',date('Y-m-d'))->update($updateData);
+        DB::table('channel_day_statistics')->where('channel_id',$model->id)->whereDate('date_at',date('Y-m-d'))->update($updateData);
         $model->save();
         $this->initStatisticsByDay($model->id);
     }
