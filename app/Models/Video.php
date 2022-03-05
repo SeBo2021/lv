@@ -11,9 +11,11 @@ class Video extends BaseModel
 {
     use Searchable;
 
+    const UPDATED_AT = NULL;
+
     protected $table = 'video';
 
-    protected $mapping = [
+    protected array $mapping = [
         'properties' => [
             'name' => [
                 'type' => 'text',
@@ -29,7 +31,7 @@ class Video extends BaseModel
      *
      * @return string
      */
-    public function searchableAs()
+    public function searchableAs(): string
     {
         return 'video_index';
     }
@@ -39,7 +41,7 @@ class Video extends BaseModel
      *
      * @return array
      */
-    public function toSearchableArray()
+    public function toSearchableArray(): array
     {
         //$array = $this->toArray();
         //'video.id','name','sync','title','url','gold','duration','type','cover_img','views','updated_at'
