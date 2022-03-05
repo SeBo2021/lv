@@ -256,6 +256,7 @@ trait VideoTrait
 
     public static function getDomain($sync)
     {
+        $sync += 0;
         return match ($sync) {
             0 => env('SLICE_DOMAIN'),
             1 => env('RESOURCE_DOMAIN'),

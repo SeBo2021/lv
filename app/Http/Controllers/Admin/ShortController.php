@@ -272,8 +272,10 @@ class ShortController extends BaseCurlController
             $job = new ProcessVideoShort($model);
             $this->dispatch($job->onQueue('high'));
             if($model->cover_img){
-                //自定义上传封面
-                $this->syncUpload($model->cover_img);
+                $coverImg = str_replace(self::getDomain($model->sync),"",$model->cover_img);
+                $model->cover_img = $coverImg;
+                $model->save();
+                $this->syncUpload($coverImg);
             }
             // app(Dispatcher::class)->dispatchNow($job);
         }catch (\Exception $e){
