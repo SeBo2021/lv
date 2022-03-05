@@ -175,19 +175,19 @@ trait ChannelTrait
         $model->deduction *= 100;
         $model->type = $type;
         if($id>0){ //编辑
-            if($model->deduction>0){
+            /*if($model->deduction>0){
                 $originalDeduction = $model->getOriginal()['deduction'];
                 if($originalDeduction != $model->deduction){
                     //dd('修改扣量');
                     $this->writeChannelDeduction($id,$model->deduction);
                 }
-            }
-            if($model->share_ratio>0){
+            }*/
+            /*if($model->share_ratio>0){
                 $originalShareRatio = $model->getOriginal()['share_ratio'];
                 if($originalShareRatio != $model->share_ratio){
                     DB::table('channel_day_statistics')->whereDate('date_at',date('Y-m-d'))->update(['share_ratio' => $model->share_ratio]);
                 }
-            }
+            }*/
             $password = $this->rq->input('password');
             if($password){
                 $exists = DB::connection('channel_mysql')->table('admins')->where('account',$model->number)->first();
@@ -217,6 +217,13 @@ trait ChannelTrait
             $password = !empty($model->password) ? $model->password : bcrypt($model->number);
             $this->createChannelAccount($model,$password);
         }
+        $updateData = [
+            'deduction' => $model->deduction,
+            'share_ratio' => $model->share_ratio,
+            'unit_price' => $model->unit_price,
+            'channel_code' => $model->number,
+        ];
+        DB::table('channel_day_statistics')->whereDate('date_at',date('Y-m-d'))->update($updateData);
         $model->save();
         $this->initStatisticsByDay($model->id);
     }
