@@ -62,7 +62,7 @@ class LiveController extends BaseCurlController
             [
                 'field' => 'sync',
                 'minWidth' => 80,
-                'title' => '专线',
+                'title' => '线路',
                 'align' => 'center',
                 'hide' => true
             ],
@@ -234,7 +234,7 @@ class LiveController extends BaseCurlController
     public function setListOutputItemExtend($item)
     {
         $item->status = UiService::switchTpl('status', $item,'','上架|下架');
-        $item->sync = UiService::switchTpl('sync', $item,'','是|否');
+        //$item->sync = UiService::switchTpl('sync', $item,'','是|否');
         return $item;
     }
 

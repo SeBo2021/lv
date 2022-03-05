@@ -70,7 +70,7 @@ class ShortController extends BaseCurlController
             [
                 'field' => 'sync',
                 'minWidth' => 80,
-                'title' => '专线',
+                'title' => '线路',
                 'align' => 'center',
                 'hide' => true
             ],
@@ -255,7 +255,7 @@ class ShortController extends BaseCurlController
         $item->tag_name = $this->getTagName($item->tag,2);
         $item->status = UiService::switchTpl('status', $item,'','上架|下架');
         $item->is_recommend = UiService::switchTpl('is_recommend', $item,'','是|否');
-        $item->sync = UiService::switchTpl('sync', $item,'','是|否');
+        //$item->sync = UiService::switchTpl('sync', $item,'','是|否');
         $item->type = UiService::switchTpl('type', $item,'','长|短');
         $item->restricted = $this->restrictedType[$item->restricted]['name'];
         $item->gold = $item->gold/$this->goldUnit;

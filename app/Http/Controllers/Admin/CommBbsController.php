@@ -102,6 +102,12 @@ class CommBbsController extends BaseCurlController
                 'align' => 'center',
             ],
             [
+                'field' => 'sync',
+                'minWidth' => 80,
+                'title' => '线路',
+                'align' => 'center',
+            ],
+            [
                 'field' => 'handle',
                 'minWidth' => 150,
                 'title' => '操作',
@@ -301,6 +307,7 @@ class CommBbsController extends BaseCurlController
 
     public function beforeSaveEvent($model, $id = '')
     {
+        $model->sync = env('SFTP_SYNC',1);
         $thumbs = $this->rq->input('thumbs','');
         if(!$thumbs){
             $model->thumbs = '[]';
