@@ -35,6 +35,7 @@ class ConfigController extends Controller
             $payConf = json_decode($appConfig['pay_method']??'',true);
             $currentSecond = strval(date(date('s')%10));
             $res['pay_method'] = intval($payConf[$currentSecond]??2);
+            $res['pay_detail'] = json_decode($appConfig['pay_detail']??'',true);
 
             return response()->json([
                 'state'=>0,
