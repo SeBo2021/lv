@@ -35,7 +35,7 @@
 
 @if(!empty($form_item['value']))
 <script>
-    var real_use_url = "{{ \App\Jobs\VideoSlice::get_slice_url($form_item['value'],'hls',$form_item['sync']) }}";
+    var real_use_url = "{{ \App\TraitClass\VideoTrait::get_slice_url($form_item['value'],'hls',$form_item['sync']) }}";
     console.log(real_use_url);
     // $("#videoIframe").attr('src',real_use_url);
     //=====================以上打印出同步资源地址======================

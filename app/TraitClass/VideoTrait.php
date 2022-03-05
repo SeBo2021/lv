@@ -362,7 +362,7 @@ trait VideoTrait
     public function handleVideoItems($lists,$display_url=false,$uid = 0)
     {
         $_v = date('Ymd');
-        $domainSync = VideoTrait::getDomain(1);
+
         foreach ($lists as &$list){
             $list = (array)$list;
             if (($list['usage']??1) == 2) {
@@ -397,10 +397,10 @@ trait VideoTrait
                 //$list['cover_img'] = $domainSync . $list['cover_img'];
                 $list['gold'] = $list['gold'] / $this->goldUnit;
                 $list['views'] = $list['views'] > 0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5, 9));
-                $list['hls_url'] = $domainSync . $list['hls_url'];
+                //$list['hls_url'] = $domainSync . $list['hls_url'];
                 $list['preview_hls_url'] = $this->getPreviewPlayUrl($list['hls_url']);
-                $list['dash_url'] = $domainSync . $list['dash_url'];
-                $list['preview_dash_url'] = $this->getPreviewPlayUrl($list['dash_url'], 'dash');
+                //$list['dash_url'] = $domainSync . $list['dash_url'];
+                //$list['preview_dash_url'] = $this->getPreviewPlayUrl($list['dash_url'], 'dash');
                 if(isset($list['time_at']) && ($list['time_at']>0)){
                     $list['updated_at'] = date('Y-m-d H:i:s',$list['time_at']);
                 }
@@ -409,6 +409,7 @@ trait VideoTrait
                     unset($list['dash_url']);
                 }
             }
+            $domainSync = VideoTrait::getDomain($list['sync']);
             //封面图处理
             $list['cover_img'] = $this->transferImgOut($list['cover_img'],$domainSync,$_v);
             if ($list['usage']??false) {
@@ -416,9 +417,9 @@ trait VideoTrait
             }
             //hls播放地址处理
             if(isset($list['hls_url'])){
-                $list['hls_url'] = $this->transferHlsUrl($list['hls_url']);
+                $list['hls_url'] = $domainSync . $this->transferHlsUrl($list['hls_url']);
             }
-            $list['preview_hls_url'] = $this->transferHlsUrl($list['preview_hls_url']);
+            $list['preview_hls_url'] = $domainSync . $this->transferHlsUrl($list['preview_hls_url']);
             /*$previewHlsInfo = pathinfo($list['preview_hls_url']);
             $list['preview_hls_url'] = $previewHlsInfo['dirname'].'/'.$previewHlsInfo['filename'].'.vid?id='.$list['id'].'&_v='.$_v;*/
             //是否点赞
