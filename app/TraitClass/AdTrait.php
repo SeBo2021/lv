@@ -31,7 +31,7 @@ trait AdTrait
                 $key = array_rand($ads);
                 $one = $ads[$key];
             }
-            $domain = env('RESOURCE_DOMAIN');
+            $domain = VideoTrait::getDomain(env('SFTP_SYNC',1));
             //$one['img'] = $domain . $one['img'];
             //图片处理
             $_v = date('Ymd');
