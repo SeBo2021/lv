@@ -52,10 +52,14 @@ class CJController extends Controller implements Pay
             'type' => [
                 'required',
                 'string',
-                Rule::in(['zfbwap', 'wxwap', '102']),
+                Rule::in(['zfbwap', 'wxwap', '102','202']),
             ],
         ])->validate();
         Log::info('cj_pay_params===', [$params]);//参数日志
+        // 强制转换
+        if ('wxwap' == $params['type']) {
+            $params['type'] = '202';
+        }
         try {
             $payEnv = self::getPayEnv();
             $secret = json_decode($payEnv['CJ']['secret'],true);
