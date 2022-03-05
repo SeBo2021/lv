@@ -116,6 +116,7 @@ class ProcessBbs implements ShouldQueue
             //保存切片地址
             DB::table('community_bbs')->where('id',$this->row->id)->update([
                 'video' => json_encode([$hlsPath]),
+                'sync' => env('SFTP_SYNC',1),
                 'video_picture' => json_encode([$videoName]),
             ]);
             $this->comSyncSlice($videoName,true);

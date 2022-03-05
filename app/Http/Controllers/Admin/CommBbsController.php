@@ -307,7 +307,6 @@ class CommBbsController extends BaseCurlController
 
     public function beforeSaveEvent($model, $id = '')
     {
-        $model->sync = env('SFTP_SYNC',1);
         $thumbs = $this->rq->input('thumbs','');
         if(!$thumbs){
             $model->thumbs = '[]';
