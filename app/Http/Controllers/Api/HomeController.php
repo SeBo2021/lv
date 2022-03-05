@@ -56,7 +56,7 @@ class HomeController extends Controller
                 ->where('cid', $cid)
                 ->get(['id','title','img','url','action_type','vid','status','end_at'])
                 ->toArray();
-            $domain = env('RESOURCE_DOMAIN');
+            $domain = self::getDomain(env('SFTP_SYNC',1));
             foreach ($data as &$item){
                 $item['img'] = $this->transferImgOut($item['img'],$domain,date('Ymd'),'auto');
                 $item['action_type'] = (string) $item['action_type'];
