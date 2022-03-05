@@ -293,7 +293,6 @@ class ShortController extends BaseCurlController
         $model->author = admin('nickname');
         $model->gold = $this->rq->input('gold',0);
         $model->gold *= $this->goldUnit;
-        $model->sync = env('SFTP_SYNC',1);
         if(isset($model->url)){
             $model->dash_url = self::get_slice_url($model->url);
             $model->hls_url = self::get_slice_url($model->url,'hls');

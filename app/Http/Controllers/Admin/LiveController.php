@@ -266,7 +266,6 @@ class LiveController extends BaseCurlController
         $model->cat = json_encode([]);
         $model->tag = json_encode([]);
         $model->gold = 0;
-        $model->sync = env('SFTP_SYNC',1);
         if(isset($model->url)){
             $model->dash_url = self::get_slice_url($model->url);
             $model->hls_url = self::get_slice_url($model->url,'hls');
