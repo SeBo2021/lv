@@ -134,6 +134,14 @@ class AppConfigController extends BaseCurlController
                         'default' => '',
                         'tips' => '配置json,开发用'
                     ],
+                    [
+                        'field' => 'pay_detail',
+                        'type' => 'textarea',
+                        'name' => '充值细节(开发用)',
+                        'must' => 1,
+                        'default' => '',
+                        'tips' => '配置json,开发用'
+                    ],
                 ]
             ]
         ];
