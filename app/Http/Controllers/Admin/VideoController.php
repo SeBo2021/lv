@@ -412,7 +412,7 @@ class VideoController extends BaseCurlController
         $model->author = admin('nickname');
         $model->gold = $this->rq->input('gold',0);
         $model->gold *= $this->goldUnit;
-        $model->sync = env('SFTP_SYNC',1);
+        //$model->sync = env('SFTP_SYNC',1);
         $model->updated_at = date('Y-m-d H:i:s');
         if($id > 0){ //编辑
             $originalData = $model->getOriginal();
