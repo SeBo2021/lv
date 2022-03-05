@@ -283,14 +283,15 @@ trait VideoTrait
     {
         $play_file_name = pathinfo($pathName,PATHINFO_FILENAME);
         $sliceDir = env('SLICE_DIR','/slice');
-        /*if($sync!==null){
-            $url = self::getDomain($sync).$url;
-        }*/
-        return match ($type) {
+        $url = match ($type) {
             "dash" => '/storage' . $sliceDir . '/' . $type . '/' . $play_file_name . '/' . $play_file_name . '.mpd',
             "hls" => '/storage' . $sliceDir . '/' . $type . '/' . $play_file_name . '/' . $play_file_name . '.m3u8',
             "cover" => '/storage' . $sliceDir . '/coverImg/' . $play_file_name . '/' . $play_file_name . '.jpg',
         };
+        if($sync!==null){
+            $url = self::getDomain($sync).$url;
+        }
+        return $url;
     }
 
     public function getSearchCheckboxResult($items,$inputData,$field)

@@ -32,7 +32,7 @@
 
 @if(!empty($form_item['value']))
     <script>
-        var real_use_url = "{{ env('RESOURCE_DOMAIN').$form_item['value'] }}";
+        var real_use_url = "{{ \App\TraitClass\VideoTrait::get_slice_url($form_item['value'],'hls',$form_item['sync']) }}";
         console.log(real_use_url);
         if(Hls.isSupported()) {
             var video = document.getElementById('dashjs');
