@@ -69,9 +69,11 @@ class AuthController extends Controller
         $validated = Validator::make($params,$this->loginRules)->validated();
         //短时间内禁止同一设备注册多个账号
         $key = $this->apiRedisKey['register_did'].$validated['did'];
-        if($this->redis()->get($key)){
+        if(!$this->redis()->setnx($key,1)){
             Log::debug('register_did===',[$validated['did']]);//参数日志
             return response()->json(['state' => -1, 'msg' => '重复注册']);
+        }else{
+            $this->redis()->expire($key,60);
         }
         $deviceInfo = !is_string($validated['dev']) ? json_encode($validated['dev']) : $validated['dev'] ;
         $appInfo = !is_string($validated['env']) ? json_encode($validated['env']) : $validated['env'] ;
@@ -127,7 +129,6 @@ class AuthController extends Controller
                     $user->password = $user->account;
                     $user->save();
                     //
-                    $this->redis()->setex($key,60,1);
                     DB::commit();
                 }catch (\Exception $e){
                     DB::rollBack();
