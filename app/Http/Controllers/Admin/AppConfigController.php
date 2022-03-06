@@ -14,11 +14,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Config;
 use App\Models\User;
+use App\TraitClass\PHPRedisTrait;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\Request;
 
 class AppConfigController extends BaseCurlController
 {
+    use PHPRedisTrait;
     //去掉公共模板
     public $commonBladePath = '';
     public $pageName = 'APP配置';
@@ -164,7 +166,7 @@ class AppConfigController extends BaseCurlController
         config_cache($config_name, $config_values);
         //
         cache()->delete('payEnv');
-        cache()->delete('api_config');
+        $this->redis()->del('api_config');
         $this->insertLog(lang('系统配置成功'));
         return $this->returnSuccessApi('设置成功');
 
