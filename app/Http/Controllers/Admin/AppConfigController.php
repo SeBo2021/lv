@@ -14,6 +14,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Config;
 use App\Models\User;
+use App\TraitClass\AdTrait;
 use App\TraitClass\PHPRedisTrait;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\Request;
