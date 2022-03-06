@@ -136,7 +136,6 @@ class VideoShortController extends Controller
         $items = $paginator->items();
 
         $data = [];
-        $resourceDomain = self::getDomain(env('SFTP_SYNC',1));
         $_v = date('Ymd');
         foreach ($items as $one) {
             //  $one = $this->handleShortVideoItems([$one], true)[0];
@@ -144,7 +143,7 @@ class VideoShortController extends Controller
             $one = $this->viewLimit($one, $user);
             $viewRecord = $this->isShortLoveOrCollect($user->id, $one['id']);
             $one['is_love'] = intval($viewRecord['is_love']) ?? 0;
-
+            $resourceDomain = self::getDomain($one['sync']);
             //是否收藏
             $one['is_collect'] = intval($viewRecord['is_collect']) ?? 0;
             $one['url'] = $resourceDomain  .$one['url'];
