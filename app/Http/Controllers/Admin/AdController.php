@@ -293,8 +293,14 @@ class AdController extends BaseCurlController
         $model->name = AdSet::query()->where('id',$model->flag_id)->value('flag');
     }
 
+    /**
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
     public function afterSaveSuccessEvent($model, $id = '')
     {
+        $coverImg = str_replace(VideoTrait::getDomain($model->sync),"",$model->img);
+        $model->img = $coverImg;
+        $model->save();
         $this->syncUpload($model->img);
         //清除首页列表缓存
         $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));

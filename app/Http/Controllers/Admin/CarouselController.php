@@ -189,8 +189,14 @@ class CarouselController extends BaseCurlController
         }
     }
 
+    /**
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
     public function afterSaveSuccessEvent($model, $id = '')
     {
+        $coverImg = str_replace(VideoTrait::getDomain($model->sync),"",$model->img);
+        $model->img = $coverImg;
+        $model->save();
         $this->syncUpload($model->img);
     }
 
