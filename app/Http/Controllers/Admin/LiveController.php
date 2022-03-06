@@ -251,12 +251,6 @@ class LiveController extends BaseCurlController
                 Log::error($e->getMessage());
             }
         }
-        if($model->cover_img){
-            $coverImg = str_replace(self::getDomain($model->sync),"",$model->cover_img);
-            $model->cover_img = $coverImg;
-            $model->save();
-            $this->syncUpload($coverImg);
-        }
         return $model;
     }
 
