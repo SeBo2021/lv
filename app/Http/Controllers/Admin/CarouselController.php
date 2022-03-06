@@ -194,7 +194,7 @@ class CarouselController extends BaseCurlController
      */
     public function afterSaveSuccessEvent($model, $id = '')
     {
-        $coverImg = str_replace(VideoTrait::getDomain($model->sync),"",$model->img);
+        $coverImg = str_replace(VideoTrait::getDomain(env('SFTP_SYNC',1)),"",$model->img);
         $model->img = $coverImg;
         $model->save();
         $this->syncUpload($model->img);
