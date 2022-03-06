@@ -8,6 +8,7 @@ use App\Models\Ad;
 use App\Models\AdSet;
 use App\Services\UiService;
 use App\TraitClass\AboutEncryptTrait;
+use App\TraitClass\AdTrait;
 use App\TraitClass\MemberCardTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\Storage;
 
 class AdController extends BaseCurlController
 {
-    use PHPRedisTrait,AboutEncryptTrait,MemberCardTrait;
+    use PHPRedisTrait,AboutEncryptTrait,MemberCardTrait,AdTrait;
 
     public $pageName = '广告';
 
@@ -293,11 +294,19 @@ class AdController extends BaseCurlController
         $model->name = AdSet::query()->where('id',$model->flag_id)->value('flag');
     }
 
+    /**
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
     public function afterSaveSuccessEvent($model, $id = '')
     {
+        $coverImg = str_replace(VideoTrait::getDomain($model->sync),"",$model->img);
+        $model->img = $coverImg;
+        $model->save();
         $this->syncUpload($model->img);
         //清除首页列表缓存
-        $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
+        if($this->getConfigDataFromDb()){
+            $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
+        }
     }
 
     //表单验证

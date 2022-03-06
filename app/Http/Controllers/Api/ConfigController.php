@@ -12,7 +12,7 @@ class ConfigController extends Controller
 {
     use PHPRedisTrait,AdTrait;
 
-    public function ack()
+    public function ack(): \Illuminate\Http\JsonResponse
     {
         $configKey = 'api_config';
         $configData = $this->redis()->get($configKey);
@@ -22,39 +22,12 @@ class ConfigController extends Controller
                 'data'=>json_decode($configData,true)
             ]);
         }else{
-            $appConfig = config_cache('app');
-            if(!empty($appConfig)){
-                //Log::info('==ConfigAnnouncement==',[$appConfig['announcement']]);
-                $res['announcement'] = stripslashes(addslashes($appConfig['announcement']));
-                $res['anActionType'] = $appConfig['announcement_action_type'];
-                //视频ID
-                $res['videoId'] = $appConfig['announcement_video_id'];
-                $res['obUrl'] = $appConfig['announcement_url'];
-                $res['adTime'] = (int)$appConfig['ad_time'];
-                $res['version'] = $appConfig['app_version'];
-                $res['kf_url'] = $appConfig['kf_url'];
-                $res['send_sms_intervals'] = (int)$appConfig['send_sms_intervals'];
-                //广告部分
-                $ads = $this->weightGet('open_screen');
-                $activityAds = $this->weightGet('activity');
-                $res['open_screen_ads'] = $ads;
-                $res['activity_ads'] = $activityAds;
-
-                $payConf = json_decode($appConfig['pay_method']??'',true);
-                $currentSecond = strval(date(date('s')%10));
-                $res['pay_method'] = intval($payConf[$currentSecond]??2);
-                $res['pay_detail'] = json_decode($appConfig['pay_detail']??'',true);
-
-                if(!empty($res)){
-                    $this->redis()->set($configKey,json_encode($res,JSON_UNESCAPED_UNICODE));
-                }
-                return response()->json([
-                    'state'=>0,
-                    'data'=>$res
-                ]);
-            }
+            $res = $this->getConfigDataFromDb();
+            return response()->json([
+                'state'=>0,
+                'data'=>$res
+            ]);
         }
-        return response()->json([]);
     }
 
     /*public function upgrade(Request $request)

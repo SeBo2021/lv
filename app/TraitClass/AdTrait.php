@@ -9,6 +9,38 @@ trait AdTrait
 {
     use AboutEncryptTrait;
 
+    public function getConfigDataFromDb(): array
+    {
+        $appConfig = config_cache('app');
+        if(!empty($appConfig)){
+            //Log::info('==ConfigAnnouncement==',[$appConfig['announcement']]);
+            $res['announcement'] = stripslashes(addslashes($appConfig['announcement']));
+            $res['anActionType'] = $appConfig['announcement_action_type'];
+            //视频ID
+            $res['videoId'] = $appConfig['announcement_video_id'];
+            $res['obUrl'] = $appConfig['announcement_url'];
+            $res['adTime'] = (int)$appConfig['ad_time'];
+            $res['version'] = $appConfig['app_version'];
+            $res['kf_url'] = $appConfig['kf_url'];
+            $res['send_sms_intervals'] = (int)$appConfig['send_sms_intervals'];
+            //广告部分
+            $ads = $this->weightGet('open_screen');
+            $activityAds = $this->weightGet('activity');
+            $res['open_screen_ads'] = $ads;
+            $res['activity_ads'] = $activityAds;
+
+            $payConf = json_decode($appConfig['pay_method']??'',true);
+            $currentSecond = strval(date(date('s')%10));
+            $res['pay_method'] = intval($payConf[$currentSecond]??2);
+            $res['pay_detail'] = json_decode($appConfig['pay_detail']??'',true);
+            if(!empty($res)){
+                $this->redis()->set('api_config',json_encode($res,JSON_UNESCAPED_UNICODE));
+                return $res;
+            }
+        }
+        return [];
+    }
+
     public function weightGet($flag=''): array
     {
         $ads = Ad::query()
