@@ -164,6 +164,7 @@ class AppConfigController extends BaseCurlController
         config_cache($config_name, $config_values);
         //
         cache()->delete('payEnv');
+        cache()->delete('api_config');
         $this->insertLog(lang('系统配置成功'));
         return $this->returnSuccessApi('设置成功');
 
