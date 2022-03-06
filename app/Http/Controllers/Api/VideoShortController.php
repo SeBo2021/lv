@@ -136,7 +136,7 @@ class VideoShortController extends Controller
         $items = $paginator->items();
 
         $data = [];
-        $resourceDomain = env('RESOURCE_DOMAIN');
+        $resourceDomain = self::getDomain(env('SFTP_SYNC',1));
         $_v = date('Ymd');
         foreach ($items as $one) {
             //  $one = $this->handleShortVideoItems([$one], true)[0];
