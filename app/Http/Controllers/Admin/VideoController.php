@@ -393,12 +393,7 @@ class VideoController extends BaseCurlController
         }
 
         //自定义上传封面
-        if($model->cover_img){
-            $coverImg = str_replace(self::getDomain($model->sync),"",$model->cover_img);
-            $model->cover_img = $coverImg;
-            $model->save();
-            $this->syncUpload($coverImg);
-        }
+
         //ProcessSyncMiddleTable::dispatchAfterResponse('video');
         return $model;
     }

@@ -154,12 +154,16 @@ class ProcessVideoSlice implements ShouldQueue
             //->addFormat($highBitrate)
             ->save($m3u8_path);
         $durationSeconds = floor($result->getDurationInMiliseconds()/1000);
+
+        $sync = $this->row->sync>0 ? $this->row->sync : env('SFTP_SYNC',1);
         $updateData = [
             'duration_seconds' => $durationSeconds,
-            'sync' => env('SFTP_SYNC',1)
+            'duration' => $this->formatSeconds($durationSeconds),
+            'cover_img' => str_replace(self::getDomain($sync),"",$this->row->cover_img),
+            'sync' => $sync,
         ];
-        $updateData['duration'] = $this->formatSeconds($durationSeconds);
         DB::table('video')->where('id',$this->row->id)->update($updateData);
+        $this->syncUpload($updateData['cover_img']);
         //删除mp4文件
         if($delMp4!==false){
             Storage::delete($mp4Path);

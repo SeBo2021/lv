@@ -153,11 +153,19 @@ class ProcessLive implements ShouldQueue
             //->addFormat($highBitrate)
             ->save($m3u8_path);
         $durationSeconds = floor($result->getDurationInMiliseconds()/1000);
+        $sync = $this->row->sync>0 ? $this->row->sync : env('SFTP_SYNC',1);
         $updateData = [
             'duration_seconds' => $durationSeconds,
-            'sync' => env('SFTP_SYNC',1)
+            'duration' => $this->formatSeconds($durationSeconds),
+            'cover_img' => str_replace(self::getDomain($sync),"",$this->row->cover_img),
+            'sync' => $sync,
         ];
-        $updateData['duration'] = $this->formatSeconds($durationSeconds);
+        /*if($model->cover_img){
+            $coverImg = str_replace(self::getDomain($model->sync),"",$model->cover_img);
+            $model->cover_img = $coverImg;
+            $model->save();
+            $this->syncUpload($coverImg);
+        }*/
         DB::table('live')->where('id',$this->row->id)->update($updateData);
         //删除mp4文件
         if($del!==false){
