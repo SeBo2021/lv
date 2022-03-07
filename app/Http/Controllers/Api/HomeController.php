@@ -50,12 +50,21 @@ class HomeController extends Controller
                 'cid' => 'required|integer'
             ])->validated();
             $cid = $validated['cid'];
-            Log::info('==carouselLog===',[$validated]);
-            $data = Carousel::query()
-                ->where('status', 1)
-                ->where('cid', $cid)
-                ->get(['id','title','img','url','action_type','vid','status','end_at'])
-                ->toArray();
+            // Log::info('==carouselLog===',[$validated]);
+
+            $configKey = 'api_carousel';
+            $carouselData = $this->redis()->get($configKey);
+            if ($carouselData) {
+                $data = json_decode($carouselData,true);
+            } else {
+                $data = Carousel::query()
+                    ->where('status', 1)
+                    ->where('cid', $cid)
+                    ->get(['id','title','img','url','action_type','vid','status','end_at'])
+                    ->toArray();
+                $this->redis()->set($configKey,json_encode($data));
+            }
+
             $domain = self::getDomain(env('SFTP_SYNC',1));
             foreach ($data as &$item){
                 $item['img'] = $this->transferImgOut($item['img'],$domain,date('Ymd'),'auto');
