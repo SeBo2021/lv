@@ -49,14 +49,21 @@ class VideoController extends Controller
         // 业务逻辑
         $params = ApiParamsTrait::parse($request->params);
         $validated = Validator::make($params, [
-            'id' => 'required|integer||min:1',
+            'id' => 'required|integer|min:1',
             'use_gold' => [
                 'nullable',
                 'string',
                 Rule::in(['1', '0']),
             ],
         ])->validated();
-        $id = $validated['id'];
+        // 增加冗错机制
+        $id = $validated['id']??false;
+        if (!$id) {
+            return response()->json([
+                'state' => -1,
+                'msg' => "参数错误",
+            ]);
+        }
         $useGold = $validated['use_gold'] ?? "1";
         $videoField = ['id', 'name', 'cid', 'cat', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'hls_url', 'dash_url', 'type', 'cover_img', 'views', 'likes', 'comments','updated_at'];
         $one = Video::query()->find($id, $videoField)->toArray();
