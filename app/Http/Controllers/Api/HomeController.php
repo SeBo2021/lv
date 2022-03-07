@@ -25,12 +25,18 @@ class HomeController extends Controller
 
     public function category(Request $request)
     {
-        $data = Category::query()
-            ->where('parent_id',2)
-            ->where('is_checked',1)
-            ->orderBy('sort')
-            ->get(['id','name','sort'])
-            ->toArray();
+        $categoryApiKey = 'api_category';
+        $cacheData = $this->redis()->get($categoryApiKey);
+        if($cacheData){
+            $data = json_decode($cacheData,true);
+        }else{
+            $data = Category::query()
+                ->where('parent_id',2)
+                ->where('is_checked',1)
+                ->orderBy('sort')
+                ->get(['id','name','sort'])
+                ->toArray();
+        }
         return response()->json([
             'state'=>0,
             'data'=>$data
