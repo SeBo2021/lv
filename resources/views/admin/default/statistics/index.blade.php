@@ -95,7 +95,7 @@
                         </div>
                     </div>
                     <div class="layui-row">
-                        <div class="layui-col-md3">
+                        <div class="layui-col-md4">
                             <div class="grid-demo">
                                 <fieldset class="layui-elem-field layui-field-title">
                                     <legend>访问量</legend>
@@ -103,7 +103,7 @@
                                 <pre class="layui-code layui-bg-blue" id="total_access"></pre>
                             </div>
                         </div>
-                        <div class="layui-col-md3">
+                        <div class="layui-col-md4">
                             <div class="grid-demo">
                                 <fieldset class="layui-elem-field layui-field-title">
                                     <legend>点击量</legend>
@@ -111,7 +111,7 @@
                                 <pre class="layui-code layui-bg-green" id="total_hits"></pre>
                             </div>
                         </div>
-                        <div class="layui-col-md3">
+                        <div class="layui-col-md4">
                             <div class="grid-demo">
                                 <fieldset class="layui-elem-field layui-field-title">
                                     <legend>安装量</legend>
@@ -119,14 +119,14 @@
                                 <pre class="layui-code layui-bg-cyan" id="total_install"></pre>
                             </div>
                         </div>
-                        <div class="layui-col-md3">
+                        {{--<div class="layui-col-md3">
                             <div class="grid-demo">
                                 <fieldset class="layui-elem-field layui-field-title">
-                                    <legend>注册量</legend>
+                                    <legend>绑定量</legend>
                                 </fieldset>
                                 <pre class="layui-code layui-bg-black" id="total_register"></pre>
                             </div>
-                        </div>
+                        </div>--}}
                         <div class="layui-col-md4">
                             <div class="grid-demo">
                                 <fieldset class="layui-elem-field layui-field-title">
