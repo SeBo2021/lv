@@ -153,7 +153,7 @@ class ProcessLive implements ShouldQueue
             //->addFormat($highBitrate)
             ->save($m3u8_path);
         $durationSeconds = floor($result->getDurationInMiliseconds()/1000);
-        $sync = $this->row->sync>0 ? $this->row->sync : env('SFTP_SYNC',1);
+        $sync = env('SFTP_SYNC',1);
         $updateData = [
             'duration_seconds' => $durationSeconds,
             'duration' => $this->formatSeconds($durationSeconds),
