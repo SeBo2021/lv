@@ -159,7 +159,7 @@ class AuthController extends Controller
             'type'=>$loginType,
             'account'=>$login_info['account'],
             'nickname'=>$login_info['nickname'],
-            'channel_id'=>$login_info['channel_id'],
+            'channel_id'=>$login_info['channel_id']??'',
             'device_info'=> $deviceInfo,
             'clipboard'=> $validated['clipboard'] ?? '',
             'source_info'=> $_SERVER['HTTP_USER_AGENT'],
