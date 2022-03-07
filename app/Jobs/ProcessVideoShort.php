@@ -128,7 +128,7 @@ class ProcessVideoShort implements ShouldQueue
         $updateData = ['duration_seconds' => $durationSeconds];
         $updateData['duration'] = $this->formatSeconds($durationSeconds);
         $updateData['url'] = $videoName;
-        $updateData['sync'] = $this->row->sync>0 ? $this->row->sync : env('SFTP_SYNC',1);
+        $updateData['sync'] = env('SFTP_SYNC',1);
         $updateData['cover_img'] = self::get_slice_url($videoName,'cover');
 
         DB::table('video_short')->where('id',$this->row->id)->update($updateData);
