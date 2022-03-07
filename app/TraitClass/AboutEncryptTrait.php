@@ -44,7 +44,7 @@ trait AboutEncryptTrait
         if((file_exists($abPath) && is_file($abPath)) || Storage::disk('sftp')->exists(str_replace('/storage','/public',$img))){
             $content = @file_get_contents($abPath);
             if(!$content){
-                $content = @file_get_contents(env('RESOURCE_DOMAIN').$img);
+                $content = @file_get_contents(VideoTrait::getDomain(env('SFTP_SYNC',1)).$img);
             }
             $put = Storage::disk('sftp')->put($img,$content);
             //加密
