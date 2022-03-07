@@ -90,12 +90,13 @@
                     <div class="layui-input-block" style="text-align: center;margin-left: 0">
                         <div class="layui-btn-group demoTest" style="margin-top: 5px;margin-bottom: 10px;">
                             <button class="layui-btn layui-btn-sm" style="background-color: #5FB878;" data-type="set" data-key="totalStatistic" data-value="0">All</button>
+                            <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="totalStatistic" data-value="3">ios轻量版</button>
                             <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="totalStatistic" data-value="2">Android</button>
                             <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="totalStatistic" data-value="1">IOS</button>
                         </div>
                     </div>
                     <div class="layui-row">
-                        <div class="layui-col-md3">
+                        <div class="layui-col-md4">
                             <div class="grid-demo">
                                 <fieldset class="layui-elem-field layui-field-title">
                                     <legend>访问量</legend>
@@ -103,7 +104,7 @@
                                 <pre class="layui-code layui-bg-blue" id="total_access"></pre>
                             </div>
                         </div>
-                        <div class="layui-col-md3">
+                        <div class="layui-col-md4">
                             <div class="grid-demo">
                                 <fieldset class="layui-elem-field layui-field-title">
                                     <legend>点击量</legend>
@@ -111,7 +112,7 @@
                                 <pre class="layui-code layui-bg-green" id="total_hits"></pre>
                             </div>
                         </div>
-                        <div class="layui-col-md3">
+                        <div class="layui-col-md4">
                             <div class="grid-demo">
                                 <fieldset class="layui-elem-field layui-field-title">
                                     <legend>安装量</legend>
@@ -119,14 +120,14 @@
                                 <pre class="layui-code layui-bg-cyan" id="total_install"></pre>
                             </div>
                         </div>
-                        <div class="layui-col-md3">
+                        {{--<div class="layui-col-md3">
                             <div class="grid-demo">
                                 <fieldset class="layui-elem-field layui-field-title">
-                                    <legend>注册量</legend>
+                                    <legend>绑定量</legend>
                                 </fieldset>
                                 <pre class="layui-code layui-bg-black" id="total_register"></pre>
                             </div>
-                        </div>
+                        </div>--}}
                         <div class="layui-col-md4">
                             <div class="grid-demo">
                                 <fieldset class="layui-elem-field layui-field-title">
@@ -169,6 +170,7 @@
                     <div class="layui-input-block" style="text-align: center;margin-left: 0;">
                         <div class="layui-btn-group demoTest" style="margin-top: 5px;margin-bottom: 10px;">
                             <button class="layui-btn layui-btn-sm" style="background-color: #5FB878;" data-type="set" data-key="activeUsers" data-value="0">All</button>
+                            <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="activeUsers" data-value="3">ios轻量版</button>
                             <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="activeUsers" data-value="2">Android</button>
                             <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="activeUsers" data-value="1">IOS</button>
                         </div>
@@ -190,6 +192,7 @@
                     <div class="layui-input-block" style="text-align: center;margin-left: 0;height: 50px">
                         <div class="layui-btn-group demoTest" style="margin-top: 5px;margin-bottom: 10px;">
                             <button class="layui-btn layui-btn-sm" style="background-color: #5FB878;" data-type="set" data-key="increment" data-value="0">All</button>
+                            <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="increment" data-value="3">ios轻量版</button>
                             <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="increment" data-value="2">Android</button>
                             <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="increment" data-value="1">IOS</button>
                         </div>
@@ -210,6 +213,7 @@
                     <div class="layui-input-block" style="text-align: center;margin-left: 0;">
                         <div class="layui-btn-group demoTest" style="margin-top: 5px;margin-bottom: 10px;">
                             <button class="layui-btn layui-btn-sm" style="background-color: #5FB878;" data-type="set" data-key="recharge" data-value="0">All</button>
+                            <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="recharge" data-value="2">ios轻量版</button>
                             <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="recharge" data-value="2">Android</button>
                             <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="recharge" data-value="1">IOS</button>
                         </div>

@@ -102,20 +102,21 @@ class StatisticsController extends BaseCurlController
                 $totalData = array_reverse($totalData->toArray());
                 foreach ($totalData as $item){
                     $json['x'][] = date('Y-m-d',$item->at_time);
-                    $json['series']['total_access'][] = $item->total_access;
-                    $json['series']['total_hits'][] = $item->total_hits;
-                    $json['series']['total_install'][] = $item->total_install;
-                    $json['series']['total_register'][] = $item->total_register;
-                    $json['series']['total_keep_day_users'][] = $item->total_keep_day_users;
-                    $json['series']['total_keep_week_users'][] = $item->total_keep_week_users;
-                    $json['series']['total_keep_month_users'][] = $item->total_keep_month_users;
-                    $json['series']['total_keep_day_rate'][] = $item->total_keep_day_rate;
-                    $json['series']['total_keep_week_rate'][] = $item->total_keep_week_rate;
-                    $json['series']['total_keep_month_rate'][] = $item->total_keep_month_rate;
+                    $json['series']['total_access'][] = $item->total_access??0;
+                    $json['series']['total_hits'][] = $item->total_hits??0;
+                    $json['series']['total_install'][] = $item->total_install??0;
+                    $json['series']['total_register'][] = $item->total_register??0;
+                    $json['series']['total_keep_day_users'][] = $item->total_keep_day_users??0;
+                    $json['series']['total_keep_week_users'][] = $item->total_keep_week_users??0;
+                    $json['series']['total_keep_month_users'][] = $item->total_keep_month_users??0;
+                    $json['series']['total_keep_day_rate'][] = $item->total_keep_day_rate??0;
+                    $json['series']['total_keep_week_rate'][] = $item->total_keep_week_rate??0;
+                    $json['series']['total_keep_month_rate'][] = $item->total_keep_month_rate??0;
                 }
                 break;
             case 'activeUsers':
-                $queryBuild = DB::table('users_day')->select('at_time',DB::raw('count(uid) as users'));
+                //$queryBuild = DB::table('users_day')->select('at_time',DB::raw('count(uid) as users'));
+                $queryBuild = DB::table('statistic_day')->select('at_time',DB::raw('sum(login_number) as users'));
                 if($channelId!==null){
                     $queryBuild = $queryBuild->where('channel_id',$channelId);
                 }

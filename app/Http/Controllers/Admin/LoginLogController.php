@@ -111,6 +111,13 @@ class LoginLogController extends BaseCurlIndexController
                 'type' => 'text',
                 'name' => '登录ip',
             ],
+            [
+                'field' => 'query_created_at',
+                'type' => 'datetime',
+//                'attr' => 'data-range=true',
+                'attr' => 'data-range=~',//需要特殊分割
+                'name' => '时间范围',
+            ],
 
         ];
         //赋值到ui数组里面必须是`search`的key值
