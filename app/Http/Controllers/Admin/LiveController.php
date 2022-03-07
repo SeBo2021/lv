@@ -261,8 +261,9 @@ class LiveController extends BaseCurlController
         $model->tag = json_encode([]);
         $model->gold = 0;
         if(isset($model->url)){
-            $model->dash_url = self::get_slice_url($model->url);
+            //$model->dash_url = self::get_slice_url($model->url);
             $model->hls_url = self::get_slice_url($model->url,'hls');
+            $model->cover_img = str_replace(self::getDomain(env('SFTP_SYNC',1)),'',$model->cover_img??'');
             if(isset($model->cover_img) && !$model->cover_img){
                 $model->cover_img = self::get_slice_url($model->url,'cover');
             }
