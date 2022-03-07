@@ -131,7 +131,7 @@ class StatisticsController extends BaseCurlController
                 $activeUsers = $queryBuild->groupBy(['at_date'])->orderByDesc('at_date')->take(15)->get();
                 $activeUsers = array_reverse($activeUsers->toArray());
                 foreach ($activeUsers as $activeUser){
-                    $json['x'][] = $activeUser->at_date;
+                    $json['x'][] = $activeUser->at_date ?? '-';
                     $json['y'][] = $activeUser->users;
                 }
                 break;
