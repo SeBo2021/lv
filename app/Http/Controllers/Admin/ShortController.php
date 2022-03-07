@@ -75,6 +75,12 @@ class ShortController extends BaseCurlController
                 'hide' => true
             ],
             [
+                'field' => 'duration',
+                'minWidth' => 150,
+                'title' => '时长',
+                'align' => 'center',
+            ],
+            [
                 'field' => 'url',
                 'minWidth' => 150,
                 'title' => '源视频',
