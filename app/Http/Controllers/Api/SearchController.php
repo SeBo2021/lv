@@ -160,6 +160,7 @@ class SearchController extends Controller
                     //Log::info('==CatList==',$res['list']);
                     $res['hasMorePages'] = $paginator->hasMorePages();
                     $redis->set($redisKey,json_encode($res,JSON_UNESCAPED_UNICODE));
+                    $redis->expire($redisKey,$this->redisExpiredTime);
                 }
             }else{
                 $res = json_decode($res,true);
