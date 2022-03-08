@@ -138,30 +138,38 @@ class SearchController extends Controller
             ])->validate();
             $cid = $params['cid'];
             $page = $params['page'];
-            $perPage = 16;
-            $paginator = DB::table('cid_vid')
-                ->join('video','cid_vid.vid','=','video.id')
-                ->where('cid_vid.cid',$cid)
-                ->where('video.status',1)
-                ->orderByDesc('video.updated_at')
-                ->simplePaginate($perPage,$this->videoFields,'cat',$page);
-            //$client = ClientBuilder::create()->build();
-            $paginatorArr = $paginator->toArray();
-            if(!empty($paginatorArr)){
-                $res['list'] = $paginatorArr['data'];
-                $res['list'] = $this->handleVideoItems($res['list'],false,$request->user()->id);
-                //广告
-                $res['list'] = $this->insertAds($res['list'],'more_page',true, $page, $perPage);
-                //Log::info('==CatList==',$res['list']);
-                $res['hasMorePages'] = $paginator->hasMorePages();
-                return response()->json([
-                    'state'=>0,
-                    'data'=>$res
-                ]);
-            }
 
+            $redisKey = $this->apiRedisKey['search_cat'].$cid.'-'.$page;
+            $redis = $this->redis();
+            $res = $redis->get($redisKey);
+            if(!$res){
+                $perPage = 16;
+                $paginator = DB::table('cid_vid')
+                    ->join('video','cid_vid.vid','=','video.id')
+                    ->where('cid_vid.cid',$cid)
+                    ->where('video.status',1)
+                    ->orderByDesc('video.updated_at')
+                    ->simplePaginate($perPage,$this->videoFields,'cat',$page);
+                //$client = ClientBuilder::create()->build();
+                $paginatorArr = $paginator->toArray();
+                if(!empty($paginatorArr)){
+                    $res['list'] = $paginatorArr['data'];
+                    $res['list'] = $this->handleVideoItems($res['list'],false,$request->user()->id);
+                    //广告
+                    $res['list'] = $this->insertAds($res['list'],'more_page',true, $page, $perPage);
+                    //Log::info('==CatList==',$res['list']);
+                    $res['hasMorePages'] = $paginator->hasMorePages();
+                    $redis->set($redisKey,json_encode($res,JSON_UNESCAPED_UNICODE));
+                }
+            }else{
+                $res = json_decode($res,true);
+            }
+            return response()->json([
+                'state'=>0,
+                'data'=>$res
+            ]);
         }
-        return [];
+        return response()->json([]);
     }
 
     //推荐
