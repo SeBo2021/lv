@@ -110,7 +110,7 @@ trait AdTrait
             ->orderBy('sort')
             ->get(['id','sort','name','title','img','position','url','play_url','type','status','action_type','vid','end_at'])
             ->toArray();
-        $domain = env(env('SFTP',1));
+        $domain = VideoTrait::getDomain(env('SFTP_SYNC',1));
         $_v = date('YmdH');
         foreach ($ads as &$ad){
             //$ad['img'] = $domain . $ad['img'];
