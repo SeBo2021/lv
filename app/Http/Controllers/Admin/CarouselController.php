@@ -9,11 +9,12 @@ use App\Models\Category;
 use App\Services\UiService;
 use App\TraitClass\AboutEncryptTrait;
 use App\TraitClass\CatTrait;
+use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
 
 class CarouselController extends BaseCurlController
 {
-    use CatTrait, AboutEncryptTrait;
+    use CatTrait, AboutEncryptTrait, PHPRedisTrait;
 
     public $pageName = '轮播图管理';
 
@@ -198,6 +199,7 @@ class CarouselController extends BaseCurlController
         $model->img = $coverImg;
         $model->save();
         $this->syncUpload($model->img);
+        $this->redis()->del('api_carousel');
     }
 
     public function setListOutputItemExtend($item)
