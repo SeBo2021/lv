@@ -111,7 +111,7 @@ trait AdTrait
             ->get(['id','sort','name','title','img','position','url','play_url','type','status','action_type','vid','end_at'])
             ->toArray();
         $domain = env('RESOURCE_DOMAIN');
-        $_v = date('Ymd');
+        $_v = date('YmdH');
         foreach ($ads as &$ad){
             //$ad['img'] = $domain . $ad['img'];
             //图片处理
