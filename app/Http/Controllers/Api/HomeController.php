@@ -68,7 +68,7 @@ class HomeController extends Controller
                     ->where('cid', $cid)
                     ->get(['id','title','img','url','action_type','vid','status','end_at'])
                     ->toArray();
-                $this->redis()->set($configKey,json_encode($data));
+                $this->redis()->set($configKey,json_encode($data,JSON_UNESCAPED_UNICODE));
             }
 
             $domain = self::getDomain(env('SFTP_SYNC',1));
