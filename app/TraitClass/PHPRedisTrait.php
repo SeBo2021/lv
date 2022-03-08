@@ -21,7 +21,7 @@ trait PHPRedisTrait
         return Redis::connection($name)->client();
     }
 
-    public function redisBatchDel($keys,$redis=null)
+    public function redisBatchDel($keys,$redis=null): void
     {
         $redis = $redis ?? $this->redis();
         foreach ($keys as $key){
