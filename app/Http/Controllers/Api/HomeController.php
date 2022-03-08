@@ -60,23 +60,23 @@ class HomeController extends Controller
 
             $configKey = 'api_carousel_'.$cid;
             $carouselData = $this->redis()->get($configKey);
-            if ($carouselData) {
-                $data = json_decode($carouselData,true);
-            } else {
+            if (!$carouselData) {
                 $data = Carousel::query()
                     ->where('status', 1)
                     ->where('cid', $cid)
                     ->get(['id','title','img','url','action_type','vid','status','end_at'])
                     ->toArray();
+                $domain = self::getDomain(env('SFTP_SYNC',1));
+                foreach ($data as &$item){
+                    $item['img'] = $this->transferImgOut($item['img'],$domain,date('Ymd'),'auto');
+                    $item['action_type'] = (string) $item['action_type'];
+                    $item['vid'] = (string) $item['vid'];
+                }
                 $this->redis()->set($configKey,json_encode($data,JSON_UNESCAPED_UNICODE));
+            } else {
+                $data = json_decode($carouselData,true);
             }
 
-            $domain = self::getDomain(env('SFTP_SYNC',1));
-            foreach ($data as &$item){
-                $item['img'] = $this->transferImgOut($item['img'],$domain,date('Ymd'),'auto');
-                $item['action_type'] = (string) $item['action_type'];
-                $item['vid'] = (string) $item['vid'];
-            }
             return response()->json([
                 'state'=>0,
                 'data'=>$data
