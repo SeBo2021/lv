@@ -199,7 +199,8 @@ class CarouselController extends BaseCurlController
         $model->img = $coverImg;
         $model->save();
         $this->syncUpload($model->img);
-        $this->redis()->del('api_carousel');
+        $api_carousel_keys = $this->redis()->keys('*api_carousel*');
+        $this->redisBatchDel($api_carousel_keys);
     }
 
     public function setListOutputItemExtend($item)
