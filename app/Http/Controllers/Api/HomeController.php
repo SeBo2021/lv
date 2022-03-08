@@ -58,7 +58,7 @@ class HomeController extends Controller
             $cid = $validated['cid'];
             // Log::info('==carouselLog===',[$validated]);
 
-            $configKey = 'api_carousel';
+            $configKey = 'api_carousel_'.$cid;
             $carouselData = $this->redis()->get($configKey);
             if ($carouselData) {
                 $data = json_decode($carouselData,true);
