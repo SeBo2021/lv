@@ -141,8 +141,8 @@ class HomeController extends Controller
             }
             $res['hasMorePages'] = $paginator->hasMorePages();
             $res['list'] = $data;
-            /*//广告
-            //$res['list'] = $this->insertAds($res['list'],'home_page',true,$page,$perPage);*/
+            //广告
+            $res['list'] = $this->insertAds($res['list'],'home_page',true,$page,$perPage);
             //存入redis
             $redis->set($sectionKey,json_encode($res,JSON_UNESCAPED_UNICODE));
             //$redis->expire($sectionKey,$this->redisExpiredTime);
@@ -150,7 +150,7 @@ class HomeController extends Controller
             $res = json_decode($res,true);
         }
         //广告
-        $res['list'] = $this->insertAds($res['list'],'home_page',true,$page,$perPage);
+        //$res['list'] = $this->insertAds($res['list'],'home_page',true,$page,$perPage);
         return response()->json([
             'state'=>0,
             'data'=>$res
