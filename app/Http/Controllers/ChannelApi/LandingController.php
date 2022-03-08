@@ -38,7 +38,7 @@ class LandingController extends Controller
         ];
         $insert['channel_id'] = $this->getChannelId($request->input('channel_id',0));
         //Log::debug('===landingPageChannel===',$insert);
-        DB::table('app_download')->insertOrIgnore($insert);
+        //DB::table('app_download')->insertOrIgnore($insert);
         $this->redis()->lPush($this->apiRedisKey['app_download'],serialize($insert));
         //统计点击量
         $this->saveStatisticByDay('hits',$insert['channel_id'],$insert['device_system'],$dateArr);
