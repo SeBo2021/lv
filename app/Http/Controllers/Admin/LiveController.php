@@ -266,6 +266,8 @@ class LiveController extends BaseCurlController
             $model->cover_img = str_replace(self::getDomain(env('SFTP_SYNC',1)),'',$model->cover_img??'');
             if(!$model->cover_img){
                 $model->cover_img = self::get_slice_url($model->url,'cover');
+            }else{
+                $this->syncUpload($model->cover_img);
             }
         }
     }

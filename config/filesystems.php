@@ -97,6 +97,33 @@ return [
                 ],
             ],
         ],
+        'sftp1' => [
+            'driver' => 'sftp',
+            'host' => env('SFTP_HOST1',''),
+            'username' => env('SFTP_USERNAME',''),
+            'password' => env('SFTP_PASSWORD',''),
+
+            // Settings for SSH key based authentication...
+            // 'privateKey' => '/path/to/privateKey',
+            // 'password' => 'encryption-password',
+
+            // Optional SFTP Settings...
+             'port' => 22,
+            // 'root' => '',
+            'timeout' => 3600,
+            'visibility' => 'public',
+            'directoryPerm' => 0755,
+            'permissions' => [
+                'file' => [
+                    'public' => 0664,
+                    'private' => 0600,
+                ],
+                'dir' => [
+                    'public' => 0755,
+                    'private' => 0700,
+                ],
+            ],
+        ],
 
         //七牛
         'qiniu' => [
