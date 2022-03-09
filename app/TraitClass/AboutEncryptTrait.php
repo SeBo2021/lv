@@ -38,7 +38,7 @@ trait AboutEncryptTrait
     /**
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    public function syncUpload($img,$sync)
+    public function syncUpload($img,$sync=2)
     {
         $abPath = public_path().$img;
         if((file_exists($abPath) && is_file($abPath)) || Storage::disk('sftp')->exists(str_replace('/storage','/public',$img))){

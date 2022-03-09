@@ -163,7 +163,7 @@ class ProcessVideoSlice implements ShouldQueue
             'sync' => $sync,
         ];
         DB::table('video')->where('id',$this->row->id)->update($updateData);
-        $this->syncUpload($updateData['cover_img'],true);
+        $this->syncUpload($updateData['cover_img']);
         //删除mp4文件
         if($delMp4!==false){
             Storage::delete($mp4Path);
