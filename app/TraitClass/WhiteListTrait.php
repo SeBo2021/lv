@@ -18,7 +18,7 @@ trait WhiteListTrait
             ->where('type',1)
             ->pluck('ip')->toArray();
         //Log::info('===adminLoginIPS===',[$whiteList,$ip]);
-        Log::info('===adminSERVER===',[$_SERVER]);
+        //Log::info('===adminSERVER===',[$_SERVER]);
         if(!in_array($ip, $whiteList)){
             return false;
         }

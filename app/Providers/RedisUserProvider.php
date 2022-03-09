@@ -2,13 +2,12 @@
 
 namespace App\Providers;
 
-use App\TraitClass\PHPRedisTrait;
 use Illuminate\Auth\EloquentUserProvider;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 
 class RedisUserProvider extends EloquentUserProvider
 {
-    use PHPRedisTrait;
 
     /**
      * Retrieve a user by the given credentials.
@@ -23,7 +22,7 @@ class RedisUserProvider extends EloquentUserProvider
         }
 
         $userId = Redis::get($credentials['api_token']);
-
+        Log::info('==UserProvider==',[$userId,$credentials['api_token']]);
         return $this->retrieveById($userId);
     }
 
