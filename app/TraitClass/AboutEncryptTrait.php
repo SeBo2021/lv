@@ -53,6 +53,7 @@ trait AboutEncryptTrait
                 $fileInfo = pathinfo($img);
                 $encryptFile = str_replace('/storage','/public',$fileInfo['dirname']).'/'.$fileInfo['filename'].'.htm';
                 $r = Storage::disk('sftp')->put($encryptFile,$content);
+                Storage::disk('sftp1')->put($encryptFile,$content);
                 Log::info('==encryptImg==',[$encryptFile,$r]);
             }
         }
