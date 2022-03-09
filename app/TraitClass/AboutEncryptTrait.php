@@ -47,6 +47,7 @@ trait AboutEncryptTrait
                 $content = @file_get_contents(VideoTrait::getDomain(env('SFTP_SYNC',1)).$img);
             }
             $put = Storage::disk('sftp')->put($img,$content);
+            Storage::disk('sftp1')->put($img,$content);
             //加密
             if($put){
                 $fileInfo = pathinfo($img);
