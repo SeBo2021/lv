@@ -78,7 +78,8 @@ $auth = [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
+//            'driver' => 'eloquent',
+            'driver' => 'redis',
             'model' => App\Models\User::class,
         ],
         // 'users' => [

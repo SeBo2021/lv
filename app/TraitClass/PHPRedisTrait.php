@@ -13,6 +13,7 @@ trait PHPRedisTrait
         'register_did' => 'api_did_', //注册机器码
         'user_gold_video' => 'api_ugv_', //用户购买过金币对应hash
         'app_download' => 'api_app_download', //用户下载记录对应的列表
+        'passport_token' => 'api_passport_token_', //用户下载记录对应的列表
     ];
 
     public $redisExpiredTime = 3600*24;

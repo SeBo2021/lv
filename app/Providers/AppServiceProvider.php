@@ -15,10 +15,13 @@ class AppServiceProvider extends ServiceProvider
      * Register any application services.
      *
      * @return void
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function register()
+    public function register(): void
     {
-
+        $this->app->make('auth')->provider('redis', function ($app, $config) {
+            return new RedisUserProvider($app['hash'], $config['model']);
+        });
     }
 
     /**
