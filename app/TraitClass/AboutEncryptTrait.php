@@ -38,7 +38,7 @@ trait AboutEncryptTrait
     /**
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    public function syncUpload($img)
+    public function syncUpload($img,$last=false)
     {
         $abPath = public_path().$img;
         if((file_exists($abPath) && is_file($abPath)) || Storage::disk('sftp')->exists(str_replace('/storage','/public',$img))){
@@ -47,13 +47,13 @@ trait AboutEncryptTrait
                 $content = @file_get_contents(VideoTrait::getDomain(env('SFTP_SYNC',1)).$img);
             }
             $put = Storage::disk('sftp')->put($img,$content);
-            Storage::disk('sftp1')->put($img,$content);
+            !$last && Storage::disk('sftp1')->put($img,$content);
             //加密
             if($put){
                 $fileInfo = pathinfo($img);
                 $encryptFile = str_replace('/storage','/public',$fileInfo['dirname']).'/'.$fileInfo['filename'].'.htm';
                 $r = Storage::disk('sftp')->put($encryptFile,$content);
-                Storage::disk('sftp1')->put($encryptFile,$content);
+                !$last && Storage::disk('sftp1')->put($encryptFile,$content);
                 Log::info('==encryptImg==',[$encryptFile,$r]);
             }
         }
