@@ -56,12 +56,20 @@ class VideoShortController extends Controller
      */
     public function cate(Request $request): JsonResponse
     {
-        $raw = Category::whereIn('mask', $this->mainCateAlias)
-            ->where('is_checked',1)
-            ->orderBy('sort', 'desc')
-            ->select('id', 'name')
-            ->get();
-        $data = json_decode($raw, true);
+        $cacheKey = 'short_category';
+        $cacheData = $this->redis()->get($cacheKey);
+        if($cacheData){
+            $data = json_decode($cacheData,true);
+        }else{
+            $raw = Category::whereIn('mask', $this->mainCateAlias)
+                ->where('is_checked',1)
+                ->orderBy('sort', 'desc')
+                ->select('id', 'name')
+                ->get();
+            $data = json_decode($raw, true);
+            $this->redis()->set($cacheKey,json_encode($data));
+        }
+
         return response()->json([
             'state' => 0,
             'data' => $data
@@ -92,7 +100,6 @@ class VideoShortController extends Controller
         $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'dash_url', 'hls_url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
         $perPage = 8;
         $model = VideoShort::query()->where('status',1);
-        $listIsRand = false;
 
         if ($tagId) {
             $tagInfo = Tag::query()->where(['mask'=>$this->cateMapAlias[$tagId]])->firstOrFail()?->toArray();
@@ -111,36 +118,40 @@ class VideoShortController extends Controller
 //            $model = $model->where('id','>=',$startId);
             $model = $model->where('id','<=',$startId);
         }
-        if(!empty($words)){
-            $model = VideoShort::search($words)->where('status', 1);
-            $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
-        }else{
-            //是否随机
-            /*if($listIsRand){
-                if($page == 1){
-                    $model = $model->inRandomOrder();
-                    $modelStr = serialize($model);
-                    DB::table('short_video_model')->where('uid',$user->id)->where('cate_id',$cateId)->delete();
-                    DB::table('short_video_model')->insert(['uid'=>$user->id,'cate_id'=>$cateId,'short_serialize' =>$modelStr]);
-                }else{
-                    $short_serialize = DB::table('short_video_model')->where('uid',$user->id)->where('cate_id',$cateId)->value('short_serialize');
-                    $model = $short_serialize ? unserialize($short_serialize) : $model;
-                }
-            }*/
-            // $model = $model->orderByDesc('id');
-            if($newIds){
-                $model = $model->orderByRaw("FIELD(id, {$newIds})");
+        if($newIds){
+            $cacheIds = explode(',',$newIds);
+            $start = $perPage*($page-1);
+            $ids = array_slice($cacheIds,$start,$perPage);
+            foreach ($ids as $id) {
+                $mapNum = $id % 300;
+                $cacheKey = "short_video_$mapNum";
+                $raw = $this->redis()->hGet($cacheKey, $id);
+                $items[] = json_decode($raw,true);
             }
-            $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
+            $more = false;
+            if (count($ids) == $perPage) {
+                $more = true;
+            }
+        } else {
+            if(!empty($words)){
+                $model = VideoShort::search($words)->where('status', 1);
+                $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
+            }else{
+                $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
+            }
+            $items = $paginator->items();
+            $more = $paginator->hasMorePages();
         }
-        $items = $paginator->items();
 
         $data = [];
         $_v = date('Ymd');
+        $isVip = $this->isVip($user);
         foreach ($items as $one) {
             //  $one = $this->handleShortVideoItems([$one], true)[0];
             $one['limit'] = 0;
-            $one = $this->viewLimit($one, $user);
+            if ($one['restricted'] == 1  && (!$isVip)) {
+                $one['limit'] = 1;
+            }
             $viewRecord = $this->isShortLoveOrCollect($user->id, $one['id']);
             $one['is_love'] = intval($viewRecord['is_love']) ?? 0;
             $resourceDomain = self::getDomain($one['sync']);
@@ -158,7 +169,7 @@ class VideoShortController extends Controller
 
         return [
             'list' => $data,
-            'hasMorePages' => $paginator->hasMorePages()
+            'hasMorePages' => $more,
         ];
     }
 
