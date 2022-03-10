@@ -191,7 +191,8 @@ class FakeLiveShortController extends Controller
         if ($remainSecond < 0) {
             $remainSecond = 0;
         }
-        $redis->set($redisLiveCalcKey,$nowTime);
+        $exp = strtotime('23:59:59')-time();
+        $redis->set($redisLiveCalcKey,$nowTime,$exp);
 
         $startSecond = $durationSeconds - ($durationSeconds - (time() % $durationSeconds));
 
