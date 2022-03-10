@@ -173,7 +173,8 @@ class CommContentController extends Controller
             $rawArea = $areaInfoMap[$v['uid']] ?? [];
             $data[$k]['location_name'] = '未知';
             if(!empty($rawArea)){
-                $data[$k]['location_name'] = $this->getAreaNameFromUser($rawArea['area']);
+                // $data[$k]['location_name'] = $this->getAreaNameFromUser($rawArea['area']);
+                $data[$k]['location_name'] = '全国';
             }
             /*$tmpArea = @json_decode($rawArea['area'] ?? '', true);
             $tmpArea = $tmpArea ?? [];
