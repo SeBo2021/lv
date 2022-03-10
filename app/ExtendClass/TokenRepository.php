@@ -19,7 +19,7 @@ class TokenRepository extends \Laravel\Passport\TokenRepository
      */
     public function find($id)
     {
-        Log::info('==TokenRepository==',[$id]);
+        //Log::info('==TokenRepository==',[$id]);
         $key = $this->apiRedisKey['passport_token'].$id;
         $redis = $this->redis();
         if($redis->exists($key)){
