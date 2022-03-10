@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Passport\Passport;
 
 class AuthServiceProvider extends ServiceProvider
@@ -24,7 +25,10 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
-
+        //将redis注入Auth中
+        Auth::provider('redis',function($app, $config){
+            return new RedisUserProvider($app['hash'], $config['model']);
+        });
         if (! $this->app->routesAreCached()) {
             Passport::routes();
         }

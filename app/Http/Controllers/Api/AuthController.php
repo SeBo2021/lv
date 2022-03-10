@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -129,7 +130,7 @@ class AuthController extends Controller
                     //更新账号
                     $user->account = $account;
                     $user->nickname = $randNickName;
-                    $user->password = $user->account;
+                    $user->password = $account;
                     $user->save();
                     //
                     DB::commit();
@@ -145,14 +146,15 @@ class AuthController extends Controller
                 if(!$member){
                     return response()->json(['state' => -1, 'msg' => '用户不存在或被禁用!']);
                 }
-                $login_info = $member->only($this->loginUserFields);
                 //授权登录验证用户名密码
-                if(!Auth::attempt(['account'=>$member->account, 'password'=>$member->account])){
+                if(!Auth::attempt(['account'=>$validated['name'], 'password'=>$member->account])){
                     return response()->json(['state'=>-1,'msg' => 'Unauthorized'], 401);
                 }
                 $user = $request->user();
+                $login_info = $member->only($this->loginUserFields);
                 break;
         }
+
         $login_info['avatar'] += 0;
         //记录登录日志
         $login_log_data = [
