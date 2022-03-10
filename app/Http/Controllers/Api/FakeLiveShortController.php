@@ -64,7 +64,9 @@ class FakeLiveShortController extends Controller
             $mapNum = $id % 100;
             $cacheKey = "fake_live_$mapNum";
             $raw = $this->redis()->hGet($cacheKey, $id);
-            $items[] = json_decode($raw,true);
+            if ($raw) {
+                $items[] = json_decode($raw,true);
+            }
         }
         $more = false;
         if (count($ids) == $perPage) {
