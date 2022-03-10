@@ -23,9 +23,6 @@ class CommCateController extends Controller
     public function info(Request $request): JsonResponse
     {
         $user = $request->user();
-        /*$raw = $this->redis()->get('common_cate');
-        $data = @json_decode($raw, true);
-        $data = $data ?? [];*/
         $data = $this->getCommCate();
         foreach ($data as $k => $datum) {
             if ($datum['mark'] == 'focus') {
@@ -54,14 +51,6 @@ class CommCateController extends Controller
             return 1;
         }
         return 0;
-        /*if($tag == 'message'){
-            return $exist ? 0 : 1;
-        }else{
-            if ($exist) {
-                return 1;
-            }
-            return 0;
-        }*/
     }
 
     /**
