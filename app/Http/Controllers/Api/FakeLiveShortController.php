@@ -139,7 +139,7 @@ class FakeLiveShortController extends Controller
             ]);
         } catch (Exception $exception) {
             $msg = $exception->getMessage();
-            Log::error("shortLists", [$msg]);
+            Log::error("liveLists", [$msg]);
             return response()->json([
                 'state' => -1,
                 'data' => $msg
