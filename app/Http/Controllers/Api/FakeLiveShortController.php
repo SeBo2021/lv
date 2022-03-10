@@ -50,11 +50,23 @@ class FakeLiveShortController extends Controller
         } else {
             $newIds = $this->redis()->get("newLiveByUid_{$uid}");
         }
-        $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'duration_seconds', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at','intro','age', 'hls_url', 'dash_url'];
         $perPage = 8;
-        $model = $newIds ? Live::query()->where('status',1)->orderByRaw("FIELD(id, {$newIds})") : Live::query()->where('status',1)->orderByDesc('id');
-        $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
-        $items = $paginator->items();
+        $cacheIds = explode(',',$newIds);
+        if (!$newIds) {
+            return [];
+        }
+        $ids = array_slice($cacheIds,$startId,$perPage);
+        foreach ($ids as $id) {
+            $mapNum = $id % 100;
+            $cacheKey = "fake_live_$mapNum";
+            $raw = $this->redis()->hGet($cacheKey, $id);
+            $items[] = json_decode($raw,true);
+        }
+        $more = false;
+        if (count($ids) == $perPage) {
+            $more = true;
+        }
+
         $data = [];
         $_v = date('Ymd');
         foreach ($items as $one) {
@@ -89,7 +101,7 @@ class FakeLiveShortController extends Controller
         }
         return [
             'list' => $data,
-            'hasMorePages' => $paginator->hasMorePages()
+            'hasMorePages' => $more
         ];
     }
 
