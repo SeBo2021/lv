@@ -79,7 +79,7 @@ class AuthController extends Controller
                 Log::debug('register_did===',[$validated['did']]);//参数日志
                 return response()->json(['state' => -1, 'msg' => '重复注册']);
             }else{
-                $this->redis()->expire($key,60);
+                $this->redis()->expire($key,30);
             }
         }
         $ip = $this->getRealIp();
