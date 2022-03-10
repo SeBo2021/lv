@@ -3,6 +3,7 @@
 namespace App\ExtendClass;
 
 use App\TraitClass\PHPRedisTrait;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Laravel\Passport\Passport;
 
@@ -14,22 +15,24 @@ class TokenRepository extends \Laravel\Passport\TokenRepository
      * Get a token by the given ID.
      *
      * @param  string  $id
-     * @return object
+     * @return \Laravel\Passport\Token
      */
-    public function find($id): object
+    public function find($id)
     {
-        $tokenKey = $this->apiRedisKey['passport_token'].$id;
+        Log::info('==TokenRepository==',[$id]);
+        $key = $this->apiRedisKey['passport_token'].$id;
         $redis = $this->redis();
-        if($redis->exists($tokenKey)){
-            $token = $redis->hGetAll($tokenKey);
-            Log::info('==PassportTokenProvider==',[$token]);
+        if($redis->exists($key)){
+            $res = unserialize($redis->get($key));
         }else{
-            $token = parent::find($id)->toArray();
-            if(!empty($token)){
-                $redis->hMSet($tokenKey,$token);
-            }
+            $res = Passport::token()->where('id', $id)->first();
+            $redis->set($key,serialize($res));
         }
-        return (object)$token;
-
+        return $res;
+        /*return Cache::remember("passport:token:{$id}", 86400,
+            function () use ($id) {
+                return Passport::token()->where('id', $id)->first();
+            }
+        );*/
     }
 }
