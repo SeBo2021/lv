@@ -240,6 +240,34 @@ class LiveController extends BaseCurlController
 
     protected function afterSaveSuccessEvent($model, $id = '')
     {
+        // 更新redis
+        $mapNum = $model->id % 100;
+        $cacheKey = "fake_live_$mapNum";
+        $this->redis()->hSet($cacheKey, $model->id, json_encode([
+            "id" => $model->id,
+            "name" => $model->name,
+            "cid" => $model->cid,
+            "cat" => $model->cat,
+            "tag" => $model->tag,
+            "restricted" => $model->restricted,
+            "sync" => $model->sync,
+            "title" => $model->title,
+            "url" => $model->url,
+            "gold" => $model->gold,
+            "duration" => $model->duration,
+            "duration_seconds" => $model->duration_seconds,
+            "type" => $model->type,
+            "views" => $model->views,
+            "likes" => $model->likes,
+            "comments" => $model->comments,
+            "cover_img" => $model->cover_img,
+            "updated_at" => $model->updated_at,
+            "intro" => $model->intro,
+            "age" => $model->age,
+            "hls_url" => $model->hls_url,
+            "dash_url" => $model->dash_url,
+        ]));
+
         $ids = Live::where('status',1)->pluck('id')->toArray();
         $this->redis()->set('fakeLiveIds',implode(',',$ids));
         if( isset($_REQUEST['callback_upload']) && ($_REQUEST['callback_upload']==1)){
@@ -267,9 +295,10 @@ class LiveController extends BaseCurlController
             if(!$model->cover_img){
                 $model->cover_img = self::get_slice_url($model->url,'cover');
             }else{
-                $this->syncUpload($model->cover_img);
+             // $this->syncUpload($model->cover_img);
             }
         }
+
     }
 
     //弹窗大小
