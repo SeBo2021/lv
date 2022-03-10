@@ -56,6 +56,9 @@ class FakeLiveShortController extends Controller
             return [];
         }
         $start = $perPage*($page-1);
+        if ($start < 0) {
+            $start = 1;
+        }
         $ids = array_slice($cacheIds,$start,$perPage);
         foreach ($ids as $id) {
             $mapNum = $id % 100;
