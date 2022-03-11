@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 trait BbsTrait
 {
-    use UserTrait;
+    use UserTrait,AboutEncryptTrait;
     /**
      * @param $uid
      * @param $list
@@ -18,7 +18,9 @@ trait BbsTrait
     private function proProcessData($uid, $list, $user=null)
     {
         //Log::info('==userLocationName==',[$user]);
+        $_v = date('Ymd');
         foreach ($list as $k => $re) {
+            $domainSync = VideoTrait::getDomain($re['sync']);
             if ($this->redis()->get("focus_{$uid}_{$re['uid']}") == 1) {
                 $list[$k]['is_focus'] = 1;
             } else {
@@ -44,7 +46,7 @@ trait BbsTrait
             $thumbsRaw = json_decode($re['thumbs'],true);
             $thumbs = [];
             foreach ($thumbsRaw as $itemP) {
-                $thumbs[] = VideoTrait::getDomain($re['sync']) .$itemP;
+                $thumbs[] = VideoTrait::getDomain($re['sync']) .$this->transferImgOut($itemP,$domainSync,$_v,'auto');
             }
             $list[$k]['thumbs']  = $thumbs;
 
