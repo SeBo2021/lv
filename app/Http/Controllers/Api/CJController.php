@@ -74,8 +74,8 @@ class CJController extends Controller implements Pay
             $mercId = $payEnv['CJ']['merchant_id'];
             $notifyUrl = env('APP_URL') . $payEnv['CJ']['notify_url'];
             if ('wxwap' == $params['type']) {
-                $params['type'] = '205';
-                // $orderInfo->amount -= 1;
+                $params['type'] = '202';
+                $orderInfo->amount -= 1;
             }
             $input = [
                 'merId' => $mercId,               //商户号
