@@ -44,14 +44,14 @@ trait BbsTrait
             $thumbsRaw = json_decode($re['thumbs'],true);
             $thumbs = [];
             foreach ($thumbsRaw as $itemP) {
-                $thumbs[] = env('RESOURCE_DOMAIN') .$itemP;
+                $thumbs[] = VideoTrait::getDomain($re['sync']) .$itemP;
             }
             $list[$k]['thumbs']  = $thumbs;
 
             $videoRaw  = json_decode($re['video'],true);
             $video = [];
             foreach ($videoRaw as $itemV) {
-                $video[] = env('RESOURCE_DOMAIN') .$itemV;
+                $video[] = VideoTrait::getDomain($re['sync']) .$itemV;
             }
             $list[$k]['video']  = $video;
         }
