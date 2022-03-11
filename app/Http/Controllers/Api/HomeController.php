@@ -127,7 +127,7 @@ class HomeController extends Controller
                 if($item['is_rand']==1){
                     $queryBuild = $queryBuild->inRandomOrder();
                 }else{
-                    $queryBuild = $queryBuild->orderByRaw('video.is_top DESC,video.updated_at DESC,video.id DESC');
+                    $queryBuild = $queryBuild->orderByRaw('video.sort ASC,video.is_top DESC,video.updated_at DESC,video.id DESC');
                 }
                 $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
                 $videoList = $queryBuild->limit($limit)->get($this->videoFields)->toArray();
