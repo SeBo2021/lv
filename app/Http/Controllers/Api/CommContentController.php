@@ -300,7 +300,7 @@ class CommContentController extends Controller
         if ($cid2) {
             $model = CommBbs::query()
                 ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
-                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel', 'video_picture')
+                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at','community_bbs.sync', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel', 'video_picture')
                 ->where('category_id', $cid2)->where('community_bbs.status',1)->orderBy('updated_at', 'desc');
             if ($locationName) {
                 $locationName = mb_ereg_replace('市|自治区|县', '', $locationName);
@@ -317,7 +317,7 @@ class CommContentController extends Controller
             $ids = $this->getChild($cid1, false);
             $model = CommBbs::query()
                 ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
-                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel', 'video_picture')
+                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'community_bbs.sync', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel', 'video_picture')
                 ->whereIn('category_id', $ids)
                 ->where('community_bbs.status',1)
                 ->orderBy('updated_at', 'desc');
