@@ -38,13 +38,15 @@ class VideoController extends BaseCurlController
     {
         return [
             [
-                'type' => 'checkbox'
+                'type' => 'checkbox',
+                'fixed' => 'left'
             ],
             [
                 'field' => 'id',
                 'width' => 80,
                 'title' => '编号',
                 'sort' => 1,
+                'fixed' => 'left',
                 'align' => 'center'
             ],
             /*[
@@ -222,6 +224,7 @@ class VideoController extends BaseCurlController
                 'field' => 'handle',
                 'minWidth' => 150,
                 'title' => '操作',
+                'fixed' => 'right',
                 'align' => 'center'
             ]
         ];
