@@ -183,12 +183,20 @@ class VideoController extends BaseCurlController
                 'align' => 'center',
             ],
             [
+                'field' => 'sort',
+                'minWidth' => 80,
+                'title' => '排序',
+                'edit' => 1,
+                'sort' => 1,
+                'align' => 'center',
+            ],
+            /*[
                 'field' => 'is_top',
                 'minWidth' => 80,
                 'title' => '是否置顶',
                 'sort' => 1,
                 'align' => 'center',
-            ],
+            ],*/
             /*[
                 'field' => 'is_recommend',
                 'minWidth' => 80,
