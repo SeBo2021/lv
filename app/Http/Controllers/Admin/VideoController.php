@@ -186,6 +186,7 @@ class VideoController extends BaseCurlController
                 'field' => 'is_top',
                 'minWidth' => 80,
                 'title' => '是否置顶',
+                'sort' => 1,
                 'align' => 'center',
             ],
             /*[
