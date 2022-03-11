@@ -295,7 +295,7 @@ class LiveController extends BaseCurlController
             if(!$model->cover_img){
                 $model->cover_img = self::get_slice_url($model->url,'cover');
             }else{
-              $this->syncUpload($model->cover_img);
+              $this->syncUpload($model->cover_img,$model->sync);
             }
         }
 
