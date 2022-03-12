@@ -18,6 +18,7 @@ use App\TraitClass\VideoTrait;
 use App\TraitClass\VipRights;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -96,6 +97,7 @@ class VideoController extends Controller
                 }
             }
         }
+        Cache::forget("cachedUser.{$user->id}");
         //Log::info('==Limit==',[$one]);
         return response()->json([
             'state' => 0,
