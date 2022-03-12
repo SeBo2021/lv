@@ -19,6 +19,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -100,6 +101,7 @@ trait PayTrait
         User::query()->find($uid)->update(
             ['gold' =>DB::raw("gold + {$info['money']}") ]
         );
+        Cache::forget("cachedUser.{$uid}");
         return [];
     }
 
@@ -142,6 +144,7 @@ trait PayTrait
             $job = new ProcessMemberCard($user->id,$cardInfo->id,($cardInfo->expired_hours?:10*365*34)*60*60);
             app(Dispatcher::class)->dispatchNow($job);
         }*/
+        Cache::forget("cachedUser.{$user->id}");
         return [
             'expired_at' => $expiredAt??false
         ];
