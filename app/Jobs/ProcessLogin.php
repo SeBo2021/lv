@@ -95,8 +95,8 @@ class ProcessLogin implements ShouldQueue
         $channel_id = 0;
         $clipboard = $this->loginLogData['clipboard'] ?? '';
         if(!empty($clipboard)){
-            $channel_id = DB::table('channels')->where('promotion_code',$this->loginLogData['clipboard'])->value('id');
-            $channel_pid = DB::table('channels')->where('id',$channel_id)->value('pid');
+            $channel_id = DB::table('channels')->where('promotion_code',$this->loginLogData['clipboard'])->value('id') ?? 0;
+            $channel_pid = DB::table('channels')->where('id',$channel_id)->value('pid') ?? 0;
             Log::info('==BindChannelUserClipboard==',[$clipboard,$channel_id]);
         }else{
             $downloadInfoArr = $this->redis()->lRange($this->apiRedisKey['app_download'],0,-1);
