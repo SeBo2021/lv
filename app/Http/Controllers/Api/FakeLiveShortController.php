@@ -224,7 +224,7 @@ class FakeLiveShortController extends Controller
             $isVip = 1;
         }*/
         //统计激活视频人数=========
-        $this->saveUsersDay($uid, $user->channel_id, $user->device_system);
+        //$this->saveUsersDay($uid, $user->channel_id, $user->device_system);
         //============================
         return response()->json([
             'state' => 0,
