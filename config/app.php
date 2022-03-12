@@ -175,6 +175,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        //App\Providers\TelescopeServiceProvider::class,
         App\Providers\BladeServiceProvider::class,//注册自定义blade指令
         App\Providers\FacadesServiceProvider::class,//注册自定义门面,
         AetherUpload\AetherUploadServiceProvider::class,
@@ -232,6 +233,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'AnyUpload' => App\Facades\AnyUpload::class,
+        'CacheUser' => App\ExtendClass\CacheUser::class,
         'FFMpeg' => ProtoneMedia\LaravelFFMpeg\Support\FFMpeg::class
 
     ],
