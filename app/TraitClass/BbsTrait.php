@@ -20,7 +20,7 @@ trait BbsTrait
         //Log::info('==userLocationName==',[$user]);
         $_v = date('Ymd');
         foreach ($list as $k => $re) {
-            $domainSync = VideoTrait::getDomain($re['sync']);
+            $domainSync = VideoTrait::getDomain($re['sync']??2);
             if ($this->redis()->get("focus_{$uid}_{$re['uid']}") == 1) {
                 $list[$k]['is_focus'] = 1;
             } else {
