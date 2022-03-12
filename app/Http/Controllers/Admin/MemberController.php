@@ -11,6 +11,7 @@ use App\TraitClass\MemberCardTrait;
 use App\TraitClass\PayTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class MemberController extends BaseCurlController
@@ -400,6 +401,7 @@ class MemberController extends BaseCurlController
                 $model->vip_expired = MemberCard::query()->select(DB::raw('SUM(IF(expired_hours>0,expired_hours,10*365*24)) as expired_hours'))->whereIn('id',$cards)->value('expired_hours') *3600;
                 $model->vip = !empty($cards) ? max($cards) : 0;
             }
+            Cache::forget("cachedUser.{$id}");
         }
     }
 
