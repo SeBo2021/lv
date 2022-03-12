@@ -53,7 +53,7 @@ trait BbsTrait
             $videoRaw  = json_decode($re['video'],true);
             $video = [];
             foreach ($videoRaw as $itemV) {
-                $video[] = VideoTrait::getDomain($re['sync']) .$itemV;
+                $video[] = VideoTrait::getDomain($re['sync']??2) .$itemV;
             }
             $list[$k]['video']  = $video;
         }
