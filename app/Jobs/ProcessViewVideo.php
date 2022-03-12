@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ProcessViewVideo implements ShouldQueue
@@ -68,6 +69,7 @@ class ProcessViewVideo implements ShouldQueue
             }
             //
             DB::table('users')->where('id',$uid)->decrement('long_vedio_times'); //当日观看次数减一
+            Cache::forget("cachedUser.{$uid}");
         }
         //
         $this->saveUsersDay($uid, $this->userModel->channel_id, $this->userModel->device_system);

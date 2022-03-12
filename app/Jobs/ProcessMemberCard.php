@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ProcessMemberCard implements ShouldQueue
@@ -67,6 +68,7 @@ class ProcessMemberCard implements ShouldQueue
                 'vip_start_last' => $now, // 最后vip开通时间
                 'vip_expired' => $vipExpired
             ]);
+            Cache::forget("cachedUser.{$this->uid}");
         }
     }
 }
