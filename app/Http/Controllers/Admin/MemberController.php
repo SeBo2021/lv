@@ -405,16 +405,11 @@ class MemberController extends BaseCurlController
         }
     }
 
-    /*public function afterSaveSuccessEvent($model, $id)
+    public function afterSaveSuccessEvent($model, $id)
     {
-        $cards = $this->rq->input('vipCards',null);
-        if ($cards!==null) {
-            foreach ($cards as $cardId){
-                $this->buyVip($cardId,$model->id);
-            }
-        }
+        Cache::forget("cachedUser.{$id}");
         return $model;
-    }*/
+    }
 
     public function handleResultModel($model): array
     {
