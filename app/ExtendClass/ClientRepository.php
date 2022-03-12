@@ -27,6 +27,7 @@ class ClientRepository extends \Laravel\Passport\ClientRepository
             $client = Passport::client();
             $res = $client->where($client->getKeyName(), $id)->first();
             $redis->set($key,serialize($res));
+            $this->redis()->expire($key,7200);
         }
         return $res;
         /*return Cache::remember("passport:client:{$id}", 86400,

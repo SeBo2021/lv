@@ -27,6 +27,7 @@ class TokenRepository extends \Laravel\Passport\TokenRepository
         }else{
             $res = Passport::token()->where('id', $id)->first();
             $redis->set($key,serialize($res));
+            $this->redis()->expire($key,7200);
         }
         return $res;
         /*return Cache::remember("passport:token:{$id}", 86400,
