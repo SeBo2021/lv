@@ -151,6 +151,9 @@ class AuthController extends Controller
                     return response()->json(['state'=>-1,'msg' => 'Unauthorized'], 401);
                 }
                 $user = $request->user();
+                if(!$user){
+                    return response()->json(['state' => -1, 'msg' => '请求异常!']);
+                }
                 $login_info = $member->only($this->loginUserFields);
                 break;
         }
