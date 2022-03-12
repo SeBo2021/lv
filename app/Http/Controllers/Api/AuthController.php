@@ -147,13 +147,10 @@ class AuthController extends Controller
                     return response()->json(['state' => -1, 'msg' => '用户不存在或被禁用!']);
                 }
                 //授权登录验证用户名密码
-                if(!Auth::attempt(['account'=>$member->account, 'password'=>$member->account])){
+                /*if(!Auth::attempt(['account'=>$member->account, 'password'=>$member->account])){
                     return response()->json(['state'=>-1,'msg' => 'Unauthorized'], 401);
-                }
-                $user = $request->user();
-                if(!$user){
-                    return response()->json(['state' => -1, 'msg' => '请求异常!']);
-                }
+                }*/
+                $user = $member;
                 $login_info = $member->only($this->loginUserFields);
                 break;
         }
