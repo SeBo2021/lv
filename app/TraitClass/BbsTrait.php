@@ -46,7 +46,7 @@ trait BbsTrait
             $thumbsRaw = json_decode($re['thumbs'],true);
             $thumbs = [];
             foreach ($thumbsRaw as $itemP) {
-                $thumbs[] = VideoTrait::getDomain($re['sync']) .$this->transferImgOut($itemP,$domainSync,$_v,'auto');
+                $thumbs[] = VideoTrait::getDomain($re['sync']??2) .$this->transferImgOut($itemP,$domainSync,$_v,'auto');
             }
             $list[$k]['thumbs']  = $thumbs;
 
