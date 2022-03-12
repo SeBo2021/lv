@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Exceptions\ErrorException;
 use App\ExtendClass\Plugin;
 
+use App\ExtendClass\UserObserver;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -19,9 +21,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->make('auth')->provider('redis', function ($app, $config) {
-            return new RedisUserProvider($app['hash'], $config['model']);
-        });
+        if ($this->app->environment('local')) {
+            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+            $this->app->register(TelescopeServiceProvider::class);
+        }
     }
 
     /**
@@ -32,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Carbon::setLocale(env('lang')=='cn'?'zh':'');
-
+        User::observe(UserObserver::class);
         //关联关系简称对应关系
         $relation = [
             'admin' => 'App\Models\Admin'

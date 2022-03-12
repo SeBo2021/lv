@@ -25,10 +25,11 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
-        //将redis注入Auth中
-        Auth::provider('redis',function($app, $config){
-            return new RedisUserProvider($app['hash'], $config['model']);
+
+        Auth::provider('cache-user', function() {
+            return resolve(CacheUserProvider::class);
         });
+
         if (! $this->app->routesAreCached()) {
             Passport::routes();
         }
