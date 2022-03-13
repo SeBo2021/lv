@@ -16,6 +16,7 @@ use App\TraitClass\VideoTrait;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -550,6 +551,7 @@ class UserController extends Controller
                 'area_number'=>0,
                 'gold'=>0
             ]);
+            Cache::forget("cachedUser.{$user->id}");
             return response()->json(['state'=>0, 'data'=>$requestUser, 'msg'=>'账号找回成功']);
         }
         return response()->json([]);
