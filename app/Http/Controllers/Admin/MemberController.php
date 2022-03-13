@@ -401,7 +401,6 @@ class MemberController extends BaseCurlController
                 $model->vip_expired = MemberCard::query()->select(DB::raw('SUM(IF(expired_hours>0,expired_hours,10*365*24)) as expired_hours'))->whereIn('id',$cards)->value('expired_hours') *3600;
                 $model->vip = !empty($cards) ? max($cards) : 0;
             }
-            Cache::forget("cachedUser.{$id}");
         }
     }
 
