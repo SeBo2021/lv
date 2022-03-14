@@ -81,7 +81,8 @@ trait StatisticTrait
                     }
                     $redis->hMSet($channel_day_statistics_key,$insertDeductionData);
                 }else{
-                    $redis->hMSet($channel_day_statistics_key,$hasStatistic->toArray());
+                    $hasStatistic = (array)$hasStatistic;
+                    $redis->hMSet($channel_day_statistics_key,$hasStatistic);
                 }
                 //DB::table($statisticTable)->insert($insertDeductionData);
             }else{
