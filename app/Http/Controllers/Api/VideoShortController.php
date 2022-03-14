@@ -118,6 +118,12 @@ class VideoShortController extends Controller
 //            $model = $model->where('id','>=',$startId);
             $model = $model->where('id','<=',$startId);
         }
+
+        if(!empty($words)){
+            $model = VideoShort::search($words)->where('status', 1);
+            $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
+        }
+
         if($newIds){
             $cacheIds = explode(',',$newIds);
             $start = $perPage*($page-1);
@@ -135,24 +141,20 @@ class VideoShortController extends Controller
                 $more = true;
             }
         }
-        /*else {
-            if(!empty($words)){
+        else {
+            /*if(!empty($words)){
                 $model = VideoShort::search($words)->where('status', 1);
                 $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
             }else{
                 $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
+            }*/
+            if(empty($words)){
+                $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
             }
             $items = $paginator->items();
             $more = $paginator->hasMorePages();
-        }*/
-        if(!empty($words)){
-            $model = VideoShort::search($words)->where('status', 1);
-            $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
-        }else{
-            $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         }
-        $items = $paginator->items();
-        $more = $paginator->hasMorePages();
+
 
         $data = [];
         $_v = date('Ymd');
