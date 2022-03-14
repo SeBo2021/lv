@@ -46,7 +46,8 @@ class SaveStatisticsDataFromRedis extends Command
         $yesterdayTime = strtotime(date('Y-m-d',strtotime('-1 day')));
         //$yesterdayDate = date('Y-m-d',$yesterdayTime);
         foreach ($statistic_day_keys as $statistic_day_key){
-            $channelStatisticItem = $redis->hGetAll(str_replace('laravel_database_','',$statistic_day_key));
+            $realKey = str_replace('laravel_database_','',$statistic_day_key);
+            $channelStatisticItem = $redis->hGetAll($realKey);
             $channel_id = $channelStatisticItem['channel_id'] ?? 0;
             $device_system = $channelStatisticItem['device_system'] ?? 0;
             $at_time = $channelStatisticItem['at_time'] ?? 0;
@@ -57,7 +58,7 @@ class SaveStatisticsDataFromRedis extends Command
                     ->where('at_time',$at_time)
                     ->updateOrInsert(['channel_id'=>$channel_id,'device_system'=>$device_system,'at_time'=>$at_time],$channelStatisticItem);
                 if($at_time<=$yesterdayTime){
-                    $redis->del($statistic_day_key);
+                    $redis->del($realKey);
                 }
             }
 
@@ -65,7 +66,8 @@ class SaveStatisticsDataFromRedis extends Command
 
         $channel_day_statistics_keys = $redis->keys('*channel_day_statistics:*');
         foreach ($channel_day_statistics_keys as $channel_day_statistics_key){
-            $item = $redis->hGetAll(str_replace('laravel_database_','',$channel_day_statistics_key));
+            $noPrefixKey = str_replace('laravel_database_','',$channel_day_statistics_key);
+            $item = $redis->hGetAll($noPrefixKey);
             $channel_id = $item['channel_id'] ?? 0;
             $date_at = $item['date_at'] ?? 0;
             if($channel_id>0){
@@ -74,7 +76,7 @@ class SaveStatisticsDataFromRedis extends Command
                     ->where('date_at',$date_at)
                     ->updateOrInsert(['channel_id'=>$channel_id,'date_at'=>$date_at],$item);
                 if(strtotime($date_at) <= $yesterdayTime){
-                    $redis->del($channel_day_statistics_key);
+                    $redis->del($noPrefixKey);
                 }
             }
         }
