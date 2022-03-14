@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\TraitClass\PHPRedisTrait;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class ProcessStatisticsChannelByDay implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, PHPRedisTrait;
 
     public $orderInfo;
 
@@ -37,9 +38,11 @@ class ProcessStatisticsChannelByDay implements ShouldQueue
         $channel_id = $this->orderInfo->channel_id ?? 0;
         $channelInfo = DB::table('channels')->where('id',$channel_id)->first();
         $statisticTable = 'channel_day_statistics';
+        $redis = $this->redis();
 
         if($channelInfo){
             $date_at = date('Y-m-d');
+            $channel_day_statistics_key = 'channel_day_statistics:'.$channel_id.':'.$date_at;
             $has = DB::table($statisticTable)
                 ->where('channel_id',$channelInfo->id)
                 ->whereDate('date_at',$date_at)
@@ -48,7 +51,7 @@ class ProcessStatisticsChannelByDay implements ShouldQueue
 
             if(!$has){//是否统计过
                 $isUsage = !in_array(1,$level_one);
-                DB::table($statisticTable)->insert([
+                $insertData = [
                     'channel_name' => $channelInfo->name,
                     'channel_promotion_code' => $channelInfo->promotion_code,
                     'channel_id' => $channel_id,
@@ -65,7 +68,9 @@ class ProcessStatisticsChannelByDay implements ShouldQueue
                     'last_order_id' => $this->orderInfo->id,
                     'order_index' => 1,
                     'usage_index' => $isUsage ? 1 : 0,
-                ]);
+                ];
+                DB::table($statisticTable)->insert($insertData);
+                $redis->hMSet($channel_day_statistics_key,$insertData);
             }else{ //累计
                 $order_index = $has->order_index + 1;
                 //是否有纳入统计条目
@@ -105,6 +110,7 @@ class ProcessStatisticsChannelByDay implements ShouldQueue
                     ->where('channel_promotion_code',$channelInfo->promotion_code)
                     ->whereDate('date_at',$date_at)
                     ->update($updateData);
+                $redis->hMSet($channel_day_statistics_key,$updateData);
             }
         }
 
