@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\TraitClass\PHPRedisTrait;
+use AWS\CRT\Log;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -43,9 +44,9 @@ class SaveStatisticsDataFromRedis extends Command
         $redis = $this->redis();
         $statistic_day_keys = $redis->keys('*statistic_day:*');
         $yesterdayTime = strtotime(date('Y-m-d',strtotime('-1 day')));
-        $yesterdayDate = date('Y-m-d',$yesterdayTime);
+        //$yesterdayDate = date('Y-m-d',$yesterdayTime);
         foreach ($statistic_day_keys as $statistic_day_key){
-            $channelStatisticItem = $redis->hGetAll($statistic_day_key);
+            $channelStatisticItem = $redis->hGetAll(str_replace('laravel_database_','',$statistic_day_key));
             $channel_id = $channelStatisticItem['channel_id'] ?? 0;
             $device_system = $channelStatisticItem['device_system'] ?? 0;
             $at_time = $channelStatisticItem['at_time'] ?? 0;
@@ -64,7 +65,7 @@ class SaveStatisticsDataFromRedis extends Command
 
         $channel_day_statistics_keys = $redis->keys('*channel_day_statistics:*');
         foreach ($channel_day_statistics_keys as $channel_day_statistics_key){
-            $item = $redis->hGetAll($channel_day_statistics_key);
+            $item = $redis->hGetAll(str_replace('laravel_database_','',$channel_day_statistics_key));
             $channel_id = $item['channel_id'] ?? 0;
             $date_at = $item['date_at'] ?? 0;
             if($channel_id>0){
