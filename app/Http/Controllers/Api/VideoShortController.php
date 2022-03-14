@@ -134,7 +134,8 @@ class VideoShortController extends Controller
             if (count($ids) == $perPage) {
                 $more = true;
             }
-        } else {
+        }
+        /*else {
             if(!empty($words)){
                 $model = VideoShort::search($words)->where('status', 1);
                 $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
@@ -143,7 +144,15 @@ class VideoShortController extends Controller
             }
             $items = $paginator->items();
             $more = $paginator->hasMorePages();
+        }*/
+        if(!empty($words)){
+            $model = VideoShort::search($words)->where('status', 1);
+            $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
+        }else{
+            $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
         }
+        $items = $paginator->items();
+        $more = $paginator->hasMorePages();
 
         $data = [];
         $_v = date('Ymd');
@@ -235,7 +244,7 @@ class VideoShortController extends Controller
             $res = $this->items($page, $user, $starId,$cateId,$tagId,$words);
             //Log::info('==ShortVideo==',[$params,$user->id,$res]);
             //统计激活视频人数===============
-            $this->saveUsersDay($user->id, $user->channel_id, $user->device_system);
+            //$this->saveUsersDay($user->id, $user->channel_id, $user->device_system);
             //============================
             return response()->json([
                 'state' => 0,
