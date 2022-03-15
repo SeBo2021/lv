@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ChannelApi;
 
 use App\Http\Controllers\Controller;
+use App\TraitClass\ChannelTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\StatisticTrait;
 use Illuminate\Http\Request;
@@ -12,20 +13,11 @@ use Illuminate\Support\Facades\Log;
 
 class LandingController extends Controller
 {
-    use StatisticTrait,PHPRedisTrait;
+    use StatisticTrait,PHPRedisTrait,ChannelTrait;
 
     public function test(Request $request)
     {
         return response()->json([]);
-    }
-
-    public function getChannelId($promotion_code)
-    {
-        //$channel_id = DB::table('channels')->where('promotion_code',$promotion_code)->value('id');
-        //return  $channel_id ?? 0;
-        return Cache::remember('cachedChannel.'.$promotion_code, 7200, function() use($promotion_code) {
-            return DB::table('channels')->where('promotion_code',$promotion_code)->value('id') ?? 0;
-        });
     }
 
     public function record(Request $request)
@@ -40,7 +32,7 @@ class LandingController extends Controller
             'device_system' => $request->input('device_system',0),
             'created_at' => $request->input('created_at',$dateArr['at']),
         ];
-        $insert['channel_id'] = $this->getChannelId($request->input('channel_id',0));
+        $insert['channel_id'] = $this->getChannelIdByPromotionCode($request->input('channel_id',0));
         //Log::debug('===landingPageChannel===',$insert);
         //DB::table('app_download')->insertOrIgnore($insert);
         $this->redis()->lPush($this->apiRedisKey['app_download'],serialize($insert));
@@ -57,7 +49,7 @@ class LandingController extends Controller
             //'channel_id' => $request->input('channel_id',0),
             'device_system' => $request->input('device_system',0),
         ];
-        $insert['channel_id'] = $this->getChannelId($request->input('channel_id',0));
+        $insert['channel_id'] = $this->getChannelIdByPromotionCode($request->input('channel_id',0));
         //DB::table('access')->insertOrIgnore($insert);
         //统计访问量
         $this->saveStatisticByDay('access',$insert['channel_id'],$insert['device_system'],$dateArr);
