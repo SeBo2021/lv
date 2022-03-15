@@ -95,7 +95,7 @@ trait StatisticTrait
                         $stepValue = round(1*(1-$deductionValue/10000),2) * 100;
                         if($is_deduction == 1){ //开启
                             //$install_real = DB::table($statisticTable)->where('channel_id',$channel_id)->where('date_at',date('Y-m-d'))->sum('install_real');
-                            $install_real = (int) $redis->hGet($channel_day_statistics_key,'install_real');
+                            $install_real = (int) $redis->hGet(str_replace('laravel_database_','',$channel_day_statistics_key),'install_real');
                             if($install_real < 11){ //第一次前十个
                                 $stepValue = 100;
                             }
