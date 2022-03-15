@@ -44,9 +44,10 @@ class RepairStatisticOrder extends Command
         $redis = $this->redis();
         $rechargeItems = DB::table('recharge')->select('id',DB::raw('sum(amount) sum_amount'),DB::raw('count(id) ids'),DB::raw('DATE_FORMAT(created_at,"%Y-%m-%d") date_at'),'channel_id','channel_pid')
             ->whereDate('created_at',date('Y-m-d'))
-            ->groupBy('date_at')
+            ->groupBy(['channel_id','date_at'])
             ->orderByDesc('created_at')
             ->get();
+        //dump($rechargeItems);
         foreach ($rechargeItems as $item)
         {
             $channel_day_statistics_key = 'channel_day_statistics:'.$item->channel_id.':'.$item->date_at;
@@ -59,7 +60,7 @@ class RepairStatisticOrder extends Command
                 'last_order_id' => $item->id,
                 'usage_index' => $item->id,
                 //share_ratio' => $item->id,
-                'share_amount' => $item->sum_amount * $share_ratio,
+                'share_amount' => round(($item->sum_amount * $share_ratio)/100),
                 'total_recharge_amount' => $item->sum_amount,
                 'orders' => $item->ids,
             ];
