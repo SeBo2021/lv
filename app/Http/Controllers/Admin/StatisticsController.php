@@ -136,7 +136,7 @@ class StatisticsController extends BaseCurlController
                 }
                 break;
             case 'recharge':
-                $queryBuild = DB::table('recharge')->select(DB::raw('DATE_FORMAT(recharge.created_at,"%Y-%m-%d") days'),DB::raw('SUM(amount)/100 as money'));
+                $queryBuild = DB::table('recharge')->select(DB::raw('DATE_FORMAT(recharge.created_at,"%Y-%m-%d") days'),DB::raw('SUM(amount) as money'));
                 if($channelId!==null){
                     $queryBuild = $queryBuild
                         ->join('users','recharge.uid','=','users.id')
