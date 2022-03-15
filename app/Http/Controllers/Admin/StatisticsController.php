@@ -39,7 +39,6 @@ class StatisticsController extends BaseCurlController
                 $fields = 'SUM(access) as total_access,
                 SUM(hits) as total_hits,
                 SUM(install) as total_install,
-                SUM(register) as total_register,
                 AVG(keep_day_rate) as avg_keep_day_rate,
                 AVG(keep_week_rate) as avg_keep_week_rate,
                 AVG(keep_month_rate) as avg_keep_month_rate';
@@ -63,13 +62,11 @@ class StatisticsController extends BaseCurlController
                 // 修正安装量与注册量
                 $newData = $this->fixDataByUserTable($channelId, $deviceSystem, $timeRange, $startDate, $endDate);
                 $totalData->total_install = $newData['newInstall'];
-                $totalData->total_register = $newData['newRegister'];
 
                 $json = [
                     'access' => $totalData->total_access ?? 0,
                     'hits' => $totalData->total_hits ?? 0,
                     'install' => $totalData->total_install ?? 0,
-                    'register' => $totalData->total_register ?? 0,
                     'keep1AG' => round($totalData->avg_keep_day_rate,2) . '%',
                     'keep7AG' => round($totalData->avg_keep_week_rate,2).'%',
                     'keep30AG' => round($totalData->avg_keep_month_rate,2).'%',
@@ -79,7 +76,6 @@ class StatisticsController extends BaseCurlController
                 $fields = 'SUM(access) as total_access,
                 SUM(hits) as total_hits,
                 SUM(install) as total_install,
-                SUM(register) as total_register,
                 SUM(keep_day_users) as total_keep_day_users,
                 SUM(keep_week_users) as total_keep_week_users,
                 SUM(keep_month_users) as total_keep_month_users,
@@ -105,7 +101,6 @@ class StatisticsController extends BaseCurlController
                     $json['series']['total_access'][] = $item->total_access??0;
                     $json['series']['total_hits'][] = $item->total_hits??0;
                     $json['series']['total_install'][] = $item->total_install??0;
-                    $json['series']['total_register'][] = $item->total_register??0;
                     $json['series']['total_keep_day_users'][] = $item->total_keep_day_users??0;
                     $json['series']['total_keep_week_users'][] = $item->total_keep_week_users??0;
                     $json['series']['total_keep_month_users'][] = $item->total_keep_month_users??0;

@@ -128,7 +128,7 @@
                                 <pre class="layui-code layui-bg-black" id="total_register"></pre>
                             </div>
                         </div>--}}
-                        <div class="layui-col-md4">
+                        {{--<div class="layui-col-md4">
                             <div class="grid-demo">
                                 <fieldset class="layui-elem-field layui-field-title">
                                     <legend>平均1日后留存率</legend>
@@ -151,7 +151,7 @@
                                 </fieldset>
                                 <pre class="layui-code layui-bg-red" id="avg_keep_month_rate"></pre>
                             </div>
-                        </div>
+                        </div>--}}
 
                     </div>
                 </div>
@@ -258,10 +258,10 @@
                     $('#total_access').text(jsonRes.access);
                     $('#total_hits').text(jsonRes.hits);
                     $('#total_install').text(jsonRes.install);
-                    $('#total_register').text(jsonRes.register);
+                    /*$('#total_register').text(jsonRes.register);
                     $('#avg_keep_day_rate').text(jsonRes.keep1AG);
                     $('#avg_keep_week_rate').text(jsonRes.keep7AG);
-                    $('#avg_keep_month_rate').text(jsonRes.keep30AG);
+                    $('#avg_keep_month_rate').text(jsonRes.keep30AG);*/
                 });
             },//日活
             activeUsers = function () {
@@ -422,7 +422,7 @@
                             }
                         },
                         legend: {
-                            data: ['访问量', '点击量', '安装量', '注册量', '1日后留存数', '7日后留存数', '30日后留存数']
+                            data: ['访问量', '点击量', '安装量', '1日后留存数', '7日后留存数', '30日后留存数']
                         },
                         grid: {
                             left: '3%',
@@ -464,13 +464,8 @@
                                 type: 'line',
                                 smooth: true,
                                 data: jsonRes.series.total_install
-                            },
-                            {
-                                name: '注册量',
-                                type: 'line',
-                                smooth: true,
-                                data: jsonRes.series.total_register
-                            },
+                            }
+                            /*,
                             {
                                 name: '1日后留存数',
                                 type: 'line',
@@ -488,7 +483,7 @@
                                 type: 'line',
                                 smooth: true,
                                 data: jsonRes.series.total_keep_month_users
-                            }
+                            }*/
                         ]
                     };
                     var item = echarts.init(document.getElementById('increment'));
