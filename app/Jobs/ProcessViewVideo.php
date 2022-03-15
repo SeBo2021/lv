@@ -72,7 +72,7 @@ class ProcessViewVideo implements ShouldQueue
             Cache::forget("cachedUser.{$uid}");
         }
         //
-        $this->saveUsersDay($uid, $this->userModel->channel_id, $this->userModel->device_system);
+        //$this->saveUsersDay($uid, $this->userModel->channel_id, $this->userModel->device_system);
         Cache::forget("cachedUser.{$uid}");
     }
 }

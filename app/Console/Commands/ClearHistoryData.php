@@ -38,15 +38,15 @@ class ClearHistoryData extends Command
      */
     public function handle(): int
     {
-        $paramDay = $this->argument('day') ?? 1;
-        $time_at = strtotime('-'.$paramDay.' day');
-        $data_at = $paramDay!==null ? date('Y-m-d',$time_at) : date('Y-m-d');
+        $paramDay = $this->argument('day') ?? 3;
+        //$time_at = strtotime('-'.$paramDay.' day');
+        //$data_at = $paramDay!==null ? date('Y-m-d',$time_at) : date('Y-m-d');
         //下载数据
-        DB::table('app_download')->whereDate('created_at','<', $data_at)->delete();
-        $this->info('######清除APP下载前一天数据执行成功######');
+        //DB::table('app_download')->whereDate('created_at','<', $data_at)->delete();
+        //$this->info('######清除APP下载前'.$paramDay.'天数据执行成功######');
         //观看数据 (7天)
-        DB::table('view_history')->where('time_at', '<',strtotime('-7 day'))->delete();
-        $this->info('######清除观看历史前一周数据执行成功######');
+        DB::table('view_history')->where('time_at', '<',strtotime('-'.$paramDay.' day'))->delete();
+        $this->info('######清除观看历史前'.$paramDay.'天数据执行成功######');
         return 0;
     }
 }
