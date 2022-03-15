@@ -552,6 +552,7 @@ class UserController extends Controller
                 'gold'=>0
             ]);
             Cache::forget("cachedUser.{$user->id}");
+            Cache::forget("cachedUser.".$requestUser['id']);
             return response()->json(['state'=>0, 'data'=>$requestUser, 'msg'=>'账号找回成功']);
         }
         return response()->json([]);
