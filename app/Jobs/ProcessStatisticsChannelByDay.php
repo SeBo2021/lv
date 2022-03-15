@@ -75,12 +75,12 @@ class ProcessStatisticsChannelByDay implements ShouldQueue
                 }
             }else{
                 $has = (object) $redis->hGetAll(str_replace('laravel_database_','',$channel_day_statistics_key));
-                $order_index = $has->order_index + 1;
+                $order_index = ($has->order_index??0) +1;
                 //是否有纳入统计条目
                 $usage_index = 0;
                 $level_one_limits = 31;
 
-                if($has->orders < $level_one_limits){
+                if(($has->orders??0) < $level_one_limits){
                     if(!in_array($order_index,$level_one)){
                         $usage_index = $order_index;
                     }
@@ -88,8 +88,8 @@ class ProcessStatisticsChannelByDay implements ShouldQueue
                     if($order_index == $level_one_limits){
                         $usage_index = $level_one_limits;
                     }else{
-                        if($has->usage_index >= $level_one_limits){
-                            $second_index = $has->usage_index + $channelInfo->level_two+1;
+                        if(($has->usage_index??0) >= $level_one_limits){
+                            $second_index = ($has->usage_index??0) + $channelInfo->level_two+1;
                             if($second_index === $order_index){
                                 $usage_index = $second_index;
                             }
@@ -97,17 +97,17 @@ class ProcessStatisticsChannelByDay implements ShouldQueue
                     }
                 }
                 $updateData = [
-                    'total_amount' => $has->total_amount + $this->orderInfo->amount,
-                    'total_orders' => $has->total_orders + 1,
+                    'total_amount' => ($has->total_amount??0) + $this->orderInfo->amount,
+                    'total_orders' => ($has->total_orders??0) + 1,
                     'order_index' => $order_index,
                     'last_order_id' => $this->orderInfo->id,
                 ];
                 if($usage_index>0){
                     $updateData['usage_index'] = $usage_index;
                     $updateData['share_ratio'] = $channelInfo->share_ratio;
-                    $updateData['share_amount'] = round(($this->orderInfo->amount * $channelInfo->share_ratio)/100 + $has->share_amount,2);
-                    $updateData['total_recharge_amount'] = $has->total_recharge_amount + $this->orderInfo->amount;
-                    $updateData['orders'] = $has->orders + 1;
+                    $updateData['share_amount'] = round(($this->orderInfo->amount * $channelInfo->share_ratio)/100 + ($has->share_amount??0),2);
+                    $updateData['total_recharge_amount'] = ($has->total_recharge_amount??0) + $this->orderInfo->amount;
+                    $updateData['orders'] = ($has->orders??0) + 1;
                 }
                 $redis->hMSet($channel_day_statistics_key,$updateData);
             }
@@ -178,7 +178,6 @@ class ProcessStatisticsChannelByDay implements ShouldQueue
                     ->where('channel_promotion_code',$channelInfo->promotion_code)
                     ->whereDate('date_at',$date_at)
                     ->update($updateData);
-                $redis->hMSet($channel_day_statistics_key,$updateData);
             }*/
         }
 
