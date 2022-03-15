@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\StatisticTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -20,8 +21,11 @@ class LandingController extends Controller
 
     public function getChannelId($promotion_code)
     {
-        $channel_id = DB::table('channels')->where('promotion_code',$promotion_code)->value('id');
-        return  $channel_id ?? 0;
+        //$channel_id = DB::table('channels')->where('promotion_code',$promotion_code)->value('id');
+        //return  $channel_id ?? 0;
+        return Cache::remember('cachedChannel.'.$promotion_code, 7200, function() use($promotion_code) {
+            return DB::table('channels')->where('promotion_code',$promotion_code)->value('id') ?? 0;
+        });
     }
 
     public function record(Request $request)

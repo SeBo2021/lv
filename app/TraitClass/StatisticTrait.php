@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 trait StatisticTrait
 {
-    use PHPRedisTrait;
+    use PHPRedisTrait,ChannelTrait;
     public function getDateArr($t=null): array
     {
         $time = $t ?? time();
@@ -55,7 +55,8 @@ trait StatisticTrait
 
 
         //总统计
-        $channelInfo = DB::table('channels')->find($channel_id);
+        //$channelInfo = DB::table('channels')->find($channel_id);
+        $channelInfo = $this->getChannelInfoById($channel_id);
         if($channelInfo){
             $statisticTable = 'channel_day_statistics';
             $channel_day_statistics_key = 'channel_day_statistics:'.$channel_id.':'.$dateArr['day'];
