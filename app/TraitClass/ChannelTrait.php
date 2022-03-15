@@ -2,6 +2,7 @@
 
 namespace App\TraitClass;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -47,6 +48,22 @@ trait ChannelTrait
             'name' => '已绑定',
         ],
     ];
+
+    public function getChannelIdByPromotionCode($promotion_code)
+    {
+        //$channel_id = DB::table('channels')->where('promotion_code',$promotion_code)->value('id');
+        //return  $channel_id ?? 0;
+        return Cache::remember('cachedChannel.'.$promotion_code, 7200, function() use($promotion_code) {
+            return DB::table('channels')->where('promotion_code',$promotion_code)->value('id') ?? 0;
+        });
+    }
+
+    public function getChannelInfoById($channel_id)
+    {
+        return Cache::remember('cachedChannelById.'.$channel_id, 7200, function() use($channel_id) {
+            return DB::table('channels')->find($channel_id);
+        });
+    }
 
     public function getChannelSelectData($all=null): array
     {
@@ -226,6 +243,7 @@ trait ChannelTrait
         DB::table('channel_day_statistics')->where('channel_id',$model->id)->whereDate('date_at',date('Y-m-d'))->update($updateData);
         $model->save();
         $this->initStatisticsByDay($model->id);
+        Cache::forget('cachedChannelById.'.$model->id);
     }
 
     public function editTableHandle($request)
@@ -250,6 +268,9 @@ trait ChannelTrait
         $type_r = $this->editTableTypeEvent($id_arr, $field, $value);
 
         if ($type_r) {
+            foreach ($id_arr as $idItem){
+                Cache::forget('cachedChannelById.'.$idItem);
+            }
             return $type_r;
         } else {
             if($field=='status'){
@@ -260,6 +281,9 @@ trait ChannelTrait
                 $this->insertLog($this->getPageName() . lang('成功修改ids') . '：' . implode(',', $id_arr));
             } else {
                 $this->insertLog($this->getPageName() . lang('失败ids') . '：' . implode(',', $id_arr));
+            }
+            foreach ($id_arr as $idItem){
+                Cache::forget('cachedChannelById.'.$idItem);
             }
             return $this->editTablePutLog($r, $field, $id_arr);
         }

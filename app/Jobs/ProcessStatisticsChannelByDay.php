@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\TraitClass\ChannelTrait;
 use App\TraitClass\PHPRedisTrait;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class ProcessStatisticsChannelByDay implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, PHPRedisTrait;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, PHPRedisTrait,ChannelTrait;
 
     public $orderInfo;
 
@@ -36,7 +37,8 @@ class ProcessStatisticsChannelByDay implements ShouldQueue
     {
         //$amount = $this->orderInfo->amount;
         $channel_id = $this->orderInfo->channel_id ?? 0;
-        $channelInfo = DB::table('channels')->where('id',$channel_id)->first();
+        //$channelInfo = DB::table('channels')->where('id',$channel_id)->first();
+        $channelInfo = $this->getChannelInfoById($channel_id);
         $level_one = explode(',', $channelInfo->level_one);
         $statisticTable = 'channel_day_statistics';
         $redis = $this->redis();

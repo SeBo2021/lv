@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\LoginLog;
 use App\Models\User;
+use App\TraitClass\ChannelTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\StatisticTrait;
 use Illuminate\Bus\Queueable;
@@ -20,7 +21,7 @@ use Illuminate\Support\Str;
 
 class ProcessLogin implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, StatisticTrait, PHPRedisTrait;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, StatisticTrait, PHPRedisTrait, ChannelTrait;
 
     /**
      * 任务尝试次数
@@ -95,8 +96,10 @@ class ProcessLogin implements ShouldQueue
         $channel_id = 0;
         $clipboard = $this->loginLogData['clipboard'] ?? '';
         if(!empty($clipboard)){
-            $channel_id = DB::table('channels')->where('promotion_code',$this->loginLogData['clipboard'])->value('id') ?? 0;
-            $channel_pid = DB::table('channels')->where('id',$channel_id)->value('pid') ?? 0;
+            //$channel_id = DB::table('channels')->where('promotion_code',$this->loginLogData['clipboard'])->value('id') ?? 0;
+            //$channel_pid = DB::table('channels')->where('id',$channel_id)->value('pid') ?? 0;
+            $channel_id = $this->getChannelIdByPromotionCode($this->loginLogData['clipboard']);
+            $channel_pid = $this->getChannelInfoById($channel_id)->pid ?? 0;
             Log::info('==BindChannelUserClipboard==',[$clipboard,$channel_id]);
         }else{
             $downloadInfoArr = $this->redis()->lRange($this->apiRedisKey['app_download'],0,-1);
