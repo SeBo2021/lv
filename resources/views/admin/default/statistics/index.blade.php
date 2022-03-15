@@ -422,7 +422,7 @@
                             }
                         },
                         legend: {
-                            data: ['访问量', '点击量', '安装量', '注册量', '1日后留存数', '7日后留存数', '30日后留存数']
+                            data: ['访问量', '点击量', '安装量', '1日后留存数', '7日后留存数', '30日后留存数']
                         },
                         grid: {
                             left: '3%',
@@ -464,12 +464,6 @@
                                 type: 'line',
                                 smooth: true,
                                 data: jsonRes.series.total_install
-                            },
-                            {
-                                name: '注册量',
-                                type: 'line',
-                                smooth: true,
-                                data: jsonRes.series.total_register
                             },
                             {
                                 name: '1日后留存数',
