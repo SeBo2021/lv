@@ -15,7 +15,7 @@ class RepairStatisticOrder extends Command
      *
      * @var string
      */
-    protected $signature = 'repair:statisticOrder';
+    protected $signature = 'repair:statisticOrder {day?}';
 
     /**
      * The console command description.
@@ -41,9 +41,11 @@ class RepairStatisticOrder extends Command
      */
     public function handle(): int
     {
+        $paramDay = $this->argument('day');
+        $data_at = $paramDay!==null ? date('Y-m-d',strtotime('-'.$paramDay.' day')) : date('Y-m-d');
         $redis = $this->redis();
         $rechargeItems = DB::table('recharge')->select('id',DB::raw('sum(amount) sum_amount'),DB::raw('count(id) ids'),DB::raw('DATE_FORMAT(created_at,"%Y-%m-%d") date_at'),'channel_id','channel_pid')
-            ->whereDate('created_at',date('Y-m-d'))
+            ->whereDate('created_at',$data_at)
             ->groupBy(['channel_id','date_at'])
             ->orderByDesc('created_at')
             ->get();
@@ -53,6 +55,8 @@ class RepairStatisticOrder extends Command
             $channel_day_statistics_key = 'channel_day_statistics:'.$item->channel_id.':'.$item->date_at;
             $share_ratio = (int)$redis->hGet(str_replace('laravel_database_','',$channel_day_statistics_key),'share_ratio');
             $hashKeys = [
+                'date_at' => $item->date_at,
+                'channel_id' => $item->channel_id,
                 'channel_pid' => $item->channel_pid,
                 'total_amount' => $item->sum_amount,
                 'total_orders' => $item->ids,
