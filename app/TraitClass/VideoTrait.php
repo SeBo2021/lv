@@ -10,6 +10,7 @@ use FFMpeg\FFMpeg;
 use FFMpeg\Format\Video\X264;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\File;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -510,6 +511,13 @@ trait VideoTrait
         $cover_path = $sliceDir.'/'.$this->coverImgDir.'/'.$file_name.'/'.$file_name.'.jpg';
         $frame->save($cover_path);
         return $cover_path;
+    }
+
+    public function getVideoById($id)
+    {
+        return Cache::remember('cachedVideoById.'.$id, 7200, function() use($id) {
+            return DB::table('video')->where('id',$id)->find($id);
+        });
     }
 
 }

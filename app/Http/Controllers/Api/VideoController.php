@@ -14,6 +14,7 @@ use App\Models\ViewRecord;
 use App\TraitClass\ApiParamsTrait;
 use App\TraitClass\MemberCardTrait;
 use App\TraitClass\PHPRedisTrait;
+use App\TraitClass\StatisticTrait;
 use App\TraitClass\VideoTrait;
 use App\TraitClass\VipRights;
 use Exception;
@@ -30,6 +31,7 @@ class VideoController extends Controller
     use PHPRedisTrait;
     use VipRights;
     use MemberCardTrait;
+    use StatisticTrait;
 
     //播放
 
@@ -66,12 +68,22 @@ class VideoController extends Controller
             ]);
         }
         $useGold = $validated['use_gold'] ?? "1";
-        $videoField = ['id', 'name', 'cid', 'cat', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'hls_url', 'dash_url', 'type', 'cover_img', 'views', 'likes', 'comments','updated_at'];
-        $one = Video::query()->find($id, $videoField)->toArray();
+        /*$videoField = ['id', 'name', 'cid', 'cat', 'restricted', 'sync', 'title', 'url', 'gold', 'duration', 'hls_url', 'dash_url', 'type', 'cover_img', 'views', 'likes', 'comments','updated_at'];
+        $one = Video::query()->find($id, $videoField)->toArray();*/
+        $one = (array)$this->getVideoById($id);
         if (!empty($one)) {
             $one = $this->handleVideoItems([$one], true,$user->id)[0];
             $one['limit'] = 0;
             //
+            if($user->long_vedio_times>0){//统计激活
+                $configData = config_cache('app');
+                $setTimes = $configData['free_view_long_video_times'] ?? 0;
+                if(($user->long_vedio_times==$setTimes) && (date('Y-m-d')==date('Y-m-d',strtotime($user->created_at)))){
+                    $this->saveStatisticByDay('active_view_users',$user->channel_id,$user->device_system);
+                }
+                //
+                DB::table('users')->where('id',$user->id)->decrement('long_vedio_times'); //当日观看次数减一
+            }
             ProcessViewVideo::dispatchAfterResponse($user, $one);
             /*$job = new ProcessViewVideo($user, $one);
             $this->dispatchSync($job);*/

@@ -60,7 +60,7 @@ class ProcessViewVideo implements ShouldQueue
         //插入历史记录
         DB::table('view_history')->insertOrIgnore(['uid'=>$uid,'vid'=>$vid,'time_at'=>time()]);
 
-        if($this->userModel->long_vedio_times>0){
+        /*if($this->userModel->long_vedio_times>0){
             //统计激活
             $configData = config_cache('app');
             $setTimes = $configData['free_view_long_video_times'] ?? 0;
@@ -69,10 +69,9 @@ class ProcessViewVideo implements ShouldQueue
             }
             //
             DB::table('users')->where('id',$uid)->decrement('long_vedio_times'); //当日观看次数减一
-            Cache::forget("cachedUser.{$uid}");
-        }
+        }*/
         //
         //$this->saveUsersDay($uid, $this->userModel->channel_id, $this->userModel->device_system);
-        Cache::forget("cachedUser.{$uid}");
+        //Cache::forget("cachedUser.{$uid}");
     }
 }

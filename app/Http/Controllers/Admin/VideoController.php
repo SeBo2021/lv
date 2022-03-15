@@ -20,6 +20,7 @@ use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\TagTrait;
 use App\TraitClass\VideoTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -405,8 +406,7 @@ class VideoController extends BaseCurlController
         }
 
         //修复路径
-
-        //ProcessSyncMiddleTable::dispatchAfterResponse('video');
+        Cache::forget('cachedVideoById.'.$model->id);
         return $model;
     }
 
@@ -869,6 +869,9 @@ class VideoController extends BaseCurlController
                 $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
             } else {
                 $this->insertLog($this->getPageName() . lang('失败ids') . '：' . implode(',', $id_arr));
+            }
+            foreach ($id_arr as $idItem){
+                Cache::forget('cachedVideoById.'.$idItem);
             }
             return $this->editTablePutLog($r, $field, $id_arr);
         }
