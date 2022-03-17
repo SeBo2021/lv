@@ -308,7 +308,7 @@ class ShortController extends BaseCurlController
                 Log::error($e->getMessage());
             }
         }else{
-            $this->resetRedisVideoShort($this->row);
+            $this->resetRedisVideoShort($model);
         }
         return $model;
     }
