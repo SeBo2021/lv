@@ -277,6 +277,7 @@ class SearchController extends Controller
     {
         $data = Category::with('childs:id,name,parent_id')
             ->where('parent_id','2')
+            ->where('is_checked',1)
             ->select('id','name','parent_id')
             ->orderBy('sort')
             ->get();
