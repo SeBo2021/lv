@@ -271,7 +271,7 @@ class ShortController extends BaseCurlController
     protected function afterSaveSuccessEvent($model, $id = '')
     {
         // 更新redis
-        $mapNum = $model->id % 300;
+        /*$mapNum = $model->id % 300;
         $cacheKey = "short_video_$mapNum";
         $this->redis()->hSet($cacheKey, $model->id, json_encode([
             "id" => $model->id,
@@ -294,10 +294,8 @@ class ShortController extends BaseCurlController
             "cover_img" => $model->cover_img,
             "updated_at" => $model->updated_at,
         ]));
-
-
         $ids = AdminVideoShort::where('status',1)->pluck('id')->toArray();
-        $this->redis()->set('shortVideoIds',implode(',',$ids));
+        $this->redis()->set('shortVideoIds',implode(',',$ids));*/
         //$isVideo = ($_REQUEST['callback_upload']??0);
         try {
 //            $job = new ProcessShort($model,$isVideo);
