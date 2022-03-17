@@ -14,6 +14,7 @@ use App\TraitClass\CatTrait;
 use App\TraitClass\GoldTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\TagTrait;
+use App\TraitClass\VideoShortTrait;
 use App\TraitClass\VideoTrait;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Http\Request;
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\Log;
 
 class ShortController extends BaseCurlController
 {
-    use VideoTrait,CatTrait,TagTrait,GoldTrait,PHPRedisTrait;
+    use VideoTrait,CatTrait,TagTrait,GoldTrait,PHPRedisTrait,VideoShortTrait;
 
     public $pageName = '小视频管理';
 
@@ -296,14 +297,18 @@ class ShortController extends BaseCurlController
         ]));
         $ids = AdminVideoShort::where('status',1)->pluck('id')->toArray();
         $this->redis()->set('shortVideoIds',implode(',',$ids));*/
-        //$isVideo = ($_REQUEST['callback_upload']??0);
-        try {
+        $isVideo = ($_REQUEST['callback_upload']??0);
+        if($isVideo>0){
+            try {
 //            $job = new ProcessShort($model,$isVideo);
-            $job = new ProcessVideoShort($model);
-            $this->dispatch($job->onQueue('high'));
-            // app(Dispatcher::class)->dispatchNow($job);
-        }catch (\Exception $e){
-            Log::error($e->getMessage());
+                $job = new ProcessVideoShort($model);
+                $this->dispatch($job->onQueue('high'));
+                // app(Dispatcher::class)->dispatchNow($job);
+            }catch (\Exception $e){
+                Log::error($e->getMessage());
+            }
+        }else{
+            $this->resetRedisVideoShort($model);
         }
         return $model;
     }
