@@ -47,14 +47,14 @@ class Kernel extends HttpKernel
 
         'api' => [
 //            'throttle:30,1',
-            'throttle:60,1', //一分钟60次
+            // 'throttle:60,1', //一分钟60次
             //'auth:api', //路由添加
             //'secret',
             \Illuminate\Routing\Middleware\SubstituteBindings::class
         ],
 
         'channel' => [
-            'throttle:60,1',
+           // 'throttle:60,1',
             \App\Http\Middleware\EnableCrossRequestMiddleware::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class
         ]
