@@ -405,7 +405,7 @@ class VideoController extends BaseCurlController
             }
         }
         //清除缓存
-        $this->redisBatchDel($this->redis()->keys('api_more_cid-page:')); //更多页
+        $this->redisBatchDel($this->redis()->keys('api_more_cid-page:*')); //更多页
         Cache::forget('cachedVideoById.'.$model->id);
         return $model;
     }
