@@ -54,7 +54,8 @@ class DBSController extends Controller implements Pay
                 throw new Exception("订单不存在");
             }
             $mercId = $payEnv['DBS']['merchant_id'];
-            $notifyUrl = env('APP_URL') . $payEnv['DBS']['notify_url'];
+            // $notifyUrl = env('APP_URL') . $payEnv['DBS']['notify_url'];
+            $notifyUrl = 'http://api.saolv200.com' . $payEnv['DBS']['notify_url'];
             $input = [
                 'mercId' => $mercId,
                 'tradeNo' => strval($payInfo->number),
