@@ -144,12 +144,16 @@ class SearchController extends Controller
             $res = $redis->get($redisKey);
             if(!$res){
                 $perPage = 16;
-                $paginator = DB::table('cid_vid')
+                $paginator = Video::query()->where('status',1)
+                    ->where('cat','like',"%{$cid}%")
+                    ->orderByDesc('video.updated_at')
+                    ->simplePaginate($perPage,$this->videoFields,'cat',$page);
+                /*$paginator = DB::table('cid_vid')
                     ->join('video','cid_vid.vid','=','video.id')
                     ->where('cid_vid.cid',$cid)
                     ->where('video.status',1)
                     ->orderByDesc('video.updated_at')
-                    ->simplePaginate($perPage,$this->videoFields,'cat',$page);
+                    ->simplePaginate($perPage,$this->videoFields,'cat',$page);*/
                 //$client = ClientBuilder::create()->build();
                 $paginatorArr = $paginator->toArray();
                 if(!empty($paginatorArr)){
@@ -277,6 +281,7 @@ class SearchController extends Controller
     {
         $data = Category::with('childs:id,name,parent_id')
             ->where('parent_id','2')
+            ->where('is_checked',1)
             ->select('id','name','parent_id')
             ->orderBy('sort')
             ->get();

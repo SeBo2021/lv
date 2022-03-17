@@ -475,6 +475,7 @@ class UserController extends Controller
             DB::commit();
             //统计注册量
             //ProcessStatistic::dispatchAfterResponse($user);
+            Cache::forget("cachedUser.{$user->id}");
             return response()->json(['state'=>0, 'msg'=>'绑定成功']);
         }
         return [];
