@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\TraitClass\VideoShortTrait;
 use App\TraitClass\VideoTrait;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
@@ -18,7 +19,7 @@ use ProtoneMedia\LaravelFFMpeg\Exporters\HLSExporter;
 
 class ProcessVideoShort implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, VideoTrait;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, VideoTrait,VideoShortTrait;
 
     /**
      * 任务尝试次数
@@ -68,7 +69,7 @@ class ProcessVideoShort implements ShouldQueue
         \AetherUpload\Util::deleteRedisSavedPath($this->row->url); //删除对应的redis秒传记录
         //同步到资源站
         $this->syncSlice($this->row->url,true);
-
+        $this->resetRedisVideoShort($this->row);
     }
 
     public function hls_slice($row, $del=false)
