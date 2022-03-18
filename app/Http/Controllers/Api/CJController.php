@@ -74,10 +74,10 @@ class CJController extends Controller implements Pay
             $mercId = $payEnv['CJ']['merchant_id'];
             // $notifyUrl = env('APP_URL') . $payEnv['CJ']['notify_url'];
             $notifyUrl = 'http://api.saolv200.com' . $payEnv['CJ']['notify_url'];
-            if ('wxwap' == $params['type']) {
+            /*if ('wxwap' == $params['type']) {
                 $params['type'] = '202';
                 $orderInfo->amount -= 1;
-            }
+            }*/
             $input = [
                 'merId' => $mercId,               //商户号
                 'orderId' => strval($payInfo->number),           //订单号，值允许英文数字
