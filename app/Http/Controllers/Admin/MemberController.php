@@ -313,6 +313,20 @@ class MemberController extends BaseCurlController
                 'must' => 0,
                 'verify' => 'rq',
             ],
+            [
+                'field' => 'area_number',
+                'type' => 'text',
+                'name' => '国际码',
+                'must' => 0,
+                'verify' => 'rq',
+            ],
+            [
+                'field' => 'phone_number',
+                'type' => 'text',
+                'name' => '手机号',
+                'must' => 0,
+                'verify' => 'rq',
+            ],
             /*[
                 'field' => 'avatar',
                 'type' => 'img',
