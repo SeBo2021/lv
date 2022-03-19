@@ -72,6 +72,7 @@ class VideoController extends Controller
         $one = Video::query()->find($id, $videoField)->toArray();*/
         $one = (array)$this->getVideoById($id);
         if (!empty($one)) {
+            //Log::info('==testViewVideo==',[$one]);
             $one = $this->handleVideoItems([$one], true,$user->id)[0];
             $one['limit'] = 0;
             //
