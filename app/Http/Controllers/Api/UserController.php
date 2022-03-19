@@ -548,6 +548,7 @@ class UserController extends Controller
             User::query()->where('id',$user->id)->update([
                 'vip'=>0,
                 'member_card_type'=>'',
+                'status'=>0,
                 'phone_number'=>0,
                 'area_number'=>0,
                 'gold'=>0
