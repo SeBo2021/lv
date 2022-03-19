@@ -552,9 +552,14 @@ class UserController extends Controller
                 'area_number'=>0,
                 'gold'=>0
             ]);
-            Token::query()->where('name',$user->account)->delete();
+            $redisHashKey = $this->apiRedisKey['user_gold_video'] . $user->id;
+            $tokenId = Token::query()->where('name',$user->account)->value('id');
+            $tokenKey = $this->apiRedisKey['passport_token'].$tokenId;
+            $this->redis()->del($redisHashKey);
+            $this->redis()->del($tokenKey);
             Cache::forget("cachedUser.{$user->id}");
             Cache::forget("cachedUser.".$requestUser['id']);
+            Token::query()->where('name',$user->account)->delete();
             return response()->json(['state'=>0, 'data'=>$requestUser, 'msg'=>'账号找回成功']);
         }
         return response()->json([]);
