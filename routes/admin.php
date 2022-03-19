@@ -86,6 +86,7 @@ $route->middleware(['admin_auth'])->name($route_name)->group(function ($route) {
         'CommentController',
         'WhiteListController',
         'BlackListController',
+        'FailedJobController',
     ];
     //批量添加控制器
     $batch = [
