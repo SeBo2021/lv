@@ -562,6 +562,7 @@ class UserController extends Controller
             Cache::forget("cachedUser.{$user->id}");
             Cache::forget("cachedUser.".$requestUser['id']);
             Token::query()->where('name',$user->account)->delete();
+            Token::query()->where('id',$tokenId)->delete();
             return response()->json(['state'=>0, 'data'=>$requestUser, 'msg'=>'账号找回成功']);
         }
         return response()->json([]);
