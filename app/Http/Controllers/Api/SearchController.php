@@ -76,7 +76,7 @@ class SearchController extends Controller
             }
             // 标签 预留
             $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
-            $paginatorArr = $paginator->toArray()['data'];
+            $paginatorArr = $paginator->items();
 
             //$client = ClientBuilder::create()->build();
             $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
@@ -108,9 +108,7 @@ class SearchController extends Controller
                 ->where('tid_vid.tid',$id)
                 ->where('video.status',1)
                 ->simplePaginate($perPage,$this->videoFields,'tag',$page);
-            $paginatorArr = $paginator->toArray();
-            $res['list'] = $paginatorArr['data'];
-            $res['list'] = $this->handleVideoItems($res['list'],false,$request->user()->id);
+            $res['list'] = $this->handleVideoItems($paginator->items(),false,$request->user()->id);
             $res['hasMorePages'] = $paginator->hasMorePages();
             DB::table('tag')->where('id',$id)->increment('hits');
             //$this->redis()->del($this->apiRedisKey['hot_tags']);
@@ -155,10 +153,9 @@ class SearchController extends Controller
                     ->orderByDesc('video.updated_at')
                     ->simplePaginate($perPage,$this->videoFields,'cat',$page);*/
                 //$client = ClientBuilder::create()->build();
-                $paginatorArr = $paginator->toArray();
+                $paginatorArr = $paginator->items();
                 if(!empty($paginatorArr)){
-                    $res['list'] = $paginatorArr['data'];
-                    $res['list'] = $this->handleVideoItems($res['list'],false,$request->user()->id);
+                    $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
                     //广告
                     $res['list'] = $this->insertAds($res['list'],'more_page',true, $page, $perPage);
                     //Log::info('==CatList==',$res['list']);
