@@ -271,7 +271,7 @@ class UserController extends Controller
                 ->orderByDesc('view_record.time_at')
                 ->simplePaginate($perPage,$this->videoFields,'myCollect',$page);
             //路径处理
-            $res['list'] = $this->handleVideoItems($paginator->items());
+            $res['list'] = $this->handleVideoItems($paginator->toArray()['data'] ?? []);
             //时长转秒
             $res['list'] = self::transferSeconds($res['list']);
             $res['hasMorePages'] = $paginator->hasMorePages();
@@ -319,7 +319,7 @@ class UserController extends Controller
                 ->orderByDesc('view_history.time_at')
                 ->simplePaginate($perPage,$this->videoFields,'viewHistory',$page);
             //路径处理
-            $res['list'] = $this->handleVideoItems($paginator->items());
+            $res['list'] = $this->handleVideoItems($paginator->toArray()['data']);
             //时长转秒
             $res['list'] = self::transferSeconds($res['list']);
             $res['hasMorePages'] = $paginator->hasMorePages();

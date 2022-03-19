@@ -363,7 +363,6 @@ trait VideoTrait
     public function handleVideoItems($lists,$display_url=false,$uid = 0)
     {
         $_v = date('Ymd');
-
         foreach ($lists as &$list){
             $list = (array)$list;
             if (($list['usage']??1) == 2) {
@@ -396,7 +395,8 @@ trait VideoTrait
                 $list['url'] = env('RESOURCE_DOMAIN_DEV') . '/' .$list['url'];
             } else {
                 //$list['cover_img'] = $domainSync . $list['cover_img'];
-                $list['gold'] = ($list['gold']??$list['vs_gold']) / $this->goldUnit;
+                //Log::info('===testHandleVideoItem==',[$list,(isset($list['gold'])? $list['gold'] :'none')]);
+                $list['gold'] = $list['gold'] / $this->goldUnit;
                 $list['views'] = $list['views'] > 0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5, 9));
                 //$list['hls_url'] = $domainSync . $list['hls_url'];
                 $list['preview_hls_url'] = $this->getPreviewPlayUrl($list['hls_url']);

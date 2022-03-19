@@ -76,7 +76,7 @@ class SearchController extends Controller
             }
             // 标签 预留
             $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
-            $paginatorArr = $paginator->items();
+            $paginatorArr = $paginator->toArray()['data'];
 
             //$client = ClientBuilder::create()->build();
             $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
@@ -108,7 +108,7 @@ class SearchController extends Controller
                 ->where('tid_vid.tid',$id)
                 ->where('video.status',1)
                 ->simplePaginate($perPage,$this->videoFields,'tag',$page);
-            $res['list'] = $this->handleVideoItems($paginator->items(),false,$request->user()->id);
+            $res['list'] = $this->handleVideoItems($paginator->toArray()['data'],false,$request->user()->id);
             $res['hasMorePages'] = $paginator->hasMorePages();
             DB::table('tag')->where('id',$id)->increment('hits');
             //$this->redis()->del($this->apiRedisKey['hot_tags']);
@@ -153,7 +153,7 @@ class SearchController extends Controller
                     ->orderByDesc('video.updated_at')
                     ->simplePaginate($perPage,$this->videoFields,'cat',$page);*/
                 //$client = ClientBuilder::create()->build();
-                $paginatorArr = $paginator->items();
+                $paginatorArr = $paginator->toArray()['data'];
                 if(!empty($paginatorArr)){
                     $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
                     //广告
@@ -200,8 +200,9 @@ class SearchController extends Controller
                     ->distinct()
                     ->inRandomOrder()
                     ->simplePaginate($perPage,$this->videoFields,'recommend',$page);*/
-                //$paginatorArr = $paginator->toArray()['data'];
-                $paginatorArr = $paginator->items();
+                $paginatorArr = $paginator->toArray()['data'];
+                //$paginatorArr = $paginator->items();
+                Log::info('==Recommend===',$paginatorArr);
                 if(!empty($paginatorArr)){
                     $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
                     //广告
