@@ -15,9 +15,11 @@ class FailedJobController extends BaseCurlController
         return $this->model = new FailedJob();
     }
 
+    //首页按钮去掉
     public function setOutputHandleBtnTpl($shareData)
     {
-        $this->uiBlade['btn'] = [];
+        //默认首页顶部添加按钮去掉
+        $this->uiBlade['btn'] = $this->defaultHandleBtnDelTpl($shareData);
     }
 
     public function indexCols(): array
