@@ -133,7 +133,7 @@ class MemberController extends BaseCurlController
             [
                 'field' => 'long_vedio_times',
                 'minWidth' => 80,
-                'title' => '可观看次数',
+                'title' => '次数',
                 'align' => 'center'
             ],
             [
@@ -172,7 +172,7 @@ class MemberController extends BaseCurlController
             ],
             [
                 'field' => 'status',
-                'minWidth' => 80,
+                'minWidth' => 100,
                 'title' => '状态',
                 'align' => 'center',
             ],
