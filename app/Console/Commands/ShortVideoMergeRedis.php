@@ -42,11 +42,20 @@ class ShortVideoMergeRedis extends Command
     public function handle()
     {
         $this->info(lang('开始执行'));
-        $this->processCache(1, 300);
+        $ids = [];
+        $cateIds = [];
+        $this->processCache(1, 300,$ids,$cateIds);
+
+        $this->redis()->set('shortVideoIds',implode(',',$ids));
+
+        foreach ($cateIds as $key => $cateId) {
+            var_dump($key);
+            $this->redis()->set("shortVideoCateIds_{$key}",implode(',',$cateId));
+        }
         $this->info(lang('执行成功'));
     }
 
-    public function processCache($page, $perNum)
+    public function processCache($page, $perNum, &$ids,&$cateIds)
     {
         try {
             $start = ($page - 1) * $perNum;
@@ -59,9 +68,14 @@ class ShortVideoMergeRedis extends Command
                 $mapNum = $item->id % 300;
                 $cacheKey = "short_video_$mapNum";
                 $this->redis()->hSet($cacheKey, $item->id, json_encode($item));
+
+                $ids[] = $item->id;
+                foreach (json_decode($item->cat,true) as $v) {
+                    $cateIds["{$v}"][] = $item->id;
+                }
             }
             if (count($video) == $perNum) {
-                $this->processCache($page+1, $perNum);
+                $this->processCache($page+1, $perNum,$ids,$cateIds);
             }
         } catch (Exception $e) {
             Log::error('执行过程出错===' . $e->getMessage());

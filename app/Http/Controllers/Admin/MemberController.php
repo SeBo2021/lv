@@ -40,7 +40,15 @@ class MemberController extends BaseCurlController
                 'minWidth' => 100,
                 'title' => '编号',
                 'sort' => 1,
+                'fixed' => 'left',
                 'align' => 'center'
+            ],
+            [
+                'field' => 'channel_id',
+                'minWidth' => 150,
+                'title' => '推广渠道',
+                'fixed' => 'left',
+                'align' => 'center',
             ],
             [
                 'field' => 'promotion_code',
@@ -66,12 +74,6 @@ class MemberController extends BaseCurlController
                 //'edit' => 1
             ],
             [
-                'field' => 'channel_id',
-                'minWidth' => 150,
-                'title' => '推广渠道',
-                'align' => 'center',
-            ],
-            [
                 'field' => 'account',
                 'minWidth' => 150,
                 'title' => '账号',
@@ -88,6 +90,13 @@ class MemberController extends BaseCurlController
                 'minWidth' => 150,
                 'title' => '最近登录位置',
                 'align' => 'center',
+            ],
+            [
+                'field' => 'area_number',
+                'minWidth' => 150,
+                'title' => '国际码',
+                'align' => 'center',
+                'hide' => true,
             ],
             [
                 'field' => 'phone_number',
@@ -177,7 +186,7 @@ class MemberController extends BaseCurlController
                 'field' => 'handle',
                 'minWidth' => 150,
                 'title' => '操作',
-                //'fixed' => 'right',
+                'fixed' => 'right',
                 'align' => 'center'
             ]
         ];
@@ -274,6 +283,11 @@ class MemberController extends BaseCurlController
                 'name' => '会员ID',
             ],
             [
+                'field' => 'find_phone_number',
+                'type' => 'text',
+                'name' => '手机号',
+            ],
+            [
                 'field' => 'query_like_account',//这个搜索写的查询条件在app/TraitClass/QueryWhereTrait.php 里面写
                 'type' => 'text',
                 'name' => '账号',
@@ -310,6 +324,20 @@ class MemberController extends BaseCurlController
                 'field' => 'account',
                 'type' => 'text',
                 'name' => '账号',
+                'must' => 0,
+                'verify' => 'rq',
+            ],
+            [
+                'field' => 'area_number',
+                'type' => 'text',
+                'name' => '国际码',
+                'must' => 0,
+                'verify' => 'rq',
+            ],
+            [
+                'field' => 'phone_number',
+                'type' => 'text',
+                'name' => '手机号',
                 'must' => 0,
                 'verify' => 'rq',
             ],
@@ -417,6 +445,10 @@ class MemberController extends BaseCurlController
         $reqGolds = $this->rq->input('query_gold', null);
         $reqDid = $this->rq->input('query_did', null);
         $reqDeviceSystem = $this->rq->input('query_device_system', null);
+        $findPhoneNumber = $this->rq->input('find_phone_number', null);
+        if($findPhoneNumber!==null){
+            $model = $model->where('phone_number',$findPhoneNumber);
+        }
         if($reqDeviceSystem!==null){
             $model = $model->where('device_system',$reqDeviceSystem);
         }

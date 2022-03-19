@@ -89,13 +89,18 @@ class VideoShortController extends Controller
     private function items($page, $user, $startId,$cateId,$tagId,$words): array
     {
         if ($page == 1) {
-            $ids = $this->redis()->get('shortVideoIds')?:'';
+            if ($cateId) {
+                $ids = $this->redis()->get("shortVideoCateIds_{$cateId}")?:'';
+            } else {
+                $ids = $this->redis()->get('shortVideoIds')?:'';
+                $cateId = 0;
+            }
             $redisIds = explode(',',$ids);
             shuffle($redisIds);
             $newIds = implode(',',$redisIds);
-            $this->redis()->set("newShortVideoByUid_{$user->id}",$newIds);
+            $this->redis()->set("newShortVideoByUid_{$cateId}_{$user->id}",$newIds);
         } else {
-            $newIds = $this->redis()->get("newShortVideoByUid_{$user->id}");
+            $newIds = $this->redis()->get("newShortVideoByUid_{$cateId}_{$user->id}");
         }
         $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'dash_url', 'hls_url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
         $perPage = 8;

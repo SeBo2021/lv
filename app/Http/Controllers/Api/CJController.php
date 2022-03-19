@@ -52,7 +52,7 @@ class CJController extends Controller implements Pay
             'type' => [
                 'required',
                 'string',
-                Rule::in(['zfbwap', 'wxwap', '102','202']),
+                Rule::in(['zfbwap', 'wxwap', '102','202', '103']),
             ],
         ])->validate();
         Log::info('cj_pay_params===', [$params]);//参数日志
@@ -74,10 +74,13 @@ class CJController extends Controller implements Pay
             $mercId = $payEnv['CJ']['merchant_id'];
             // $notifyUrl = env('APP_URL') . $payEnv['CJ']['notify_url'];
             $notifyUrl = 'http://api.saolv200.com' . $payEnv['CJ']['notify_url'];
-            /*if ('wxwap' == $params['type']) {
-                $params['type'] = '202';
-                $orderInfo->amount -= 1;
-            }*/
+            if ('zfbwap' == $params['type']) {
+                $params['type'] = '103';
+            }
+            if ('wxwap' == $params['type']) {
+                $params['type'] = '205';
+                // $orderInfo->amount -= 1;
+            }
             $input = [
                 'merId' => $mercId,               //商户号
                 'orderId' => strval($payInfo->number),           //订单号，值允许英文数字
