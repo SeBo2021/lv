@@ -118,43 +118,32 @@ class VideoShortController extends Controller
 //            $model = $model->where('id','>=',$startId);
             $model = $model->where('id','<=',$startId);
         }
-
-        if(!empty($words)){
-            $model = VideoShort::search($words)->where('status', 1);
-            $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
+        if($newIds){
+            $cacheIds = explode(',',$newIds);
+            $start = $perPage*($page-1);
+            $ids = array_slice($cacheIds,$start,$perPage);
+            foreach ($ids as $id) {
+                $mapNum = $id % 300;
+                $cacheKey = "short_video_$mapNum";
+                $raw = $this->redis()->hGet($cacheKey, $id);
+                if ($raw) {
+                    $items[] = json_decode($raw,true);
+                }
+            }
+            $more = false;
+            if (count($ids) == $perPage) {
+                $more = true;
+            }
+        } else {
+            if(!empty($words)){
+                $model = VideoShort::search($words)->where('status', 1);
+                $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
+            }else{
+                $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
+            }
             $items = $paginator->items();
             $more = $paginator->hasMorePages();
-        }else{
-            if($newIds){
-                $cacheIds = explode(',',$newIds);
-                $start = $perPage*($page-1);
-                $ids = array_slice($cacheIds,$start,$perPage);
-                foreach ($ids as $id) {
-                    $mapNum = $id % 300;
-                    $cacheKey = "short_video_$mapNum";
-                    $raw = $this->redis()->hGet($cacheKey, $id);
-                    $items[] = json_decode($raw,true);
-                    if ($raw) {
-                        $items[] = json_decode($raw,true);
-                    }
-                }
-                $more = false;
-                if (count($ids) == $perPage) {
-                    $more = true;
-                }
-            } else {
-                /*if(!empty($words)){
-                    $model = VideoShort::search($words)->where('status', 1);
-                    $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
-                }else{
-                    $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
-                }*/
-                $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
-                $items = $paginator->items();
-                $more = $paginator->hasMorePages();
-            }
         }
-
 
         $data = [];
         $_v = date('Ymd');
@@ -246,7 +235,7 @@ class VideoShortController extends Controller
             $res = $this->items($page, $user, $starId,$cateId,$tagId,$words);
             //Log::info('==ShortVideo==',[$params,$user->id,$res]);
             //统计激活视频人数===============
-            //$this->saveUsersDay($user->id, $user->channel_id, $user->device_system);
+            $this->saveUsersDay($user->id, $user->channel_id, $user->device_system);
             //============================
             return response()->json([
                 'state' => 0,
