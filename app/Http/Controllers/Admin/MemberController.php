@@ -40,7 +40,15 @@ class MemberController extends BaseCurlController
                 'minWidth' => 100,
                 'title' => '编号',
                 'sort' => 1,
+                'fixed' => 'left',
                 'align' => 'center'
+            ],
+            [
+                'field' => 'channel_id',
+                'minWidth' => 150,
+                'title' => '推广渠道',
+                'fixed' => 'left',
+                'align' => 'center',
             ],
             [
                 'field' => 'promotion_code',
@@ -66,12 +74,6 @@ class MemberController extends BaseCurlController
                 //'edit' => 1
             ],
             [
-                'field' => 'channel_id',
-                'minWidth' => 150,
-                'title' => '推广渠道',
-                'align' => 'center',
-            ],
-            [
                 'field' => 'account',
                 'minWidth' => 150,
                 'title' => '账号',
@@ -88,6 +90,13 @@ class MemberController extends BaseCurlController
                 'minWidth' => 150,
                 'title' => '最近登录位置',
                 'align' => 'center',
+            ],
+            [
+                'field' => 'area_number',
+                'minWidth' => 150,
+                'title' => '国际码',
+                'align' => 'center',
+                'hide' => true,
             ],
             [
                 'field' => 'phone_number',
@@ -177,7 +186,7 @@ class MemberController extends BaseCurlController
                 'field' => 'handle',
                 'minWidth' => 150,
                 'title' => '操作',
-                //'fixed' => 'right',
+                'fixed' => 'right',
                 'align' => 'center'
             ]
         ];
@@ -274,7 +283,7 @@ class MemberController extends BaseCurlController
                 'name' => '会员ID',
             ],
             [
-                'field' => 'query_phone_number',
+                'field' => 'find_phone_number',
                 'type' => 'text',
                 'name' => '手机号',
             ],
@@ -436,9 +445,9 @@ class MemberController extends BaseCurlController
         $reqGolds = $this->rq->input('query_gold', null);
         $reqDid = $this->rq->input('query_did', null);
         $reqDeviceSystem = $this->rq->input('query_device_system', null);
-        $queryPhoneNumber = $this->rq->input('query_phone_number', null);
-        if($queryPhoneNumber!==null){
-            $model = $model->where('phone_number',$queryPhoneNumber);
+        $findPhoneNumber = $this->rq->input('find_phone_number', null);
+        if($findPhoneNumber!==null){
+            $model = $model->where('phone_number',$findPhoneNumber);
         }
         if($reqDeviceSystem!==null){
             $model = $model->where('device_system',$reqDeviceSystem);
