@@ -552,6 +552,7 @@ class UserController extends Controller
                 'area_number'=>0,
                 'gold'=>0
             ]);
+            Token::query()->where('name',$user->account)->delete();
             Cache::forget("cachedUser.{$user->id}");
             Cache::forget("cachedUser.".$requestUser['id']);
             return response()->json(['state'=>0, 'data'=>$requestUser, 'msg'=>'账号找回成功']);
