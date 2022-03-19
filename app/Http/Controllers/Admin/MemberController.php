@@ -436,6 +436,10 @@ class MemberController extends BaseCurlController
         $reqGolds = $this->rq->input('query_gold', null);
         $reqDid = $this->rq->input('query_did', null);
         $reqDeviceSystem = $this->rq->input('query_device_system', null);
+        $queryPhoneNumber = $this->rq->input('query_phone_number', null);
+        if($queryPhoneNumber!==null){
+            $model = $model->where('phone_number',$queryPhoneNumber);
+        }
         if($reqDeviceSystem!==null){
             $model = $model->where('device_system',$reqDeviceSystem);
         }
