@@ -89,7 +89,11 @@ class VideoShortController extends Controller
     private function items($page, $user, $startId,$cateId,$tagId,$words): array
     {
         if ($page == 1) {
-            $ids = $this->redis()->get('shortVideoIds')?:'';
+            if ($cateId) {
+                $ids = $this->redis()->get("shortVideoCateIds_{$cateId}")?:'';
+            } else {
+                $ids = $this->redis()->get('shortVideoIds')?:'';
+            }
             $redisIds = explode(',',$ids);
             shuffle($redisIds);
             $newIds = implode(',',$redisIds);
