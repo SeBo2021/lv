@@ -209,14 +209,14 @@ class VideoController extends BaseCurlController
             [
                 'field' => 'created_at',
                 'sort' => 1,
-                'minWidth' => 150,
+                'minWidth' => 170,
                 'title' => '创建时间',
                 'align' => 'center',
             ],
             [
                 'field' => 'updated_at',
                 'sort' => 1,
-                'minWidth' => 150,
+                'minWidth' => 170,
                 'title' => '更新时间',
                 'align' => 'center',
                 'hide' => true

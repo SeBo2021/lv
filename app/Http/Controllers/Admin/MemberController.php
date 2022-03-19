@@ -293,13 +293,6 @@ class MemberController extends BaseCurlController
                 'name' => '账号',
             ],
             [
-                'field' => 'query_created_at',
-                'type' => 'datetime',
-//                'attr' => 'data-range=true',
-                'attr' => 'data-range=~',//需要特殊分割
-                'name' => '时间范围',
-            ],
-            [
                 'field' => 'query_status',
                 'type' => 'select',
                 'name' => '是否启用',
@@ -311,7 +304,13 @@ class MemberController extends BaseCurlController
                 'type' => 'text',
                 'name' => '机器码',
             ],
-
+            [
+                'field' => 'query_created_at',
+                'type' => 'datetime',
+//                'attr' => 'data-range=true',
+                'attr' => 'data-range=~',//需要特殊分割
+                'name' => '时间范围',
+            ],
         ];
         //赋值到ui数组里面必须是`search`的key值
         $this->uiBlade['search'] = $data;
