@@ -274,6 +274,11 @@ class MemberController extends BaseCurlController
                 'name' => '会员ID',
             ],
             [
+                'field' => 'query_phone_number',
+                'type' => 'text',
+                'name' => '手机号',
+            ],
+            [
                 'field' => 'query_like_account',//这个搜索写的查询条件在app/TraitClass/QueryWhereTrait.php 里面写
                 'type' => 'text',
                 'name' => '账号',
