@@ -152,7 +152,7 @@ class CommContentController extends Controller
      */
     private function processArea(&$data)
     {
-        $ids = array_column($data, 'uid');
+        /*$ids = array_column($data, 'uid');
         $ids = array_filter($ids);
         $lastLogin = LoginLog::query()
             ->select('uid', DB::raw('max(id) as max_id'))->whereIn('uid', $ids)
@@ -168,20 +168,9 @@ class CommContentController extends Controller
         if (!$areaInfo) {
             return;
         }
-        $areaInfoMap = array_column($areaInfo, null, 'uid');
+        $areaInfoMap = array_column($areaInfo, null, 'uid');*/
         foreach ($data as $k => $v) {
-            $rawArea = $areaInfoMap[$v['uid']] ?? [];
-            $data[$k]['location_name'] = '未知';
-            if(!empty($rawArea)){
-                // $data[$k]['location_name'] = $this->getAreaNameFromUser($rawArea['area']);
-                $data[$k]['location_name'] = '全国';
-            }
-            /*$tmpArea = @json_decode($rawArea['area'] ?? '', true);
-            $tmpArea = $tmpArea ?? [];
-            $data[$k]['location_name'] = '未知';
-            if(!empty($tmpArea)){
-                $data[$k]['location_name'] = $tmpArea[2] ?: ($tmpArea[1] ?: ($tmpArea[0]));
-            }*/
+            $data[$k]['location_name'] = '全国';
         }
     }
 
