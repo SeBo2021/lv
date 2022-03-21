@@ -28,7 +28,7 @@ trait CatTrait
     {
         $topCat = Category::query()
             ->where('parent_id',$parentId)
-            ->where('is_checked',1)
+            // ->where('is_checked',1)
             ->orderBy('sort')
             ->get(['id','name','sort'])
             ->toArray();
