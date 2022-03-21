@@ -74,9 +74,9 @@ class CJController extends Controller implements Pay
             $mercId = $payEnv['CJ']['merchant_id'];
             // $notifyUrl = env('APP_URL') . $payEnv['CJ']['notify_url'];
             $notifyUrl = 'http://api.saolv200.com' . $payEnv['CJ']['notify_url'];
-            if ('zfbwap' == $params['type']) {
-                $params['type'] = '103';
-            }
+            /*if ('zfbwap' == $params['type']) {
+                $params['type'] = 'zfbwap';
+            }*/
             if ('wxwap' == $params['type']) {
                 $params['type'] = '202';
                 $orderInfo->amount -= 1;
