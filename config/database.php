@@ -71,6 +71,7 @@ return [
                 'username' => env('DB_USERNAME_WRITE', 'forge'),
                 'password' => env('DB_PASSWORD_WRITE', ''),
             ],
+            'sticky' => true,
         ],
 
         'master_mysql' => [
