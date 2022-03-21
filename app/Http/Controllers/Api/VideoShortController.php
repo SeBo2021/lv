@@ -240,7 +240,7 @@ class VideoShortController extends Controller
             $res = $this->items($page, $user, $starId,$cateId,$tagId,$words);
             //Log::info('==ShortVideo==',[$params,$user->id,$res]);
             //统计激活视频人数===============
-            $this->saveUsersDay($user->id, $user->channel_id, $user->device_system);
+            // $this->saveUsersDay($user->id, $user->channel_id, $user->device_system);
             //============================
             return response()->json([
                 'state' => 0,

@@ -71,7 +71,7 @@ class ProcessViewVideo implements ShouldQueue
             DB::table('users')->where('id',$uid)->decrement('long_vedio_times'); //当日观看次数减一
         }*/
         //
-        //$this->saveUsersDay($uid, $this->userModel->channel_id, $this->userModel->device_system);
+        // $this->saveUsersDay($uid, $this->userModel->channel_id, $this->userModel->device_system);
         //Cache::forget("cachedUser.{$uid}");
     }
 }
