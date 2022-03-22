@@ -194,7 +194,7 @@ class CommContentController extends Controller
             $list = CommBbs::query()
             ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
             ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
-            ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get();
+            ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get()->toArray();
             $redis->set($listKey,json_encode($list,JSON_UNESCAPED_UNICODE));
             $redis->expire($listKey,7200);
         }else{
