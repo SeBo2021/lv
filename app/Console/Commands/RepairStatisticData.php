@@ -73,6 +73,7 @@ class RepairStatisticData extends Command
             $hashKeys=[
                 'active_users' => $item->ids
             ];
+            $this->info($item->channel_id.':'.$item->device_system.':'.$item->ids.'######执行成功######');
             $redis->hMSet($statistic_day_key,$hashKeys);
         }
 
