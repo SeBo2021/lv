@@ -116,9 +116,10 @@ class YKController extends Controller implements Pay
     public function callback(Request $request): mixed
     {
         // TODO: Implement callback() method.
-        $postResp = $request->post();
-        Log::info('yk_pay_callback===', [$postResp]);//三方返回参数日志
+        $post = $request->post();
+        Log::info('yk_pay_callback===', [$post]);//三方返回参数日志
         try {
+            $postResp = json_decode($post,true);
             $payEnv = self::getPayEnv()['YK'];
             $secret = $payEnv['YK']['secret'];
             $signPass = $this->verify($postResp, $secret, $postResp['sign']);
@@ -126,10 +127,12 @@ class YKController extends Controller implements Pay
                 // 签名验证不通过
                 throw new Exception('签名验证不通过', -1);
             }
-            // 记录支付信息
-            DB::beginTransaction();
-            $this->orderUpdate($postResp['orderNo'], $postResp);
-            DB::commit();
+            if ($postResp['status'] == 1) {
+                // 记录支付信息
+                DB::beginTransaction();
+                $this->orderUpdate($postResp['orderNo'], $postResp);
+                DB::commit();
+            }
             $return = 'success';
         } catch (Exception $e) {
             Log::info('yk_error_callback===', ['code' => $e->getCode(), 'msg' => $e->getMessage()]);//三方返回参数日志
