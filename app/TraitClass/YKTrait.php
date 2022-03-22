@@ -26,7 +26,7 @@ trait YKTrait
      */
     function verify($data, $md5Key, $pubKey): bool
     {
-        $sig_data = strtolower(md5($md5Key . $data['orderId'] . $data['appId'] . $data['amount'] . $data['notifyCallback']));
+        $sig_data = strtolower(md5($md5Key . $data['orderNo'] . $data['appId'] . $data['amount'] . $data['notifyCallback']));
         if ($sig_data == $pubKey) {
             return true;
         }

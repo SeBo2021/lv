@@ -116,10 +116,9 @@ class YKController extends Controller implements Pay
     public function callback(Request $request): mixed
     {
         // TODO: Implement callback() method.
-        $post = $request->post();
-        Log::info('yk_pay_callback===', [$post]);//三方返回参数日志
+        $postResp = $request->post();
+        Log::info('yk_pay_callback===', [$postResp]);//三方返回参数日志
         try {
-            $postResp = json_decode($post,true);
             $payEnv = self::getPayEnv()['YK'];
             $secret = $payEnv['YK']['secret'];
             $signPass = $this->verify($postResp, $secret, $postResp['sign']);
