@@ -199,6 +199,8 @@ class CommContentController extends Controller
             ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
             ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get();
             $result = $this->proProcessData($uid, $list,$user);
+            $result[0]['category_id'] = $list[0]['category_id'];
+            $result[0]['user_id'] = $list[0]['user_id'];
             $redis->set($listKey,json_encode($result,JSON_UNESCAPED_UNICODE));
             $redis->expire($listKey,7200);
         }else{
