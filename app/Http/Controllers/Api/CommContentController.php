@@ -210,10 +210,10 @@ class CommContentController extends Controller
         //Log::info('==userLocationName1==',[$user]);
         //$result = $this->proProcessData($uid, $list,$user);
         // 处理新文章通知
-        
-        $mask = $redis->get("c_{$list[0]['category_id']}");
+
+        $mask = $redis->get("c_{$result[0]['category_id']}");
         if ($mask == 'focus') {
-            $keyMe = "status_me_focus_{$list[0]['user_id']}";
+            $keyMe = "status_me_focus_{$result[0]['user_id']}";
         } else {
             $keyMe = "status_me_{$mask}_$uid";
         }
