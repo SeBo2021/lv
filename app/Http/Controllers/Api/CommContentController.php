@@ -190,23 +190,25 @@ class CommContentController extends Controller
 
         $listKey = 'communityBbsList:'.$id;
         $listFromRedis= $redis->get($listKey);
+        $user = $request->user();
+        $uid = $user->id;
+
         if(!$listFromRedis){
             $list = CommBbs::query()
             ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
             ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
             ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get();
-            $redis->set($listKey,serialize($list));
+            $result = $this->proProcessData($uid, $list,$user);
+            $redis->set($listKey,json_encode($result,JSON_UNESCAPED_UNICODE));
             $redis->expire($listKey,7200);
         }else{
-            $list = unserialize($listFromRedis);
+            $result = json_decode($listFromRedis,true);
         } 
         
-        $user = $request->user();
-        $uid = $user->id;
         // 增加点击数
         CommBbs::query()->where('community_bbs.id', $id)->increment('views');
         //Log::info('==userLocationName1==',[$user]);
-        $result = $this->proProcessData($uid, $list,$user);
+        //$result = $this->proProcessData($uid, $list,$user);
         // 处理新文章通知
         
         $mask = $redis->get("c_{$list[0]['category_id']}");
