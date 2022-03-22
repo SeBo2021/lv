@@ -112,7 +112,7 @@ class StatisticsController extends BaseCurlController
             case 'activeUsers':
                 //$queryBuild = DB::table('users_day')->select('at_time',DB::raw('count(uid) as users'));
                 //$queryBuild = DB::table('login_log')->select('created_at',DB::raw('count(id) as users,cast(created_at AS date) AS at_date'));
-                $queryBuild = DB::table('statistic_day')->select('active_users',DB::raw('cast(at_time AS date) AS at_date'));
+                $queryBuild = DB::table('statistic_day')->select('sum(active_users) as users',DB::raw('cast(at_time AS date) AS at_date'));
                 if($channelId!==null){
                     $queryBuild = $queryBuild->where('channel_id',$channelId);
                 }
