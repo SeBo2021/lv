@@ -111,7 +111,8 @@ class StatisticsController extends BaseCurlController
                 break;
             case 'activeUsers':
                 //$queryBuild = DB::table('users_day')->select('at_time',DB::raw('count(uid) as users'));
-                $queryBuild = DB::table('login_log')->select('created_at',DB::raw('count(id) as users,cast(created_at AS date) AS at_date'));
+                //$queryBuild = DB::table('login_log')->select('created_at',DB::raw('count(id) as users,cast(created_at AS date) AS at_date'));
+                $queryBuild = DB::table('statistic_day')->select('active_users',DB::raw('cast(at_time AS date) AS at_date'));
                 if($channelId!==null){
                     $queryBuild = $queryBuild->where('channel_id',$channelId);
                 }
@@ -119,9 +120,10 @@ class StatisticsController extends BaseCurlController
                     $queryBuild = $queryBuild->where('device_system',$deviceSystem);
                 }
                 if($timeRange != 0){
-                    $queryBuild = $queryBuild->whereBetween('created_at',[$startDate,$endDate]);
-                        //->where('created_at','>=',$startDate)
-                        //->where('created_at','<=',$endDate);
+                    $queryBuild = $queryBuild
+                    // ->whereBetween('at_time',[$startDate,$endDate]);
+                        ->where('at_time','>=',strtotime($startDate))
+                        ->where('at_time','<=',strtotime($endDate));
                 }
                 $activeUsers = $queryBuild->groupBy(['at_date'])->orderByDesc('at_date')->take(15)->get();
                 $activeUsers = array_reverse($activeUsers->toArray());
