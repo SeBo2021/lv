@@ -186,10 +186,21 @@ class CommContentController extends Controller
             'id' => 'integer',
         ])->validate();
         $id = $params['id'] ?? 0;
-        $list = CommBbs::query()
+        $redis = $this->redis();
+
+        $listKey = 'communityBbsList:'.$id;
+        $listFromRedis= $redis->get($listKey);
+        if(!$listFromRedis){
+            $list = CommBbs::query()
             ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
             ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
             ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get();
+            $redis->set($listKey,json_encode($listKey,JSON_UNESCAPED_UNICODE));
+            $redis->expire($listKey,7200);
+        }else{
+            $list = json_decode($listFromRedis,true);
+        } 
+        
         $user = $request->user();
         $uid = $user->id;
         // 增加点击数
@@ -197,7 +208,7 @@ class CommContentController extends Controller
         //Log::info('==userLocationName1==',[$user]);
         $result = $this->proProcessData($uid, $list,$user);
         // 处理新文章通知
-        $redis = $this->redis();
+        
         $mask = $redis->get("c_{$list[0]['category_id']}");
         if ($mask == 'focus') {
             $keyMe = "status_me_focus_{$list[0]['user_id']}";
