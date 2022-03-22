@@ -187,19 +187,21 @@ class SearchController extends Controller
             $vid = $params['vid'];
 //            $cat = Video::query()->where('id',$vid)->value('cat');
             $cat = $this->getVideoById($vid)->cat;
-            //$cidArr = $cat ? json_decode($cat,true) : [];
+            
             if(!empty($cat)){
-                $paginator = Video::query()->where('status',1)
+                /* $paginator = Video::query()->where('status',1)
                     ->where('cat','like',"%{$cat}%")
-                    ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
-                /*$paginator = DB::table('cid_vid')
+                    ->simplePaginate($perPage,$this->videoFields,'recommend',$page); */
+                    
+                $cidArr = $cat ? json_decode($cat,true) : [];
+                $paginator = DB::table('cid_vid')
                     ->join('video','cid_vid.vid','=','video.id')
                     ->whereIn('cid_vid.cid',$cidArr)
                     ->where('video.status',1)
                     ->where('video.id','!=',$vid)
                     ->distinct()
                     ->inRandomOrder()
-                    ->simplePaginate($perPage,$this->videoFields,'recommend',$page);*/
+                    ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
                 $paginatorArr = $paginator->toArray()['data'];
                 //$paginatorArr = $paginator->items();
                 Log::info('==Recommend===',$paginatorArr);
