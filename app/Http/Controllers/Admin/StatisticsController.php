@@ -112,7 +112,7 @@ class StatisticsController extends BaseCurlController
             case 'activeUsers':
                 //$queryBuild = DB::table('users_day')->select('at_time',DB::raw('count(uid) as users'));
                 //$queryBuild = DB::table('login_log')->select('created_at',DB::raw('count(id) as users,cast(created_at AS date) AS at_date'));
-                $queryBuild = DB::table('statistic_day')->select('at_time',DB::raw('sum(active_users) as users'),DB::raw('cast(at_time AS date) AS at_date'));
+                $queryBuild = DB::table('statistic_day')->select('at_time',DB::raw('sum(active_users) as users'));
                 if($channelId!==null){
                     $queryBuild = $queryBuild->where('channel_id',$channelId);
                 }
@@ -125,10 +125,10 @@ class StatisticsController extends BaseCurlController
                         ->where('at_time','>=',strtotime($startDate))
                         ->where('at_time','<=',strtotime($endDate));
                 }
-                $activeUsers = $queryBuild->groupBy(['at_date'])->orderByDesc('at_date')->take(15)->get();
+                $activeUsers = $queryBuild->groupBy(['at_time'])->orderByDesc('at_time')->take(15)->get();
                 $activeUsers = array_reverse($activeUsers->toArray());
                 foreach ($activeUsers as $activeUser){
-                    $json['x'][] = $activeUser->at_date ?? '-';
+                    $json['x'][] = date('Y-m-d',$activeUser->at_time) ?? '-';
                     $json['y'][] = $activeUser->users;
                 }
                 break;
