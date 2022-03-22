@@ -73,7 +73,8 @@ class YKController extends Controller implements Pay
                 throw new Exception("订单不存在");
             }
             $mercId = $payEnv['YK']['merchant_id'];
-            $notifyUrl = env('APP_URL') . $payEnv['YK']['notify_url'];
+           // $notifyUrl = env('APP_URL') . $payEnv['YK']['notify_url'];
+            $notifyUrl = 'https://qa.saoltv.com' . $payEnv['YK']['notify_url'];
             $input = [
                 'appId' => $mercId,               //商户号
                 'orderNo' => strval($payInfo->number),           //订单号，值允许英文数字
