@@ -170,7 +170,7 @@ trait StatisticTrait
     }
 
     //保存活跃用户数据
-    public function saveUsersDay($uid,$channel_id,$device_system)
+    /* public function saveUsersDay($uid,$channel_id,$device_system)
     {
         $at_time = strtotime(date('Y-m-d'));
         //
@@ -187,7 +187,7 @@ trait StatisticTrait
         }
 
 
-    }
+    } */
 
     /**
      * 通用用户表修复统计数据
