@@ -214,6 +214,7 @@ class SearchController extends Controller
                         //广告
                         $res['list'] = $this->insertAds($res['list'],'recommend',1);
                         $res['hasMorePages'] = $paginator->hasMorePages();
+                        $redis->set($key,json_encode($res,JSON_UNESCAPED_UNICODE));
                         return response()->json([
                             'state'=>0,
                             'data'=>$res
