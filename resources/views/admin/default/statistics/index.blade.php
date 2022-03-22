@@ -223,7 +223,7 @@
             </div>
         </div>
 
-        <div class="layui-card shadow panel">
+        <!-- <div class="layui-card shadow panel">
             <div class="layui-card-header">IP分布
                 <div class="panel-action"  >
                     <a href="#" data-perform="panel-collapse"><i  title="点击可折叠" class="layui-icon layui-icon-subtraction"></i></a>
@@ -234,7 +234,7 @@
                     <div class="" id="IPDistribution" style="height: 600px"></div>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <script src="{{ ___('admin/layui/lay/modules/laydate.js',$res_version??'') }}"></script>
         <script src="{{ ___('admin/layui/layui.js',$res_version??'') }}"></script>
@@ -629,7 +629,7 @@
             users();
             recharge();
             increment();
-            IPDistribution();
+            //IPDistribution();
             //==============================
         </script>
 
