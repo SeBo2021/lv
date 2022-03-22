@@ -188,33 +188,45 @@ class SearchController extends Controller
 //            $cat = Video::query()->where('id',$vid)->value('cat');
             $cat = $this->getVideoById($vid)->cat;
             
+
             if(!empty($cat)){
                 /* $paginator = Video::query()->where('status',1)
                     ->where('cat','like',"%{$cat}%")
                     ->simplePaginate($perPage,$this->videoFields,'recommend',$page); */
-                    
-                $cidArr = $cat ? json_decode($cat,true) : [];
-                $paginator = DB::table('cid_vid')
-                    ->join('video','cid_vid.vid','=','video.id')
-                    ->whereIn('cid_vid.cid',$cidArr)
-                    ->where('video.status',1)
-                    ->where('video.id','!=',$vid)
-                    ->distinct()
-                    ->inRandomOrder()
-                    ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
-                $paginatorArr = $paginator->toArray()['data'];
-                //$paginatorArr = $paginator->items();
-                Log::info('==Recommend===',$paginatorArr);
-                if(!empty($paginatorArr)){
-                    $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
-                    //广告
-                    $res['list'] = $this->insertAds($res['list'],'recommend',1);
-                    $res['hasMorePages'] = $paginator->hasMorePages();
+                $key = 'searchRecommend:'.$cat.':'.$page;
+                $redis = $this->redis();
+                $redisJsonData = $redis->get($key);
+                if(!$redisJsonData){
+                    $cidArr = $cat ? json_decode($cat,true) : [];
+                    $paginator = DB::table('cid_vid')
+                        ->join('video','cid_vid.vid','=','video.id')
+                        ->whereIn('cid_vid.cid',$cidArr)
+                        ->where('video.status',1)
+                        ->where('video.id','!=',$vid)
+                        ->distinct()
+                        ->inRandomOrder()
+                        ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
+                    $paginatorArr = $paginator->toArray()['data'];
+                    //$paginatorArr = $paginator->items();
+                    Log::info('==Recommend===',$paginatorArr);
+                    if(!empty($paginatorArr)){
+                        $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
+                        //广告
+                        $res['list'] = $this->insertAds($res['list'],'recommend',1);
+                        $res['hasMorePages'] = $paginator->hasMorePages();
+                        return response()->json([
+                            'state'=>0,
+                            'data'=>$res
+                        ]);
+                    }
+                }else{
+                    $res = json_decode($redisJsonData,true);
                     return response()->json([
                         'state'=>0,
                         'data'=>$res
                     ]);
                 }
+                    
             }
             return response()->json([
                 'state'=>0,
