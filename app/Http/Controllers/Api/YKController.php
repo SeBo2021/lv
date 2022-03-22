@@ -73,7 +73,9 @@ class YKController extends Controller implements Pay
                 throw new Exception("订单不存在");
             }
             $mercId = $payEnv['YK']['merchant_id'];
-            $notifyUrl = env('APP_URL') . $payEnv['YK']['notify_url'];
+           // $notifyUrl = env('APP_URL') . $payEnv['YK']['notify_url'];
+            // $notifyUrl = 'https://qa.saoltv.com' . $payEnv['YK']['notify_url'];
+            $notifyUrl = 'http://api.saolv200.com' . $payEnv['YK']['notify_url'];
             $input = [
                 'appId' => $mercId,               //商户号
                 'orderNo' => strval($payInfo->number),           //订单号，值允许英文数字
@@ -118,17 +120,20 @@ class YKController extends Controller implements Pay
         $postResp = $request->post();
         Log::info('yk_pay_callback===', [$postResp]);//三方返回参数日志
         try {
-            $payEnv = self::getPayEnv()['YK'];
+            $payEnv = self::getPayEnv();
             $secret = $payEnv['YK']['secret'];
+            $postResp['appId']= $payEnv['YK']['merchant_id'];
             $signPass = $this->verify($postResp, $secret, $postResp['sign']);
             if (!$signPass) {
                 // 签名验证不通过
                 throw new Exception('签名验证不通过', -1);
             }
-            // 记录支付信息
-            DB::beginTransaction();
-            $this->orderUpdate($postResp['orderNo'], $postResp);
-            DB::commit();
+            if ($postResp['status'] == 1) {
+                // 记录支付信息
+                DB::beginTransaction();
+                $this->orderUpdate($postResp['orderNo'], $postResp);
+                DB::commit();
+            }
             $return = 'success';
         } catch (Exception $e) {
             Log::info('yk_error_callback===', ['code' => $e->getCode(), 'msg' => $e->getMessage()]);//三方返回参数日志
