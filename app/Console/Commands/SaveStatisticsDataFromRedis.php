@@ -56,12 +56,11 @@ class SaveStatisticsDataFromRedis extends Command
                     ->where('channel_id',$channel_id)
                     ->where('device_system',$device_system)
                     ->where('at_time',$at_time)
-                    ->updateOrInsert(['channel_id'=>$channel_id,'device_system'=>$device_system,'at_time'=>$at_time],$channelStatisticItem);
-                if($at_time<=$yesterdayTime){
-                    $redis->del($realKey);
-                }
+                    ->updateOrInsert(['channel_id'=>$channel_id,'device_system'=>$device_system,'at_time'=>$at_time],$channelStatisticItem);   
             }
-
+            if($at_time<=$yesterdayTime){
+                $redis->del($realKey);
+            }    
         }
 
         $channel_day_statistics_keys = $redis->keys('*channel_day_statistics:*');
