@@ -51,7 +51,7 @@ class SaveStatisticsDataFromRedis extends Command
             $channel_id = $channelStatisticItem['channel_id'] ?? 0;
             $device_system = $channelStatisticItem['device_system'] ?? 0;
             $at_time = $channelStatisticItem['at_time'] ?? 0;
-            if($at_time>0){
+            if($at_time>0 && $device_system>0){
                 DB::table('statistic_day')
                     ->where('channel_id',$channel_id)
                     ->where('device_system',$device_system)
