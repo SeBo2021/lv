@@ -118,7 +118,7 @@ class YKController extends Controller implements Pay
         // TODO: Implement callback() method.
         $postResp = $request->post();
         Log::info('yk_pay_callback===', [$postResp]);//三方返回参数日志
-        // try {
+        try {
             $payEnv = self::getPayEnv();
             $secret = $payEnv['YK']['secret'];
             $postResp['appId']= $payEnv['YK']['merchant_id'];
@@ -134,11 +134,11 @@ class YKController extends Controller implements Pay
                 DB::commit();
             }
             $return = 'success';
-       /* } catch (Exception $e) {
+        } catch (Exception $e) {
             Log::info('yk_error_callback===', ['code' => $e->getCode(), 'msg' => $e->getMessage()]);//三方返回参数日志
             DB::rollBack();
             $return = 'failure';
-        }*/
+        }
         return response($return);
     }
 
