@@ -51,6 +51,7 @@ class RepairStatisticData extends Command
             ->orderByDesc('created_at')
             ->get();
         //dump($rechargeItems);
+        $idsArr = [];
         foreach ($Items as $item)
         {
             //$channel_day_statistics_key = 'channel_day_statistics:'.$item->channel_id.':'.$item->date_at;
@@ -73,11 +74,12 @@ class RepairStatisticData extends Command
             $hashKeys=[
                 'active_users' => $item->ids
             ];
+            $idsArr[] = $item->ids;
             $this->info($item->channel_id.':'.$item->device_system.':'.$item->ids.'######执行成功######');
             $redis->hMSet($statistic_day_key,$hashKeys);
         }
 
-        $this->info('######执行成功######');
+        $this->info('######执行成功######'.array_sum($idsArr));
         return 0;
     }
 }
