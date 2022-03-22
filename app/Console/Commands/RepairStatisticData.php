@@ -72,7 +72,10 @@ class RepairStatisticData extends Command
                 'orders' => $item->ids,
             ]; */
             $hashKeys=[
-                'active_users' => $item->ids
+                'active_users' => $item->ids,
+                'channel_id' => $item->channel_id,
+                'device_system' => $item->device_system,
+                'at_time' => $date_time,
             ];
             $idsArr[] = $item->ids;
             $this->info($item->channel_id.':'.$item->device_system.':'.$item->ids.'######执行成功######');
