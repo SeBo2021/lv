@@ -49,7 +49,7 @@ class OrderController extends Controller
             'pay_method' => [
                 'nullable',
                 'integer',
-                Rule::in([1, 2]),
+                Rule::in([1, 2,3]),
             ],
         ])->validate();
         Log::info('order_create_params===',[$params]);//参数日志
@@ -156,7 +156,7 @@ class OrderController extends Controller
             'pay_method' => [
                 'nullable',
                 'integer',
-                Rule::in([1, 2]),
+                Rule::in([1, 2,3]),
             ],
         ])->validate();
         Log::info('order_pay_params===',[$params]);//参数日志
