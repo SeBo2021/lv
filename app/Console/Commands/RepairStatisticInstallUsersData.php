@@ -44,7 +44,7 @@ class RepairStatisticInstallUsersData extends Command
         $paramDay = $this->argument('day');
         $data_at = $paramDay!==null ? date('Y-m-d',strtotime('-'.$paramDay.' day')) : date('Y-m-d');
         $at_time = strtotime($data_at);
-        $usersByYesterday = DB::table('users')->select('channel_id','device_system',DB::raw('count(id) as users'),'at_time')->whereDate('at_time', $at_time)->groupBy(['channel_id','device_system','at_time'])
+        $usersByYesterday = DB::table('users')->select('channel_id','device_system',DB::raw('count(id) as users'),'at_time')->where('at_time', $at_time)->groupBy(['channel_id','device_system','at_time'])
             ->get();
         foreach ($usersByYesterday as $item){
             DB::table('statistic_day')
