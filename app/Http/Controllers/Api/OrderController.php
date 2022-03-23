@@ -111,7 +111,7 @@ class OrderController extends PayBaseController
             $order = Order::query()->create($createData);
             $payMethod = $params['pay_method']??1;
             if ($params['pay_method'] == 0) {
-                $payMethod = $this->getOwnCode($params['method_id'],$params['goods_id'],$params['method_id']);
+                $payMethod = $this->getOwnCode($params['type'],$params['goods_id'],$params['method_id']);
             }
             // 准备支付记录
             $pay = PayLog::query()->create([
