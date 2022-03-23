@@ -60,8 +60,8 @@ class StatisticsController extends BaseCurlController
                 $totalData = $queryBuild->orderByDesc('at_time')->limit(30)->get()[0];
 
                 // 修正安装量与注册量
-                $newData = $this->fixDataByUserTable($channelId, $deviceSystem, $timeRange, $startDate, $endDate);
-                $totalData->total_install = $newData['newInstall'];
+                /* $newData = $this->fixDataByUserTable($channelId, $deviceSystem, $timeRange, $startDate, $endDate);
+                $totalData->total_install = $newData['newInstall']; */
 
                 $json = [
                     'access' => $totalData->total_access ?? 0,
