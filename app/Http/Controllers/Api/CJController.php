@@ -80,8 +80,10 @@ class CJController extends PayBaseController implements Pay
                 $params['type'] = '202';
                 $orderInfo->amount -= 1;
             }*/
+            $oldMix = false;
             $rechargeChannel = $params['type'];
             if (in_array($params['type'],['1','2'])) {
+                $oldMix = true;
                 $rechargeChannel = $this->getOwnMethod($orderInfo->type,$orderInfo->type_id,$params['type']);
             }
             $input = [
@@ -107,12 +109,15 @@ class CJController extends PayBaseController implements Pay
                 // 'headers' => ['Content-Type' => 'multipart/form-data'],
                 'verify' => false,
             ]))->post($payEnv['CJ']['pay_url'], ['form_params' => $input]);
-            var_dump($curl->getHeaders());
             $response = $curl->getBody();
             Log::info('cj_third_response===', [$response]);//三方响应日志
             $resJson = json_decode($response, true);
             if ($resJson['code'] == 1) {
-                $return = $this->format(0, $resJson, '取出成功');
+                if ($oldMix) {
+                    $return = $this->format(0, ['url'=>$resJson['data']['payurl']], '取出成功');
+                } else {
+                    $return = $this->format(0, $resJson, '取出成功');
+                }
             } else {
                 $return = $this->format($resJson['code'],new \StdClass(), $response);
             }
