@@ -157,15 +157,33 @@ class StatisticsController extends BaseCurlController
                 break;
             case 'users':
                 // 修正安装量与注册量
-                $json = $this->fixDataByUserTable($channelId, $deviceSystem, $timeRange, $startDate, $endDate,true);
+                // $json = $this->fixDataByUserTable($channelId, $deviceSystem, $timeRange, $startDate, $endDate,true);
+                $fields = 'sum(install) as value,device_system';
+                $queryBuild = DB::table('statistic_day')->select(DB::raw($fields));
+                if($channelId!==null){
+                    $queryBuild = $queryBuild->where('channel_id',$channelId);
+                }
 
+                if( $deviceSystem>0 ){
+                    $queryBuild = $queryBuild->where('device_system',$deviceSystem);
+                }
+
+                if($timeRange != 0){
+                    $queryBuild = $queryBuild
+                        ->where('at_time','>=',strtotime($startDate))
+                        ->where('at_time','<=',strtotime($endDate));
+                }
+
+                $totalData = $queryBuild->groupBy('device_system')->get();
+    
                 $systemName = [
                     0 => '其它',
                     1 => '苹果(IOS)',
                     2 => '安卓(Android)',
                     3 => '苹果(轻量版)',
                 ];
-                foreach ($json as &$item){
+
+                foreach ($totalData as &$item){
                     $item->name = $systemName[$item->device_system];
                 }
                 break;
