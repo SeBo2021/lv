@@ -207,7 +207,7 @@ class OrderController extends PayBaseController
                     ])->first()?->toArray();
             $payMethod = $params['pay_method']??1;
             if ($params['pay_method'] == 0) {
-                $payMethod = $this->getOwnCode($params['method_id'],$order['type_id'],$params['method_id']);
+                $payMethod = $this->getOwnCode($order['type'],$order['type_id'],$params['method_id']);
             }
             if ($payLog) {
                 $payId = $payLog['id'];
