@@ -6,10 +6,12 @@ use App\Models\Gold;
 use App\Models\RechargeChannel;
 use App\Services\UiService;
 use App\TraitClass\PayTrait;
+use App\TraitClass\PHPRedisTrait;
 
 class GoldController extends BaseCurlController
 {
     use PayTrait;
+    use PHPRedisTrait;
     //设置页面的名称
     public $pageName = '骚豆设置';
 
@@ -200,7 +202,6 @@ class GoldController extends BaseCurlController
     protected function afterSaveSuccessEvent($model, $id = '')
     {
         //清除缓存
-        $redis = $this->redis();
         $this->redis()->del('api_recharge_member_gold');
         return $model;
     }
