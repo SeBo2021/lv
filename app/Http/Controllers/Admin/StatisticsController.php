@@ -174,7 +174,7 @@ class StatisticsController extends BaseCurlController
                         ->where('at_time','<=',strtotime($endDate));
                 }
 
-                $totalData = $queryBuild->groupBy('device_system')->get();
+                $json = $queryBuild->groupBy('device_system')->get();
     
                 $systemName = [
                     0 => '其它',
@@ -183,7 +183,7 @@ class StatisticsController extends BaseCurlController
                     3 => '苹果(轻量版)',
                 ];
 
-                foreach ($totalData as &$item){
+                foreach ($json as &$item){
                     $item->name = $systemName[$item->device_system];
                 }
                 break;
