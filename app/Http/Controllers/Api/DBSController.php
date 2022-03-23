@@ -18,7 +18,7 @@ use GuzzleHttp\Client;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
-class DBSController extends Controller implements Pay
+class DBSController extends PayBaseController implements Pay
 {
     use PayTrait;
     use ApiParamsTrait;
@@ -39,7 +39,7 @@ class DBSController extends Controller implements Pay
             'type' => [
                 'required',
                 'string',
-                Rule::in(['wechat','alipay','union','quickUnion','fixedAlipay','fixedWechat','usdt','unionCard','fixedIosPay','fixedIosWechat']),
+                Rule::in(['wechat','alipay','union','quickUnion','fixedAlipay','fixedWechat','usdt','unionCard','fixedIosPay','fixedIosWechat','1','2']),
             ],
         ])->validate();
         Log::info('dbs_pay_params===',[$params]);//参数日志
@@ -53,18 +53,24 @@ class DBSController extends Controller implements Pay
             if (!$orderInfo) {
                 throw new Exception("订单不存在");
             }
+            $oldMix = false;
+            $rechargeChannel = $params['type'];
+            if (in_array($params['type'],['1','2'])) {
+                $oldMix = true;
+                $rechargeChannel = $this->getOwnMethod($orderInfo->type,$orderInfo->type_id,$params['type']);
+            }
             $mercId = $payEnv['DBS']['merchant_id'];
             // $notifyUrl = env('APP_URL') . $payEnv['DBS']['notify_url'];
             $notifyUrl = 'http://api.saolv200.com' . $payEnv['DBS']['notify_url'];
             $input = [
                 'mercId' => $mercId,
                 'tradeNo' => strval($payInfo->number),
-                'type' => $params['type'],
+                'type' => $rechargeChannel,
                 'money' => strval($orderInfo->amount),
                 'notifyUrl' => $notifyUrl,
                 'time' => strval(time().'000'),
                 // 'mode' => 'sdk',
-                'sign' => $this->sign($mercId, $orderInfo->amount,$notifyUrl,$payInfo->number,$params['type'],$payEnv['DBS']['secret']),
+                'sign' => $this->sign($mercId, $orderInfo->amount,$notifyUrl,$payInfo->number,$rechargeChannel,$payEnv['DBS']['secret']),
                 // 'payload' => //选填。⽬前仅⽀持过滤赔付渠道, 传 1 ,则过滤赔付渠道
                 'info' => [
                     'playerId'=>strval($request->user()->id),
@@ -86,7 +92,11 @@ class DBSController extends Controller implements Pay
             Log::info('dbs_third_response===',[$response]);//三方响应日志
             $resJson = json_decode($response,true);
             if ($resJson['code'] == 200) {
-                $return = $this->format(0, $resJson, '取出成功');
+                if ($oldMix) {
+                    $return = $this->format(0, ['url'=>$resJson['msg']['payUrl']], '取出成功');
+                } else {
+                    $return = $this->format(0, $resJson, '取出成功');
+                }
             } else {
                 $return = $this->format($resJson['code'], [], $resJson['err']);
             }

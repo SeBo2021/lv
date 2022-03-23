@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\PayLog;
 use App\Services\Pay;
@@ -28,7 +27,7 @@ use App\TraitClass\IpTrait;
  * Class CJController
  * @package App\Http\Controllers\Api
  */
-class CJController extends Controller implements Pay
+class CJController extends PayBaseController implements Pay
 {
     use PayTrait;
     use ApiParamsTrait;
@@ -52,7 +51,7 @@ class CJController extends Controller implements Pay
             'type' => [
                 'required',
                 'string',
-                Rule::in(['zfbwap', 'wxwap', '102','202', '103']),
+                Rule::in(['zfbwap', 'wxwap', '102','202', '103','1','2']),
             ],
         ])->validate();
         Log::info('cj_pay_params===', [$params]);//参数日志
@@ -81,11 +80,15 @@ class CJController extends Controller implements Pay
                 $params['type'] = '202';
                 $orderInfo->amount -= 1;
             }*/
+            $rechargeChannel = $params['type'];
+            if (in_array($params['type'],['1','2'])) {
+                $rechargeChannel = $this->getOwnMethod($orderInfo->type,$orderInfo->type_id,$params['type']);
+            }
             $input = [
                 'merId' => $mercId,               //商户号
                 'orderId' => strval($payInfo->number),           //订单号，值允许英文数字
                 'orderAmt' => strval($orderInfo->amount??0),              //订单金额,单位元保留两位小数
-                'channel' => $params['type'],            //支付通道编码
+                'channel' => $rechargeChannel,            //支付通道编码
                 'desc' => '正常充值',           //简单描述，只允许英文数字 最大64
                 'attch' => '',             //附加信息,原样返回
                 'smstyle' => '1',               //用于扫码模式（sm），仅带sm接口可用，默认0返回扫码图片，为1则返回扫码跳转地址。
@@ -100,10 +103,12 @@ class CJController extends Controller implements Pay
             $input['sign'] = $this->sign($input, $md5Key, $privateKey);
 
             Log::info('cj_third_params===', [$input]);//三方参数日志
-            $response = (new Client([
+            $curl = (new Client([
                 // 'headers' => ['Content-Type' => 'multipart/form-data'],
                 'verify' => false,
-            ]))->post($payEnv['CJ']['pay_url'], ['form_params' => $input])->getBody();
+            ]))->post($payEnv['CJ']['pay_url'], ['form_params' => $input]);
+            var_dump($curl->getHeaders());
+            $response = $curl->getBody();
             Log::info('cj_third_response===', [$response]);//三方响应日志
             $resJson = json_decode($response, true);
             if ($resJson['code'] == 1) {
@@ -156,4 +161,5 @@ class CJController extends Controller implements Pay
         // TODO: Implement method() method.
         return '';
     }
+
 }

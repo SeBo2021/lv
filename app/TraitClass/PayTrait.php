@@ -26,6 +26,43 @@ use Psr\SimpleCache\InvalidArgumentException;
 
 trait PayTrait
 {
+
+    public static function getPayTypeCode()
+    {
+        $payChannel = env('PAY_CHANNEL','');
+        foreach (explode(',',$payChannel) as $v) {
+            $data[$v] = [
+                'id' => $v,
+                'name' => $v,
+            ];
+        }
+        return $data;
+    }
+
+    public static function getPayMethod()
+    {
+        $payChannel = env('PAY_CHANNEL','');
+        foreach (explode(',',$payChannel) as $v) {
+            $data[$v] = [
+                'id' => $v,
+                'name' => $v,
+            ];
+        }
+        return $data;
+    }
+
+    public static function getAtionPayCode()
+    {
+        $payChannel = env('PAY_CHANNEL','');
+        foreach (explode(',',$payChannel) as $v) {
+            $data[$v] = [
+                'id' => $v,
+                'name' => $v,
+            ];
+        }
+        return $data;
+    }
+
     /**
      * 返回支付类型标识
      * @param string $flag
