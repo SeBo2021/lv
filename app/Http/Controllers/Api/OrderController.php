@@ -202,6 +202,7 @@ class OrderController extends PayBaseController
             $payLog = PayLog::query()->orderBy('id','desc')
                 ->where([
                     'order_id'=>$params['order_id'],
+                    'method_id' => $params['method_id']??1,
                     'status'=>'0',
                     ])->first()?->toArray();
             $payMethod = $params['pay_method']??1;
