@@ -7,7 +7,7 @@ use AWS\CRT\Log;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
-class RepairStatisticData extends Command
+class RepairStatisticActiveUsersData extends Command
 {
     use PHPRedisTrait;
     /**
@@ -15,7 +15,7 @@ class RepairStatisticData extends Command
      *
      * @var string
      */
-    protected $signature = 'repair:statisticData {day?}';
+    protected $signature = 'repair:statisticActiveUsersData {day?}';
 
     /**
      * The console command description.
