@@ -74,8 +74,16 @@ class VipController extends \App\Http\Controllers\Controller
         $rechargeData = $this->getRechargeChannel();
         $baseUrl =  env('APP_URL');
         foreach ($memberCard as $mcKey=>$mvItem) {
-            $memberCard[$mcKey]['zfb_url'] = $baseUrl . $rechargeData[$mvItem['zfb_action_id']];
-            $memberCard[$mcKey]['wx_url'] = $baseUrl . $rechargeData[$mvItem['wx_action_id']];
+            if ($zfb_action_id = $rechargeData[$mvItem['zfb_action_id']]) {
+                $memberCard[$mcKey]['zfb_url'] = $baseUrl . $zfb_action_id;
+            } else {
+                $memberCard[$mcKey]['zfb_url'] = '';
+            }
+            if ($wx_action_id = $rechargeData[$mvItem['wx_action_id']]) {
+                $memberCard[$mcKey]['wx_url'] = $baseUrl . $wx_action_id;
+            } else {
+                $memberCard[$mcKey]['wx_url'] = '';
+            }
         }
 
         $res['list'] = $memberCard;
@@ -94,8 +102,16 @@ class VipController extends \App\Http\Controllers\Controller
        $rechargeData = $this->getRechargeChannel();
        $baseUrl =  env('APP_URL');
        foreach ($gold as $mcKey=>$mvItem) {
-           $gold[$mcKey]->zfb_url = $baseUrl . $rechargeData[$mvItem->zfb_action_id];
-           $gold[$mcKey]->wx_url = $baseUrl . $rechargeData[$mvItem->wx_action_id];
+           if ($zfb_action_id = $rechargeData[$mvItem->zfb_action_id]) {
+               $gold[$mcKey]->zfb_url = $baseUrl . $zfb_action_id;
+           } else {
+               $gold[$mcKey]->zfb_url = '';
+           }
+           if ($wx_action_id = $rechargeData[$mvItem->wx_action_id]) {
+               $gold[$mcKey]->wx_url = $baseUrl . $wx_action_id;
+           } else {
+               $gold[$mcKey]->wx_url = '';
+           }
        }
         return response()->json([
             'state'=>0,
