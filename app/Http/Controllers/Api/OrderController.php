@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
-class OrderController extends Controller
+class OrderController extends PayBaseController
 {
     use ApiParamsTrait;
     use PayTrait;
@@ -43,6 +43,11 @@ class OrderController extends Controller
                 Rule::in(['1', '2','3']),
             ],
             'goods_id' => 'required|string',
+            'method_id' => [
+                'nullable',
+                'string',
+                Rule::in(['1', '2']),
+            ],
             'forward' => 'nullable',
             'vid' => 'nullable',
             'time' => 'required|string',
@@ -72,17 +77,25 @@ class OrderController extends Controller
             Log::info('===memberCard_diff_time==',[$user->created_at,$goodsInfo['hours']*3600,$validPeriodTime,time(),$useRealValue]);
         }
         try {
+            if ($params['method_id']??false) {
+                $amount = $goodsInfo[match ($params['method_id']) {
+                    '1' => 'zfb_fee',
+                    '2' => 'wx_fee',
+                }];
+            } else {
+                $amount = $goodsInfo[match ($params['type']) {
+                    '1' => $useRealValue ? 'real_value' : 'value',
+                    '2' => 'money',
+                    '3' => 'gold',
+                }];
+            }
             $number = self::getPayNumber();
             $createData = [
                 'remark' => json_encode($goodsInfo),
                 'number' => $number,
                 'type' => $params['type'],
                 'type_id' => $params['goods_id'],
-                'amount' => $goodsInfo[match ($params['type']) {
-                    '1' => $useRealValue ? 'real_value' : 'value',
-                    '2' => 'money',
-                    '3' => 'gold',
-                }],
+                'amount' => $amount,
                 'uid' => $user->id,
                 'channel_id' => $user->channel_id??0,
                 'channel_pid' => $user->channel_pid??0,
@@ -96,6 +109,10 @@ class OrderController extends Controller
             DB::beginTransaction();
             // 创建订单
             $order = Order::query()->create($createData);
+            $payMethod = $params['pay_method']??1;
+            if ($params['pay_method'] == 0) {
+                $payMethod = $this->getOwnCode($params['method_id'],$params['goods_id'],$params['method_id']);
+            }
             // 准备支付记录
             $pay = PayLog::query()->create([
                 'order_id' => $order->id,
@@ -106,7 +123,7 @@ class OrderController extends Controller
                 'status' => 0,
                 'device_system' => $request->user()->device_system??1,
                 'created_at' => $now,
-                'pay_method' => $params['pay_method']??1,
+                'pay_method' => $payMethod,
                 'updated_at' => $now,
             ]);
             DB::commit();
@@ -158,10 +175,24 @@ class OrderController extends Controller
                // 'integer',
               //  Rule::in([1, 2,3]),
             ],
+            'method_id' => [
+                'nullable',
+                'string',
+                Rule::in(['1', '2']),
+            ],
+            'amount' => [
+                'nullable',
+                'integer',
+            ],
         ])->validate();
         Log::info('order_pay_params===',[$params]);//参数日志
         try {
-            $order = Order::query()->find($params['order_id'])?->toArray();
+            $orderModel = Order::query();
+            if ($params['amount']??false) {
+                $orderModel->where('id',$params['order_id'])->update(['amount'=>$params['amount']]);
+            }
+            $order = $orderModel->find($params['order_id'])?->toArray();
+
             if (!$order) {
                 throw new Exception('订单不存在', -1);
             }
@@ -173,6 +204,10 @@ class OrderController extends Controller
                     'order_id'=>$params['order_id'],
                     'status'=>'0',
                     ])->first()?->toArray();
+            $payMethod = $params['pay_method']??1;
+            if ($params['pay_method'] == 0) {
+                $payMethod = $this->getOwnCode($params['method_id'],$order['type_id'],$params['method_id']);
+            }
             if ($payLog) {
                 $payId = $payLog['id'];
             } else {
@@ -186,7 +221,8 @@ class OrderController extends Controller
                     'status' => 0,
                     'created_at' => $now,
                     'updated_at' => $now,
-                    'pay_method' => $params['pay_method']??1,
+                    'pay_method' => $payMethod,
+                    'method_id' => $params['method_id']??1,
                 ]);
                 $payId = $payNew['id'];
             }

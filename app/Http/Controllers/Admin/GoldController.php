@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Gold;
+use App\Models\RechargeChannel;
 use App\Services\UiService;
+use App\TraitClass\PayTrait;
 
 class GoldController extends BaseCurlController
 {
+    use PayTrait;
     //设置页面的名称
     public $pageName = '骚豆设置';
 
@@ -40,9 +43,45 @@ class GoldController extends BaseCurlController
             [
                 'field' => 'money',
                 'minWidth' => 100,
-                'title' => '金额',
+                'title' => '展示金额',
                 'align' => 'center',
                 'edit' => 1
+            ],
+            [
+                'field' => 'zfb_action_name',
+                'minWidth' => 100,
+                'title' => '支付宝充值方式',
+                'align' => 'center',
+            ],
+            [
+                'field' => 'zfb_channel',
+                'minWidth' => 100,
+                'title' => '支付宝通道',
+                'align' => 'center',
+            ],
+            [
+                'field' => 'zfb_fee',
+                'minWidth' => 100,
+                'title' => '支付宝金额',
+                'align' => 'center',
+            ],
+            [
+                'field' => 'wx_action_name',
+                'minWidth' => 100,
+                'title' => '微信充值方式',
+                'align' => 'center',
+            ],
+            [
+                'field' => 'wx_channel',
+                'minWidth' => 100,
+                'title' => '微信通道',
+                'align' => 'center',
+            ],
+            [
+                'field' => 'wx_fee',
+                'minWidth' => 100,
+                'title' => '微信金额',
+                'align' => 'center',
             ],
             [
                 'field' => 'status',
@@ -68,9 +107,51 @@ class GoldController extends BaseCurlController
             [
                 'field' => 'money',
                 'type' => 'text',
-                'name' => '金额',
+                'name' => '展示金额',
                 'must' => 1,
                 'verify' => 'rq',
+            ],
+            [
+                'field' => 'zfb_action_id',
+                'minWidth' => 100,
+                'name' => '支付宝充值方式',
+                'type' => 'select',
+                'data' => $this->getPayChannelData()
+            ],
+            [
+                'field' => 'zfb_channel',
+                'minWidth' => 100,
+                'name' => '支付宝渠道',
+                'type' => 'select',
+                'data' => $this->getPayTypeCode()
+            ],
+            [
+                'field' => 'zfb_fee',
+                'minWidth' => 100,
+                'name' => '支付宝金额',
+                'type' => 'number',
+                'align' => 'center',
+            ],
+            [
+                'field' => 'wx_action_id',
+                'minWidth' => 100,
+                'name' => '微信充值方式',
+                'type' => 'select',
+                'data' => $this->getPayChannelData()
+            ],
+            [
+                'field' => 'wx_channel',
+                'minWidth' => 100,
+                'name' => '微信通道',
+                'type' => 'select',
+                'data' => $this->getPayTypeCode()
+            ],
+            [
+                'field' => 'wx_fee',
+                'minWidth' => 100,
+                'name' => '微信金额',
+                'type' => 'number',
+                'align' => 'center',
             ],
             [
                 'field' => 'sort',
@@ -93,5 +174,34 @@ class GoldController extends BaseCurlController
     {
         $item->status = UiService::switchTpl('status', $item,'');
         return $item;
+    }
+
+    public function getPayChannelData()
+    {
+        $res = RechargeChannel::query()
+            ->where('status',1)
+            ->get(['id','name','remark']);
+        $data = $this->uiService->allDataArr('请选择支付方式');
+        foreach ($res as $item) {
+            $data[$item->id] = [
+                'id' => $item->id,
+                'name' => $item->remark,
+            ];
+        }
+        return $data;
+    }
+
+    /**
+     * 清理缓存
+     * @param $model
+     * @param string $id
+     * @return mixed
+     */
+    protected function afterSaveSuccessEvent($model, $id = '')
+    {
+        //清除缓存
+        $redis = $this->redis();
+        $this->redis()->del('api_recharge_member_gold');
+        return $model;
     }
 }

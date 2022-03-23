@@ -28,7 +28,7 @@ use App\TraitClass\IpTrait;
  * Class YKController
  * @package App\Http\Controllers\Api
  */
-class YKController extends Controller implements Pay
+class YKController extends PayBaseController implements Pay
 {
     use PayTrait;
     use ApiParamsTrait;
@@ -52,7 +52,7 @@ class YKController extends Controller implements Pay
             'type' => [
                 'required',
                 'string',
-                Rule::in(['zfbwap', 'wxwap']),
+                Rule::in(['zfbwap', 'wxwap','1','2']),
             ],
         ])->validate();
         Log::info('yk_pay_params===', [$params]);//参数日志
@@ -65,13 +65,19 @@ class YKController extends Controller implements Pay
             if (!$payInfo) {
                 throw new Exception("记录不存在");
             }
-            $payChannel = json_decode($payEnv['YK']['pay_channel'], true);
-            $channelNo = $payChannel[$params['type']];
 
             $orderInfo = Order::query()->find($payInfo['order_id']);
             if (!$orderInfo) {
                 throw new Exception("订单不存在");
             }
+
+            $oldMix = false;
+            $channelNo = $params['type'];
+            if (in_array($params['type'],['1','2'])) {
+                $oldMix = true;
+                $channelNo = $this->getOwnMethod($orderInfo->type,$orderInfo->type_id,$params['type']);
+            }
+
             $mercId = $payEnv['YK']['merchant_id'];
            // $notifyUrl = env('APP_URL') . $payEnv['YK']['notify_url'];
             // $notifyUrl = 'https://qa.saoltv.com' . $payEnv['YK']['notify_url'];
@@ -98,7 +104,11 @@ class YKController extends Controller implements Pay
             // Log::info('yk_third_response===', [$response]);//三方响应日志
             $resJson = json_decode($response, true);
             if ($resJson['code'] == 1) {
-                $return = $this->format(0, $resJson, '取出成功');
+                if ($oldMix) {
+                    $return = $this->format(0, ['url'=>$resJson['payUrl']], '取出成功');
+                } else {
+                    $return = $this->format(0, $resJson, '取出成功');
+                }
             } else {
                 $return = $this->format($resJson['code'], new \StdClass(), $response);
             }
