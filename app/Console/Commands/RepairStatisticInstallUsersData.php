@@ -55,7 +55,7 @@ class RepairStatisticInstallUsersData extends Command
                     'channel_id' =>  $item->channel_id,
                     'device_system' =>  $item->device_system,
                     'at_time' =>  $at_time,
-                ],['install'=>$item->install]);
+                ],['install'=>$item->users]);
         }
 
         if($paramDay){
