@@ -52,26 +52,22 @@ class RepairStatisticInstallUsersData extends Command
                 ->where('device_system',$item->device_system)
                 ->where('at_time',$at_time)
                 ->update(['install'=>$item->users]);
+                if($item->channel_id == 0){
+                    $insertData = [
+                        'channel_id'=>$item->channel_id,
+                        'device_system'=>2,
+                        'access'=>$item->install * 2,
+                        'hits'=>$item->install,
+                        'install'=>$item->install,
+                        'at_time'=>$at_time,
+                    ];
+                    DB::table('statistic_day')->insert($insertData);
+                }
+                
         }
 
         /* $channelIds = DB::table('channels')->pluck('id');
         DB::table('statistic_day')->whereNotIn('channel_id',$channelIds)->delete(); */
-        $items = DB::table('channel_day_statistics')->where('channel_id',0)->get(['channel_id','access','hits','install','active_users','active_view_users','login_number','date_at']);
-        foreach($items as $item){
-            $insertData = [
-                'channel_id'=>$item->channel_id,
-                'device_system'=>2,
-                'access'=>$item->access,
-                'hits'=>$item->hits,
-                'install'=>$item->install,
-                'active_users'=>$item->active_users,
-                'active_view_users'=>$item->active_view_users,
-                'login_number'=>$item->login_number,
-                'at_time'=>strtotime($item->date_at),
-            ];
-            DB::table('statistic_day')->insert($insertData);
-        }
-
 
         if($paramDay){
             $this->info('######同步前第'.$paramDay.'天用户安装量数据执行成功######');
