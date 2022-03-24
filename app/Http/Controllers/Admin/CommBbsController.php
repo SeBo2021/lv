@@ -301,6 +301,7 @@ class CommBbsController extends BaseCurlController
     public function setListOutputItemExtend($item)
     {
         $item->category_name = $item->category['name'] ?? '';
+        $item->url = json_decode($item->video,true)[0] ?? '';
         $item->status = UiService::switchTpl('status', $item,0,"是|否");
         return $item;
     }
