@@ -55,7 +55,7 @@ class RepairStatisticInstallUsersData extends Command
                 if($item->channel_id == 0){
                     $insertData = [
                         'channel_id'=>$item->channel_id,
-                        'device_system'=>2,
+                        'device_system'=>$item->device_system,
                         'access'=>$item->users * 2,
                         'hits'=>$item->users,
                         'install'=>$item->users,
