@@ -103,6 +103,13 @@ class CommBbsController extends BaseCurlController
                 'align' => 'center'
             ],
             [
+                'field' => 'thumbs',
+                'minWidth' => 150,
+                'title' => '相册',
+                'hide' => true,
+                'align' => 'center'
+            ],
+            [
                 'field' => 'status',
                 'minWidth' => 80,
                 'title' => '审核',
