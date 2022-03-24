@@ -19,12 +19,14 @@ use App\Models\CommBbs;
 use App\Models\CommCate;
 use App\Models\User;
 use App\Services\UiService;
+use App\TraitClass\VideoTrait;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class CommBbsController extends BaseCurlController
 {
+    use VideoTrait;
     //那些页面不共享，需要单独设置的方法
     //public $denyCommonBladePathActionName = ['create'];
     //设置页面的名称
@@ -89,9 +91,23 @@ class CommBbsController extends BaseCurlController
                 'align' => 'center'
             ],
             [
+                'field' => 'video',
+                'minWidth' => 150,
+                'title' => '视频',
+                'hide' => true,
+                'align' => 'center'
+            ],
+            [
                 'field' => 'video_picture',
                 'minWidth' => 150,
                 'title' => '封面图片',
+                'hide' => true,
+                'align' => 'center'
+            ],
+            [
+                'field' => 'thumbs',
+                'minWidth' => 150,
+                'title' => '相册',
                 'hide' => true,
                 'align' => 'center'
             ],
@@ -301,6 +317,7 @@ class CommBbsController extends BaseCurlController
     public function setListOutputItemExtend($item)
     {
         $item->category_name = $item->category['name'] ?? '';
+        $item->url = $this->getDomain($item->sync).json_decode($item->video,true)[0] ?? '';
         $item->status = UiService::switchTpl('status', $item,0,"是|否");
         return $item;
     }
@@ -313,8 +330,9 @@ class CommBbsController extends BaseCurlController
         } else {
             $fixPic = [];
             $raw = json_decode($thumbs,true);
+            $domain = $this->getDomain(env('SFTP_SYNC',1));
             foreach ($raw as $item) {
-                $fixPic[] = $item['path']??$item;
+                $fixPic[] = $domain.$item['path']??$item;
             }
             $model->thumbs = json_encode($fixPic);
         }
@@ -331,6 +349,7 @@ class CommBbsController extends BaseCurlController
         if(!$videoPicture){
             $model->video_picture = '[]';
         }
+        
     }
 
     protected function afterSaveSuccessEvent($model, $id = '')

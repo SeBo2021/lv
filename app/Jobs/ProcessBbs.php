@@ -141,7 +141,8 @@ class ProcessBbs implements ShouldQueue
         Log::info('==encryptImg==',[$encryptFile,$r]);
         if ($result) {
             DB::table('community_bbs')->where('id', $this->row->id)->update([
-                'video_picture' => json_encode([$coverName])
+                'video_picture' => json_encode([$coverName]),
+                'sync' => env('SFTP_SYNC',1),
             ]);
         }
     }
@@ -152,6 +153,7 @@ class ProcessBbs implements ShouldQueue
     public function syncThumbs()
     {
         foreach ($this->thumbsImage as $pic) {
+            $pic = str_replace($this->getDomain(env('SFTP_SYNC',1)),'',$pic);
             $file = '/' . public_path() . $pic;
             $exist = Storage::disk('sftp')->exists($pic);
             if ($exist) {
@@ -160,7 +162,7 @@ class ProcessBbs implements ShouldQueue
             $content = @file_get_contents($file);
             $upload = Storage::disk('sftp')->put($pic, $content);
             if ($upload) {
-                Storage::delete($this->mp4Path);
+                Storage::delete($pic);
             }
         }
     }
