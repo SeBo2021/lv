@@ -153,6 +153,7 @@ class ProcessBbs implements ShouldQueue
     public function syncThumbs()
     {
         foreach ($this->thumbsImage as $pic) {
+            $pic = str_replace($this->getDomain(env('SFTP_SYNC',1)),'',$pic);
             $file = '/' . public_path() . $pic;
             $exist = Storage::disk('sftp')->exists($pic);
             if ($exist) {
