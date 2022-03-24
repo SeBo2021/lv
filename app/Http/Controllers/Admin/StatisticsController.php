@@ -60,8 +60,8 @@ class StatisticsController extends BaseCurlController
                 $totalData = $queryBuild->orderByDesc('at_time')->limit(30)->get()[0];
 
                 // 修正安装量与注册量
-                $newData = $this->fixDataByUserTable($channelId, $deviceSystem, $timeRange, $startDate, $endDate);
-                $totalData->total_install = $newData['newInstall'];
+                /* $newData = $this->fixDataByUserTable($channelId, $deviceSystem, $timeRange, $startDate, $endDate);
+                $totalData->total_install = $newData['newInstall']; */
 
                 $json = [
                     'access' => $totalData->total_access ?? 0,
@@ -111,7 +111,8 @@ class StatisticsController extends BaseCurlController
                 break;
             case 'activeUsers':
                 //$queryBuild = DB::table('users_day')->select('at_time',DB::raw('count(uid) as users'));
-                $queryBuild = DB::table('login_log')->select('created_at',DB::raw('count(id) as users,cast(created_at AS date) AS at_date'));
+                //$queryBuild = DB::table('login_log')->select('created_at',DB::raw('count(id) as users,cast(created_at AS date) AS at_date'));
+                $queryBuild = DB::table('statistic_day')->select('at_time',DB::raw('sum(active_users) as users'));
                 if($channelId!==null){
                     $queryBuild = $queryBuild->where('channel_id',$channelId);
                 }
@@ -119,14 +120,15 @@ class StatisticsController extends BaseCurlController
                     $queryBuild = $queryBuild->where('device_system',$deviceSystem);
                 }
                 if($timeRange != 0){
-                    $queryBuild = $queryBuild->whereBetween('created_at',[$startDate,$endDate]);
-                        //->where('created_at','>=',$startDate)
-                        //->where('created_at','<=',$endDate);
+                    $queryBuild = $queryBuild
+                    // ->whereBetween('at_time',[$startDate,$endDate]);
+                        ->where('at_time','>=',strtotime($startDate))
+                        ->where('at_time','<=',strtotime($endDate));
                 }
-                $activeUsers = $queryBuild->groupBy(['at_date'])->orderByDesc('at_date')->take(15)->get();
+                $activeUsers = $queryBuild->groupBy(['at_time'])->orderByDesc('at_time')->take(15)->get();
                 $activeUsers = array_reverse($activeUsers->toArray());
                 foreach ($activeUsers as $activeUser){
-                    $json['x'][] = $activeUser->at_date ?? '-';
+                    $json['x'][] = date('Y-m-d',$activeUser->at_time) ?? '-';
                     $json['y'][] = $activeUser->users;
                 }
                 break;
@@ -155,20 +157,38 @@ class StatisticsController extends BaseCurlController
                 break;
             case 'users':
                 // 修正安装量与注册量
-                $json = $this->fixDataByUserTable($channelId, $deviceSystem, $timeRange, $startDate, $endDate,true);
+                // $json = $this->fixDataByUserTable($channelId, $deviceSystem, $timeRange, $startDate, $endDate,true);
+                $fields = 'sum(install) as value,device_system';
+                $queryBuild = DB::table('statistic_day')->select(DB::raw($fields));
+                if($channelId!==null){
+                    $queryBuild = $queryBuild->where('channel_id',$channelId);
+                }
 
+                if( $deviceSystem>0 ){
+                    $queryBuild = $queryBuild->where('device_system',$deviceSystem);
+                }
+
+                if($timeRange != 0){
+                    $queryBuild = $queryBuild
+                        ->where('at_time','>=',strtotime($startDate))
+                        ->where('at_time','<=',strtotime($endDate));
+                }
+
+                $json = $queryBuild->groupBy('device_system')->get();
+    
                 $systemName = [
                     0 => '其它',
                     1 => '苹果(IOS)',
                     2 => '安卓(Android)',
                     3 => '苹果(轻量版)',
                 ];
+
                 foreach ($json as &$item){
                     $item->name = $systemName[$item->device_system];
                 }
                 break;
             case 'IPDistribution':
-                $queryBuild = DB::table('login_log');
+                /* $queryBuild = DB::table('login_log');
                 if($channelId!==null){
                     $queryBuild = $queryBuild
                         ->select('area','ip','users.channel_id','login_log.device_system',DB::raw('count(distinct ip) as ips'),DB::raw('json_extract(area,"$[1]") as province'))
@@ -196,7 +216,7 @@ class StatisticsController extends BaseCurlController
                     }
                 }
                 $json['min'] = !empty($ips) ? min($ips) : 0;
-                $json['max'] = !empty($ips) ? max($ips) : 0;
+                $json['max'] = !empty($ips) ? max($ips) : 0; */
                 break;
         }
         return response()->json($json);

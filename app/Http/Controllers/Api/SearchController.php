@@ -142,16 +142,16 @@ class SearchController extends Controller
             $res = $redis->get($redisKey);
             if(!$res){
                 $perPage = 16;
-                $paginator = Video::query()->where('status',1)
+                /* $paginator = Video::query()->where('status',1)
                     ->where('cat','like',"%{$cid}%")
                     ->orderByDesc('video.updated_at')
-                    ->simplePaginate($perPage,$this->videoFields,'cat',$page);
-                /*$paginator = DB::table('cid_vid')
+                    ->simplePaginate($perPage,$this->videoFields,'cat',$page); */
+                $paginator = DB::table('cid_vid')
                     ->join('video','cid_vid.vid','=','video.id')
                     ->where('cid_vid.cid',$cid)
                     ->where('video.status',1)
                     ->orderByDesc('video.updated_at')
-                    ->simplePaginate($perPage,$this->videoFields,'cat',$page);*/
+                    ->simplePaginate($perPage,$this->videoFields,'cat',$page);
                 //$client = ClientBuilder::create()->build();
                 $paginatorArr = $paginator->toArray()['data'];
                 if(!empty($paginatorArr)){
@@ -161,7 +161,7 @@ class SearchController extends Controller
                     //Log::info('==CatList==',$res['list']);
                     $res['hasMorePages'] = $paginator->hasMorePages();
                     $redis->set($redisKey,json_encode($res,JSON_UNESCAPED_UNICODE));
-                    $redis->expire($redisKey,$this->redisExpiredTime);
+                    $redis->expire($redisKey,7200);
                 }
             }else{
                 $res = json_decode($res,true);

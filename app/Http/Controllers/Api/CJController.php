@@ -72,8 +72,8 @@ class CJController extends PayBaseController implements Pay
             }
             $mercId = $payEnv['CJ']['merchant_id'];
             // $notifyUrl = env('APP_URL') . $payEnv['CJ']['notify_url'];
-            $notifyUrl = 'https://qa.saoltv.com' . $payEnv['CJ']['notify_url'];
-            // $notifyUrl = 'http://api.saolv200.com' . $payEnv['CJ']['notify_url'];
+            // $notifyUrl = 'https://qa.saoltv.com' . $payEnv['CJ']['notify_url'];
+            $notifyUrl = 'http://api.saolv200.com' . $payEnv['CJ']['notify_url'];
             /*if ('zfbwap' == $params['type']) {
                 $params['type'] = 'zfbwap';
             }*/

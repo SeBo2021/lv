@@ -61,8 +61,8 @@ class DBSController extends PayBaseController implements Pay
             }
             $mercId = $payEnv['DBS']['merchant_id'];
             // $notifyUrl = env('APP_URL') . $payEnv['DBS']['notify_url'];
-            $notifyUrl = 'https://qa.saoltv.com' . $payEnv['DBS']['notify_url'];
-            // $notifyUrl = 'http://api.saolv200.com' . $payEnv['DBS']['notify_url'];
+            // $notifyUrl = 'https://qa.saoltv.com' . $payEnv['DBS']['notify_url'];
+            $notifyUrl = 'http://api.saolv200.com' . $payEnv['DBS']['notify_url'];
             $input = [
                 'mercId' => $mercId,
                 'tradeNo' => strval($payInfo->number),
