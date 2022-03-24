@@ -241,7 +241,7 @@ class ProcessBbs implements ShouldQueue
             mkdir($dirname, 0755, true);
         }
 
-        $m3u8_path = $tmp_path.'/'.$pathInfo['filename'].'.m3u8';
+        $m3u8_path = '/storage'.env('SLICE_DIR','/slice').'/hls/'.$pathInfo['filename'].'/'.$pathInfo['filename'].'.m3u8';
 
         $format = new \FFMpeg\Format\Video\X264();
         //增加commads的参数,使用ffmpeg -hwaccels命令查看支持的硬件加速选项
