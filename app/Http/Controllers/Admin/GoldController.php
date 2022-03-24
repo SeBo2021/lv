@@ -175,6 +175,12 @@ class GoldController extends BaseCurlController
     public function setListOutputItemExtend($item)
     {
         $item->status = UiService::switchTpl('status', $item,'');
+        $rechargeData = RechargeChannel::query()
+            ->where('status',1)
+            ->pluck('remark','id')
+            ->toArray();
+        $item->wx_action_name = $rechargeData[$item->wx_action_id??1];
+        $item->zfb_action_name = $rechargeData[$item->zfb_action_id??1];
         return $item;
     }
 
