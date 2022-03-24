@@ -29,7 +29,7 @@ trait BbsTrait
             if (!$re['video_picture']) {
                 $list[$k]['video_picture'] = [];
             } else {
-                $list[$k]['video_picture']  = [env('RESOURCE_DOMAIN') . (json_decode($re['video_picture'],true)[0]??'')];
+                $list[$k]['video_picture']  = [$domainSync . (json_decode($re['video_picture'],true)[0]??'')];
             }
             if ($this->redis()->get("comm_like_{$uid}_{$re['id']}") == 1) {
                 $list[$k]['is_love'] = 1;
@@ -46,14 +46,14 @@ trait BbsTrait
             $thumbsRaw = json_decode($re['thumbs'],true);
             $thumbs = [];
             foreach ($thumbsRaw as $itemP) {
-                $thumbs[] = VideoTrait::getDomain($re['sync']??2) .$this->transferImgOut($itemP,$domainSync,$_v,'auto');
+                $thumbs[] =$this->transferImgOut($itemP,$domainSync,$_v,'auto');
             }
             $list[$k]['thumbs']  = $thumbs;
 
             $videoRaw  = json_decode($re['video'],true);
             $video = [];
             foreach ($videoRaw as $itemV) {
-                $video[] = VideoTrait::getDomain($re['sync']??2) .$itemV;
+                $video[] = $this->transferHlsUrl($itemV);
             }
             $list[$k]['video']  = $video;
         }
