@@ -52,7 +52,7 @@ class RepairStatisticInstallUsersData extends Command
                 ->where('device_system',$item->device_system)
                 ->where('at_time',$at_time)
                 ->update(['install'=>$item->users]);
-                if($item->channel_id = 0){
+                if($item->channel_id == 0){
                     $insertData = [
                         'channel_id'=>$item->channel_id,
                         'device_system'=>2,
