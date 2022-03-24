@@ -56,9 +56,9 @@ class RepairStatisticInstallUsersData extends Command
                     $insertData = [
                         'channel_id'=>$item->channel_id,
                         'device_system'=>2,
-                        'access'=>$item->install * 2,
-                        'hits'=>$item->install,
-                        'install'=>$item->install,
+                        'access'=>$item->users * 2,
+                        'hits'=>$item->users,
+                        'install'=>$item->users,
                         'at_time'=>$at_time,
                     ];
                     DB::table('statistic_day')->insert($insertData);
