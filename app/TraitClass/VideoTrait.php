@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use ProtoneMedia\LaravelFFMpeg\Exporters\HLSExporter;
 
 trait VideoTrait
@@ -284,15 +285,29 @@ trait VideoTrait
     {
         $play_file_name = pathinfo($pathName,PATHINFO_FILENAME);
         $sliceDir = env('SLICE_DIR','/slice');
-        $url = match ($type) {
+        $path = match ($type) {
             "dash" => '/storage' . $sliceDir . '/' . $type . '/' . $play_file_name . '/' . $play_file_name . '.mpd',
-            "hls" => '/storage' . $sliceDir . '/' . $type . '/' . $play_file_name . '/' . $play_file_name . '.m3u8',
+            "hls" => '/storage' . $sliceDir . '/' . $type . '/' . $play_file_name . '/' . $play_file_name . '_0_1000.m3u8',
             "cover" => '/storage' . $sliceDir . '/coverImg/' . $play_file_name . '/' . $play_file_name . '.jpg',
         };
+         
         if($sync!==null){
-            $url = self::getDomain($sync).$url;
+            $url = self::getDomain($sync).$path;
+            $url .= '?sign='. (self::getSignForVideo($path));
         }
         return $url;
+    }
+
+    //视频鉴权签名
+    public static function getSignForVideo($path)
+    {
+        $authKey = 'q93We8y8VOlBAakUA48eqOPlK';
+        $signStr = '';
+        $timestamp = time();
+        $randStr = Str::random(16);
+        $md5Str=md5($path.'-'.$timestamp.'-'.$randStr.'-0-'.$authKey);
+        $signStr = $timestamp.'-'.$randStr.'-0-'.$md5Str;
+        return $signStr;
     }
 
     public function getSearchCheckboxResult($items,$inputData,$field)
