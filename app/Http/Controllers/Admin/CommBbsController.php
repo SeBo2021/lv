@@ -272,7 +272,7 @@ class CommBbsController extends BaseCurlController
                 'field' => 'video',
                 'type' => 'movie',
                 'name' => '视频',
-                'sync' =>  $show ? $show->sync : 0,
+                'sync' => $show ? $show->sync : 0,
                 'url' => $show ? $show->url : '',
 //                 'value' => $show ? \App\Jobs\VideoSlice::getOrigin($show->sync,$show->url) :''
                 'value' => $show ? $show->url :''
