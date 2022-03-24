@@ -89,6 +89,13 @@ class CommBbsController extends BaseCurlController
                 'align' => 'center'
             ],
             [
+                'field' => 'video',
+                'minWidth' => 150,
+                'title' => '视频',
+                'hide' => true,
+                'align' => 'center'
+            ],
+            [
                 'field' => 'video_picture',
                 'minWidth' => 150,
                 'title' => '封面图片',
