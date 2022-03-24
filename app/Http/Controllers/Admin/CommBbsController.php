@@ -329,9 +329,11 @@ class CommBbsController extends BaseCurlController
         } else {
             $fixPic = [];
             $raw = json_decode($thumbs,true);
-            $domain = $this->getDomain(env('SFTP_SYNC',1));
+            //$domain = $this->getDomain(env('SFTP_SYNC',1));
             foreach ($raw as $item) {
-                $fixPic[] = $domain.$item['path']??$item;
+               /*  $path = $item['path']??$item;
+                $fixPic[] = $domain.str_replace($this->getDomain(env('SFTP_SYNC',1)),'',$path); */
+                $fixPic[] = $item['path']??$item;
             }
             $model->thumbs = json_encode($fixPic);
         }

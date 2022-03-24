@@ -58,7 +58,9 @@ class ProcessBbs implements ShouldQueue
         // 初始化数据
         $this->originName = $this->getOriginNameByJson();
         $this->mp4Path = $this->getLocalMp4ByJson();
+        Log::info('==test03==',[$this->mp4Path]);
         $this->thumbsImage = $this->getThumbsByJson();
+        Log::info('==test04==',[$this->thumbsImage]);
     }
 
     /**
@@ -68,7 +70,7 @@ class ProcessBbs implements ShouldQueue
     private function getOriginNameByJson(): mixed
     {
         $raw = json_decode($this->row->video, true);
-        return $raw[0] ?? '';
+        return !empty($raw) ? $raw[0] : '';
     }
 
     /**
@@ -87,11 +89,11 @@ class ProcessBbs implements ShouldQueue
     private function getLocalMp4ByJson(): string
     {
         $raw = json_decode($this->row->video, true);
-        if ($raw[0] ?? false) {
+        /* if ($raw[0] ?? false) {
             $resource = Util::getResource($raw[0]);
             return $resource->path;
-        }
-        return '';
+        } */
+        return !empty($raw) ? Util::getResource($raw[0])->path : '';
     }
 
     /**
@@ -117,7 +119,6 @@ class ProcessBbs implements ShouldQueue
             DB::table('community_bbs')->where('id',$this->row->id)->update([
                 'video' => json_encode([$hlsPath]),
                 'sync' => env('SFTP_SYNC',1),
-                'video_picture' => json_encode([$videoName]),
             ]);
             $this->comSyncSlice($videoName,true);
             // 上传视频
@@ -161,9 +162,14 @@ class ProcessBbs implements ShouldQueue
             }
             $content = @file_get_contents($file);
             $upload = Storage::disk('sftp')->put($pic, $content);
-            if ($upload) {
+            //加密
+            $fileInfo = pathinfo($pic);
+            $encryptFile = str_replace('/storage','/public',$fileInfo['dirname']).'/'.$fileInfo['filename'].'.htm';
+            $r = Storage::disk('sftp')->put($encryptFile,$content);
+            Log::info('==TestCommBbsEn=',[$r]);
+            /* if ($upload) {
                 Storage::delete($pic);
-            }
+            } */
         }
     }
 
