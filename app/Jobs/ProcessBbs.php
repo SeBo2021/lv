@@ -230,10 +230,13 @@ class ProcessBbs implements ShouldQueue
     public function comHlsSlice($relativeStorageFilePath, $mp4_path, $delMp4=false): string
     {
         //创建对应的切片目录
-        $pathInfo = pathinfo($relativeStorageFilePath);
+        /* $pathInfo = pathinfo($relativeStorageFilePath);
         $tmp_path = $this->getLocalSliceDir($pathInfo);
+        $dirname = storage_path('app/').$tmp_path; */
+        //创建对应的切片目录
+        $pathInfo = pathinfo($relativeStorageFilePath);
+        $tmp_path = 'public'.env('SLICE_DIR','/slice').'/hls/'.$pathInfo['filename'].'/';
         $dirname = storage_path('app/').$tmp_path;
-
         if(!is_dir($dirname)){
             mkdir($dirname, 0755, true);
         }
