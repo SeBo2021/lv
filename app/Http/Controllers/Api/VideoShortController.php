@@ -165,12 +165,11 @@ class VideoShortController extends Controller
             //是否收藏
             $one['is_collect'] = intval($viewRecord['is_collect']) ?? 0;
             $one['url'] = $resourceDomain  .$one['url'];
-            $one['hls_url'] = $resourceDomain  .$one['hls_url'];
             $one['dash_url'] = $resourceDomain  .$one['dash_url'];
             //$one['cover_img'] = $resourceDomain . $one['cover_img'];
             $one['cover_img'] = $this->transferImgOut($one['cover_img'],$resourceDomain,$_v);
             //hls处理
-            $one['hls_url'] = $this->transferHlsUrl($one['hls_url'],$one['id'],$_v);
+            $one['hls_url'] = $resourceDomain .$this->transferHlsUrl($one['hls_url'],$one['id'],$_v);
             $data[] = $one;
         }
 

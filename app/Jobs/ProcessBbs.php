@@ -230,15 +230,18 @@ class ProcessBbs implements ShouldQueue
     public function comHlsSlice($relativeStorageFilePath, $mp4_path, $delMp4=false): string
     {
         //创建对应的切片目录
-        $pathInfo = pathinfo($relativeStorageFilePath);
+        /* $pathInfo = pathinfo($relativeStorageFilePath);
         $tmp_path = $this->getLocalSliceDir($pathInfo);
+        $dirname = storage_path('app/').$tmp_path; */
+        //创建对应的切片目录
+        $pathInfo = pathinfo($relativeStorageFilePath);
+        $tmp_path = 'public'.env('SLICE_DIR','/slice').'/hls/'.$pathInfo['filename'].'/';
         $dirname = storage_path('app/').$tmp_path;
-
         if(!is_dir($dirname)){
             mkdir($dirname, 0755, true);
         }
 
-        $m3u8_path = $tmp_path.'/'.$pathInfo['filename'].'.m3u8';
+        $m3u8_path = '/storage'.env('SLICE_DIR','/slice').'/hls/'.$pathInfo['filename'].'/'.$pathInfo['filename'].'.m3u8';
 
         $format = new \FFMpeg\Format\Video\X264();
         //增加commads的参数,使用ffmpeg -hwaccels命令查看支持的硬件加速选项
