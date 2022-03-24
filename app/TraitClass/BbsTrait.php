@@ -53,7 +53,7 @@ trait BbsTrait
             $videoRaw  = json_decode($re['video'],true);
             $video = [];
             foreach ($videoRaw as $itemV) {
-                $video[] = $this->transferHlsUrl($itemV);
+                $video[] = $domainSync.$this->transferHlsUrl($itemV);
             }
             $list[$k]['video']  = $video;
         }
