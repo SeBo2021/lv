@@ -290,7 +290,7 @@ trait VideoTrait
             "hls" => '/storage' . $sliceDir . '/' . $type . '/' . $play_file_name . '/' . $play_file_name . '_0_1000.m3u8',
             "cover" => '/storage' . $sliceDir . '/coverImg/' . $play_file_name . '/' . $play_file_name . '.jpg',
         };
-         
+        $url = $path; 
         if($sync!==null){
             $url = self::getDomain($sync).$path;
             $url .= '?sign='. (self::getSignForVideo($path));
