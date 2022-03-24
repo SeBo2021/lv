@@ -53,6 +53,10 @@ class RepairStatisticInstallUsersData extends Command
                 ->where('at_time',$at_time)
                 ->update(['install'=>$item->users]);
         }
+
+        $channelIds = DB::table('channels')->pluck('id');
+        DB::table('statistic_day')->whereNotIn('channel_id',$channelIds)->delete();
+    
         if($paramDay){
             $this->info('######同步前第'.$paramDay.'天用户安装量数据执行成功######');
         }else{
