@@ -48,10 +48,14 @@ class RepairStatisticInstallUsersData extends Command
             ->get();
         foreach ($usersByYesterday as $item){
             DB::table('statistic_day')
-                ->where('channel_id',$item->channel_id)
-                ->where('device_system',$item->device_system)
-                ->where('at_time',$at_time)
-                ->update(['install'=>$item->users]);
+                // ->where('channel_id',$item->channel_id)
+                // ->where('device_system',$item->device_system)
+                // ->where('at_time',$at_time)
+                ->updateOrInsert([
+                    'channel_id' =>  $item->channel_id,
+                    'device_system' =>  $item->device_system,
+                    'at_time' =>  $at_time,
+                ],['install'=>$item->install]);
         }
 
         if($paramDay){
