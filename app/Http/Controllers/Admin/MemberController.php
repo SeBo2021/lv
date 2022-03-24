@@ -177,6 +177,12 @@ class MemberController extends BaseCurlController
                 'align' => 'center',
             ],
             [
+                'field' => 'app_info',
+                'minWidth' => 100,
+                'title' => '应用信息',
+                'align' => 'center',
+            ],
+            [
                 'field' => 'created_at',
                 'minWidth' => 170,
                 'title' => '创建时间',

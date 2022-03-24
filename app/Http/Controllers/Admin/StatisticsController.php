@@ -26,8 +26,8 @@ class StatisticsController extends BaseCurlController
         $channelId = $request->input('channel_id');
         $deviceSystem = $request->input('deviceSystem',0);
         //时间范围
-        $startDate = date('Y-m-d');
-        $endDate = date('Y-m-d',strtotime('-30 day'));
+        $startDate= date('Y-m-d',strtotime('-30 day')).' 00:00:00';
+        $endDate = date('Y-m-d').' 23:59:59';
         $timeRange = $request->input('range_date', 0);
         if($timeRange > 0){
             $timeRangeArr = explode('~',$timeRange);
@@ -51,11 +51,9 @@ class StatisticsController extends BaseCurlController
                     $queryBuild = $queryBuild->where('device_system',$deviceSystem);
                 }
 
-                if($timeRange != 0){
-                    $queryBuild = $queryBuild
+                $queryBuild = $queryBuild
                         ->where('at_time','>=',strtotime($startDate))
                         ->where('at_time','<=',strtotime($endDate));
-                }
 
                 $totalData = $queryBuild->orderByDesc('at_time')->limit(30)->get()[0];
 
@@ -89,11 +87,9 @@ class StatisticsController extends BaseCurlController
                 if( $deviceSystem>0 ){
                     $queryBuild = $queryBuild->where('device_system',$deviceSystem);
                 }
-                if($timeRange != 0){
-                    $queryBuild = $queryBuild
+                 $queryBuild = $queryBuild
                         ->where('at_time','>=',strtotime($startDate))
                         ->where('at_time','<=',strtotime($endDate));
-                }
                 $totalData = $queryBuild->groupBy('at_time')->orderByDesc('at_time')->limit(15)->get();
                 $totalData = array_reverse($totalData->toArray());
                 foreach ($totalData as $item){
@@ -119,12 +115,11 @@ class StatisticsController extends BaseCurlController
                 if( $deviceSystem>0 ){
                     $queryBuild = $queryBuild->where('device_system',$deviceSystem);
                 }
-                if($timeRange != 0){
+                // if($timeRange != 0){
                     $queryBuild = $queryBuild
-                    // ->whereBetween('at_time',[$startDate,$endDate]);
                         ->where('at_time','>=',strtotime($startDate))
                         ->where('at_time','<=',strtotime($endDate));
-                }
+                // }
                 $activeUsers = $queryBuild->groupBy(['at_time'])->orderByDesc('at_time')->take(15)->get();
                 $activeUsers = array_reverse($activeUsers->toArray());
                 foreach ($activeUsers as $activeUser){
@@ -142,9 +137,9 @@ class StatisticsController extends BaseCurlController
                 if( $deviceSystem>0 ){
                     $queryBuild = $queryBuild->where('device_system',$deviceSystem);
                 }
-                if($timeRange != 0){
+                // if($timeRange != 0){
                     $queryBuild = $queryBuild->whereBetween('recharge.created_at',[$startDate,$endDate]);
-                }
+                // }
                 $items = $queryBuild->groupBy('days')->orderByDesc('days')->limit(15)->get();
                 $items = array_reverse($items->toArray());
                 $X = [];
@@ -168,11 +163,11 @@ class StatisticsController extends BaseCurlController
                     $queryBuild = $queryBuild->where('device_system',$deviceSystem);
                 }
 
-                if($timeRange != 0){
+                // if($timeRange != 0){
                     $queryBuild = $queryBuild
                         ->where('at_time','>=',strtotime($startDate))
                         ->where('at_time','<=',strtotime($endDate));
-                }
+                // }
 
                 $json = $queryBuild->groupBy('device_system')->get();
     

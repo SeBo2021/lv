@@ -27,13 +27,14 @@ trait AboutEncryptTrait
 
     public function transferHlsUrl($url,$id=null,$_v=null): string
     {
-        // $_v = $_v ?? 1;
-        // $hlsInfo = pathinfo($url);
-        // if(!isset($hlsInfo['dirname'])){
-        //     return '';
-        // }
+        $_v = $_v ?? 1;
+        $hlsInfo = pathinfo($url);
+        if(!isset($hlsInfo['dirname'])){
+            return '';
+        }
         // return $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'.vid?id='.$id.'&_v='.$_v;
-        return $url;
+        return $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'._0_1000.m3u8';
+        // return $url;
     }
 
     /**

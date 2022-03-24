@@ -60,7 +60,7 @@
                             <span class="layui-item-text">选择日期</span>
                         </div>
                         <div class="layui-input-block">
-                            <input class="layui-input" type="text" id="range_date" >
+                            <input placeholder="选择日期(默认一月内)" class="layui-input" type="text" id="range_date" >
                         </div>
                     </div>
 
