@@ -26,8 +26,8 @@ class StatisticsController extends BaseCurlController
         $channelId = $request->input('channel_id');
         $deviceSystem = $request->input('deviceSystem',0);
         //时间范围
-        $startDate= date('Y-m-d',strtotime('-30 day')).' 23:59:59';
-        $endDate = date('Y-m-d').' 00:00:00';
+        $startDate= date('Y-m-d',strtotime('-30 day')).' 00:00:00';
+        $endDate = date('Y-m-d').' 23:59:59';
         $timeRange = $request->input('range_date', 0);
         if($timeRange > 0){
             $timeRangeArr = explode('~',$timeRange);
