@@ -272,7 +272,7 @@ class CommBbsController extends BaseCurlController
                 'field' => 'video',
                 'type' => 'movie',
                 'name' => '视频',
-                'sync' =>  $show ? $show->sync : 0,
+                'sync' => $show ? $show->sync : 0,
                 'url' => $show ? $show->url : '',
 //                 'value' => $show ? \App\Jobs\VideoSlice::getOrigin($show->sync,$show->url) :''
                 'value' => $show ? $show->url :''
@@ -317,7 +317,6 @@ class CommBbsController extends BaseCurlController
     public function setListOutputItemExtend($item)
     {
         $item->category_name = $item->category['name'] ?? '';
-        $item->url = $this->getDomain($item->sync).json_decode($item->video,true)[0] ?? '';
         $item->status = UiService::switchTpl('status', $item,0,"是|否");
         return $item;
     }

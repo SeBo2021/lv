@@ -290,7 +290,7 @@ trait VideoTrait
             "hls" => '/storage' . $sliceDir . '/' . $type . '/' . $play_file_name . '/' . $play_file_name . '_0_1000.m3u8',
             "cover" => '/storage' . $sliceDir . '/coverImg/' . $play_file_name . '/' . $play_file_name . '.jpg',
         };
-         
+        $url = $path; 
         if($sync!==null){
             $url = self::getDomain($sync).$path;
             $url .= '?sign='. (self::getSignForVideo($path));
@@ -435,7 +435,7 @@ trait VideoTrait
             if(isset($list['hls_url'])){
                 $list['hls_url'] = $domainSync . $this->transferHlsUrl($list['hls_url']);
             }
-            $list['preview_hls_url'] = $domainSync . $this->transferHlsUrl($list['preview_hls_url']);
+            $list['preview_hls_url'] = $domainSync . $list['preview_hls_url'];
             /*$previewHlsInfo = pathinfo($list['preview_hls_url']);
             $list['preview_hls_url'] = $previewHlsInfo['dirname'].'/'.$previewHlsInfo['filename'].'.vid?id='.$list['id'].'&_v='.$_v;*/
             //是否点赞

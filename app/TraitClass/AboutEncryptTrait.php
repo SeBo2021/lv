@@ -32,6 +32,9 @@ trait AboutEncryptTrait
         if(!isset($hlsInfo['dirname'])){
             return '';
         }
+        if($hlsInfo['filename']=='preview'){
+            return $url;
+        }
         // return $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'.vid?id='.$id.'&_v='.$_v;
         return $hlsInfo['dirname'].'/'.$hlsInfo['filename'].'._0_1000.m3u8';
         // return $url;
