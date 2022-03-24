@@ -339,6 +339,7 @@ class CommBbsController extends BaseCurlController
         if(!$videoPicture){
             $model->video_picture = '[]';
         }
+        
     }
 
     protected function afterSaveSuccessEvent($model, $id = '')
