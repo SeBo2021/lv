@@ -123,31 +123,33 @@ class VideoShortController extends Controller
 //            $model = $model->where('id','>=',$startId);
             $model = $model->where('id','<=',$startId);
         }
-        if($newIds){
-            $cacheIds = explode(',',$newIds);
-            $start = $perPage*($page-1);
-            $ids = array_slice($cacheIds,$start,$perPage);
-            foreach ($ids as $id) {
-                $mapNum = $id % 300;
-                $cacheKey = "short_video_$mapNum";
-                $raw = $this->redis()->hGet($cacheKey, $id);
-                if ($raw) {
-                    $items[] = json_decode($raw,true);
-                }
-            }
-            $more = false;
-            if (count($ids) == $perPage) {
-                $more = true;
-            }
-        } else {
-            if(!empty($words)){
-                $model = VideoShort::search($words)->where('status', 1);
-                $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
-            }else{
-                $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
-            }
+        if(!empty($words)){
+            $model = VideoShort::search($words)->where('status', 1);
+            $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
             $items = $paginator->items();
             $more = $paginator->hasMorePages();
+        }else {
+            if ($newIds) {
+                $cacheIds = explode(',', $newIds);
+                $start = $perPage * ($page - 1);
+                $ids = array_slice($cacheIds, $start, $perPage);
+                foreach ($ids as $id) {
+                    $mapNum = $id % 300;
+                    $cacheKey = "short_video_$mapNum";
+                    $raw = $this->redis()->hGet($cacheKey, $id);
+                    if ($raw) {
+                        $items[] = json_decode($raw, true);
+                    }
+                }
+                $more = false;
+                if (count($ids) == $perPage) {
+                    $more = true;
+                }
+            } else {
+                $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
+                $items = $paginator->items();
+                $more = $paginator->hasMorePages();
+            }
         }
 
         $data = [];
