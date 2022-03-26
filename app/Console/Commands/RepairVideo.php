@@ -15,7 +15,7 @@ class RepairVideo extends Command
      *
      * @var string
      */
-    protected $signature = 'repair:video';
+    protected $signature = 'repair:video {tableName?}';
 
     /**
      * The console command description.
@@ -41,7 +41,8 @@ class RepairVideo extends Command
      */
     public function handle(): int
     {
-        $Items = DB::table('video')->get(['id','hls_url']);
+        $paramTableName = $this->argument('tableName')??'video';
+        $Items = DB::table($paramTableName)->get(['id','hls_url']);
         $bar = $this->output->createProgressBar(count($Items));
 
         $bar->start();
