@@ -83,7 +83,7 @@ class VideoController extends Controller
                     $this->saveStatisticByDay('active_view_users',$user->channel_id,$user->device_system);
                 }
                 //
-                DB::table('users')->where('id',$user->id)->decrement('long_vedio_times'); //当日观看次数减一
+                DB::table('users')->where('id',$user->id)->where('long_vedio_times','>',0)->decrement('long_vedio_times'); //当日观看次数减一
             }
             ProcessViewVideo::dispatchAfterResponse($user, $one);
             /*$job = new ProcessViewVideo($user, $one);
@@ -93,7 +93,7 @@ class VideoController extends Controller
             if ($one['restricted'] != 0) {
                 //是否有观看次数
                 $one['restricted'] += 0;
-                if ($viewLongVideoTimes <= 0 || $one['restricted']!=1) {
+                if (($viewLongVideoTimes <= 0) || ($one['restricted']!=1)) {
                     /*if ($user->phone_number > 0) {*/
                     // unset($one['preview_hls_url'], $one['preview_dash_url']);
                     $one = $this->vipOrGold($one, $user);
