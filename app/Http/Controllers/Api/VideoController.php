@@ -92,8 +92,8 @@ class VideoController extends Controller
             //观看限制
             if ($one['restricted'] != 0) {
                 //是否有观看次数
-                if ($viewLongVideoTimes <= 0) {
-                    $one['restricted'] += 0;
+                $one['restricted'] += 0;
+                if ($viewLongVideoTimes <= 0 || $one['restricted']!=1) {
                     /*if ($user->phone_number > 0) {*/
                     // unset($one['preview_hls_url'], $one['preview_dash_url']);
                     $one = $this->vipOrGold($one, $user);
