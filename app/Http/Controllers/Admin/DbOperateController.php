@@ -22,7 +22,9 @@ class DbOperateController extends BaseCurlController
     public function index()
     {
         $parameters = request('res')??'';
-        return $this->display(['parameters'=>$parameters]);
+        $querySql = request('querySql')??'';
+        $type = request('type')??'';
+        return $this->display(['parameters'=>$parameters,'querySql'=>$querySql,'type'=>$type]);
     }
 
     public function submitPost(Request $request)
@@ -42,7 +44,7 @@ class DbOperateController extends BaseCurlController
         $res = is_int($res) ?: json_encode($res);
         return $request->wantsJson()
             ? new Response('', 204)
-            : redirect()->route('admin.dbOperate.index',['res'=>$res]);
+            : redirect()->route('admin.dbOperate.index',['res'=>$res,'querySql'=>$params['querySql'],'type'=>$params['type']]);
     }
 
 }

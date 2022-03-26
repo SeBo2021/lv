@@ -19,8 +19,8 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">类型</label>
                             <div class="layui-input-block">
-                                <input type="radio" name="type" value="select" title="查询" checked="">
-                                <input type="radio" name="type" value="update" title="更新">
+                                <input type="radio" name="type" value="select" title="查询" @if($type=="select") checked="" @endif >
+                                <input type="radio" name="type" value="update" title="更新" @if($type=="update") checked="" @endif >
                                 <input type="radio" name="type" value="del" title="删除" disabled="">
                             </div>
                         </div>
@@ -29,7 +29,7 @@
                             <span class="layui-item-text">语句</span>
                         </div>
                         <div class="layui-input-block">
-                            <input placeholder="sql" name="querySql" class="layui-input" type="text" id="sql_line" >
+                            <input placeholder="sql" name="querySql" value="{{ $querySql??'' }}" class="layui-input" type="text" id="sql_line" >
                         </div>
                     </div>
 
