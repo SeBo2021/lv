@@ -31,22 +31,16 @@ class RedisOperateController extends BaseCurlController
 
     public function submitPost(Request $request)
     {
-        /* return response()->json([
-            'code' => 200,
-            'msg' => '提交成功'
-        ]); */
         $params = $request->all(['method','parameters','type']);
         
-        
-        Redis::connection()->command('select', [$params['type']]);
         $disabledMethods = ['flushdb','flushall','config'];
-        $method = $params['method']; 
-        if(in_array(strtolower($method),$disabledMethods)){
+        if(in_array(strtolower($params['method']),$disabledMethods)){
             return redirect()->route('admin.redisOperate.index',['res'=>'禁用此命令']);
         }
+        $res = [];
         $parameters = explode(' ',$params['parameters']);
-        $res = Redis::connection()->command($method,$parameters);
-        //dump($res);exit;
+        Redis::select(intval($params['type']));
+        $res = Redis::command($params['method'],$parameters);
         $res = json_encode($res);
         return $request->wantsJson()
             ? new Response('', 204)
