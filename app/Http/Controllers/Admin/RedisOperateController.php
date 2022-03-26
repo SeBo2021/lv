@@ -39,7 +39,7 @@ class RedisOperateController extends BaseCurlController
             'select' =>  DB::connection()->select($sql),
             'update' =>  DB::connection()->update($sql)
         };
-        Redis::connection()->
+        // Redis::connection()->
         // $res = DB::connection()->delete($sql);
         $res = is_int($res) ?: json_encode($res);
         return $request->wantsJson()
