@@ -208,7 +208,7 @@ class SearchController extends Controller
                         ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
                     $paginatorArr = $paginator->toArray()['data'];
                     //$paginatorArr = $paginator->items();
-                    Log::info('==Recommend===',$paginatorArr);
+                    //Log::info('==Recommend===',$paginatorArr);
                     if(!empty($paginatorArr)){
                         $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
                         //广告
