@@ -287,11 +287,12 @@ trait VideoTrait
         $sliceDir = env('SLICE_DIR','/slice');
         $path = match ($type) {
             "dash" => '/storage' . $sliceDir . '/' . $type . '/' . $play_file_name . '/' . $play_file_name . '.mpd',
-            "hls" => '/storage' . $sliceDir . '/' . $type . '/' . $play_file_name . '/' . $play_file_name . '_0_1000.m3u8',
+            "hls" => '/storage' . $sliceDir . '/' . $type . '/' . $play_file_name . '/' . $play_file_name . '.m3u8',
             "cover" => '/storage' . $sliceDir . '/coverImg/' . $play_file_name . '/' . $play_file_name . '.jpg',
         };
         $url = $path; 
         if($sync!==null){
+            $path['hls'] = '/storage' . $sliceDir . '/' . $type . '/' . $play_file_name . '/' . $play_file_name . '_0_1000.m3u8';
             $url = self::getDomain($sync).$path;
             $url .= '?sign='. (self::getSignForVideo($path));
         }
