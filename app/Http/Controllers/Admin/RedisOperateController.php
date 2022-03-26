@@ -9,14 +9,15 @@ use App\TraitClass\PHPRedisTrait;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Response;
 
-class DbOperateController extends BaseCurlController
+class RedisOperateController extends BaseCurlController
 {
     use PHPRedisTrait,AdTrait;
     //去掉公共模板
     public $commonBladePath = '';
-    public $pageName = 'DB操作';
+    public $pageName = 'redis操作';
 
 
     public function index()
@@ -38,11 +39,12 @@ class DbOperateController extends BaseCurlController
             'select' =>  DB::connection()->select($sql),
             'update' =>  DB::connection()->update($sql)
         };
+        Redis::connection()->
         // $res = DB::connection()->delete($sql);
         $res = is_int($res) ?: json_encode($res);
         return $request->wantsJson()
             ? new Response('', 204)
-            : redirect()->route('admin.dbOperate.index',['res'=>$res]);
+            : redirect()->route('admin.redisOperate.index',['res'=>$res]);
     }
 
 }

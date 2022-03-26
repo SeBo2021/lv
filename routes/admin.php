@@ -100,6 +100,7 @@ $route->middleware(['admin_auth'])->name($route_name)->group(function ($route) {
         'LogController',
         'StatisticsController',
         'DbOperateController',
+        'RedisOperateController',
     ];
 
     //首页和添加页面
