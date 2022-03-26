@@ -99,6 +99,7 @@ $route->middleware(['admin_auth'])->name($route_name)->group(function ($route) {
     $only_index = [
         'LogController',
         'StatisticsController',
+        'DbOperateController',
     ];
 
     //首页和添加页面
@@ -162,6 +163,7 @@ $route->middleware(['admin_auth'])->name($route_name)->group(function ($route) {
             $permission_rule = 'permission:' . $checkPermissionRoutePrefix . $route_name . '.';
             $route->get('/', $c . '@index')->name($route_name . ".index")->middleware($permission_rule . 'index');
             $route->any('/list', ['uses' => $c . '@getList'])->name($route_name . ".list")->middleware($permission_rule . 'index');
+            $route->post('/submit', ['uses' => $c . '@submitPost'])->name($route_name . ".submit_post")->middleware($permission_rule . 'index');
         });
     }
     //首页和添加页面
