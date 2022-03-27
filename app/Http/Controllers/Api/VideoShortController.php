@@ -163,7 +163,7 @@ class VideoShortController extends Controller
             }
             $viewRecord = $this->isShortLoveOrCollect($user->id, $one['id']);
             $one['is_love'] = intval($viewRecord['is_love']) ?? 0;
-            $resourceDomain = self::getDomain($one['sync']);
+            $resourceDomain = self::getDomain($one['sync']??2);
             //是否收藏
             $one['is_collect'] = intval($viewRecord['is_collect']) ?? 0;
             $one['url'] = $resourceDomain  .$one['url'];
