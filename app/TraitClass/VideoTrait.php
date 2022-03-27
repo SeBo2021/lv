@@ -19,7 +19,7 @@ use ProtoneMedia\LaravelFFMpeg\Exporters\HLSExporter;
 
 trait VideoTrait
 {
-    use GoldTrait,AboutEncryptTrait;
+    use GoldTrait,AboutEncryptTrait,PHPRedisTrait;
 
     public object $row;
 
@@ -213,6 +213,8 @@ trait VideoTrait
             //dump('版块中间表执行:'.count($insertArr).'条');
             foreach ($insertArr as $insertValue){
                 DB::table('cid_vid')->insertOrIgnore($insertValue);
+                //存redis
+                // $this->redis()->zAdd();
             }
             DB::commit();
         }catch (Exception $e){

@@ -6,7 +6,8 @@ trait IpTrait
 {
     public function getRealIp(): string
     {
-        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? \request()->getClientIp();
+        // $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? \request()->getClientIp();
+        $ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? ($_SERVER['HTTP_X_FORWARDED_FOR'] ?? \request()->getClientIp());
         return $this->forceToIpV4($ip);
     }
 
