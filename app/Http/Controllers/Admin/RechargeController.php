@@ -250,11 +250,18 @@ class RechargeController extends BaseCurlIndexController
                 'data' => [['id' => '0', 'name' => '全部'],['id' => '1', 'name' => '大白鲨支付'],['id' => '2', 'name' => '长江支付'],]
             ],
             [
+                'field' => 'register_at',
+                'type' => 'datetime',
+//                'attr' => 'data-range=true',
+                'attr' => 'data-range=~',//需要特殊分割
+                'name' => '会员注册时间',
+            ],
+            [
                 'field' => 'created_at',
                 'type' => 'datetime',
 //                'attr' => 'data-range=true',
                 'attr' => 'data-range=~',//需要特殊分割
-                'name' => '时间范围',
+                'name' => '创建时间',
             ],
         ];
         //赋值到ui数组里面必须是`search`的key值
@@ -274,6 +281,7 @@ class RechargeController extends BaseCurlIndexController
         $topChannelId = $this->rq->input('channel_id_tree',null);
         $queryUid = $this->rq->input('query_uid',0);
         $created_at = $this->rq->input('created_at',null);
+        $register_at = $this->rq->input('register_at',null);
         $deviceSystem = $this->rq->input('device_system',null);
         //
         $page = $this->rq->input('page', 1);
@@ -299,6 +307,12 @@ class RechargeController extends BaseCurlIndexController
                 $build->where('recharge.channel_id',$topChannelId)
                     ->orWhere('recharge.channel_pid',$topChannelId);
             });
+        }
+        if($register_at!==null){
+            $dateArr = explode('~',$register_at);
+            if(isset($dateArr[0]) && isset($dateArr[1])){
+                $build = $build->whereBetween('users.created_at', [trim($dateArr[0]),trim($dateArr[1])]);
+            }
         }
         if($created_at!==null){
             $dateArr = explode('~',$created_at);
