@@ -120,13 +120,10 @@ class HomeController extends Controller
             foreach ($data as &$item)
             {
                 //获取模块数据
-                /*$queryBuild = DB::table('cid_vid')
+                $queryBuild = DB::table('cid_vid')
                     ->join('video','cid_vid.vid','=','video.id')
                     ->where('cid_vid.cid',$item['id'])
-                    ->where('video.status',1);*/
-                $itemId = $item['id'] ?? 0;
-                $queryBuild = Video::query()->where('status',1)
-                    ->where('cat','like',"%{$itemId}%");
+                    ->where('video.status',1);
 
                 if($item['is_rand']==1){
                     $queryBuild = $queryBuild->inRandomOrder();
