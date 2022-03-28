@@ -265,6 +265,7 @@ trait PayTrait
     public static function getPayEnv(): mixed
     {
         $payEnv = cache()->get('payEnv');
+        $payEnv = null;
         if (!$payEnv) {
             $payEnv = RechargeChannel::query()
                 ->where('status',1)
