@@ -26,7 +26,7 @@ trait XDTrait
      */
     function verify($data, $md5Key, $pubKey): bool
     {
-        $sig_data = md5($md5Key . $data['fxstatus'] . $data['fxid'] . $data['fxddh'] . $data['fxfee'] . $md5Key);
+        $sig_data = md5($data['fxstatus'] . $data['fxid'] . $data['fxddh'] . $data['fxfee'] . $md5Key);
         if ($sig_data == $pubKey) {
             return true;
         }

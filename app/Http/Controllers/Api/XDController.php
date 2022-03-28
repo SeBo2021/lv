@@ -130,7 +130,6 @@ class XDController extends PayBaseController implements Pay
         try {
             $payEnv = self::getPayEnv();
             $secret = $payEnv['XD']['secret'];
-            $postResp['appId'] = $payEnv['XD']['merchant_id'];
             $signPass = $this->verify($postResp, $secret, $postResp['fxsign']);
             if (!$signPass) {
                 // 签名验证不通过
