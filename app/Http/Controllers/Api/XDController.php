@@ -135,7 +135,7 @@ class XDController extends PayBaseController implements Pay
                 // 签名验证不通过
                 throw new Exception('签名验证不通过', -1);
             }
-            if ($postResp['status'] == 1) {
+            if ($postResp['fxstatus'] == 1) {
                 // 记录支付信息
                 DB::beginTransaction();
                 $this->orderUpdate($postResp['fxddh'], $postResp);
