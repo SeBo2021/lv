@@ -248,7 +248,7 @@ class RechargeController extends BaseCurlIndexController
                 'type' => 'select',
                 'name' => '支付渠道',
                 'default' => '',
-                'data' => [['id' => '0', 'name' => '全部'],['id' => '1', 'name' => '大白鲨支付'],['id' => '2', 'name' => '长江支付'],]
+                'data' => [['id' => '0', 'name' => '全部'],['id' => '1', 'name' => '大白鲨支付'],['id' => '2', 'name' => '长江支付'],['id' => '4', 'name' => 'YK支付'],['id' => '101', 'name' => '旺达支付'],]
             ],
             [
                 'field' => 'register_at',
