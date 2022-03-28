@@ -304,11 +304,13 @@ class ShortController extends BaseCurlController
             $this->redis()->set("shortVideoCateIds_{$v}",implode(',',$cateIds));
         }
 
-        //$isVideo = ($_REQUEST['callback_upload']??0);
+        $isVideo = ($_REQUEST['callback_upload']??0);
         try {
 //            $job = new ProcessShort($model,$isVideo);
-            $job = new ProcessVideoShort($model);
-            $this->dispatch($job->onQueue('high'));
+            if($isVideo){
+                $job = new ProcessVideoShort($model);
+                $this->dispatch($job->onQueue('high'));
+            }
             // app(Dispatcher::class)->dispatchNow($job);
         }catch (\Exception $e){
             Log::error($e->getMessage());
