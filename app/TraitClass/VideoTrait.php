@@ -214,7 +214,8 @@ trait VideoTrait
             foreach ($insertArr as $insertValue){
                 DB::table('cid_vid')->insertOrIgnore($insertValue);
                 //存redis
-                // $this->redis()->zAdd();
+                $catKey = 'catForVideo:'.$insertValue['cid'];
+                $this->redis()->sAdd($catKey,$insertValue['vid']);
             }
             DB::commit();
         }catch (Exception $e){
