@@ -608,7 +608,7 @@ class VideoController extends BaseCurlController
                     'data-value' => 0,
                 ]
             ];
-            $data[] = [
+            /*$data[] = [
                 'class' => 'layui-btn-danger',
                 'name' => '同步版块中间表',
                 'id' => 'btn-syncMiddleCatTable',
@@ -629,7 +629,7 @@ class VideoController extends BaseCurlController
                     'data-field' => "tid_vid",
                     'data-value' => 0,
                 ]
-            ];
+            ];*/
             $data[] = [
                 'class' => 'layui-btn-danger',
                 'name' => '同步封面',
