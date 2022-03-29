@@ -118,7 +118,6 @@ class ProcessBbs implements ShouldQueue
             //保存切片地址
             DB::table('community_bbs')->where('id',$this->row->id)->update([
                 'video' => json_encode([$hlsPath]),
-                'sync' => env('SFTP_SYNC',1),
             ]);
             $this->comSyncSlice($videoName,true);
             // 上传视频
@@ -143,7 +142,6 @@ class ProcessBbs implements ShouldQueue
         if ($result) {
             DB::table('community_bbs')->where('id', $this->row->id)->update([
                 'video_picture' => json_encode([$coverName]),
-                'sync' => env('SFTP_SYNC',1),
             ]);
         }
     }
@@ -183,7 +181,6 @@ class ProcessBbs implements ShouldQueue
         $videoName = $this->uniVideoPath . $file;
         $content = Storage::get($this->mp4Path);
         DB::table('community_bbs')->where('id', $this->row->id)->update([
-            'sync' => 1,
             'video' => json_encode([$videoName])
         ]);
         $exist = Storage::disk('sftp')->exists($videoName);

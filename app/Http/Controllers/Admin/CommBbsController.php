@@ -329,10 +329,7 @@ class CommBbsController extends BaseCurlController
         } else {
             $fixPic = [];
             $raw = json_decode($thumbs,true);
-            //$domain = $this->getDomain(env('SFTP_SYNC',1));
             foreach ($raw as $item) {
-               /*  $path = $item['path']??$item;
-                $fixPic[] = $domain.str_replace($this->getDomain(env('SFTP_SYNC',1)),'',$path); */
                 $fixPic[] = $item['path']??$item;
             }
             $model->thumbs = json_encode($fixPic);
@@ -350,7 +347,7 @@ class CommBbsController extends BaseCurlController
         if(!$videoPicture){
             $model->video_picture = '[]';
         }
-        $model->sync = env('SFTP_SYNC',1);
+        $model->sync = env('SFTP_SYNC',2);
     }
 
     protected function afterSaveSuccessEvent($model, $id = '')
