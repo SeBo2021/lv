@@ -641,7 +641,7 @@ class VideoController extends BaseCurlController
                     'data-value' => 0,
                 ]
             ];
-            $data[] = [
+            /*$data[] = [
                 'class' => 'layui-btn-danger',
                 'name' => '批量预览',
                 'id' => 'btn-preview',
@@ -651,7 +651,7 @@ class VideoController extends BaseCurlController
                     'data-field' => "preview",
                     'data-value' => 0,
                 ]
-            ];
+            ];*/
         }
         if ($this->isCanEdit()) {
             $data[] = [
@@ -676,7 +676,7 @@ class VideoController extends BaseCurlController
                     'data-value' => 0,
                 ]
             ];
-            $data[] = [
+            /*$data[] = [
                 'class' => 'layui-btn-dark',
                 'name' => '智能打标签',
                 'id' => 'btn-autoTag',
@@ -686,7 +686,7 @@ class VideoController extends BaseCurlController
                     'data-field' => "tag_match",
                     'data-value' => 0,
                 ]
-            ];
+            ];*/
 
             $data[] = [
                 'class' => 'layui-btn-dark',
@@ -777,7 +777,7 @@ class VideoController extends BaseCurlController
             return $type_r;
         } else {
             switch ($field){
-                case 'tid_vid':
+                /*case 'tid_vid':
                     ProcessSyncMiddleTagTable::dispatchAfterResponse();
                     $r=true;
                     break;
@@ -785,7 +785,7 @@ class VideoController extends BaseCurlController
                     //队列执行更新版块中间表
                     ProcessSyncMiddleSectionTable::dispatchAfterResponse();
                     $r=true;
-                    break;
+                    break;*/
                 case 'cover_img':
                     $covers = Video::query()->whereIn($id, $id_arr)->get(['id','cover_img']);
                     foreach ($covers as $cover){
@@ -813,10 +813,10 @@ class VideoController extends BaseCurlController
                     $buildQueryVideo = Video::query()->whereIn($id, $id_arr);
                     $buildQueryVideo->update(['tag'=>json_encode($value_arr)]);
                     //更新标签中间表
-                    ProcessSyncMiddleTagTable::dispatchAfterResponse();
+//                    ProcessSyncMiddleTagTable::dispatchAfterResponse();
                     $r=true;
                     break;
-                case 'tag_match':
+                /*case 'tag_match':
                     $videos = Video::query()->whereIn($id, $id_arr)->get(['id','tag','name'])->toArray();
                     $tags = $this->getTagData();
                     foreach ($videos as $video){
@@ -836,7 +836,7 @@ class VideoController extends BaseCurlController
                         }
                     }
                     $r = true;
-                    break;
+                    break;*/
                 case 'duration_seconds':
                     $videos = Video::query()->whereIn($id, $id_arr)->get(['id','duration','duration_seconds'])->toArray();
                     foreach ($videos as $video){
