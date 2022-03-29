@@ -404,6 +404,7 @@ class VideoController extends BaseCurlController
                 Log::error($e->getMessage());
             }
         }
+
         //清除缓存
         $this->redisBatchDel($this->redis()->keys('api_more_cid-page:*')); //更多页
         Cache::forget('cachedVideoById.'.$model->id);
@@ -421,7 +422,7 @@ class VideoController extends BaseCurlController
         $model->gold *= $this->goldUnit;
         //$model->sync = env('SFTP_SYNC',1);
         $model->updated_at = date('Y-m-d H:i:s');
-        if($id > 0){ //编辑
+        /*if($id > 0){ //编辑
             $originalData = $model->getOriginal();
             if($model->status != $originalData['status']){
                 $model->is_top = 0;
@@ -433,7 +434,7 @@ class VideoController extends BaseCurlController
             if($model->status==0){
                 $model->is_top = 0;
             }
-        }
+        }*/
         if(isset($model->url)){
             //$model->dash_url = self::get_slice_url($model->url);
             $model->hls_url = self::get_slice_url($model->url,'hls');
@@ -445,7 +446,7 @@ class VideoController extends BaseCurlController
             }
         }
         //自动打标签
-        if(isset($model->tagNames) && (empty($tags))){
+        /*if(isset($model->tagNames) && (empty($tags))){
             $tagLists = $this->getTagData();
             $tagArr = [];
             foreach ($tagLists as $tagList){
@@ -457,7 +458,9 @@ class VideoController extends BaseCurlController
             if(!empty($tagArr)){
                 $model->tag = json_encode($tagArr);
             }
-        }
+        }*/
+        $this->resetRedisCatVideo($cats,$model->id);
+        $this->resetRedisTagVideo($tags,$model->id);
         //清除缓存
         $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
 

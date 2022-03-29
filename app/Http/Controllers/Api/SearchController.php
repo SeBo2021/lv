@@ -142,16 +142,22 @@ class SearchController extends Controller
             $res = $redis->get($redisKey);
             if(!$res){
                 $perPage = 16;
-                /* $paginator = Video::query()->where('status',1)
-                    ->where('cat','like',"%{$cid}%")
-                    ->orderByDesc('video.updated_at')
-                    ->simplePaginate($perPage,$this->videoFields,'cat',$page); */
-                $paginator = DB::table('cid_vid')
-                    ->join('video','cid_vid.vid','=','video.id')
-                    ->where('cid_vid.cid',$cid)
-                    ->where('video.status',1)
-                    ->orderByDesc('video.updated_at')
-                    ->simplePaginate($perPage,$this->videoFields,'cat',$page);
+                $ids = $redis->sMembers('catForVideo:'.$cid);
+                if(!empty($ids)){
+                    $paginator = DB::table('video')
+                        ->where('status',1)
+                        ->whereIn('id',$ids)
+                        ->orderByDesc('updated_at')
+                        ->simplePaginate($perPage,$this->videoFields,'cat',$page);
+                }else{
+                    $paginator = DB::table('cid_vid')
+                        ->join('video','cid_vid.vid','=','video.id')
+                        ->where('cid_vid.cid',$cid)
+                        ->where('video.status',1)
+                        ->orderByDesc('video.updated_at')
+                        ->simplePaginate($perPage,$this->videoFields,'cat',$page);
+                }
+
                 //$client = ClientBuilder::create()->build();
                 $paginatorArr = $paginator->toArray()['data'];
                 if(!empty($paginatorArr)){
@@ -187,7 +193,6 @@ class SearchController extends Controller
             $vid = $params['vid'];
 //            $cat = Video::query()->where('id',$vid)->value('cat');
             $cat = $this->getVideoById($vid)->cat;
-            
 
             if(!empty($cat)){
                 /* $paginator = Video::query()->where('status',1)
@@ -198,14 +203,32 @@ class SearchController extends Controller
                 $redisJsonData = $redis->get($key);
                 if(!$redisJsonData){
                     $cidArr = $cat ? json_decode($cat,true) : [];
-                    $paginator = DB::table('cid_vid')
-                        ->join('video','cid_vid.vid','=','video.id')
-                        ->whereIn('cid_vid.cid',$cidArr)
-                        ->where('video.status',1)
-                        ->where('video.id','!=',$vid)
-                        ->distinct()
-                        ->inRandomOrder()
-                        ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
+                    $ids = [];
+                    foreach ($cidArr as $item){
+                        $ids += array_flip(($redis->sMembers('catForVideo:'.$item)??[]));
+                    }
+                    //去掉当前的;
+                    if(isset($ids[$vid])){
+                        unset($ids[$vid]);
+                    }
+                    $ids = array_keys($ids);
+                    if(!empty($ids)){
+                        $paginator = DB::table('video')
+                            ->where('status',1)
+                            ->whereIn('id',$ids)
+                            ->inRandomOrder()
+                            ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
+                    }else{
+                        $paginator = DB::table('cid_vid')
+                            ->join('video','cid_vid.vid','=','video.id')
+                            ->whereIn('cid_vid.cid',$cidArr)
+                            ->where('video.status',1)
+                            ->where('video.id','!=',$vid)
+                            ->distinct()
+                            ->inRandomOrder()
+                            ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
+                    }
+
                     $paginatorArr = $paginator->toArray()['data'];
                     //$paginatorArr = $paginator->items();
                     //Log::info('==Recommend===',$paginatorArr);

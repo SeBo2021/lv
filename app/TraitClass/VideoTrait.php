@@ -192,50 +192,95 @@ trait VideoTrait
 
     }
 
+    public function resetRedisCatVideo($cats,$vid)
+    {
+        $redis = $this->redis();
+        $catKeys = $redis->keys('catForVideo:*');
+        foreach ($catKeys as $catKey){
+            $key = str_replace('laravel_database_','',$catKey);
+            $redis->sRem($key,$vid);
+        }
+        foreach ($cats as $cat)
+        {
+            $redis->sAdd('catForVideo:'.$cat,$vid);
+        }
+    }
+
+    public function resetRedisTagVideo($tags,$vid)
+    {
+        $redis = $this->redis();
+        $tagKeys = $redis->keys('tagForVideo:*');
+        foreach ($tagKeys as $tagKey){
+            $key = str_replace('laravel_database_','',$tagKey);
+            $redis->sRem($key,$vid);
+        }
+        foreach ($tags as $tag)
+        {
+            $redis->sAdd('tagForVideo:'.$tag,$vid);
+        }
+    }
+
     public function syncMiddleSectionTable()
     {
-        DB::beginTransaction();
         try {
-            $Video = DB::table('video')->get(['id','cat']);
-            DB::table('cid_vid')->where('cid','>',0)->delete();
-            $insertArr = [];
+            $redis = $this->redis();
+            $Video = DB::table('video')->where('status',1)->get(['id','cat']);
             foreach ($Video as $item)
             {
                 $catArr = $item->cat ? @json_decode($item->cat) : [];
                 if(!empty($catArr)){
                     foreach ($catArr as $cid){
                         if($cid > 0){
-                            $insertArr[$cid.'-'.$item->id] = ['cid'=>$cid, 'vid'=>$item->id];
+//                            $insertArr[$cid.'-'.$item->id] = ['cid'=>$cid, 'vid'=>$item->id];
+                            //存redis
+                            $catKey = 'catForVideo:'.$cid;
+                            $redis->sAdd($catKey,$item->id);
                         }
                     }
                 }
             }
-            //dump('版块中间表执行:'.count($insertArr).'条');
-            foreach ($insertArr as $insertValue){
-                DB::table('cid_vid')->insertOrIgnore($insertValue);
-                //存redis
-                // $this->redis()->zAdd();
-            }
-            DB::commit();
         }catch (Exception $e){
             Log::error('syncMiddleSectionTable==='.$e->getMessage());
-            DB::rollBack();
         }
 
     }
 
     public function syncMiddleTagTable()
     {
-        DB::beginTransaction();
+//        DB::beginTransaction();
         try {
-            $this->syncMiddleTagProcess(1, 100);
+            $this->syncMiddleTagProcess();
+//            $this->syncMiddleTagProcess(1, 100);
         } catch (Exception $e) {
             Log::error('syncMiddleTagTable===' . $e->getMessage());
-            DB::rollBack();
+//            DB::rollBack();
         }
     }
 
-    private function syncMiddleTagProcess($page, $limit)
+    private function syncMiddleTagProcess()
+    {
+        $Video = DB::table('video')->where('status',1)->get(['id', 'tag']);
+//        DB::table('tid_vid')->where('tid', '>', 0)->delete();
+//        $insertArr = [];
+        foreach ($Video as $item) {
+            $tagArr = $item->tag ? @json_decode($item->tag) : [];
+            if (!empty($tagArr)) {
+                foreach ($tagArr as $tid) {
+//                    $insertArr[$tid . '-' . $item->id] = ['tid' => $tid, 'vid' => $item->id];
+                    //存redis
+                    $tagKey = 'tagForVideo:'.$tid;
+                    $this->redis()->sAdd($tagKey,$item->id);
+                }
+            }
+        }
+        //dump('标签中间表执行:'.count($insertArr).'条');
+
+        /*if (!empty($insertArr)) {
+            DB::table('tid_vid')->insertOrIgnore($insertArr);
+        }*/
+    }
+
+    /*private function syncMiddleTagProcess($page, $limit)
     {
         $Video = DB::table('video')->offset(($page - 1) * $limit)->limit($limit)->get(['id', 'tag']);
         DB::table('tid_vid')->where('tid', '>', 0)->delete();
@@ -256,7 +301,7 @@ trait VideoTrait
         if (count($insertArr) == $limit) {
             $this->syncMiddleTagProcess($page, $limit);
         }
-    }
+    }*/
 
     public static function getDomain($sync)
     {

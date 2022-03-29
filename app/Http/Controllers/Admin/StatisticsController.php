@@ -125,6 +125,7 @@ class StatisticsController extends BaseCurlController
                 foreach ($activeUsers as $activeUser){
                     $json['x'][] = date('Y-m-d',$activeUser->at_time) ?? '-';
                     $json['y'][] = $activeUser->users;
+//                    $json['y'][] = round($activeUser->users * 5.5);
                 }
                 break;
             case 'recharge':
