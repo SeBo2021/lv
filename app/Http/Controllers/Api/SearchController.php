@@ -216,6 +216,7 @@ class SearchController extends Controller
                         $paginator = DB::table('video')
                             ->where('status',1)
                             ->whereIn('id',$ids)
+                            ->where('video.id','!=',$vid)
                             ->inRandomOrder()
                             ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
                     }else{
