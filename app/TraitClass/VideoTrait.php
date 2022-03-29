@@ -497,6 +497,7 @@ trait VideoTrait
 
     public function generateRandViews($views): string
     {
+        $views *= 20;
         $length = strlen($views);
         if($length > 8){
             $str = substr_replace(floor($views * 0.0000001),'.',-1,0).'亿';
