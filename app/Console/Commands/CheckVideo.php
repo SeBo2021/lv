@@ -46,12 +46,15 @@ class CheckVideo extends Command
         $bar = $this->output->createProgressBar(count($Items));
 
         $bar->start();
+        $num = 1;
         foreach ($Items as $item)
         {
             $urlName = pathinfo($item->url);
             $hlsUrlName = pathinfo($item->hls_url);
             if($urlName['filename']!=$hlsUrlName['filename']){
                 $this->info($item->id.'-'.$item->url.'-'.$item->hls_url);
+                $this->info($num);
+                ++$num;
             }
             $bar->advance();
         }
