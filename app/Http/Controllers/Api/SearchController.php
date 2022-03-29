@@ -142,10 +142,6 @@ class SearchController extends Controller
             $res = $redis->get($redisKey);
             if(!$res){
                 $perPage = 16;
-                /* $paginator = Video::query()->where('status',1)
-                    ->where('cat','like',"%{$cid}%")
-                    ->orderByDesc('video.updated_at')
-                    ->simplePaginate($perPage,$this->videoFields,'cat',$page); */
                 $ids = $redis->sMembers('catForVideo:'.$cid);
                 if(!empty($ids)){
                     $paginator = DB::table('video')
@@ -211,12 +207,15 @@ class SearchController extends Controller
                     foreach ($cidArr as $item){
                         $ids += array_flip(($redis->sMembers('catForVideo:'.$item)??[]));
                     }
+                    //去掉当前的;
+                    if(isset($ids[$vid])){
+                        unset($ids[$vid]);
+                    }
                     $ids = array_keys($ids);
                     if(!empty($ids)){
                         $paginator = DB::table('video')
                             ->where('status',1)
                             ->whereIn('id',$ids)
-                            ->where('video.id','!=',$vid)
                             ->inRandomOrder()
                             ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
                     }else{

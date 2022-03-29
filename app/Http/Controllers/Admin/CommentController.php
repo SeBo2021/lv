@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Comment;
+use App\Services\UiService;
 
-class CommentController extends BaseCurlIndexController
+class CommentController extends BaseCurlController
 {
     public $pageName = '评论';
 
@@ -39,7 +40,6 @@ class CommentController extends BaseCurlIndexController
                 'title' => '视频ID',
                 'sort' => 1,
                 'align' => 'center',
-                'edit' => 1
             ],
             [
                 'field' => 'uid',
@@ -69,4 +69,35 @@ class CommentController extends BaseCurlIndexController
 
         return $cols;
     }
+
+    public function setOutputHandleBtnTpl($shareData)
+    {
+        $data = [];
+        /*if ($this->isCanCreate()) {
+
+            $data[] = [
+                'name' => '添加',
+                'data' => [
+                    'data-type' => "add"
+                ]
+            ];
+        }*/
+        if ($this->isCanDel()) {
+            $data[] = [
+                'class' => 'layui-btn-danger',
+                'name' => '删除',
+                'data' => [
+                    'data-type' => "allDel"
+                ]
+            ];
+        }
+        $this->uiBlade['btn'] = $data;
+    }
+
+    public function setListOutputItemExtend($item)
+    {
+        $item->handle = UiService::editDelTpl(0,1);
+        return $item;
+    }
+
 }
