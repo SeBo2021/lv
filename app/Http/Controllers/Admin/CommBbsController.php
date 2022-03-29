@@ -350,7 +350,7 @@ class CommBbsController extends BaseCurlController
         if(!$videoPicture){
             $model->video_picture = '[]';
         }
-        
+        $model->sync = env('SFTP_SYNC',1);
     }
 
     protected function afterSaveSuccessEvent($model, $id = '')
