@@ -3,13 +3,14 @@
 namespace App\Console\Commands;
 
 use App\TraitClass\PHPRedisTrait;
+use App\TraitClass\VideoTrait;
 use AWS\CRT\Log;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class CheckVideo extends Command
 {
-    use PHPRedisTrait;
+    use PHPRedisTrait,VideoTrait;
     /**
      * The name and signature of the console command.
      *
@@ -52,7 +53,10 @@ class CheckVideo extends Command
             $urlName = pathinfo($item->url);
             $hlsUrlName = pathinfo($item->hls_url);
             if($urlName['filename']!=$hlsUrlName['filename']){
-                $this->info($item->id.'-'.$item->url.'-'.$item->hls_url);
+//                $this->info($item->id.'-'.$item->url.'-'.$item->hls_url);
+                DB::table($paramTableName)->where('id',$item->id)->update([
+                    'hls_url' => $this->get_slice_url($item->url,'hls')
+                ]);
                 $this->info($num);
                 ++$num;
             }
