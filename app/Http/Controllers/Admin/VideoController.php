@@ -641,7 +641,7 @@ class VideoController extends BaseCurlController
                     'data-value' => 0,
                 ]
             ];
-            /*$data[] = [
+            $data[] = [
                 'class' => 'layui-btn-danger',
                 'name' => '批量预览',
                 'id' => 'btn-preview',
@@ -651,7 +651,7 @@ class VideoController extends BaseCurlController
                     'data-field' => "preview",
                     'data-value' => 0,
                 ]
-            ];*/
+            ];
         }
         if ($this->isCanEdit()) {
             $data[] = [
