@@ -497,7 +497,17 @@ trait VideoTrait
 
     public function generateRandViews($views): string
     {
-        return ($views*10) * round(rand(1,9)/10,1).'万';
+        $views *= 20;
+        $length = strlen($views);
+        if($length > 8){
+            $str = substr_replace(floor($views * 0.0000001),'.',-1,0).'亿';
+        }elseif($length > 4){
+            $str = floor($views * 0.001) * 0.1.'万';
+        }else{
+            return $views;
+        }
+        return $str;
+//        return ($views*10) * round(rand(1,9)/10,1).'万';
     }
 
     public function getPreviewPlayUrl($url,$type='hls'): array|string
