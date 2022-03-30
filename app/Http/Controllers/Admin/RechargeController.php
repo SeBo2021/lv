@@ -284,7 +284,7 @@ class RechargeController extends BaseCurlIndexController
     public function handleResultModel($model)
     {
         $field = ['recharge.id','recharge.amount','recharge.uid','recharge.order_id','orders.status',
-            'recharge.channel_id','recharge.device_system','recharge.created_at','users.created_at as register_at','orders.type','orders.forward','orders.vid','orders.type_id','orders.remark','recharge.pay_method'];
+            'recharge.channel_id','recharge.device_system','recharge.created_at','users.created_at as register_at','orders.type','orders.forward','orders.vid','orders.type_id','orders.remark','recharge.pay_method','recharge.channel_code'];
         $raw = implode(',',$field);
         $model = $model->select(DB::raw($raw));
 
