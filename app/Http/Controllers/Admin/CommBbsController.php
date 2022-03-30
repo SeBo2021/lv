@@ -361,8 +361,8 @@ class CommBbsController extends BaseCurlController
             Log::error($e->getMessage());
         }
         // 更新缓存
-        $this->redis()->hDel("comm_home_cache_{$model->author_id}");
-        $this->redis()->hDel("comm_other_cache_{$model->category_id}");
+        $this->redis()->del("comm_home_cache_{$model->author_id}");
+        $this->redis()->del("comm_other_cache_{$model->category_id}");
         return $model;
     }
 }
