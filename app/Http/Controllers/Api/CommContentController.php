@@ -303,19 +303,25 @@ class CommContentController extends Controller
     private function other($uid, $locationName = '', $cid1 = 0, $cid2 = 0, $perPage = 6, $page = 1): Collection|array
     {
         if ($cid2) {
-            $model = CommBbs::query()
-                ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
-                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at','community_bbs.sync', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel', 'video_picture')
-                ->where('category_id', $cid2)->where('community_bbs.status',1)->orderBy('updated_at', 'desc');
-            if ($locationName) {
-                $locationName = mb_ereg_replace('市|自治区|县', '', $locationName);
-                $model->where('users.location_name', 'like', "%{$locationName}%");
+            $raw = $this->redis()->hGet("comm_other_cache_{$cid2}", $page);
+            if ($raw) {
+                $data = json_decode($raw,true);
+            } else {
+                $model = CommBbs::query()
+                    ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
+                    ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at','community_bbs.sync', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel', 'video_picture')
+                    ->where('category_id', $cid2)->where('community_bbs.status',1)->orderBy('updated_at', 'desc');
+                if ($locationName) {
+                    $locationName = mb_ereg_replace('市|自治区|县', '', $locationName);
+                    $model->where('users.location_name', 'like', "%{$locationName}%");
+                }
+                $paginator = $model->simplePaginate($perPage, ['*'], '', $page);
+                $data['hasMorePages'] = $paginator->hasMorePages();
+                $list = $paginator->items();
+                $result = $this->proProcessData($uid, $list);
+                $data['bbs_list'] = $result;
+                $this->redis()->hSet("comm_other_cache_{$cid2}", $page,json_encode($data));
             }
-            $paginator = $model->simplePaginate($perPage, ['*'], '', $page);
-            $data['hasMorePages'] = $paginator->hasMorePages();
-            $list = $paginator->items();
-            $result = $this->proProcessData($uid, $list);
-            $data['bbs_list'] = $result;
             return $data;
         }
         if ($cid1) {
