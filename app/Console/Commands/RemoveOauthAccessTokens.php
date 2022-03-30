@@ -43,18 +43,15 @@ class RemoveOauthAccessTokens extends Command
     {
         $paramDay = $this->argument('day');
         $data_at = $paramDay!==null ? date('Y-m-d',strtotime('-'.$paramDay.' day')) : date('Y-m-d');
-
-        DB::table('oauth_access_tokens')
-            ->where('scopes','["check-user"]')
-            ->whereDate('expires_at','<',$data_at)
-            ->orderBy('id')
-            ->chunkById(100,function ($items){
-                foreach ($items as $item){
-                    DB::table('oauth_access_tokens')->where('id',$item->id)->delete();
-                }
-            });
-
-        $this->info('######执行成功######');
+        $items = DB::table('oauth_access_tokens')->where('scopes','["check-user"]')->whereDate('expires_at','<',$data_at)->get(['id']);
+        $bar = $this->output->createProgressBar(count($items));
+        $bar->start();
+        foreach ($items as $item){
+            DB::table('oauth_access_tokens')->where('id',$item->id)->delete();
+            $bar->advance();
+        }
+        $bar->finish();
+        $this->info('######执行完成######');
         return 0;
     }
 }
