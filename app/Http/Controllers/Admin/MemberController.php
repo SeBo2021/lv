@@ -189,6 +189,12 @@ class MemberController extends BaseCurlController
                 'align' => 'center'
             ],
             [
+                'field' => 'updated_at',
+                'minWidth' => 170,
+                'title' => '更新时间',
+                'align' => 'center'
+            ],
+            [
                 'field' => 'handle',
                 'minWidth' => 150,
                 'title' => '操作',
