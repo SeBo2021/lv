@@ -189,7 +189,7 @@ class OrderController extends BaseCurlController
                 'name' => '会员ID',
             ],
             [
-                'field' => 'query_status',
+                'field' => 'status',
                 'type' => 'select',
                 'name' => '状态',
                 'default' => '',
@@ -207,7 +207,7 @@ class OrderController extends BaseCurlController
                 ]
             ],
             [
-                'field' => 'query_created_at',
+                'field' => 'created_at',
                 'type' => 'datetime',
 //                'attr' => 'data-range=true',
                 'attr' => 'data-range=~',//需要特殊分割
@@ -235,17 +235,16 @@ class OrderController extends BaseCurlController
         $page = $this->rq->input('page', 1);
         $pagesize = $this->rq->input('limit', 30);
 
-        $queryUid = $this->rq->input('query_uid',0);
-        if($queryUid>0){
-            $model = $model->where('uid',$queryUid);
-        }
-
         $field = ['orders.id', 'orders.remark', 'orders.number', 'orders.forward', 'orders.type', 'orders.vid', 'orders.type_id', 'orders.channel_pid', 'orders.channel_id', 'orders.uid', 'orders.amount', 'orders.status', 'orders.created_at', 'orders.updated_at', 'orders.expired_at', 'recharge.pay_method', 'recharge.channel_code'];
         $raw = implode(',',$field);
         $model = $model->select(DB::raw($raw));
 
+        $order_by_name = $this->orderByName();
+        $order_by_type = $this->orderByType();
+        $model = $this->orderBy($model, $order_by_name, $order_by_type);
+
         $build = $model
-            ->leftJoin('recharge','recharge.order_id','=','orders.id');
+            ->leftJoin('recharge','orders.id','=','recharge.order_id');
 
         $queryPayMethod = $this->rq->input('query_pay_method',0);
         if($queryPayMethod>0){
@@ -255,8 +254,21 @@ class OrderController extends BaseCurlController
         if($queryChannelCode>0){
             $build = $build->where('recharge.channel_code',$queryChannelCode);
         }
-
-        $totalAmount = $build->sum('recharge.amount');
+        $queryUid = $this->rq->input('query_uid',0);
+        if($queryUid>0){
+            $build = $build->where('orders.uid',$queryUid);
+        }
+        $queryStatus = $this->rq->input('status','');
+        if($queryStatus != ''){
+            $build = $build->where('orders.status',$queryStatus);
+        }
+        $created_at = $this->rq->input('created_at',null);
+        if($created_at!==null){
+            $dateArr = explode('~',$created_at);
+            if(isset($dateArr[0]) && isset($dateArr[1])){
+                $build = $build->whereBetween('orders.created_at', [trim($dateArr[0]),trim($dateArr[1])]);
+            }
+        }
 
         $total = $build->count();
 
@@ -264,7 +276,6 @@ class OrderController extends BaseCurlController
         $this->listOutputJson($total, $currentPageData, 0);
         return [
             'total' => $total,
-           // 'totalRow' => ['amount'=>$totalAmount],
             'result' => $currentPageData
         ];
     }
