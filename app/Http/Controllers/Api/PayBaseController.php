@@ -64,6 +64,31 @@ class PayBaseController extends Controller
         }
     }
 
+    /**
+     * 返回支付代码
+     * @param $type
+     * @param $goodsId
+     * @param $channel
+     * @return mixed
+     */
+    protected function getOwnNumber($type, $goodsId, $channel): mixed
+    {
+        if ($type == 1) {
+            $memberCardData = $this->getMemberCardData();
+            // var_dump($memberCardData[$goodsId]);
+            if ($channel == 1) {
+                return $memberCardData[$goodsId]['zfb_channel'];
+            }
+            return $memberCardData[$goodsId]['wx_channel'];
+        } elseif ($type == 2) {
+            $goldCardData = $this->getGoldData();
+            if ($channel == 1) {
+                return $goldCardData[$goodsId]['zfb_channel'];
+            }
+            return $goldCardData[$goodsId]['wx_channel'];
+        }
+    }
+
     private function getMemberCardData() {
         $memberCardApiKey = "api_recharge_member_card";
         $cacheData = $this->redis()->get($memberCardApiKey);
