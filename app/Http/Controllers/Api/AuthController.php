@@ -176,9 +176,9 @@ class AuthController extends Controller
         /*$job = new ProcessLogin($login_log_data);
         $this->dispatch($job);*/
         //ProcessLogin::dispatch($login_log_data)->delay(now()->addMinutes());
-        /*if($loginType==2){
+        if($loginType==2){
             Token::query()->where('name',$login_info['account'])->delete();
-        }*/
+        }
         //重新分配token
         $tokenResult = $user->createToken($user->account,['check-user']);
         $token = $tokenResult->token;
