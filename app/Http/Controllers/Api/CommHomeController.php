@@ -42,32 +42,39 @@ class CommHomeController extends Controller
             return [];
         }
         $page = $params['page'] ?? 1;
-        //二级分类列表
-        $perPage = 6;
-        $paginator = CommBbs::query()
-            ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
-            ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel','video_picture')
-            ->where('community_bbs.author_id', $id)->orderBy('updated_at', 'desc')
-            ->orderBy('updated_at')
-            ->simplePaginate($perPage, ['*'], '', $page);
-        $secondCateList = $paginator->toArray();
-        $data = $secondCateList['data'];
-        $user = $request->user();
-        $uid = $user->id;
-        $result = $this->proProcessData($uid, $data, $user);
-        //加入视频列表
-        $res['hasMorePages'] = $paginator->hasMorePages();
-        $userInfo = User::query()
-            ->select('id','nickname','is_office','location_name','attention','fans','avatar','loves','sex')
-            ->find($id);
-        $uid = $request->user()->id;
-        if (CommFocus::query()->where(['user_id'=>$uid,'to_user_id'=>$userInfo->id])->exists()) {
-            $userInfo->is_focus = 1;
+        $raw = $this->redis()->hGet("comm_home_cache_{$id}", $page);
+        if ($raw) {
+            $res = json_decode($raw,true);
         } else {
-            $userInfo->is_focus = 0;
+            //二级分类列表
+            $perPage = 6;
+            $paginator = CommBbs::query()
+                ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
+                ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel','video_picture')
+                ->where('community_bbs.author_id', $id)->orderBy('updated_at', 'desc')
+                ->orderBy('updated_at')
+                ->simplePaginate($perPage, ['*'], '', $page);
+            $secondCateList = $paginator->toArray();
+            $data = $secondCateList['data'];
+            $user = $request->user();
+            $uid = $user->id;
+            $result = $this->proProcessData($uid, $data, $user);
+            //加入视频列表
+            $res['hasMorePages'] = $paginator->hasMorePages();
+            $userInfo = User::query()
+                ->select('id','nickname','is_office','location_name','attention','fans','avatar','loves','sex')
+                ->find($id);
+            $uid = $request->user()->id;
+            if (CommFocus::query()->where(['user_id'=>$uid,'to_user_id'=>$userInfo->id])->exists()) {
+                $userInfo->is_focus = 1;
+            } else {
+                $userInfo->is_focus = 0;
+            }
+            $res['user_info'] = $userInfo;
+            $res['bbs_list'] = $result;
+            $this->redis()->hSet("comm_home_cache_{$id}", $page,json_encode($res));
         }
-        $res['user_info'] = $userInfo;
-        $res['bbs_list'] = $result;
+
         return response()->json([
             'state' => 0,
             'data' => $res

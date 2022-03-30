@@ -360,6 +360,8 @@ class CommBbsController extends BaseCurlController
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }
+        // 更新缓存
+        $this->redis()->hDel("comm_home_cache_{$model->author_id}");
         return $model;
     }
 }
