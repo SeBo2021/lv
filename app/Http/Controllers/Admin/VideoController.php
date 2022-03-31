@@ -446,7 +446,7 @@ class VideoController extends BaseCurlController
             }
         }
         //自动打标签
-        /*if(isset($model->tagNames) && (empty($tags))){
+        if(isset($model->tagNames) && (empty($tags))){
             $tagLists = $this->getTagData();
             $tagArr = [];
             foreach ($tagLists as $tagList){
@@ -458,9 +458,9 @@ class VideoController extends BaseCurlController
             if(!empty($tagArr)){
                 $model->tag = json_encode($tagArr);
             }
-        }*/
+        }
         $this->resetRedisCatVideo($cats,$model->id);
-        $this->resetRedisTagVideo($tags,$model->id);
+        $this->resetRedisTagVideo($tagArr??$tags,$model->id);
         //清除缓存
         $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
 
