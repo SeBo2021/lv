@@ -110,6 +110,7 @@ class OrderController extends PayBaseController
             // 创建订单
             $order = Order::query()->create($createData);
             $payMethod = $params['pay_method']??1;
+            $payNumber = '';
             if ($params['pay_method'] == 0) {
                 $payMethod = $this->getOwnCode($params['type'],$params['goods_id'],$params['method_id']);
                 $payNumber = $this->getOwnNumber($params['type'],$params['goods_id'],$params['method_id']);
@@ -208,6 +209,7 @@ class OrderController extends PayBaseController
                     'status'=>'0',
                     ])->first()?->toArray();
             $payMethod = $params['pay_method']??1;
+            $payNumber = '';
             if ($params['pay_method'] == 0) {
                 $payMethod = $this->getOwnCode($order['type'],$order['type_id'],$params['method_id']);
                 $payNumber = $this->getOwnNumber($order['type'],$order['goods_id'],$params['method_id']);
