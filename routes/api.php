@@ -35,6 +35,7 @@ Route::group([
     Route::post('callbackCJ', 'CJController@callback');  //长江支付回调
     Route::post('callbackYK', 'YKController@callback');  //YK支付回调
     Route::post('callbackXD', 'XDController@callback');  //信达支付回调
+    Route::post('callbackAX', 'AXController@callback');  //艾希支付回调
 });
 
 Route::group([
@@ -91,6 +92,8 @@ Route::group([
     Route::post('payYK', 'YKController@pay');  //YK支付动作
     /// YK支付相关接口
     Route::post('payXD', 'XDController@pay');  //信达支付动作
+    /// 艾希支付相关接口
+    Route::post('payAX', 'AXController@pay');  //艾希支付动作
     /// 订单相关接口
     Route::post('oderCreate', 'OrderController@create');  //订单创建接口
     Route::get('orderQuery', 'OrderController@query');  //订单查询接口
