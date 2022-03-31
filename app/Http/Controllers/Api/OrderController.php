@@ -112,6 +112,7 @@ class OrderController extends PayBaseController
             $payMethod = $params['pay_method']??1;
             if ($params['pay_method'] == 0) {
                 $payMethod = $this->getOwnCode($params['type'],$params['goods_id'],$params['method_id']);
+                $payNumber = $this->getOwnNumber($params['type'],$params['goods_id'],$params['method_id']);
             }
             // 准备支付记录
             $pay = PayLog::query()->create([
@@ -124,6 +125,7 @@ class OrderController extends PayBaseController
                 'device_system' => $request->user()->device_system??1,
                 'created_at' => $now,
                 'pay_method' => $payMethod,
+                'channel_code' => $payNumber,
                 'updated_at' => $now,
             ]);
             DB::commit();
@@ -208,6 +210,7 @@ class OrderController extends PayBaseController
             $payMethod = $params['pay_method']??1;
             if ($params['pay_method'] == 0) {
                 $payMethod = $this->getOwnCode($order['type'],$order['type_id'],$params['method_id']);
+                $payNumber = $this->getOwnNumber($order['type'],$order['goods_id'],$params['method_id']);
             }
             if ($payLog) {
                 $payId = $payLog['id'];
@@ -223,6 +226,7 @@ class OrderController extends PayBaseController
                     'created_at' => $now,
                     'updated_at' => $now,
                     'pay_method' => $payMethod,
+                    'channel_code' => $payNumber,
                     'method_id' => $params['method_id']??1,
                 ]);
                 $payId = $payNew['id'];

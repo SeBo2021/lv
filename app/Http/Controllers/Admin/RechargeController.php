@@ -8,11 +8,12 @@ use App\Models\Recharge;
 use App\Services\UiService;
 use App\TraitClass\ChannelTrait;
 use App\TraitClass\MemberCardTrait;
+use App\TraitClass\PayTrait;
 use Illuminate\Support\Facades\DB;
 
 class RechargeController extends BaseCurlIndexController
 {
-    use ChannelTrait,MemberCardTrait;
+    use ChannelTrait,MemberCardTrait,PayTrait;
 
 //    public $pageName = '充值';
     public array $forward = [
@@ -148,6 +149,12 @@ class RechargeController extends BaseCurlIndexController
                 'align' => 'center'
             ],
             [
+                'field' => 'channel_code',
+                'minWidth' => 80,
+                'title' => '充值渠道',
+                'align' => 'center',
+            ],
+            [
                 'field' => 'register_at',
                 'width' => 150,
                 'title' => '会员注册时间',
@@ -247,9 +254,14 @@ class RechargeController extends BaseCurlIndexController
             [
                 'field' => 'query_pay_method',
                 'type' => 'select',
-                'name' => '支付渠道',
-                'default' => '',
-                'data' => [['id' => '0', 'name' => '全部'],['id' => '1', 'name' => '大白鲨支付'],['id' => '2', 'name' => '长江支付'],['id' => '4', 'name' => 'YK支付'],['id' => '101', 'name' => '旺达支付'],]
+                'name' => '充值类型',
+                'data' => $this->getAllPayChannel()
+            ],
+            [
+                'field' => 'query_channel_code',
+                'type' => 'select',
+                'name' => '充值渠道',
+                'data' => array_merge(['0'=>['id'=>'0','name'=>'全部']],$this->getPayTypeCode())
             ],
             [
                 'field' => 'register_at',
@@ -273,7 +285,7 @@ class RechargeController extends BaseCurlIndexController
     public function handleResultModel($model)
     {
         $field = ['recharge.id','recharge.amount','recharge.uid','recharge.order_id','orders.status',
-            'recharge.channel_id','recharge.device_system','recharge.created_at','users.created_at as register_at','orders.type','orders.forward','orders.vid','orders.type_id','orders.remark','recharge.pay_method'];
+            'recharge.channel_id','recharge.device_system','recharge.created_at','users.created_at as register_at','orders.type','orders.forward','orders.vid','orders.type_id','orders.remark','recharge.pay_method','recharge.channel_code'];
         $raw = implode(',',$field);
         $model = $model->select(DB::raw($raw));
 
@@ -337,6 +349,15 @@ class RechargeController extends BaseCurlIndexController
                 2 => $build->where('orders.forward', 'video'),
                 1 => $build->where('orders.forward', '')
             };
+        }
+
+        $queryPayMethod = $this->rq->input('query_pay_method',0);
+        if($queryPayMethod>0){
+            $build = $build->where('recharge.pay_method',$queryPayMethod);
+        }
+        $queryChannelCode = $this->rq->input('query_channel_code',0);
+        if($queryChannelCode>0){
+            $build = $build->where('recharge.channel_code',$queryChannelCode);
         }
 
         $totalAmount = $build->sum('recharge.amount');

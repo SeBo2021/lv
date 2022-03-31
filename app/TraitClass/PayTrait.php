@@ -63,6 +63,14 @@ trait PayTrait
         return $data;
     }
 
+    public function getAllPayChannel(){
+        $data[] = ['id'=>'0','name'=>'全部'];
+        $raw = RechargeChannel::where('status',1)->get();
+        foreach ($raw as $v) {
+            $data[] = ['id'=>$v->id,'name'=>$v->remark];
+        }
+        return $data;
+    }
     /**
      * 返回支付类型标识
      * @param string $flag
@@ -248,6 +256,7 @@ trait PayTrait
             'channel_pid' => $orderInfo->channel_pid ?? 0,
             'order_id' => $orderInfo->id,
             'pay_method' => $payInfo->pay_method??1,
+            'channel_code' => $payInfo->channel_code??'',
             'created_at' => $nowData,
             'updated_at' => $nowData,
         ];
