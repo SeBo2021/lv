@@ -241,7 +241,9 @@ trait ChannelTrait
             'channel_code' => $model->number,
         ];
         DB::table('channel_day_statistics')->where('channel_id',$model->id)->whereDate('date_at',date('Y-m-d'))->update($updateData);
-        DB::table('channel_day_statistics')->where('channel_pid',$model->id)->whereDate('date_at',date('Y-m-d'))->update(['unit_price'=>$model->unit_price]);
+        if($model->id>0){
+            DB::table('channel_day_statistics')->where('channel_pid',$model->id)->whereDate('date_at',date('Y-m-d'))->update(['unit_price'=>$model->unit_price]);
+        }
         $model->save();
         $this->initStatisticsByDay($model->id);
         Cache::forget('cachedChannelById.'.$model->id);
