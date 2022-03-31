@@ -95,7 +95,7 @@ class HomeController extends Controller
             $validated = Validator::make($params,[
                 'cid' => 'required|integer',
                 'page' => 'required|integer',
-            ])->validate();
+            ])->validated();
             $cid = $validated['cid'];
             $page = $validated['page'];
         }else{
