@@ -131,6 +131,7 @@ class OrderController extends BaseCurlController
             '4' => 'YK支付',
             '1' => '大白鲨支付',
             '101' => '信达支付',
+            '102' => '艾希支付',
             default => '大白鲨支付',
         };
         return $item;
