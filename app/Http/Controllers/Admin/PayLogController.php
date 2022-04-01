@@ -189,7 +189,7 @@ class PayLogController extends BaseCurlController
         $page = $this->rq->input('page', 1);
         $pagesize = $this->rq->input('limit', 30);
 
-        $field = ['pay_log.id', 'pay_log.number', 'pay_log.order_id', 'pay_log.uid', 'pay_log.pay_type', 'pay_log.status', 'pay_log.created_at', 'pay_log.device_system', 'pay_log.pay_method', 'pay_log.method_id', 'pay_log.channel_code', 'orders.remark', 'orders.number', 'orders.forward', 'orders.type', 'orders.channel_pid', 'orders.channel_id'];
+        $field = ['pay_log.id', 'pay_log.number', 'pay_log.order_id', 'pay_log.uid', 'pay_log.pay_type', 'pay_log.status', 'pay_log.created_at', 'pay_log.pay_method', 'pay_log.method_id', 'pay_log.channel_code',  'orders.channel_id'];
         $raw = implode(',', $field);
         $model = $model->select(DB::raw($raw));
 
