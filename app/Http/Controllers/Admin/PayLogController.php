@@ -115,8 +115,8 @@ class PayLogController extends BaseCurlController
     {
         $deviceSystems = [
             0 => '',
-            1 => '苹果',
-            2 => 'ios轻量版',
+            1 => 'ios轻量版',
+            2 => '安卓',
             3 => 'ios轻量版',
         ];
         $types = [
