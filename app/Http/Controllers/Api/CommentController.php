@@ -120,6 +120,7 @@ class CommentController extends Controller
             $fields = ['comments.id','vid','uid','reply_cid','replied_uid','content','replies','reply_at','users.avatar','users.nickname'];
             $queryBuild = DB::table('comments')
                 ->join('users','comments.uid','=','users.id')
+                ->where('comments.status',1)
                 ->where('comments.vid',$vid);
             $queryBuild = $queryBuild->where('reply_cid',$reply_cid);
             $paginator = $queryBuild->orderByDesc('id')->simplePaginate($perPage,$fields,'commentLists',$page);
