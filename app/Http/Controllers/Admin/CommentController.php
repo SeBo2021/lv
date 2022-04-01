@@ -54,6 +54,12 @@ class CommentController extends BaseCurlController
                 'align' => 'center',
             ],
             [
+                'field' => 'status',
+                'minWidth' => 80,
+                'title' => '审核',
+                'align' => 'center',
+            ],
+            [
                 'field' => 'reply_at',
                 'minWidth' => 150,
                 'title' => '创建时间',
@@ -96,6 +102,7 @@ class CommentController extends BaseCurlController
 
     public function setListOutputItemExtend($item)
     {
+        $item->status = UiService::switchTpl('status', $item,0,"通过|待审核");
         $item->handle = UiService::editDelTpl(0,1);
         return $item;
     }
