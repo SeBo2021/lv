@@ -82,7 +82,7 @@ class ShortCommentController extends BaseCurlIndexController
     {
         $data = [
 
-            [
+            /*[
                 'field' => 'query_like_name',//这个搜索写的查询条件在app/TraitClass/QueryWhereTrait.php 里面写
                 'type' => 'text',
                 'name' => '评论者id',
@@ -91,7 +91,7 @@ class ShortCommentController extends BaseCurlIndexController
                 'field' => 'query_category_id',
                 'type' => 'text',
                 'name' => '文章id',
-            ],
+            ],*/
         ];
         //赋值到ui数组里面必须是`search`的key值
         $this->uiBlade['search'] = $data;
