@@ -27,7 +27,7 @@ class CommentShortController extends Controller
         try {
             //权限控制
             $user = $request->user();
-            if(!$this->commentRight($user)){
+            if(!$this->commentRight($user) || $user->status==0){
                 return response()->json([
                     'state' => -2,
                     'msg' => "权限不足",
