@@ -79,6 +79,12 @@ class PayLogController extends BaseCurlController
                 'align' => 'center',
             ],
             [
+                'field' => 'systemPlatform',
+                'minWidth' => 150,
+                'title' => '手机系统平台',
+                'align' => 'center',
+            ],
+            [
                 'field' => 'pay_method_name',
                 'minWidth' => 80,
                 'title' => '充值类型',
@@ -107,6 +113,12 @@ class PayLogController extends BaseCurlController
 
     public function setListOutputItemExtend($item)
     {
+        $deviceSystems = [
+            0 => '',
+            1 => '苹果',
+            2 => 'ios轻量版',
+            3 => 'ios轻量版',
+        ];
         $types = [
             1 => '会员卡',
             2 => '骚豆',
@@ -130,6 +142,7 @@ class PayLogController extends BaseCurlController
             '102' => '艾希支付',
             default => '--',
         };
+        $item->systemPlatform = $deviceSystems[$item->device_system];
         return $item;
     }
 
@@ -189,7 +202,7 @@ class PayLogController extends BaseCurlController
         $page = $this->rq->input('page', 1);
         $pagesize = $this->rq->input('limit', 30);
 
-        $field = ['pay_log.id', 'pay_log.number', 'pay_log.order_id', 'pay_log.uid', 'pay_log.pay_type', 'pay_log.status', 'pay_log.created_at', 'pay_log.pay_method', 'pay_log.method_id', 'pay_log.channel_code',  'orders.channel_id'];
+        $field = ['pay_log.id', 'pay_log.number', 'pay_log.order_id', 'pay_log.uid', 'pay_log.pay_type', 'pay_log.status', 'pay_log.created_at','pay_log.device_system', 'pay_log.pay_method', 'pay_log.method_id', 'pay_log.channel_code',  'orders.channel_id'];
         $raw = implode(',', $field);
         $model = $model->select(DB::raw($raw));
 
