@@ -32,7 +32,7 @@ class CommentController extends Controller
                 'reply_at' => date('Y-m-d H:i:s'),
             ];
             //权限控制
-            if(!$this->commentRight($user)){
+            if(!$this->commentRight($user) || $user->status==0){
                 return response()->json([
                     'state' => -2,
                     'msg' => "权限不足",
