@@ -53,6 +53,13 @@ class CommCommentsController extends BaseCurlController
 
             ],
             [
+                'field' => 'user_id',
+                'minWidth' => 100,
+                'title' => '用户ID',
+                'align' => 'center',
+
+            ],
+            [
                 'field' => 'bbs_content',
                 'minWidth' => 120,
                 'title' => '相关文章',
@@ -63,6 +70,12 @@ class CommCommentsController extends BaseCurlController
                 'minWidth' => 120,
                 'title' => '内容',
                 'align' => 'center'
+            ],
+            [
+                'field' => 'status',
+                'minWidth' => 80,
+                'title' => '审核',
+                'align' => 'center',
             ],
             [
                 'field' => 'created_at',
@@ -105,6 +118,7 @@ class CommCommentsController extends BaseCurlController
 
     public function setListOutputItemExtend($item)
     {
+        $item->status = UiService::switchTpl('status', $item,0,"通过|待审核");
         $item->user_name = $item->user['nickname'] ?? '';
         $item->bbs_content = mb_substr($item->bbs['content'] ?? '',0,50);
         $item->content = mb_substr($item['content'] ?? '',0,50);
