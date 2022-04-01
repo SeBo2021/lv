@@ -138,7 +138,7 @@ class CommentShortController extends Controller
             $fields = ['comments_short.id', 'vid', 'uid', 'reply_cid', 'replied_uid', 'content', 'replies', 'reply_at', 'users.avatar', 'users.nickname'];
             $queryBuild = DB::table('comments_short')
                 ->join('users', 'comments_short.uid', '=', 'users.id')
-                ->where('comments_short.vid', $vid)
+                ->where('comments_short.status', 1)
                 ->where('comments_short.vid', $vid);
             $queryBuild = $queryBuild->where('reply_cid', $reply_cid);
             $paginator = $queryBuild->orderBy('id','desc')->simplePaginate($perPage, $fields, 'commentLists', $page);
