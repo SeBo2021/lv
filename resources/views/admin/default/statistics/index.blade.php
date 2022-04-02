@@ -213,7 +213,7 @@
                     <div class="layui-input-block" style="text-align: center;margin-left: 0;">
                         <div class="layui-btn-group demoTest" style="margin-top: 5px;margin-bottom: 10px;">
                             <button class="layui-btn layui-btn-sm" style="background-color: #5FB878;" data-type="set" data-key="recharge" data-value="0">All</button>
-                            <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="recharge" data-value="2">ios轻量版</button>
+                            <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="recharge" data-value="3">ios轻量版</button>
                             <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="recharge" data-value="2">Android</button>
                             <button class="layui-btn layui-btn-primary layui-btn-sm" data-type="set" data-key="recharge" data-value="1">IOS</button>
                         </div>
