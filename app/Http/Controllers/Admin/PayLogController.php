@@ -156,6 +156,11 @@ class PayLogController extends BaseCurlController
                 'name' => '会员ID',
             ],
             [
+                'field' => 'number',
+                'type' => 'text',
+                'name' => '订单编号',
+            ],
+            [
                 'field' => 'status',
                 'type' => 'select',
                 'name' => '状态',
@@ -228,6 +233,10 @@ class PayLogController extends BaseCurlController
         $queryStatus = $this->rq->input('status', '');
         if ($queryStatus != '') {
             $build = $build->where('pay_log.status', $queryStatus);
+        }
+        $queryNumber = $this->rq->input('number', '');
+        if ($queryNumber != '') {
+            $build = $build->where('pay_log.number', $queryNumber);
         }
         $created_at = $this->rq->input('created_at', null);
         if ($created_at !== null) {
