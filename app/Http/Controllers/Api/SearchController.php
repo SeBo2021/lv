@@ -213,11 +213,16 @@ class SearchController extends Controller
                     }
                     $ids = array_keys($ids);
                     if(!empty($ids)){
+                        shuffle($ids);
+                        if(count($ids)>8){
+                            $ids = array_slice($ids,0,8);
+                        }
                         $paginator = DB::table('video')
                             ->where('status',1)
-                            ->whereIn('id',$ids)
-                            ->inRandomOrder()
-                            ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
+                            ->whereIn('id',$ids)->get($this->videoFields);
+//                            ->inRandomOrder()
+//                            ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
+                        $paginatorArr = $paginator->toArray();
                     }else{
                         $paginator = DB::table('cid_vid')
                             ->join('video','cid_vid.vid','=','video.id')
@@ -227,9 +232,9 @@ class SearchController extends Controller
                             ->distinct()
                             ->inRandomOrder()
                             ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
+                        $paginatorArr = $paginator->toArray()['data'];
                     }
 
-                    $paginatorArr = $paginator->toArray()['data'];
                     //$paginatorArr = $paginator->items();
                     //Log::info('==Recommend===',$paginatorArr);
                     if(!empty($paginatorArr)){
