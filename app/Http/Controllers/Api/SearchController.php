@@ -241,7 +241,7 @@ class SearchController extends Controller
                         $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
                         //广告
                         $res['list'] = $this->insertAds($res['list'],'recommend',1);
-                        $res['hasMorePages'] = $paginator->hasMorePages()??false;
+                        $res['hasMorePages'] = false;
                         $redis->set($key,json_encode($res,JSON_UNESCAPED_UNICODE));
                         $redis->expire($key,7200);
                         return response()->json([
