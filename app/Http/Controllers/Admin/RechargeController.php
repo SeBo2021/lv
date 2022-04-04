@@ -37,6 +37,10 @@ class RechargeController extends BaseCurlIndexController
             'id'=>4,
             'name'=>'直播'
         ],
+        5=>[
+            'id'=>5,
+            'name'=>'社区'
+        ],
     ];
 
     public array $orderType = [
@@ -190,6 +194,7 @@ class RechargeController extends BaseCurlIndexController
             'video' => '长视频',
             'short' => '短视频',
             'live' => '直播',
+            'community' => '社区',
             default => '我的',
         };
         $item->device_system = $this->deviceSystem[$item->device_system]['name'];
@@ -344,6 +349,7 @@ class RechargeController extends BaseCurlIndexController
         if($forward!==null){
             $forward += 0;
             $build = match ($forward) {
+                5 => $build->where('orders.forward', 'community'),
                 4 => $build->where('orders.forward', 'live'),
                 3 => $build->where('orders.forward', 'short'),
                 2 => $build->where('orders.forward', 'video'),
