@@ -44,7 +44,7 @@ class MemberController extends BaseCurlController
                 'align' => 'center'
             ],
             [
-                'field' => 'channel_id',
+                'field' => 'channel_name',
                 'minWidth' => 150,
                 'title' => '推广渠道',
                 'fixed' => 'left',
@@ -77,6 +77,12 @@ class MemberController extends BaseCurlController
                 'field' => 'account',
                 'minWidth' => 150,
                 'title' => '账号',
+                'align' => 'center',
+            ],
+            [
+                'field' => 'channel_principal',
+                'minWidth' => 150,
+                'title' => '渠道负责人',
                 'align' => 'center',
             ],
             [
@@ -290,9 +296,11 @@ class MemberController extends BaseCurlController
                 'data' => $this->deviceSystemsSelect
             ],
             [
-                'field' => 'id',
-                'type' => 'text',
-                'name' => '会员ID',
+                'field' => 'query_status',
+                'type' => 'select',
+                'name' => '是否启用',
+                'default' => '',
+                'data' => $this->uiService->trueFalseData(1)
             ],
             [
                 'field' => 'find_phone_number',
@@ -305,16 +313,19 @@ class MemberController extends BaseCurlController
                 'name' => '账号',
             ],
             [
-                'field' => 'query_status',
-                'type' => 'select',
-                'name' => '是否启用',
-                'default' => '',
-                'data' => $this->uiService->trueFalseData(1)
+                'field' => 'id',
+                'type' => 'text',
+                'name' => '会员ID',
             ],
             [
                 'field' => 'query_did',
                 'type' => 'text',
                 'name' => '机器码',
+            ],
+            [
+                'field' => 'query_channel_principal',
+                'type' => 'text',
+                'name' => '渠道负责人',
             ],
             [
                 'field' => 'query_created_at',
@@ -418,11 +429,9 @@ class MemberController extends BaseCurlController
     public function setListOutputItemExtend($item)
     {
         $item->systemPlatform = $this->deviceSystems[$item->device_system];
-        $item->channel_id = isset($this->getChannelSelectData(true)[$item->channel_id]) ? $this->getChannelSelectData(true)[$item->channel_id]['name'] : '该渠道被删除';
         //$item->area = DB::table('login_log')->where('uid',$item->id)->orderByDesc('id')->value('area');
         $item->status = UiService::switchTpl('status', $item,'');
         $item->phone_number = $item->phone_number>0 ? $item->phone_number : '未绑定';
-        $item->member_card_type = $this->getMemberCardList('gold')[max(explode(',',$item->member_card_type))]['name'] ?? '';
         $item->vip_start_last = date('Y-m-d H:i:s',$item->vip_start_last);
         $item->vip_expired = $item->vip_expired>0 ? round($item->vip_expired/3600).'小时' :0;
         return $item;
@@ -457,8 +466,16 @@ class MemberController extends BaseCurlController
         $reqDid = $this->rq->input('query_did', null);
         $reqDeviceSystem = $this->rq->input('query_device_system', null);
         $findPhoneNumber = $this->rq->input('find_phone_number', null);
+        $reqChannelPrincipal = $this->rq->input('query_channel_principal', null);
         if($findPhoneNumber!==null){
             $model = $model->where('phone_number',$findPhoneNumber);
+        }
+        if($reqChannelPrincipal!==null){
+            $ids = DB::table('channels')
+                ->where('principal','like','%'.$reqChannelPrincipal)
+                ->pluck('id')->all();
+//            dump($ids);
+            $model = $model->whereIn('channel_id',$ids);
         }
         if($reqDeviceSystem!==null){
             $model = $model->where('device_system',$reqDeviceSystem);
@@ -485,7 +502,32 @@ class MemberController extends BaseCurlController
                     break;
             }
         }
-        return parent::handleResultModel($model);
+
+        /*$channels = DB::table('channels')->get(['id','name','principal']);
+        $channelCollection = [];
+        foreach ($channels as $channel){
+            $channelCollection[$channel->id] = $channel;
+        }*/
+
+        $memberCardTypes = $this->getMemberCardList('gold');
+
+        $page = $this->rq->input('page', 1);
+        $pagesize = $this->rq->input('limit', 30);
+        $order_by_name = $this->orderByName();
+        $order_by_type = $this->orderByType();
+        $model = $this->orderBy($model, $order_by_name, $order_by_type);
+        $total = $model->count();
+        $result = $model->forPage($page, $pagesize)->get();
+
+        foreach ($result as $item){
+            $item->channel_name = $channelCollection[$item->channel_id]->name ?? '官方';
+            $item->channel_principal = $channelCollection[$item->channel_id]->principal ?? '';
+            $item->member_card_type = $memberCardTypes[max(explode(',',$item->member_card_type))]['name'] ?? '';
+        }
+        return [
+            'total' => $total,
+            'result' => $result
+        ];
     }
 
     public function setOutputHandleBtnTpl($shareData): array
