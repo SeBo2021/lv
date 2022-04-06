@@ -164,6 +164,7 @@ trait ChannelTrait
             $exists = DB::connection('master_mysql')->table($statistic_table)->where('channel_id', $channel->id)->where('date_at', $currentDate)->exists();
             if (!$exists) {
                 $insertData = [
+                    'principal' => $channel->principal,
                     'channel_name' => $channel->name,
                     'channel_id' => $channel->id,
                     'channel_pid' => $channel->pid,
@@ -239,6 +240,7 @@ trait ChannelTrait
             'share_ratio' => $model->share_ratio,
             'unit_price' => $model->unit_price,
             'channel_code' => $model->number,
+            'principal' => $model->principal,
         ];
         DB::table('channel_day_statistics')->where('channel_id',$model->id)->whereDate('date_at',date('Y-m-d'))->update($updateData);
         if($model->id>0){
