@@ -448,7 +448,7 @@ trait VideoTrait
                 $list['dash_url'] = $list['vs_dash_url'] ;
                 $list['gold'] = $list['vs_gold'] / $this->goldUnit;
                 $list['views'] = $list['views'] > 0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5, 9));
-                $list['hls_url'] = '';
+                // $list['hls_url'] = '';
                 $list['preview_hls_url'] = '';
                 $list['dash_url'] = '';
                 $list['preview_dash_url'] ='';
