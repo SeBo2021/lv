@@ -258,7 +258,7 @@ trait PayTrait
             'channel_pid' => $orderInfo->channel_pid ?? 0,
             'order_id' => $orderInfo->id,
             'pay_method' => $payInfo->pay_method??1,
-            'channel_code' => $channelInfo->channel_code??'',
+            'channel_code' => $payInfo->channel_code??'',
             'channel_principal' => $channelInfo->channel_principal??'',
             'created_at' => $nowData,
             'updated_at' => $nowData,
