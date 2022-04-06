@@ -428,6 +428,7 @@ trait VideoTrait
         $_v = date('Ymd');
         foreach ($lists as &$list){
             $list = (array)$list;
+            $domainSync = VideoTrait::getDomain($list['sync']);
             if (($list['usage']??1) == 2) {
                 /// 重置信息
                 $list['id'] = $list['vs_id'] ;
@@ -451,6 +452,9 @@ trait VideoTrait
                 $list['preview_hls_url'] = '';
                 $list['dash_url'] = '';
                 $list['preview_dash_url'] ='';
+                if(isset($list['hls_url'])){
+                    $list['hls_url'] = $domainSync . $this->transferHlsUrl($list['hls_url']);
+                }
                 if (!$display_url) {
                     unset($list['hls_url']);
                     unset($list['dash_url']);
@@ -473,7 +477,7 @@ trait VideoTrait
                     unset($list['dash_url']);
                 }
             }
-            $domainSync = VideoTrait::getDomain($list['sync']);
+
             //封面图处理
             $list['cover_img'] = $this->transferImgOut($list['cover_img'],$domainSync,$_v);
             if ($list['usage']??false) {
