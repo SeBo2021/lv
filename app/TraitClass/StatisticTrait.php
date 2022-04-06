@@ -72,6 +72,7 @@ trait StatisticTrait
                     $insertDeductionData['channel_name'] = $channelInfo->name;
                     $insertDeductionData['channel_promotion_code'] = $channelInfo->promotion_code;
                     $insertDeductionData['channel_code'] = $channelInfo->number;
+                    $insertDeductionData['principal'] = $channelInfo->principal;
                     $insertDeductionData['channel_type'] = $channelInfo->type;
                     $insertDeductionData['unit_price'] = $channelInfo->unit_price;
                     $insertDeductionData['share_ratio'] = $channelInfo->share_ratio ?? 0;
