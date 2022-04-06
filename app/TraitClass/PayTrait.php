@@ -26,6 +26,7 @@ use Psr\SimpleCache\InvalidArgumentException;
 
 trait PayTrait
 {
+    use ChannelTrait;
 
     public static function getPayTypeCode()
     {
@@ -246,6 +247,7 @@ trait PayTrait
             3 => 'buyVideo',
         };
         $biz = $this->$method($orderInfo->type_id??0,$payInfo->uid);
+        $channelInfo = $this->getChannelInfoById($orderInfo->channel_id);
         $chargeData = [
             'type' => $orderInfo->type??1,
             'uid' => $orderInfo->uid,
@@ -256,8 +258,8 @@ trait PayTrait
             'channel_pid' => $orderInfo->channel_pid ?? 0,
             'order_id' => $orderInfo->id,
             'pay_method' => $payInfo->pay_method??1,
-            'channel_code' => $payInfo->channel_code??'',
-            'channel_principal' => $payInfo->channel_principal??'',
+            'channel_code' => $channelInfo->channel_code??'',
+            'channel_principal' => $channelInfo->channel_principal??'',
             'created_at' => $nowData,
             'updated_at' => $nowData,
         ];
