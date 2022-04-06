@@ -503,11 +503,11 @@ class MemberController extends BaseCurlController
             }
         }
 
-        /*$channels = DB::table('channels')->get(['id','name','principal']);
+        $channels = DB::table('channels')->get(['id','name','principal']);
         $channelCollection = [];
         foreach ($channels as $channel){
             $channelCollection[$channel->id] = $channel;
-        }*/
+        }
 
         $memberCardTypes = $this->getMemberCardList('gold');
 
