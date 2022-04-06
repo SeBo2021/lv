@@ -99,8 +99,14 @@ class RechargeController extends BaseCurlIndexController
             ],
             [
                 'field' => 'channel_id',
-                'width' => 100,
+                'minWidth' => 100,
                 'title' => '推广渠道',
+                'align' => 'center'
+            ],
+            [
+                'field' => 'channel_principal',
+                'minWidth' => 100,
+                'title' => '渠道负责人',
                 'align' => 'center'
             ],
             [
@@ -269,6 +275,11 @@ class RechargeController extends BaseCurlIndexController
                 'data' => array_merge(['0'=>['id'=>'0','name'=>'全部']],$this->getPayTypeCode())
             ],
             [
+                'field' => 'query_channel_principal',
+                'type' => 'text',
+                'name' => '渠道负责人',
+            ],
+            [
                 'field' => 'register_at',
                 'type' => 'datetime',
 //                'attr' => 'data-range=true',
@@ -302,6 +313,7 @@ class RechargeController extends BaseCurlIndexController
         $created_at = $this->rq->input('created_at',null);
         $register_at = $this->rq->input('register_at',null);
         $deviceSystem = $this->rq->input('device_system',null);
+        $reqChannelPrincipal = $this->rq->input('query_channel_principal', null);
         //
         $page = $this->rq->input('page', 1);
         $pagesize = $this->rq->input('limit', 30);
@@ -320,6 +332,9 @@ class RechargeController extends BaseCurlIndexController
         }
         if($deviceSystem!==null){
             $build = $build->where('recharge.device_system',$deviceSystem);
+        }
+        if($reqChannelPrincipal!==null){
+            $build = $build->where('recharge.channel_principal','like','%'.$reqChannelPrincipal);
         }
         if($topChannelId!==null){
             $build = $build->where(function ($build) use ($topChannelId){
@@ -371,7 +386,7 @@ class RechargeController extends BaseCurlIndexController
         $total = $build->count();
 
         $currentPageData = $build->forPage($page, $pagesize)->get($field);
-        $this->listOutputJson($total, $currentPageData, 0);
+//        $this->listOutputJson($total, $currentPageData, 0);
         return [
             'total' => $total,
             'totalRow' => ['amount'=>$totalAmount],
