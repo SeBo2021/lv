@@ -270,13 +270,13 @@ class ProcessBbs implements ShouldQueue
     {
         $pathInfo = pathinfo($relativeStorageFilePath);
         $localSliceDir = $pathInfo['dirname'];
-        Log::info('==testSliceDir===',[$localSliceDir]);
+//        Log::info('==testSliceDir===',[$localSliceDir]);
         $sliceFiles = Storage::files($localSliceDir);
-        Log::info('==sliceFilesCounts===',[count($sliceFiles)]);
+//        Log::info('==sliceFilesCounts===',[count($sliceFiles)]);
         foreach ($sliceFiles as $file){
             $content = Storage::get($file);
             $r = Storage::disk('sftp')->put($file,$content);
-            Log::info('==sliceFilesUploadRes===',[$r]);
+//            Log::info('==sliceFilesUploadRes===',[$r]);
         }
         if($delLocalSlice!==false){
             Storage::deleteDirectory($localSliceDir);
