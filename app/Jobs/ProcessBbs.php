@@ -119,7 +119,7 @@ class ProcessBbs implements ShouldQueue
             DB::table('community_bbs')->where('id',$this->row->id)->update([
                 'video' => json_encode([$hlsPath]),
             ]);
-            $this->syncSlice($videoName,true);
+            $this->comSyncSlice($hlsPath,true);
             // 上传视频
             //$this->syncMp4($this->originName);
         }
@@ -238,7 +238,7 @@ class ProcessBbs implements ShouldQueue
             mkdir($dirname, 0755, true);
         }
 
-        $m3u8_path = '/storage'.env('SLICE_DIR','/slice').'/hls/'.$pathInfo['filename'].'/'.$pathInfo['filename'].'.m3u8';
+        $m3u8_path = '/public'.env('SLICE_DIR','/slice').'/hls/'.$pathInfo['filename'].'/'.$pathInfo['filename'].'.m3u8';
 
         $format = new \FFMpeg\Format\Video\X264();
         //增加commads的参数,使用ffmpeg -hwaccels命令查看支持的硬件加速选项
@@ -268,16 +268,15 @@ class ProcessBbs implements ShouldQueue
 
     public function comSyncSlice($relativeStorageFilePath,$delLocalSlice=false)
     {
-        //$this->syncSlice();
         $pathInfo = pathinfo($relativeStorageFilePath);
-        $localSliceDir = $this->getLocalSliceDir($pathInfo);
-        $sliceDir = storage_path('app/').$localSliceDir;
-        Log::info('==testSliceDir===',[$sliceDir]);
+        $localSliceDir = $pathInfo['dirname'];
+        Log::info('==testSliceDir===',[$localSliceDir]);
         $sliceFiles = Storage::files($localSliceDir);
-        Log::info('==sliceFiles===',[$sliceFiles]);
+        Log::info('==sliceFilesCounts===',[count($sliceFiles)]);
         foreach ($sliceFiles as $file){
             $content = Storage::get($file);
-            Storage::disk('sftp')->put($file,$content);
+            $r = Storage::disk('sftp')->put($file,$content);
+            Log::info('==sliceFilesUploadRes===',[$r]);
         }
         if($delLocalSlice!==false){
             Storage::deleteDirectory($localSliceDir);
