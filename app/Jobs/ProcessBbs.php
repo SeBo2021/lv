@@ -119,7 +119,7 @@ class ProcessBbs implements ShouldQueue
             DB::table('community_bbs')->where('id',$this->row->id)->update([
                 'video' => json_encode([$hlsPath]),
             ]);
-            $this->comSyncSlice($videoName,true);
+            $this->syncSlice($videoName,true);
             // 上传视频
             //$this->syncMp4($this->originName);
         }
