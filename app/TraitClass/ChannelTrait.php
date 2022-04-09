@@ -235,6 +235,7 @@ trait ChannelTrait
             $password = !empty($model->password) ? $model->password : bcrypt($model->number);
             $this->createChannelAccount($model,$password);
         }
+        $model->save();
         $updateData = [
             'deduction' => $model->deduction,
             'share_ratio' => $model->share_ratio,
@@ -242,11 +243,10 @@ trait ChannelTrait
             'channel_code' => $model->number,
             'principal' => $model->principal,
         ];
-        DB::table('channel_day_statistics')->where('channel_id',$model->id)->whereDate('date_at',date('Y-m-d'))->update($updateData);
+        DB::connection('master_mysql')->table('channel_day_statistics')->where('channel_id',$model->id)->whereDate('date_at',date('Y-m-d'))->update($updateData);
         if($model->id>0){
-            DB::table('channel_day_statistics')->where('channel_pid',$model->id)->whereDate('date_at',date('Y-m-d'))->update(['unit_price'=>$model->unit_price]);
+            DB::connection('master_mysql')->table('channel_day_statistics')->where('channel_pid',$model->id)->whereDate('date_at',date('Y-m-d'))->update(['unit_price'=>$model->unit_price]);
         }
-        $model->save();
         $this->initStatisticsByDay($model->id);
         Cache::forget('cachedChannelById.'.$model->id);
     }
