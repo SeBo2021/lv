@@ -152,7 +152,7 @@ trait ChannelTrait
     {
         $currentDate = date('Y-m-d');
         $statistic_table = 'channel_day_statistics';
-        $query = DB::table('channels');
+        $query = DB::connection('master_mysql')->table('channels');
         if($channelId >0){
             $query = $query->where('id',$channelId);
         }else{
