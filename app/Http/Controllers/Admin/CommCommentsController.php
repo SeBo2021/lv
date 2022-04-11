@@ -34,7 +34,8 @@ class CommCommentsController extends BaseCurlController
     public function indexCols()
     {
         //这里99%跟layui的表格设置参数一样
-        $data = [
+        //要返回给数组
+        return [
             [
                 'type' => 'checkbox'
             ],
@@ -90,8 +91,6 @@ class CommCommentsController extends BaseCurlController
                 'align' => 'center'
             ]
         ];
-        //要返回给数组
-        return $data;
     }
 
 

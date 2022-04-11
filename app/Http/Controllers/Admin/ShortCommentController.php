@@ -16,7 +16,7 @@ class ShortCommentController extends BaseCurlIndexController
 
     public function indexCols()
     {
-        $cols = [
+        return [
             [
                 'type' => 'checkbox'
             ],
@@ -40,7 +40,7 @@ class ShortCommentController extends BaseCurlIndexController
                 'title' => '视频ID',
                 'sort' => 1,
                 'align' => 'center',
-                'edit' => 1
+//                'edit' => 1
             ],
             [
                 'field' => 'uid',
@@ -73,8 +73,6 @@ class ShortCommentController extends BaseCurlIndexController
                 'align' => 'center'
             ]
         ];
-
-        return $cols;
     }
 
     //3.设置搜索数据表单
