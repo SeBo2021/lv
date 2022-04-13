@@ -229,14 +229,15 @@ trait VideoTrait
             {
                 $catArr = $item->cat ? @json_decode($item->cat) : [];
                 if(!empty($catArr)){
-                    foreach ($catArr as $cid){
+                    $this->resetRedisCatVideo($catArr,$item->id);
+                    /*foreach ($catArr as $cid){
                         if($cid > 0){
 //                            $insertArr[$cid.'-'.$item->id] = ['cid'=>$cid, 'vid'=>$item->id];
                             //存redis
                             $catKey = 'catForVideo:'.$cid;
                             $redis->sAdd($catKey,$item->id);
                         }
-                    }
+                    }*/
                 }
             }
         }catch (Exception $e){
@@ -265,12 +266,13 @@ trait VideoTrait
         foreach ($Video as $item) {
             $tagArr = $item->tag ? @json_decode($item->tag) : [];
             if (!empty($tagArr)) {
-                foreach ($tagArr as $tid) {
+                $this->resetRedisTagVideo($tagArr,$item->id);
+                /*foreach ($tagArr as $tid) {
 //                    $insertArr[$tid . '-' . $item->id] = ['tid' => $tid, 'vid' => $item->id];
                     //存redis
                     $tagKey = 'tagForVideo:'.$tid;
                     $this->redis()->sAdd($tagKey,$item->id);
-                }
+                }*/
             }
         }
         //dump('标签中间表执行:'.count($insertArr).'条');
