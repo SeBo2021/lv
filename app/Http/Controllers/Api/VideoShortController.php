@@ -129,7 +129,7 @@ class VideoShortController extends Controller
             $items = $paginator->items();
             $more = $paginator->hasMorePages();
         }else {
-            if ($newIds) {
+            if ($newIds && (!$tagId)) {
                 $cacheIds = explode(',', $newIds);
                 $start = $perPage * ($page - 1);
                 $ids = array_slice($cacheIds, $start, $perPage);
