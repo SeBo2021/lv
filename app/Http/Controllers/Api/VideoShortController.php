@@ -121,7 +121,7 @@ class VideoShortController extends Controller
         }
         if ($startId) {
 //            $model = $model->where('id','>=',$startId);
-            $model = $model->where('id','<=',$startId);
+            $model = $model->where('id','<=',$startId)->orderBy('id','desc');
         }
         if(!empty($words)){
             $model = VideoShort::search($words)->where('status', 1);
@@ -129,7 +129,7 @@ class VideoShortController extends Controller
             $items = $paginator->items();
             $more = $paginator->hasMorePages();
         }else {
-            if ($newIds && (!$tagId)) {
+            if ($newIds && (!$tagId) && (!$startId)) {
                 $cacheIds = explode(',', $newIds);
                 $start = $perPage * ($page - 1);
                 $ids = array_slice($cacheIds, $start, $perPage);
