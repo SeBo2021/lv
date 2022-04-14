@@ -425,7 +425,7 @@ trait VideoTrait
         return $h*3600 + $i*60 + $s;
     }
 
-    public function handleVideoItems($lists,$display_url=false,$uid = 0)
+    public function handleVideoItems($lists,$display_url=false,$uid = 0,$appendInfo = false)
     {
         $_v = date('Ymd');
         foreach ($lists as &$list){
@@ -457,6 +457,10 @@ trait VideoTrait
                     unset($list['dash_url']);
                 }
                 $list['url'] = env('RESOURCE_DOMAIN_DEV') . '/' .$list['url'];
+                if ($appendInfo) {
+                    $list['comments'] = $list['vs_comments'] ;
+                    $list['likes'] = $list['vs_comments'] ;
+                }
             } else {
                 //$list['cover_img'] = $domainSync . $list['cover_img'];
                 //Log::info('===testHandleVideoItem==',[$list,(isset($list['gold'])? $list['gold'] :'none')]);
