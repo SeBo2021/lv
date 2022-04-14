@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Comment;
+use App\Models\Video;
 use App\Services\UiService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CommentController extends BaseCurlController
 {
@@ -105,6 +108,53 @@ class CommentController extends BaseCurlController
         $item->status = UiService::switchTpl('status', $item,0,"通过|待审核");
         $item->handle = UiService::editDelTpl(0,1);
         return $item;
+    }
+
+    public function editTable(Request $request)
+    {
+        $this->rq = $request;
+        $ids = $request->input('ids'); // 修改的表主键id批量分割字符串
+        //分割ids
+        $id_arr = explode(',', $ids);
+
+        $id_arr = is_array($id_arr) ? $id_arr : [$id_arr];
+
+        if (empty($id_arr)) {
+            return $this->returnFailApi(lang('没有选择数据'));
+        }
+        //表格编辑过滤IDS
+        $id_arr = $this->editTableFilterIds($id_arr);
+
+        $field = $request->input('field'); // 修改哪个字段
+        $value = $request->input('field_value'); // 修改字段值
+        $id = 'id'; // 表主键id值
+
+        $type_r = $this->editTableTypeEvent($id_arr, $field, $value);
+
+        if ($type_r) {
+            return $type_r;
+        } else {
+            if($field=='status'){
+                if($value == 0){
+                    return $this->returnFailApi(lang('已审核,若不符请删除'));
+                }
+                foreach ($id_arr as $commentId){
+                    $commentItem = Comment::query()->find($commentId);
+                    if($commentItem->reply_cid>0){
+                        Comment::query()->where('id',$commentItem->reply_cid)->increment('replies');
+                    }else{
+                        Video::query()->where('id',$commentItem->vid)->increment('comments');
+                    }
+                }
+            }
+            $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update([$field => $value]);
+            if ($r) {
+                $this->insertLog($this->getPageName() . lang('成功修改ids') . '：' . implode(',', $id_arr));
+            } else {
+                $this->insertLog($this->getPageName() . lang('失败ids') . '：' . implode(',', $id_arr));
+            }
+            return $this->editTablePutLog($r, $field, $id_arr);
+        }
     }
 
 }

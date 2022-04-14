@@ -39,11 +39,8 @@ class CommentController extends Controller
                 ]);
             }
 
-            DB::beginTransaction();
             try {   //先偿试队列
                 $commentId = DB::table('comments')->insertGetId($insertData);
-                Video::where('id',$vid)->increment('comments');
-                DB::commit();
                 if($commentId >0){
                     return response()->json([
                         'state'=>0,
@@ -51,7 +48,6 @@ class CommentController extends Controller
                     ]);
                 }
             }catch (\Exception $e){
-                DB::rollBack();
                 Log::error('createUser===' . $e->getMessage());
             }
             return response()->json([
@@ -94,10 +90,11 @@ class CommentController extends Controller
                 'content' => $validated['content'],
                 'reply_at' => date('Y-m-d H:i:s'),
             ];
-            DB::beginTransaction();
+            DB::table('comments')->insert($insertData);
+            /*DB::beginTransaction();
             DB::table('comments')->insert($insertData);
             DB::table('comments')->where('id',$validated['comment_id'])->increment('replies');
-            DB::commit();
+            DB::commit();*/
             return response()->json([
                 'state'=>0,
                 'msg'=>'回复成功'
@@ -120,8 +117,8 @@ class CommentController extends Controller
             $fields = ['comments.id','vid','uid','reply_cid','replied_uid','content','replies','reply_at','users.avatar','users.nickname'];
             $queryBuild = DB::table('comments')
                 ->join('users','comments.uid','=','users.id')
-                ->where('comments.status',1)
-                ->where('comments.vid',$vid);
+                ->where('comments.vid',$vid)
+                ->where('comments.status',1);
             $queryBuild = $queryBuild->where('reply_cid',$reply_cid);
             $paginator = $queryBuild->orderByDesc('id')->simplePaginate($perPage,$fields,'commentLists',$page);
             $items = $paginator->items();
