@@ -94,6 +94,8 @@ Route::group([
     Route::post('payXD', 'XDController@pay');  //信达支付动作
     /// 艾希支付相关接口
     Route::post('payAX', 'AXController@pay');  //艾希支付动作
+    // 锦绣支付
+    Route::post('payJX', 'JXController@pay');  //锦绣支付动作
     /// 订单相关接口
     Route::post('oderCreate', 'OrderController@create');  //订单创建接口
     Route::get('orderQuery', 'OrderController@query');  //订单查询接口
