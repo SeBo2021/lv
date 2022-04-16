@@ -69,6 +69,8 @@ class ChannelStatisticByDay extends Command
             }
         }
         $this->info('######渠道日统计初始化数据执行成功######');
+        //更新负责人信息
+        DB::connection('master_mysql')->update('update channel_day_statistics a inner join channels c on a.channel_id=c.id set a.principal=c.principal');
         return 0;
     }
 }
