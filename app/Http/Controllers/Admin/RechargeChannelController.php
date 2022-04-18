@@ -160,12 +160,12 @@ class RechargeChannelController extends BaseCurlController
                 'tips' => '(多个逗号分隔)',
                 'must' => 1,
             ],
-            /*[
+            [
                 'field' => 'remark',
                 'type' => 'text',
-                'name' => '备注',
+                'name' => '支付名称',
                 'must' => 0,
-            ],*/
+            ],
             [
                 'field' => 'status',
                 'type' => 'radio',
