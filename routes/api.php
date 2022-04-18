@@ -36,7 +36,6 @@ Route::group([
     Route::post('callbackYK', 'YKController@callback');  //YK支付回调
     Route::post('callbackXD', 'XDController@callback');  //信达支付回调
     Route::post('callbackAX', 'AXController@callback');  //艾希支付回调
-    Route::post('callbackJX', 'JXController@callback');  //锦绣支付回调
     Route::get('callbackDF', 'DFController@callback');  //大发支付回调
 });
 
