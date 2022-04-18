@@ -167,6 +167,12 @@ class RechargeChannelController extends BaseCurlController
                 'must' => 0,
             ],
             [
+                'field' => 'action_url',
+                'type' => 'text',
+                'name' => '支付接口地址',
+                'must' => 0,
+            ],
+            [
                 'field' => 'status',
                 'type' => 'radio',
                 'name' => '是否启用',
