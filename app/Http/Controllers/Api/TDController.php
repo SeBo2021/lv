@@ -55,8 +55,8 @@ class TDController extends PayBaseController implements Pay
         ])->validate();
         //Log::info('df_pay_params===', [$params]);//参数日志
         $payEnv = self::getPayEnv();
-        $payInfo = $payEnv['TD'];
-        $secret = $payInfo['secret'];
+        $payEnvInfo = $payEnv['TD'];
+        $secret = $payEnvInfo['secret'];
 
         $payInfo = PayLog::query()->find($params['pay_id']);
         if (!$payInfo) {
@@ -73,10 +73,10 @@ class TDController extends PayBaseController implements Pay
             $channelNo = $this->getOwnMethod($orderInfo->type, $orderInfo->type_id, $params['type']);
         }
 
-        $mercId = $payInfo['merchant_id'];
+        $mercId = $payEnvInfo['merchant_id'];
         // $notifyUrl = env('APP_URL') . $payInfo['notify_url'];
         // $notifyUrl = 'https://qa.saoltv.com' . $payInfo['notify_url'];
-        $notifyUrl = 'http://api.saolv200.com' . $payInfo['notify_url'];
+        $notifyUrl = 'http://api.saolv200.com' . $payEnvInfo['notify_url'];
         $input = [
             'mch_id' => $mercId,               //商户号
             'pass_code' => $channelNo,            //通道类型
