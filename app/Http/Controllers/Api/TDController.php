@@ -100,7 +100,7 @@ class TDController extends PayBaseController implements Pay
         Log::info($this->payFlag.'_third_response===', [$response]);//三方响应日志
         $resJson = json_decode($response, true);
         if ($resJson['code'] == 0) {
-            $return = $this->format(0, ['data' => $resJson['data']??''], '取出成功');
+            $return = $this->format($resJson['code'], ['url' => $resJson['data']['pay_url']??''], $resJson['msg']??'');
         } else {
             $return = $this->format($resJson['code'], $resJson, $resJson['msg']??'');
         }
@@ -151,11 +151,14 @@ class TDController extends PayBaseController implements Pay
     {
         $native = $data;
         ksort($native);
-        $md5str = "";
+        //Log::info($this->payFlag.'_signData===', $native);
+        $md5str = '';
+        $lastKeyName = array_key_last($native);
         foreach ($native as $key => $val) {
-            $md5str = $md5str . $key . "=" . $val . "&";
+            $md5str = ($key==$lastKeyName ? $md5str . $key . "=" . $val : $md5str . $key . "=" . $val . "&");
         }
-        return strtoupper(md5($md5str . "key=" . $md5Key));
+        //Log::info($this->payFlag.'_signStr===', [$md5str. $md5Key]);
+        return strtoupper(md5($md5str . $md5Key));
     }
 
     /**
