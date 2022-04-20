@@ -204,15 +204,8 @@ class RechargeController extends BaseCurlIndexController
             default => '我的',
         };
         $item->device_system = $this->deviceSystem[$item->device_system]['name'];
-        $item->pay_method_name = match (strval($item->pay_method)) {
-            '2' => '长江支付',
-            '4' => 'YK支付',
-            '1' => '大白鲨支付',
-            '101' => '信达支付',
-            '102' => '艾希支付',
-            '104' => '通达支付',
-            default => '--',
-        };
+        $payChannels = $this->getPayChannels();
+        $item->pay_method_name = $payChannels[$item->pay_method]??'-';
         return $item;
     }
 
