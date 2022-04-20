@@ -75,7 +75,7 @@ class TDController extends PayBaseController implements Pay
 
         $mercId = $payEnvInfo['merchant_id'];
         // $notifyUrl = env('APP_URL') . $payInfo['notify_url'];
-        $notifyUrl = 'https://qa.saoltv.com' . $payInfo['notify_url'];
+        $notifyUrl = 'https://qa.saoltv.com' . $payEnvInfo['notify_url'];
 //        $notifyUrl = 'http://api.saolv200.com' . $payEnvInfo['notify_url'];
         $input = [
             'mch_id' => $mercId,               //商户号
@@ -94,7 +94,7 @@ class TDController extends PayBaseController implements Pay
         $curl = (new Client([
             'headers' => ['Content-Type' => 'application/json'],
             'verify' => false,
-        ]))->post($payEnvInfo['pay_url'], ['form_params' => $input]);
+        ]))->post($payEnvInfo['pay_url'], ['json' => $input]);
 
         $response = $curl->getBody();
         Log::info($this->payFlag.'_third_response===', [$response]);//三方响应日志
