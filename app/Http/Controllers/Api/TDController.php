@@ -75,8 +75,8 @@ class TDController extends PayBaseController implements Pay
 
         $mercId = $payEnvInfo['merchant_id'];
         // $notifyUrl = env('APP_URL') . $payInfo['notify_url'];
-        $notifyUrl = 'https://qa.saoltv.com' . $payEnvInfo['notify_url'];
-//        $notifyUrl = 'http://api.saolv200.com' . $payEnvInfo['notify_url'];
+        //$notifyUrl = 'https://qa.saoltv.com' . $payEnvInfo['notify_url'];
+        $notifyUrl = 'http://api.saolv300.com' . $payEnvInfo['notify_url'];
         $input = [
             'mch_id' => $mercId,               //商户号
             'pass_code' => $channelNo,            //通道类型
@@ -117,7 +117,7 @@ class TDController extends PayBaseController implements Pay
     {
         // TODO: Implement callback() method.
         $postResp = $request->post();
-        Log::info($this->payFlag.'_pay_callback===', [$postResp]);//三方返回参数日志
+        Log::info($this->payFlag.'_pay_callback===', [$postResp]);
         try {
             $payEnv = self::getPayEnv();
             $secret = $payEnv['TD']['secret'];
@@ -138,6 +138,7 @@ class TDController extends PayBaseController implements Pay
             DB::rollBack();
             $return = 'FAILED';
         }
+        Log::info($this->payFlag.'_pay_callback_res===', [$return]);
         return response($return);
     }
 
