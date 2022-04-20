@@ -210,6 +210,7 @@ class RechargeController extends BaseCurlIndexController
             '1' => '大白鲨支付',
             '101' => '信达支付',
             '102' => '艾希支付',
+            '104' => '通达支付',
             default => '--',
         };
         return $item;
