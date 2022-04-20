@@ -134,14 +134,8 @@ class PayLogController extends BaseCurlController
         }
         $channel_name = $item->channel_id > 0 ? DB::table('channels')->where('id', $item->order->channel_id)->value('name') : '官方';
         $item->channel_id = $channel_name . '(' . $item->order->channel_id . ')';
-        $item->pay_method_name = match (strval($item->pay_method)) {
-            '2' => '长江支付',
-            '4' => 'YK支付',
-            '1' => '大白鲨支付',
-            '101' => '信达支付',
-            '102' => '艾希支付',
-            default => '--',
-        };
+        $payChannels = $this->getPayChannels();
+        $item->pay_method_name = $payChannels[$item->pay_method]??'-';
         $item->systemPlatform = $deviceSystems[$item->device_system];
         return $item;
     }
@@ -249,7 +243,7 @@ class PayLogController extends BaseCurlController
         $total = $build->count();
 
         $currentPageData = $build->forPage($page, $pagesize)->get($field);
-        $this->listOutputJson($total, $currentPageData, 0);
+        //$this->listOutputJson($total, $currentPageData, 0);
         return [
             'total' => $total,
             'result' => $currentPageData

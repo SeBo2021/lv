@@ -214,6 +214,7 @@ class RechargeChannelController extends BaseCurlController
     {
         //清除缓存
         $this->redis()->del('api_recharge_channel');
+        cache()->delete('payEnv');
         return $model;
     }
 }
