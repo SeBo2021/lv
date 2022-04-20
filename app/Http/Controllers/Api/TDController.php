@@ -92,7 +92,7 @@ class TDController extends PayBaseController implements Pay
         $input['sign'] = $this->sign($input, $secret);
         Log::info($this->payFlag.'_third_params===', [$input]);//三方参数日志
         $curl = (new Client([
-            //  'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+            'headers' => ['Content-Type' => 'application/json'],
             'verify' => false,
         ]))->post($payEnvInfo['pay_url'], ['form_params' => $input]);
 
