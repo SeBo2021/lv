@@ -118,6 +118,7 @@ class TDController extends PayBaseController implements Pay
         // TODO: Implement callback() method.
         $postResp = $request->post();
         Log::info($this->payFlag.'_pay_callback===', [$postResp]);//三方返回参数日志
+        $postResp = @json_decode($postResp,true);
         try {
             $payEnv = self::getPayEnv();
             $secret = $payEnv['TD']['secret'];
@@ -157,7 +158,7 @@ class TDController extends PayBaseController implements Pay
         foreach ($native as $key => $val) {
             $md5str = ($key==$lastKeyName ? $md5str . $key . "=" . $val : $md5str . $key . "=" . $val . "&");
         }
-        //Log::info($this->payFlag.'_signStr===', [$md5str. $md5Key]);
+        Log::info($this->payFlag.'_signStr===', [$md5str. $md5Key]);
         return strtoupper(md5($md5str . $md5Key));
     }
 
