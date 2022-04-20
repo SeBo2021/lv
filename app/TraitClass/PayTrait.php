@@ -288,4 +288,9 @@ trait PayTrait
         return $payEnv;
 
     }
+
+    public function getPayChannels(): array
+    {
+        return RechargeChannel::query()->pluck('remark','id')->all();
+    }
 }
