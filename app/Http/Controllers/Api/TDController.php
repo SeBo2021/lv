@@ -94,7 +94,7 @@ class TDController extends PayBaseController implements Pay
         $curl = (new Client([
             //  'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
             'verify' => false,
-        ]))->post($payInfo['pay_url'], ['form_params' => $input]);
+        ]))->post($payEnvInfo['pay_url'], ['form_params' => $input]);
 
         $response = $curl->getBody();
         Log::info($this->payFlag.'_third_response===', [$response]);//三方响应日志
