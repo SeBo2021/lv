@@ -268,7 +268,7 @@ class OrderController extends BaseCurlController
         $total = $build->count();
 
         $currentPageData = $build->forPage($page, $pagesize)->get($field);
-        $this->listOutputJson($total, $currentPageData, 0);
+//        $this->listOutputJson($total, $currentPageData, 0);
         return [
             'total' => $total,
             'result' => $currentPageData
