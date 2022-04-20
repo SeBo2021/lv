@@ -21,15 +21,17 @@ use Psr\SimpleCache\InvalidArgumentException;
 use App\TraitClass\IpTrait;
 
 /**
- * 大发支付
+ * 通达支付
  * Class AXController
  * @package App\Http\Controllers\Api
  */
-class DFController extends PayBaseController implements Pay
+class TDController extends PayBaseController implements Pay
 {
     use PayTrait;
     use ApiParamsTrait;
     use IpTrait;
+
+    public string $payFlag = 'td';
 
     /**
      * 支付动作
@@ -53,7 +55,8 @@ class DFController extends PayBaseController implements Pay
         ])->validate();
         //Log::info('df_pay_params===', [$params]);//参数日志
         $payEnv = self::getPayEnv();
-        $secret = $payEnv['DF']['secret'];
+        $payInfo = $payEnv['TD'];
+        $secret = $payInfo['secret'];
 
         $payInfo = PayLog::query()->find($params['pay_id']);
         if (!$payInfo) {
@@ -70,44 +73,37 @@ class DFController extends PayBaseController implements Pay
             $channelNo = $this->getOwnMethod($orderInfo->type, $orderInfo->type_id, $params['type']);
         }
 
-        $mercId = $payEnv['DF']['merchant_id'];
-        // $notifyUrl = env('APP_URL') . $payEnv['DF']['notify_url'];
-        // $notifyUrl = 'https://qa.saoltv.com' . $payEnv['DF']['notify_url'];
-        $notifyUrl = 'http://api.saolv200.com' . $payEnv['DF']['notify_url'];
+        $mercId = $payInfo['merchant_id'];
+        // $notifyUrl = env('APP_URL') . $payInfo['notify_url'];
+        // $notifyUrl = 'https://qa.saoltv.com' . $payInfo['notify_url'];
+        $notifyUrl = 'http://api.saolv200.com' . $payInfo['notify_url'];
         $input = [
-            'p1_merchantno' => $mercId,               //商户号
-            'p2_amount' => intval($orderInfo->amount ?? 0),              //订单金额,单位元保留两位小数
-            'p3_orderno' => strval($payInfo->number),           //订单号，值允许英文数字
-            'p4_paytype' => $channelNo,            //支付通道编码
-            'p5_reqtime' => date('YmdHis'),//支付发起时间
-            'p6_goodsname' => $orderInfo->id,              //商品名称
-            //'p7_bankcode' => '', //【可选】银行编码: 付款银行的编码，仅在网关支付产品中有意义, 其他支付产品请传递空白字符串或忽略该参数。
-            'p8_returnurl' => 'https://dl.yinlian66.com',     //同步跳转 URL
-            'p9_callbackurl' => $notifyUrl,              //后台异步通知 (回调) 地址
+            'mch_id' => $mercId,               //商户号
+            'pass_code' => $channelNo,            //通道类型
+            'subject' => $orderInfo->id,              //订单标题
+            'out_trade_no' => strval($payInfo->number),           //订单号，值允许英文数字
+            'amount' => intval($orderInfo->amount ?? 0),              //订单金额,单位元保留两位小数
+            'client_ip' => $this->getRealIp(),            //客户IP地址
+            'notify_url' => $notifyUrl,              //后台异步通知 (回调) 地址
+            'timestamp' => date('Y-m-d H:i:s'),//支付发起时间
         ];
         //生成签名 请求参数按照Ascii编码排序
         //MD5 签名: HEX 大写, 32 字节。
         $input['sign'] = $this->sign($input, $secret);
-        Log::info('df_third_params===', [$input]);//三方参数日志
+        Log::info($this->payFlag.'_third_params===', [$input]);//三方参数日志
         $curl = (new Client([
             //  'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
             'verify' => false,
-        ]))->post($payEnv['DF']['pay_url'], ['form_params' => $input]);
+        ]))->post($payInfo['pay_url'], ['form_params' => $input]);
 
         $response = $curl->getBody();
-        //Log::info('df_third_response===', [$response]);//三方响应日志
+        Log::info($this->payFlag.'_third_response===', [$response]);//三方响应日志
         $resJson = json_decode($response, true);
-        if ($resJson['rspcode'] == 'A0') {
+        if ($resJson['code'] == 0) {
             $return = $this->format(0, ['data' => $resJson['data']??''], '取出成功');
         } else {
-            $return = $this->format($resJson['rspcode'], $resJson, $resJson['rspmsg']);
+            $return = $this->format($resJson['code'], $resJson, $resJson['msg']??'');
         }
-        // 强制转换
-        /*try {
-
-        } catch (Exception | InvalidArgumentException $e) {
-            $return = $this->format($e->getCode(), new \StdClass(), $e->getMessage());
-        }*/
         return response()->json($return);
     }
 
@@ -121,10 +117,10 @@ class DFController extends PayBaseController implements Pay
     {
         // TODO: Implement callback() method.
         $postResp = $request->post();
-        Log::info('df_pay_callback===', [$postResp]);//三方返回参数日志
+        Log::info($this->payFlag.'_pay_callback===', [$postResp]);//三方返回参数日志
         try {
             $payEnv = self::getPayEnv();
-            $secret = $payEnv['DF']['secret'];
+            $secret = $payEnv['TD']['secret'];
             $signPass = $this->verify($postResp, $secret, $postResp['sign']);
             if (!$signPass) {
                 // 签名验证不通过
@@ -153,23 +149,13 @@ class DFController extends PayBaseController implements Pay
 
     function sign($data, $md5Key): string
     {
-        /*$native = array(
-            "pay_memberid" => $data['pay_memberid'],
-            "pay_orderid" => $data['pay_orderid'],
-            "pay_amount" => $data['pay_amount'],
-            "pay_applydate" => $data['pay_applydate'],
-            "pay_bankcode" => $data['pay_bankcode'],
-            "pay_notifyurl" => $data['pay_notifyurl'],
-            "pay_callbackurl" => $data['pay_callbackurl'],
-        );*/
         $native = $data;
         ksort($native);
         $md5str = "";
         foreach ($native as $key => $val) {
             $md5str = $md5str . $key . "=" . $val . "&";
         }
-        $sign = strtoupper(md5($md5str . "key=" . $md5Key));
-        return $sign;
+        return strtoupper(md5($md5str . "key=" . $md5Key));
     }
 
     /**
@@ -181,24 +167,7 @@ class DFController extends PayBaseController implements Pay
      */
     function verify($data, $md5Key, $pubKey): bool
     {
-        $returnArray = array( // 返回字段
-            "p1_merchantno" => $data["p1_merchantno"],
-            'p2_amount' => $data["p2_amount"],
-            'p3_orderno' => $data["p3_orderno"],
-            'p4_paytype' => $data["p4_status"],
-            'p5_producttype' => $data["p5_producttype"],
-            'p6_requesttime' => $data["p6_requesttime"],
-            'p7_goodsname' => $data["p7_goodsname"],
-            'p8_tradetime' => $data["p8_tradetime"],
-            'p9_porderno' => $data["p9_porderno"],
-        );
-        ksort($returnArray);
-        reset($returnArray);
-        $md5str = "";
-        foreach ($returnArray as $key => $val) {
-            $md5str = $md5str . $key . "=" . $val . "&";
-        }
-        $sign = strtoupper(md5($md5str . "key=" . $md5Key));
+        $sign = $this->sign($data,$md5Key);
         if ($sign == $pubKey) {
             return true;
         }
