@@ -39,7 +39,7 @@ class ProcessStatisticsChannelByDay implements ShouldQueue
         $channel_id = $this->orderInfo->channel_id ?? 0;
         //$channelInfo = DB::table('channels')->where('id',$channel_id)->first();
         $channelInfo = $this->getChannelInfoById($channel_id);
-        $level_one = explode(',', $channelInfo->level_one);
+        $level_one = explode(',', $channelInfo->level_one??'');
         $statisticTable = 'channel_day_statistics';
         $redis = $this->redis();
 
