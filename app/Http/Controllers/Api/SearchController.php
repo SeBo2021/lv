@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Jobs\UpdateKeyWords;
 use App\Models\Category;
-use App\Models\CidVid;
 use App\Models\KeyWords;
 use App\Models\Tag;
 use App\Models\Video;
@@ -20,13 +19,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
-use ONGR\ElasticsearchDSL\Query\FullText\MatchQuery;
-use ONGR\ElasticsearchDSL\Sort\FieldSort;
-use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 class SearchController extends Controller
 {
     use VideoTrait,PHPRedisTrait,AdTrait;
@@ -149,26 +143,20 @@ class SearchController extends Controller
                         ->whereIn('id',$ids)
                         ->orderByDesc('updated_at')
                         ->simplePaginate($perPage,$this->videoFields,'cat',$page);
-                }else{
-                    $paginator = DB::table('cid_vid')
-                        ->join('video','cid_vid.vid','=','video.id')
-                        ->where('cid_vid.cid',$cid)
-                        ->where('video.status',1)
-                        ->orderByDesc('video.updated_at')
-                        ->simplePaginate($perPage,$this->videoFields,'cat',$page);
+                    $paginatorArr = $paginator->toArray()['data'];
+                    if(!empty($paginatorArr)){
+                        $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
+                        //广告
+                        $res['list'] = $this->insertAds($res['list'],'more_page',true, $page, $perPage);
+                        //Log::info('==CatList==',$res['list']);
+                        $res['hasMorePages'] = $paginator->hasMorePages();
+                        $redis->set($redisKey,json_encode($res,JSON_UNESCAPED_UNICODE));
+                        $redis->expire($redisKey,7200);
+                    }
                 }
 
                 //$client = ClientBuilder::create()->build();
-                $paginatorArr = $paginator->toArray()['data'];
-                if(!empty($paginatorArr)){
-                    $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
-                    //广告
-                    $res['list'] = $this->insertAds($res['list'],'more_page',true, $page, $perPage);
-                    //Log::info('==CatList==',$res['list']);
-                    $res['hasMorePages'] = $paginator->hasMorePages();
-                    $redis->set($redisKey,json_encode($res,JSON_UNESCAPED_UNICODE));
-                    $redis->expire($redisKey,7200);
-                }
+
             }else{
                 $res = json_decode($res,true);
             }
@@ -202,7 +190,7 @@ class SearchController extends Controller
                 $redis = $this->redis();
                 $redisJsonData = $redis->get($key);
                 if(!$redisJsonData){
-                    $cidArr = $cat ? json_decode($cat,true) : [];
+                    $cidArr = @json_decode($cat,true);
                     $ids = [];
                     foreach ($cidArr as $item){
                         $ids += array_flip(($redis->sMembers('catForVideo:'.$item)??[]));
@@ -215,40 +203,29 @@ class SearchController extends Controller
                     if(!empty($ids)){
                         shuffle($ids);
                         if(count($ids)>8){
-                            $ids = array_slice($ids,0,8);
+                            $ids = array_slice($ids,0,$perPage);
                         }
                         $paginator = DB::table('video')
                             ->where('status',1)
                             ->whereIn('id',$ids)->get($this->videoFields);
-//                            ->inRandomOrder()
-//                            ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
                         $paginatorArr = $paginator->toArray();
-                    }else{
-                        $paginator = DB::table('cid_vid')
-                            ->join('video','cid_vid.vid','=','video.id')
-                            ->whereIn('cid_vid.cid',$cidArr)
-                            ->where('video.status',1)
-                            ->where('video.id','!=',$vid)
-                            ->distinct()
-                            ->inRandomOrder()
-                            ->simplePaginate($perPage,$this->videoFields,'recommend',$page);
-                        $paginatorArr = $paginator->toArray()['data'];
+                        if(!empty($paginatorArr)){
+                            $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
+                            //广告
+                            $res['list'] = $this->insertAds($res['list'],'recommend',1);
+                            $res['hasMorePages'] = false;
+                            $redis->set($key,json_encode($res,JSON_UNESCAPED_UNICODE));
+                            $redis->expire($key,7200);
+                            return response()->json([
+                                'state'=>0,
+                                'data'=>$res
+                            ]);
+                        }
                     }
 
                     //$paginatorArr = $paginator->items();
                     //Log::info('==Recommend===',$paginatorArr);
-                    if(!empty($paginatorArr)){
-                        $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
-                        //广告
-                        $res['list'] = $this->insertAds($res['list'],'recommend',1);
-                        $res['hasMorePages'] = false;
-                        $redis->set($key,json_encode($res,JSON_UNESCAPED_UNICODE));
-                        $redis->expire($key,7200);
-                        return response()->json([
-                            'state'=>0,
-                            'data'=>$res
-                        ]);
-                    }
+
                 }else{
                     $res = json_decode($redisJsonData,true);
                     return response()->json([
@@ -260,7 +237,7 @@ class SearchController extends Controller
             }
             return response()->json([
                 'state'=>0,
-                'data'=>['list'=>[],'hasMorePages'=>false]
+                'data'=>['list'=>[], 'hasMorePages'=>false]
             ]);
         }
         return [];
@@ -344,7 +321,7 @@ class SearchController extends Controller
     private function getAllVid($cid, $bid = []): array
     {
         // 数组的起始值作为缓存key
-        $cacheKey = sprintf('search_vid_%s_%s',$cid[0]??0 , $bid[0]??0);
+        /*$cacheKey = sprintf('search_vid_%s_%s',$cid[0]??0 , $bid[0]??0);
         $vids = cache()->get($cacheKey)?:[];
         if (!$vids) {
             $cids = $bid;
@@ -363,6 +340,24 @@ class SearchController extends Controller
                 ->pluck('vid')->toArray();
             cache()->set($cacheKey,$vids,30*60);
         }
-        return $vids?:($bid?[-1]:[]);
+        return $vids?:($bid?[-1]:[]);*/
+        $catId = $cid[0]??0;
+        $blockId = $bid[0]??0;
+        $vidArr = [];
+        $redis = $this->redis();
+        if($catId>0){
+            $catIds = Category::query()
+                ->where('parent_id',$cid)
+                ->where('is_checked',1)
+                ->pluck('id')->all();
+            foreach ($catIds as $id){
+                $vidArr = array_merge($vidArr,$redis->sMembers('catForVideo:'.$id) ?? []);
+            }
+            $vidArr = array_unique($vidArr);
+        }
+        if($blockId>0){
+            $vidArr = $redis->sMembers('catForVideo:'.$blockId);
+        }
+        return $vidArr;
     }
 }
