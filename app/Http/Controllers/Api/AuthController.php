@@ -87,7 +87,7 @@ class AuthController extends Controller
         $test = $validated['test'] ?? false;
 
         $user = new User();
-        $member = $user::query()->where('did',$validated['did'])->where('status',1)->orderByDesc('created_at')->first($this->loginUserFields);
+        $member = $user::query()->where('did',$validated['did'])->where('status',1)->first($this->loginUserFields);
         $loginType = !$member ? 1 : 2;
         $login_info = [];
         switch ($loginType){
