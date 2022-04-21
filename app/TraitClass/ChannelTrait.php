@@ -51,8 +51,6 @@ trait ChannelTrait
 
     public function getChannelIdByPromotionCode($promotion_code)
     {
-        //$channel_id = DB::table('channels')->where('promotion_code',$promotion_code)->value('id');
-        //return  $channel_id ?? 0;
         return Cache::remember('cachedChannel.'.$promotion_code, 7200, function() use($promotion_code) {
             return DB::table('channels')->where('promotion_code',$promotion_code)->value('id') ?? 0;
         });

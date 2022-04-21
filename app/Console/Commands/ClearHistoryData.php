@@ -39,12 +39,10 @@ class ClearHistoryData extends Command
     public function handle(): int
     {
         $paramDay = $this->argument('day') ?? 3;
-        //$time_at = strtotime('-'.$paramDay.' day');
-        //$data_at = $paramDay!==null ? date('Y-m-d',$time_at) : date('Y-m-d');
-        //$this->info('######清除APP下载前'.$paramDay.'天数据执行成功######');
         //登录日志
         $delLoginLogTime = strtotime('-30 day');
         DB::table('login_log')->whereDate('created_at', '<',date('Y-m-d H:i:s',$delLoginLogTime))->delete();
+        $this->info('######清除登录日志30天前数据执行成功######');
         //观看数据 (7天)
         DB::table('view_history')->where('time_at', '<',strtotime('-'.$paramDay.' day'))->delete();
         $this->info('######清除观看历史前'.$paramDay.'天数据执行成功######');

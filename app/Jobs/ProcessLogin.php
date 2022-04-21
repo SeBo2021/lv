@@ -94,28 +94,16 @@ class ProcessLogin implements ShouldQueue
         //绑定渠道推广
         //$lastTime = strtotime('-1 day');
         $lastTime = strtotime('-2 hour');
-        $lastDayDate = date('Y-m-d H:i:s',$lastTime);
         $device_system = $this->loginLogData['device_system'];
         $channel_id = 0;
         $clipboard = $this->loginLogData['clipboard'] ?? '';
         if(!empty($clipboard)){
-            //$channel_id = DB::table('channels')->where('promotion_code',$this->loginLogData['clipboard'])->value('id') ?? 0;
-            //$channel_pid = DB::table('channels')->where('id',$channel_id)->value('pid') ?? 0;
             $channel_id = $this->getChannelIdByPromotionCode($this->loginLogData['clipboard']);
             $channel_pid = $this->getChannelInfoById($channel_id)->pid ?? 0;
-            Log::info('==BindChannelUserClipboard==',[$clipboard,$channel_id]);
+            //Log::info('==BindChannelUserClipboard==',[$clipboard,$channel_id]);
         }else{
             $downloadInfoArr = $this->redis()->lRange($this->apiRedisKey['app_download'],0,-1);
-
-            if(!empty($downloadInfoArr)){
-                $downloadInfo = $downloadInfoArr;
-            }else{
-                $downloadInfo = DB::connection('master_mysql')->table('app_download')
-                    ->where('status',0)
-                    ->whereDate('created_at','>=', $lastDayDate)
-                    ->orderByDesc('created_at')
-                    ->get(['id','channel_id','device_system','ip','agent_info','code','created_at'])->toArray();
-            }
+            $downloadInfo = !empty($downloadInfoArr) ? $downloadInfoArr : [];
 
             foreach ($downloadInfo as $item)
             {
@@ -130,7 +118,8 @@ class ProcessLogin implements ShouldQueue
                     $item = (array)$item ;
                 }
                 if($this->loginLogData['ip'] == $item['ip']){
-                    $pid = DB::table('users')->where('promotion_code',$item['code'])->value('id');
+                    //$pid = DB::table('users')->where('promotion_code',$item['code'])->value('id');
+                    $pid = 0;
                     $channel_id = $item['channel_id'];
                     $device_system = $item['device_system'];
                     $channel_pid = DB::table('channels')->where('id',$channel_id)->value('pid');
@@ -140,13 +129,12 @@ class ProcessLogin implements ShouldQueue
             }
         }
 
-        $updateData = [
+        //Log::info('==BindChannelUser==',$updateData);
+        return [
             'pid'=>$pid ?? 0,
             'channel_id'=>$channel_id ?? 0,
             'device_system'=>$device_system ?? 0,
             'channel_pid'=>$channel_pid ?? 0
         ];
-        Log::info('==BindChannelUser==',$updateData);
-        return $updateData;
     }
 }
