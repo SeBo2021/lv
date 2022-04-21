@@ -56,7 +56,7 @@ class SearchController extends Controller
             $words = $validated['words']??false;
             $model = Video::search($words?:"*")->where('status', 1);
             // 分类
-            if ($vIds) {
+            if (!empty($vIds)) {
                 $model->whereIn('id',$vIds);
             }
             // 类别
