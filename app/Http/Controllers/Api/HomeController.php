@@ -123,8 +123,8 @@ class HomeController extends Controller
                 /**/
                 $ids = $redis->sMembers('catForVideo:'.$item['id']);
                 if(!empty($ids)){
-                    $queryBuild = Video::search()->where('status',1)->whereIn('id',$ids);
-                    //$queryBuild = DB::table('video')->where('status',1)->whereIn('id',$ids);
+//                    $queryBuild = Video::search()->where('status',1)->whereIn('id',$ids);
+                    $queryBuild = DB::table('video')->where('status',1)->whereIn('id',$ids);
                     if($item['is_rand']==1){
                         $queryBuild = $queryBuild->inRandomOrder();
                     }else{
