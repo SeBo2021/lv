@@ -78,9 +78,9 @@ class SAController extends PayBaseController implements Pay
         //$notifyUrl = 'https://qa.saoltv.com' . $payEnvInfo['notify_url'];
         $notifyUrl = 'http://api.saolv300.com' . $payEnvInfo['notify_url'];
         $input = [
-            'channel' => 2,            //通道号
+            'channel' => 98,            //通道号
             'type' => $channelNo,            //通道类型
-            'money' => intval($orderInfo->amount ?? 0),              //订单金额,单位元保留两位小数
+            'money' => intval($orderInfo->amount*100 ?? 0),              //订单金额,单位分
             'orderno' => strval($payInfo->number),           //订单号，值允许英文数字
             'notifyurl' => $notifyUrl,              //后台异步通知 (回调) 地址
         ];
@@ -97,9 +97,9 @@ class SAController extends PayBaseController implements Pay
         Log::info($this->payFlag.'_third_response===', [$response]);//三方响应日志
         $resJson = json_decode($response, true);
         if ($resJson['result']) {
-            $return = $this->format(0, ['url' => $resJson['data']['pay_url']??''], $resJson['msg']??'');
+            $return = $this->format(0, ['url' => $resJson['data']['pay_url']??''], $resJson['message']??'');
         } else {
-            $return = $this->format(-1, $resJson, $resJson['msg']??'');
+            $return = $this->format(-1, $resJson, $resJson['message']??'');
         }
         return response()->json($return);
     }
@@ -157,8 +157,9 @@ class SAController extends PayBaseController implements Pay
                 $md5str = ($key==$lastKeyName ? $md5str . $key . "=" . $val : $md5str . $key . "=" . $val . "&");
             }
         }
-        Log::info($this->payFlag.'_signStr===', [$md5str.'&key='. $md5Key]);
-        return strtoupper(md5($md5str . $md5Key));
+        $keyStr = $md5str.'&key='. $md5Key;
+        Log::info($this->payFlag.'_signStr===', [$keyStr]);
+        return strtoupper(md5($keyStr));
     }
 
     /**
