@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use App\Models\CidVid;
 class SearchController extends Controller
 {
     use VideoTrait,PHPRedisTrait,AdTrait;
