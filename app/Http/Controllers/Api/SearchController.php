@@ -351,7 +351,8 @@ class SearchController extends Controller
                 ->where('is_checked',1)
                 ->pluck('id')->all();
             foreach ($catIds as $id){
-                $vidArr = array_merge($vidArr,$redis->sMembers('catForVideo:'.$id) ?? []);
+                $mergeArr = $redis->sMembers('catForVideo:'.$id) ?? [];
+                $vidArr = array_merge($vidArr,$mergeArr);
             }
             $vidArr = array_unique($vidArr);
         }
