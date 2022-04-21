@@ -38,6 +38,7 @@ Route::group([
     Route::post('callbackAX', 'AXController@callback');  //艾希支付回调
     Route::get('callbackDF', 'DFController@callback');  //大发支付回调
     Route::post('callbackTD', 'TDController@callback');  //通达支付回调
+    Route::post('callbackSA', 'SAController@callback');  //SA支付回调
 });
 
 Route::group([
@@ -102,6 +103,8 @@ Route::group([
     Route::post('payDF', 'DFController@pay');  //大发支付动作
     // 通达支付
     Route::post('payTD', 'TDController@pay');  //通达支付动作
+    // SA支付
+    Route::post('paySA', 'SAController@pay');  //SA支付动作
     /// 订单相关接口
     Route::post('oderCreate', 'OrderController@create');  //订单创建接口
     Route::get('orderQuery', 'OrderController@query');  //订单查询接口
