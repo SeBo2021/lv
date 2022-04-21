@@ -123,29 +123,21 @@ class HomeController extends Controller
                 /**/
                 $ids = $redis->sMembers('catForVideo:'.$item['id']);
                 if(!empty($ids)){
-                    $queryBuild = DB::table('video')
-                        ->where('status',1)
-                        ->whereIn('id',$ids);
-                }else{
-                    $queryBuild = DB::table('cid_vid')
-                        ->join('video','cid_vid.vid','=','video.id')
-                        ->where('cid_vid.cid',$item['id'])
-                        ->where('video.status',1);
-                }
+                    $queryBuild = DB::table('video')->where('status',1)->whereIn('id',$ids);
+                    if($item['is_rand']==1){
+                        $queryBuild = $queryBuild->inRandomOrder();
+                    }else{
+                        $queryBuild = $queryBuild->orderByRaw('video.sort DESC,video.updated_at DESC,video.id DESC');
+                    }
+                    $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
+                    $videoList = $queryBuild->limit($limit)->get($this->videoFields)->toArray();
 
-                if($item['is_rand']==1){
-                    $queryBuild = $queryBuild->inRandomOrder();
-                }else{
-                    $queryBuild = $queryBuild->orderByRaw('video.sort DESC,video.updated_at DESC,video.id DESC');
-                }
-                $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
-                $videoList = $queryBuild->limit($limit)->get($this->videoFields)->toArray();
+                    $videoList = $this->handleVideoItems($videoList,false,$request->user()->id);
+                    $item['small_video_list'] = $videoList;
 
-                $videoList = $this->handleVideoItems($videoList,false,$request->user()->id);
-                $item['small_video_list'] = $videoList;
-
-                if(!empty($item['bg_img'])){
-                    $item['bg_img'] = env('APP_URL').$item['bg_img'];
+                    if(!empty($item['bg_img'])){
+                        $item['bg_img'] = env('APP_URL').$item['bg_img'];
+                    }
                 }
             }
             $res['hasMorePages'] = $paginator->hasMorePages();
@@ -158,8 +150,6 @@ class HomeController extends Controller
         }else{
             $res = json_decode($res,true);
         }
-        //广告
-        //$res['list'] = $this->insertAds($res['list'],'home_page',true,$page,$perPage);
         return response()->json([
             'state'=>0,
             'data'=>$res

@@ -608,28 +608,6 @@ class VideoController extends BaseCurlController
                     'data-value' => 0,
                 ]
             ];
-            /*$data[] = [
-                'class' => 'layui-btn-danger',
-                'name' => '同步版块中间表',
-                'id' => 'btn-syncMiddleCatTable',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "cid_vid",
-                    'data-value' => 0,
-                ]
-            ];
-            $data[] = [
-                'class' => 'layui-btn-danger',
-                'name' => '同步标签中间表',
-                'id' => 'btn-syncMiddleTagTable',
-                'data'=>[
-                    'data-type' => "handle",
-                    'data-title' => "确定批量操作吗",
-                    'data-field' => "tid_vid",
-                    'data-value' => 0,
-                ]
-            ];*/
             $data[] = [
                 'class' => 'layui-btn-danger',
                 'name' => '同步封面',
@@ -777,15 +755,6 @@ class VideoController extends BaseCurlController
             return $type_r;
         } else {
             switch ($field){
-                /*case 'tid_vid':
-                    ProcessSyncMiddleTagTable::dispatchAfterResponse();
-                    $r=true;
-                    break;
-                case 'cid_vid':
-                    //队列执行更新版块中间表
-                    ProcessSyncMiddleSectionTable::dispatchAfterResponse();
-                    $r=true;
-                    break;*/
                 case 'cover_img':
                     $covers = Video::query()->whereIn($id, $id_arr)->get(['id','cover_img']);
                     foreach ($covers as $cover){
@@ -812,8 +781,6 @@ class VideoController extends BaseCurlController
                     $value_arr = explode(',',$value);
                     $buildQueryVideo = Video::query()->whereIn($id, $id_arr);
                     $buildQueryVideo->update(['tag'=>json_encode($value_arr)]);
-                    //更新标签中间表
-//                    ProcessSyncMiddleTagTable::dispatchAfterResponse();
                     $r=true;
                     break;
                 /*case 'tag_match':
