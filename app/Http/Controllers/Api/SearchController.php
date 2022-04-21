@@ -321,7 +321,7 @@ class SearchController extends Controller
     private function getAllVid($cid, $bid = []): array
     {
         // 数组的起始值作为缓存key
-        /*$cacheKey = sprintf('search_vid_%s_%s',$cid[0]??0 , $bid[0]??0);
+        $cacheKey = sprintf('search_vid_%s_%s',$cid[0]??0 , $bid[0]??0);
         $vids = cache()->get($cacheKey)?:[];
         if (!$vids) {
             $cids = $bid;
@@ -340,8 +340,8 @@ class SearchController extends Controller
                 ->pluck('vid')->toArray();
             cache()->set($cacheKey,$vids,30*60);
         }
-        return $vids?:($bid?[-1]:[]);*/
-        $catId = $cid[0]??0;
+        return $vids?:($bid?[-1]:[]);
+        /*$catId = $cid[0]??0;
         $blockId = $bid[0]??0;
         $vidArr = [];
         $redis = $this->redis();
@@ -359,6 +359,6 @@ class SearchController extends Controller
         if($blockId>0){
             $vidArr = $redis->sMembers('catForVideo:'.$blockId);
         }
-        return $vidArr;
+        return $vidArr;*/
     }
 }
