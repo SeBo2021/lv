@@ -166,23 +166,4 @@ class HomeController extends Controller
         ]);
     }
 
-    //充值活动
-    /*public function rechargeActivity(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $data = [
-            'is_pop' => 0,
-        ];
-        $user = $request->user();
-        $ads = $this->getAds('recharge_activity');
-        $MemberCards = DB::table('member_card')->get(['id','name','value','expired_hours']);
-        foreach ($ads as $item){
-            $item['action_type'] = (string) $item['action_type'];
-            $item['vid'] = (string) $item['vid'];
-        }
-        return response()->json([
-            'state'=>0,
-            'data'=>$data
-        ]);
-    }*/
-
 }

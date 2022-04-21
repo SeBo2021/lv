@@ -38,7 +38,7 @@ class Statistics extends Command
      */
     public function handle()
     {
-        $startDate = date('Y-m-d',strtotime('-32 day'));
+        /*$startDate = date('Y-m-d',strtotime('-32 day'));
         $endDate = date('Y-m-d',strtotime('-1 day'));
         $startTime =  strtotime($startDate);
         $endTime =  strtotime($endDate);
@@ -104,7 +104,7 @@ class Statistics extends Command
                     'keep_week_rate' => $first_day_users>0 ? round($keep_week_users/$first_day_users,2)*100 : 0,
                     'keep_month_rate' => $first_day_users>0 ? round($keep_month_users/$first_day_users,2)*100 : 0,
             ]);
-        }
+        }*/
 
         $this->info('######统计用户留存执行成功######');
         return 0;
