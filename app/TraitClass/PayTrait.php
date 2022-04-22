@@ -205,43 +205,32 @@ trait PayTrait
      */
     private function orderUpdate($tradeNo,$jsonResp = []): void
     {
-        $payModel = PayLog::query()->where(['number' => $tradeNo]);
-        $payInfo = $payModel->firstOrFail();
-        if ($payInfo->status == 1){
+        $nowData = date('Y-m-d H:i:s');
+        $payModel = PayLog::query()->where('number',$tradeNo);
+        $payInfo = $payModel->first();
+        $status = $payInfo->status ?? 0;
+        if ($status == 1){
             return;
         }
         $payModel->update([
-                'response_info' => json_encode($jsonResp),
-                'status' => 1,
-                'updated_at' => date('Y-m-d H:i:s', time()),
-            ]
-        );
-        $orderModel = Order::query()->where(['id' => $payInfo->order_id??0]);
+            'response_info' => json_encode($jsonResp),
+            'status' => 1,
+            'updated_at' => $nowData,
+        ]);
+        $orderId = $payInfo->order_id??0;
+        $orderModel = Order::query()->where('id',$orderId);
         $orderModel->update([
             'status' => 1,
-            'updated_at' => date('Y-m-d H:i:s', time()),
+            'updated_at' => $nowData,
         ]);
 
-        /*if (!$update) {
-            throw new Exception('订单更新失败', -1);
-        }*/
 
-        $orderInfo = $orderModel->firstOrFail();
+        $orderInfo = $orderModel->first();
         //########渠道CPS日统计########
         ProcessStatisticsChannelByDay::dispatchAfterResponse($orderInfo);
         //#############################
-        $nowData = date('Y-m-d H:i:s',time());
 
-
-        $payInfo = $payModel->firstOrFail();
-        $payModel->update([
-                'response_info' => json_encode($jsonResp),
-                'status' => 1,
-                'updated_at' => date('Y-m-d H:i:s', time()),
-            ]
-        );
-
-        $method = match ($orderInfo->type??0) {
+        $method = match ($orderInfo->type) {
             1 => 'buyVip',
             2 => 'buyGold',
             3 => 'buyVideo',
@@ -282,7 +271,6 @@ trait PayTrait
                 ->where('status',1)
                 ->get()?->toArray();
             $payEnv = array_column($payEnv,null,'name');
-//            cache()->set('payEnv',array_column($payEnv,null,'name'));
             cache()->set('payEnv',$payEnv);
         }
         return $payEnv;
