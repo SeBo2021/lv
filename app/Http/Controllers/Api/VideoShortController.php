@@ -105,6 +105,7 @@ class VideoShortController extends Controller
         $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'dash_url', 'hls_url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
         $perPage = 8;
         $model = VideoShort::query()->where('status',1);
+//        $model = VideoShort::search("*")->where('status',1);
 
         if ($tagId) {
             $tagInfo = Tag::query()->where(['mask'=>$this->cateMapAlias[$tagId]])->firstOrFail()?->toArray();
@@ -114,13 +115,11 @@ class VideoShortController extends Controller
             }
         }else{
             if ($cateId) {
-                //$listIsRand = Category::query()->where('id',$cateId)->value('is_rand')==1;
                 $cateWord = sprintf('"%s"',$cateId);
                 $model = $model->where('cat','like',"%{$cateWord}%");
             }
         }
         if ($startId) {
-//            $model = $model->where('id','>=',$startId);
             $model = $model->where('id','<=',$startId)->orderBy('id','desc');
         }
         if(!empty($words)){
