@@ -156,19 +156,19 @@ class VideoShortController extends Controller
         $_v = date('Ymd');
         $isVip = $this->isVip($user);
         foreach ($items as $one) {
-            //  $one = $this->handleShortVideoItems([$one], true)[0];
             $one['limit'] = 0;
             if ($one['restricted'] == 1  && (!$isVip)) {
                 $one['limit'] = 1;
             }
             $viewRecord = $this->isShortLoveOrCollect($user->id, $one['id']);
             $one['is_love'] = intval($viewRecord['is_love']) ?? 0;
-            $resourceDomain = self::getDomain($one['sync']??2);
+            $sync = $one['sync'] ?? 2;
+            $sync = $sync>0 ? $sync : 2;
+            $resourceDomain = self::getDomain($sync);
             //是否收藏
             $one['is_collect'] = intval($viewRecord['is_collect']) ?? 0;
             $one['url'] = $resourceDomain  .$one['url'];
             $one['dash_url'] = $resourceDomain  .$one['dash_url'];
-            //$one['cover_img'] = $resourceDomain . $one['cover_img'];
             $one['cover_img'] = $this->transferImgOut($one['cover_img'],$resourceDomain,$_v);
             //hls处理
             $one['hls_url'] = $resourceDomain .$this->transferHlsUrl($one['hls_url'],$one['id'],$_v);
