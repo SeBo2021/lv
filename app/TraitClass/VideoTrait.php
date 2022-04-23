@@ -314,7 +314,6 @@ trait VideoTrait
             2 => env('RESOURCE_DOMAIN2'),
             default => '',
         };
-        //return $sync==1 ? env('RESOURCE_DOMAIN') : env('SLICE_DOMAIN');
     }
 
     public static function getOrigin($sync,$pathName = '',$simple = false)
