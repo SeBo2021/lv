@@ -123,16 +123,18 @@ class HomeController extends Controller
                 /**/
                 $ids = $redis->sMembers('catForVideo:'.$item['id']);
                 if(!empty($ids)){
-//                    $queryBuild = Video::search()->where('status',1)->whereIn('id',$ids);
-                    $queryBuild = DB::table('video')->where('status',1)->whereIn('id',$ids);
-                    if($item['is_rand']==1){
-                        $queryBuild = $queryBuild->inRandomOrder();
-                    }else{
-                        $queryBuild = $queryBuild->orderByRaw('video.sort DESC,video.updated_at DESC,video.id DESC');
-                    }
+                    $queryBuild = Video::search('*')->where('status',1)->whereIn('id',$ids);
                     $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
-                    $videoList = $queryBuild->limit($limit)->get($this->videoFields)->toArray();
-
+                    $videoList = $queryBuild->simplePaginate($limit, 'searchPage', 1)->toArray()['data'];
+                    if($item['is_rand']==1){
+                        shuffle($videoList);
+                    }else{
+                        arrayDataMultiSort($videoList,[
+                            'sort' => 'desc',
+                            'updated_at' => 'desc',
+                            'id' => 'desc',
+                        ]);
+                    }
                     $videoList = $this->handleVideoItems($videoList,false,$request->user()->id);
                     $item['small_video_list'] = $videoList;
 

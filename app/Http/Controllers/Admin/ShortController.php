@@ -31,7 +31,7 @@ class ShortController extends BaseCurlController
         'short_rec'
     ];
 
-    public function setModel()
+    public function setModel(): AdminVideoShort
     {
         return $this->model = new AdminVideoShort();
     }
@@ -306,12 +306,10 @@ class ShortController extends BaseCurlController
 
         $isVideo = ($_REQUEST['callback_upload']??0);
         try {
-//            $job = new ProcessShort($model,$isVideo);
             if($isVideo){
                 $job = new ProcessVideoShort($model);
                 $this->dispatch($job->onQueue('high'));
             }
-            // app(Dispatcher::class)->dispatchNow($job);
         }catch (\Exception $e){
             Log::error($e->getMessage());
         }
