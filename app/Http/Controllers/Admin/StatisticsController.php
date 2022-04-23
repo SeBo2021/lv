@@ -106,8 +106,6 @@ class StatisticsController extends BaseCurlController
                 }
                 break;
             case 'activeUsers':
-                //$queryBuild = DB::table('users_day')->select('at_time',DB::raw('count(uid) as users'));
-                //$queryBuild = DB::table('login_log')->select('created_at',DB::raw('count(id) as users,cast(created_at AS date) AS at_date'));
                 $queryBuild = DB::table('statistic_day')->select('at_time',DB::raw('sum(active_users) as users'));
                 if($channelId!==null){
                     $queryBuild = $queryBuild->where('channel_id',$channelId);
@@ -125,7 +123,6 @@ class StatisticsController extends BaseCurlController
                 foreach ($activeUsers as $activeUser){
                     $json['x'][] = date('Y-m-d',$activeUser->at_time) ?? '-';
                     $json['y'][] = $activeUser->users;
-//                    $json['y'][] = round($activeUser->users * 5.5);
                 }
                 break;
             case 'recharge':
@@ -138,9 +135,7 @@ class StatisticsController extends BaseCurlController
                 if( $deviceSystem>0 ){
                     $queryBuild = $queryBuild->where('device_system',$deviceSystem);
                 }
-                // if($timeRange != 0){
-                    $queryBuild = $queryBuild->whereBetween('recharge.created_at',[$startDate,$endDate]);
-                // }
+                $queryBuild = $queryBuild->whereBetween('recharge.created_at',[$startDate,$endDate]);
                 $items = $queryBuild->groupBy('days')->orderByDesc('days')->limit(15)->get();
                 $items = array_reverse($items->toArray());
                 $X = [];
@@ -153,9 +148,7 @@ class StatisticsController extends BaseCurlController
                 break;
             case 'users':
                 // 修正安装量与注册量
-                // $json = $this->fixDataByUserTable($channelId, $deviceSystem, $timeRange, $startDate, $endDate,true);
-                $fields = 'sum(install) as value,device_system';
-                $queryBuild = DB::table('statistic_day')->select(DB::raw($fields));
+                $queryBuild = DB::table('statistic_day')->select(DB::raw('sum(install) as value,device_system'));
                 if($channelId!==null){
                     $queryBuild = $queryBuild->where('channel_id',$channelId);
                 }
@@ -164,11 +157,9 @@ class StatisticsController extends BaseCurlController
                     $queryBuild = $queryBuild->where('device_system',$deviceSystem);
                 }
 
-                // if($timeRange != 0){
-                    $queryBuild = $queryBuild
-                        ->where('at_time','>=',strtotime($startDate))
-                        ->where('at_time','<=',strtotime($endDate));
-                // }
+                $queryBuild = $queryBuild
+                    ->where('at_time','>=',strtotime($startDate))
+                    ->where('at_time','<=',strtotime($endDate));
 
                 $json = $queryBuild->groupBy('device_system')->get();
     
