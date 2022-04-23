@@ -133,6 +133,7 @@ class HomeController extends Controller
                     $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
                     //$videoList = $queryBuild->limit($limit)->get($this->videoFields)->toArray();
                     $videoList = $queryBuild->take($limit)->get()->toArray();
+                    $videoList = !empty($videoList) ? $videoList : [];
                     if($item['is_rand']==1){
                         shuffle($videoList);
                     }else{
