@@ -153,23 +153,13 @@ class DFController extends PayBaseController implements Pay
 
     function sign($data, $md5Key): string
     {
-        /*$native = array(
-            "pay_memberid" => $data['pay_memberid'],
-            "pay_orderid" => $data['pay_orderid'],
-            "pay_amount" => $data['pay_amount'],
-            "pay_applydate" => $data['pay_applydate'],
-            "pay_bankcode" => $data['pay_bankcode'],
-            "pay_notifyurl" => $data['pay_notifyurl'],
-            "pay_callbackurl" => $data['pay_callbackurl'],
-        );*/
         $native = $data;
         ksort($native);
         $md5str = "";
         foreach ($native as $key => $val) {
             $md5str = $md5str . $key . "=" . $val . "&";
         }
-        $sign = strtoupper(md5($md5str . "key=" . $md5Key));
-        return $sign;
+        return strtoupper(md5($md5str . "key=" . $md5Key));
     }
 
     /**
@@ -181,24 +171,7 @@ class DFController extends PayBaseController implements Pay
      */
     function verify($data, $md5Key, $pubKey): bool
     {
-        $returnArray = array( // 返回字段
-            "p1_merchantno" => $data["p1_merchantno"],
-            'p2_amount' => $data["p2_amount"],
-            'p3_orderno' => $data["p3_orderno"],
-            'p4_paytype' => $data["p4_status"],
-            'p5_producttype' => $data["p5_producttype"],
-            'p6_requesttime' => $data["p6_requesttime"],
-            'p7_goodsname' => $data["p7_goodsname"],
-            'p8_tradetime' => $data["p8_tradetime"],
-            'p9_porderno' => $data["p9_porderno"],
-        );
-        ksort($returnArray);
-        reset($returnArray);
-        $md5str = "";
-        foreach ($returnArray as $key => $val) {
-            $md5str = $md5str . $key . "=" . $val . "&";
-        }
-        $sign = strtoupper(md5($md5str . "key=" . $md5Key));
+        $sign = $this->sign($data,$md5Key);
         if ($sign == $pubKey) {
             return true;
         }

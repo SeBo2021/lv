@@ -13,7 +13,7 @@ class PayController extends PayBaseController
     public function entrance($channel): \Illuminate\Http\JsonResponse
     {
         $params = ApiParamsTrait::parse(request()->params ?? '');
-        Validator::make($params, [
+        $validated = Validator::make($params, [
             'pay_id' => 'required|string',
             'type' => [
                 'required',
@@ -22,7 +22,13 @@ class PayController extends PayBaseController
             ],
         ])->validated();
 //        dump($channel);
+        (new $channel($validated))->pay();
         return response()->json($channel);
+    }
+
+    public function callback($channel)
+    {
+
     }
 
 }
