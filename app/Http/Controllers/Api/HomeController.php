@@ -125,16 +125,16 @@ class HomeController extends Controller
                 /**/
                 $ids = $redis->sMembers('catForVideo:'.$item['id']);
                 if(!empty($ids)){
-                    $queryBuild = $queryBuild->whereIn('id',$ids)->orderBy('sort','desc');
+                    $queryBuild = $queryBuild->whereIn('id',$ids)->orderBy('updated_at','desc');
                     $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
                     $videoList = $queryBuild->get()->toArray();
 //                    $videoList = $queryBuild->simplePaginate($limit, 'searchPage', 1)->toArray()['data'];
                     if($item['is_rand']==1){
                         shuffle($videoList);
                     }else{
-                        arrayDataMultiSort($videoList,[
+                        $videoList = arrayDataMultiSort($videoList,[
                             'sort' => 'desc',
-                            'updated_at' => 'desc',
+                            //'updated_at' => 'desc',
                             'id' => 'desc',
                         ]);
                     }
