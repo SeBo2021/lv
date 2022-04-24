@@ -22,7 +22,7 @@ class PayController extends PayBaseController
             ],
         ])->validated();
 //        dump($channel);
-        return response()->json($params);
+        return response()->json($channel);
     }
 
 }
