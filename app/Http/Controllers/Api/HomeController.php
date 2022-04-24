@@ -134,7 +134,7 @@ class HomeController extends Controller
                     }else{
                         arrayDataMultiSort($videoList,[
                             'sort' => 'desc',
-                            //'updated_at' => 'desc',
+                            'updated_at' => 'desc',
                             'id' => 'desc',
                         ]);
                     }
