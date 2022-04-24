@@ -118,14 +118,14 @@ class HomeController extends Controller
             $data = $secondCateList['data'];
 
             //加入视频列表
-            $queryBuild = Video::search('*')->where('status',1);
+            //$queryBuild = Video::search('*')->where('status',1);
             foreach ($data as &$item)
             {
                 //获取模块数据
                 /**/
                 $ids = $redis->sMembers('catForVideo:'.$item['id']);
                 if(!empty($ids)){
-                    $queryBuild = $queryBuild->whereIn('id',$ids);
+                    /*$queryBuild = $queryBuild->whereIn('id',$ids);
                     $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
                     $videoList = $queryBuild->get()->toArray();
 //                    $videoList = $queryBuild->simplePaginate($limit, 'searchPage', 1)->toArray()['data'];
@@ -145,7 +145,20 @@ class HomeController extends Controller
 
                     if(!empty($item['bg_img'])){
                         $item['bg_img'] = env('APP_URL').$item['bg_img'];
+                    }*/
+                    //$queryBuild = Video::search()->where('status',1)->whereIn('id',$ids);
+//                    $queryBuild = Video::search()->where('status',1)->whereIn('id',$ids);
+                    $queryBuild = DB::table('video')->where('status',1)->whereIn('id',$ids);
+                    if($item['is_rand']==1){
+                        $queryBuild = $queryBuild->inRandomOrder();
+                    }else{
+                        $queryBuild = $queryBuild->orderByRaw('video.sort DESC,video.updated_at DESC,video.id DESC');
                     }
+                    $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
+                    $videoList = $queryBuild->limit($limit)->get($this->videoFields)->toArray();
+
+                    $videoList = $this->handleVideoItems($videoList,false,$request->user()->id);
+                    $item['small_video_list'] = $videoList;
                 }
             }
             $res['hasMorePages'] = $paginator->hasMorePages();
