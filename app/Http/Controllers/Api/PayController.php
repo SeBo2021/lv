@@ -10,8 +10,8 @@ class PayController extends PayBaseController
     public function entrance($channel): \Illuminate\Http\JsonResponse
     {
         //return $channel;
-        $return = $this->format(0, ['url' => $channel], '取出成功');
-        return response()->json($return);
+//        $return = $this->format(0, ['url' => $channel], '取出成功');
+        return response()->json($channel);
     }
 
 }
