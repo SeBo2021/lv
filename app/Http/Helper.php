@@ -757,5 +757,5 @@ function arrayDataMultiSort(array &$rows, array $sorts): array
     }
     $args[] = &$rows;
     call_user_func_array("array_multisort", $args);
-    return $rows;
+    return $args;
 }
