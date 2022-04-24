@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
 class PayController extends PayBaseController
 {
     use ApiParamsTrait;
-    public function entrance(Request $request,$channel): \Illuminate\Http\JsonResponse
+    public function entrance(Request $request): \Illuminate\Http\JsonResponse
     {
         $params = ApiParamsTrait::parse($request->params ?? '');
         Validator::make($params, [
@@ -21,7 +21,6 @@ class PayController extends PayBaseController
                 Rule::in(['1', '2']),
             ],
         ])->validated();
-        dump($channel);
         return response()->json($params);
     }
 
