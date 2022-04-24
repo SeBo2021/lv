@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\TraitClass\ApiParamsTrait;
+
 class PayController extends PayBaseController
 {
-    public function entrance($channel)
+    use ApiParamsTrait;
+    public function entrance($channel): \Illuminate\Http\JsonResponse
     {
         //return $channel;
-        return response($channel);
+        $return = $this->format(0, ['url' => $channel], '取出成功');
+        return response()->json($return);
     }
 
 }
