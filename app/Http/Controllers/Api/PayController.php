@@ -21,7 +21,7 @@ class PayController extends PayBaseController
                 Rule::in(['1', '2']),
             ],
         ])->validated();
-        dump($channel);
+//        dump($channel);
         return response()->json($params);
     }
 
