@@ -138,7 +138,7 @@ class HomeController extends Controller
                             'id' => 'desc',
                         ]);
                     }
-                    $videoList = array_slice($videoList,0,$limit-1);
+                    $videoList = array_slice($videoList,0,$limit);
                     //Log::info('===TestSmallVideoList2==',$videoList);
                     $videoList = $this->handleVideoItems($videoList,false,$user->id);
                     $item['small_video_list'] = $videoList;
