@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\TraitClass\ApiParamsTrait;
+use Illuminate\Http\Request;
 
 class PayController extends PayBaseController
 {
     use ApiParamsTrait;
-    public function entrance($channel): \Illuminate\Http\JsonResponse
+    public function entrance(Request $request): \Illuminate\Http\JsonResponse
     {
-        //return $channel;
-//        $return = $this->format(0, ['url' => $channel], '取出成功');
-        return response()->json($channel);
+        return response()->json($request->all());
     }
 
 }
