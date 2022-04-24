@@ -90,6 +90,7 @@ class HomeController extends Controller
      */
     public function lists(Request $request): \Illuminate\Http\JsonResponse
     {
+        $user = $request->user();
         if(isset($request->params)){
             $params = ApiParamsTrait::parse($request->params);
             $validated = Validator::make($params,[
@@ -135,7 +136,7 @@ class HomeController extends Controller
                             'id' => 'desc',
                         ]);
                     }
-                    $videoList = $this->handleVideoItems($videoList,false,$request->user()->id);
+                    $videoList = $this->handleVideoItems($videoList,false,$user->id);
                     $item['small_video_list'] = $videoList;
 
                     if(!empty($item['bg_img'])){
