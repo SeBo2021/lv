@@ -90,10 +90,10 @@ Route::group([
     Route::post('methodDbs', 'DBSController@method');  //大白鲨支付方式
 
     // 长江支付相关接口
-    Route::post('pay{name}', function ($name){
+    /*Route::post('pay{name}', function ($name){
         return $name.'Controller@pay';
-    });
-    /*Route::post('payCJ', 'CJController@pay');  //长江支付动作
+    });*/
+    Route::post('payCJ', 'CJController@pay');  //长江支付动作
     /// YK支付相关接口
     Route::post('payYK', 'YKController@pay');  //YK支付动作
     /// YK支付相关接口
@@ -107,7 +107,7 @@ Route::group([
     // 通达支付
     Route::post('payTD', 'TDController@pay');  //通达支付动作
     // SA支付
-    Route::post('paySA', 'SAController@pay');  //SA支付动作*/
+    Route::post('paySA', 'SAController@pay');  //SA支付动作
     /// 订单相关接口
     Route::post('oderCreate', 'OrderController@create');  //订单创建接口
     Route::get('orderQuery', 'OrderController@query');  //订单查询接口
