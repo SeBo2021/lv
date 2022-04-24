@@ -130,12 +130,13 @@ class HomeController extends Controller
                     if($item['is_rand']==1){
                         shuffle($videoList);
                     }else{
-                        $videoList = arrayDataMultiSort($videoList,[
+                        arrayDataMultiSort($videoList,[
                             'sort' => 'desc',
                             'updated_at' => 'desc',
                             'id' => 'desc',
                         ]);
                     }
+                    Log::info('===TestSmallVideoList==',$videoList);
                     $videoList = $this->handleVideoItems($videoList,false,$user->id);
                     $item['small_video_list'] = $videoList;
 
