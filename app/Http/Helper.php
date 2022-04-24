@@ -740,7 +740,7 @@ function naction($name,$pram=[]){
  * @param array $sorts
  * @return array
  */
-function arrayDataMultiSort(array $rows, array $sorts): array
+function arrayDataMultiSort(array &$rows, array $sorts): array
 {
 
     $args = [];
