@@ -463,7 +463,7 @@ trait VideoTrait
             } else {
                 //$list['cover_img'] = $domainSync . $list['cover_img'];
                 //Log::info('===testHandleVideoItem==',[$list,(isset($list['gold'])? $list['gold'] :'none')]);
-                $list['gold'] = ($list['gold']??0) / $this->goldUnit;
+                $list['gold'] = $list['gold'] / $this->goldUnit;
                 $list['views'] = $list['views'] > 0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5, 9));
                 //$list['hls_url'] = $domainSync . $list['hls_url'];
                 $list['preview_hls_url'] = $this->getPreviewPlayUrl($list['hls_url']);
