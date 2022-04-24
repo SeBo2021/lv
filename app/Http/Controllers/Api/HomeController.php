@@ -127,6 +127,7 @@ class HomeController extends Controller
                     $queryBuild = Video::search('*')->where('status',1)->whereIn('id',$ids);
                     $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
                     $videoList = $queryBuild->simplePaginate($limit, 'searchPage', 1)->toArray()['data'];
+                    Log::info('===TestSmallVideoList1==',$videoList);
                     if($item['is_rand']==1){
                         shuffle($videoList);
                     }else{
@@ -136,7 +137,7 @@ class HomeController extends Controller
                             'id' => 'desc',
                         ]);
                     }
-                    Log::info('===TestSmallVideoList==',$videoList);
+                    Log::info('===TestSmallVideoList2==',$videoList);
                     $videoList = $this->handleVideoItems($videoList,false,$user->id);
                     $item['small_video_list'] = $videoList;
 
