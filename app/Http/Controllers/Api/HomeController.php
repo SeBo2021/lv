@@ -118,15 +118,17 @@ class HomeController extends Controller
             $data = $secondCateList['data'];
 
             //加入视频列表
+            $queryBuild = Video::search('*')->where('status',1);
             foreach ($data as &$item)
             {
                 //获取模块数据
                 /**/
                 $ids = $redis->sMembers('catForVideo:'.$item['id']);
                 if(!empty($ids)){
-                    $queryBuild = Video::search('*')->where('status',1)->whereIn('id',$ids);
+                    $queryBuild = $queryBuild->whereIn('id',$ids);
                     $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
-                    $videoList = $queryBuild->simplePaginate($limit, 'searchPage', 1)->toArray()['data'];
+                    $videoList = $queryBuild->get()->toArray();
+//                    $videoList = $queryBuild->simplePaginate($limit, 'searchPage', 1)->toArray()['data'];
                     if($item['is_rand']==1){
                         shuffle($videoList);
                     }else{
@@ -136,6 +138,8 @@ class HomeController extends Controller
                             'id' => 'desc',
                         ]);
                     }
+                    $videoList = array_slice($videoList,0,$limit);
+                    //Log::info('===TestSmallVideoList2==',$videoList);
                     $videoList = $this->handleVideoItems($videoList,false,$user->id);
                     $item['small_video_list'] = $videoList;
 
