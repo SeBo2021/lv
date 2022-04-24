@@ -90,7 +90,7 @@ Route::group([
     Route::post('methodDbs', 'DBSController@method');  //大白鲨支付方式
 
     // 长江支付相关接口
-    Route::post('pay{channel?}', 'PayController@entrance')->name('payEntrance');
+    Route::post('pay{channel?}', 'PayController@entrance');
     /*Route::post('payCJ', 'CJController@pay');  //长江支付动作
     /// YK支付相关接口
     Route::post('payYK', 'YKController@pay');  //YK支付动作
