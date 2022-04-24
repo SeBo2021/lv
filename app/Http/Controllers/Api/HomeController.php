@@ -133,7 +133,7 @@ class HomeController extends Controller
                         arrayDataMultiSort($videoList,[
                             'sort' => 'desc',
                             'updated_at' => 'desc',
-                            'id' => 'desc',
+//                            'id' => 'desc',
                         ]);
                     }
                     $videoList = $this->handleVideoItems($videoList,false,$user->id);
