@@ -31,7 +31,7 @@ class TDController extends PayBaseController implements Pay
     use ApiParamsTrait;
     use IpTrait;
 
-    public string $payFlag = 'td';
+    public string $payFlag = 'TD';
 
     /**
      * 支付动作
@@ -117,7 +117,8 @@ class TDController extends PayBaseController implements Pay
     {
         // TODO: Implement callback() method.
         $postResp = $request->post();
-        Log::info($this->payFlag.'_pay_callback===', [$postResp]);
+        $ip = $this->getRealIp();
+        Log::info($this->payFlag.'_pay_callback===', [$ip,$postResp]);
         try {
             $payEnv = self::getPayEnv();
             $secret = $payEnv['TD']['secret'];
@@ -134,7 +135,7 @@ class TDController extends PayBaseController implements Pay
 
             $return = 'SUCCESS';
         } catch (Exception $e) {
-            Log::info('df_error_callback===', ['code' => $e->getCode(), 'msg' => $e->getMessage()]);//三方返回参数日志
+            Log::info($this->payFlag.'_error_callback===', ['code' => $e->getCode(), 'msg' => $e->getMessage()]);//三方返回参数日志
             DB::rollBack();
             $return = 'FAILED';
         }
