@@ -153,11 +153,11 @@ class TDController extends PayBaseController implements Pay
     {
         $native = $data;
         ksort($native);
-        //Log::info($this->payFlag.'_signData===', $native);
         $md5str = '';
         $lastKeyName = array_key_last($native);
+        Log::info($this->payFlag.'_signData===', $native);
         foreach ($native as $key => $val) {
-            if(!empty($val) && $key!='sign'){
+            if($val=="0" || (!empty($val) && $key!='sign')){
                 $md5str = ($key==$lastKeyName ? $md5str . $key . "=" . $val : $md5str . $key . "=" . $val . "&");
             }
         }
