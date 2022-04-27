@@ -307,6 +307,8 @@ class AdController extends BaseCurlController
         $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
         //清除推荐缓存
         $this->redisBatchDel($this->redis()->keys('*searchRecommend*'));
+        //清除更多页缓存
+        $this->redisBatchDel($this->redis()->keys('*api_more_cid-page:'));
     }
 
     //表单验证
