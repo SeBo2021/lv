@@ -304,11 +304,9 @@ class AdController extends BaseCurlController
         $model->save();
         $this->syncUpload($model->img);
         //清除首页列表缓存
-        if($this->getConfigDataFromDb()){
-            $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
-            //清除推荐缓存
-            $this->redisBatchDel($this->redis()->keys('*searchRecommend*'));
-        }
+        $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
+        //清除推荐缓存
+        $this->redisBatchDel($this->redis()->keys('*searchRecommend*'));
     }
 
     //表单验证
