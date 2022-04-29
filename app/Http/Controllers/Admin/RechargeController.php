@@ -248,7 +248,7 @@ class RechargeController extends BaseCurlIndexController
             [
                 'field' => 'device_system',
                 'type' => 'select',
-                'name' => '手机系统平台',
+                'name' => '手机系统',
                 'data' => $this->deviceSystem
             ],
             [

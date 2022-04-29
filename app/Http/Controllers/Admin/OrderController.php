@@ -16,6 +16,24 @@ class OrderController extends BaseCurlController
     use PayTrait;
     //设置页面的名称
     public $pageName = '订单';
+    public array $deviceSystem = [
+        0=>[
+            'id'=>'',
+            'name'=>'全部'
+        ],
+        1=>[
+            'id'=>1,
+            'name'=>'苹果'
+        ],
+        2=>[
+            'id'=>2,
+            'name'=>'安卓'
+        ],
+        3=>[
+            'id'=>3,
+            'name'=>'ios轻量版'
+        ],
+    ];
 
     //1.设置模型
     public function setModel(): Order
@@ -202,23 +220,29 @@ class OrderController extends BaseCurlController
                 ]
             ],
             [
-                'field' => 'created_at',
-                'type' => 'datetime',
-//                'attr' => 'data-range=true',
-                'attr' => 'data-range=~',//需要特殊分割
-                'name' => '时间范围',
-            ],
-            [
                 'field' => 'query_pay_method',
                 'type' => 'select',
                 'name' => '充值类型',
                 'data' => $this->getAllPayChannel()
             ],
             [
+                'field' => 'device_system',
+                'type' => 'select',
+                'name' => '手机系统',
+                'data' => $this->deviceSystem
+            ],
+            [
                 'field' => 'query_channel_code',
                 'type' => 'select',
                 'name' => '充值渠道',
                 'data' => array_merge(['0'=>['id'=>'0','name'=>'全部']],$this->getPayTypeCode())
+            ],
+            [
+                'field' => 'created_at',
+                'type' => 'datetime',
+//                'attr' => 'data-range=true',
+                'attr' => 'data-range=~',//需要特殊分割
+                'name' => '时间范围',
             ],
         ];
         //赋值到ui数组里面必须是`search`的key值
@@ -229,6 +253,7 @@ class OrderController extends BaseCurlController
     {
         $page = $this->rq->input('page', 1);
         $pagesize = $this->rq->input('limit', 30);
+        $deviceSystem = $this->rq->input('device_system',null);
 
         $field = ['orders.id', 'orders.remark', 'orders.number', 'orders.forward', 'orders.type', 'orders.vid', 'orders.type_id', 'orders.channel_pid', 'orders.channel_id', 'orders.uid', 'orders.amount', 'orders.status', 'orders.created_at', 'orders.updated_at', 'orders.expired_at', 'recharge.pay_method', 'recharge.channel_code'];
         $raw = implode(',',$field);
@@ -257,6 +282,9 @@ class OrderController extends BaseCurlController
         if($queryStatus != ''){
             $build = $build->where('orders.status',$queryStatus);
         }
+        if($deviceSystem!==null){
+            $build = $build->where('recharge.device_system',$deviceSystem);
+        }
         $created_at = $this->rq->input('created_at',null);
         if($created_at!==null){
             $dateArr = explode('~',$created_at);
@@ -264,6 +292,7 @@ class OrderController extends BaseCurlController
                 $build = $build->whereBetween('orders.created_at', [trim($dateArr[0]),trim($dateArr[1])]);
             }
         }
+
 
         $total = $build->count();
 
