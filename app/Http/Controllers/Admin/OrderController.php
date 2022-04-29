@@ -95,6 +95,12 @@ class OrderController extends BaseCurlController
                 'align' => 'center',
             ],
             [
+                'field' => 'device_system',
+                'minWidth' => 100,
+                'title' => '手机系统',
+                'align' => 'center'
+            ],
+            [
                 'field' => 'status',
                 'minWidth' => 80,
                 'title' => '状态',
@@ -114,7 +120,7 @@ class OrderController extends BaseCurlController
             ],
             [
                 'field' => 'created_at',
-                'minWidth' => 150,
+                'minWidth' => 175,
                 'title' => '创建时间',
                 'align' => 'center'
             ],
@@ -144,6 +150,7 @@ class OrderController extends BaseCurlController
         $item->status = UiService::switchTpl('status', $item,'','完成|未付');
         $channel_name = $item->channel_id>0 ? DB::table('channels')->where('id',$item->channel_id)->value('name') : '官方';
         $item->channel_id = $channel_name . '('.$item->channel_id.')';
+        $item->device_system = $this->deviceSystem[$item->device_system]['name'];
         $payChannels = $this->getPayChannels();
         $item->pay_method_name = $payChannels[$item->pay_method]??'-';
         return $item;
@@ -255,7 +262,7 @@ class OrderController extends BaseCurlController
         $pagesize = $this->rq->input('limit', 30);
         $deviceSystem = $this->rq->input('device_system',null);
 
-        $field = ['orders.id', 'orders.remark', 'orders.number', 'orders.forward', 'orders.type', 'orders.vid', 'orders.type_id', 'orders.channel_pid', 'orders.channel_id', 'orders.uid', 'orders.amount', 'orders.status', 'orders.created_at', 'orders.updated_at', 'orders.expired_at', 'recharge.pay_method', 'recharge.channel_code'];
+        $field = ['orders.id', 'orders.remark', 'orders.number', 'orders.forward', 'orders.type', 'orders.vid', 'orders.type_id', 'orders.channel_pid', 'orders.channel_id', 'orders.uid', 'orders.amount', 'orders.status', 'orders.created_at', 'orders.updated_at', 'orders.expired_at', 'recharge.pay_method','recharge.device_system', 'recharge.channel_code'];
         $raw = implode(',',$field);
         $model = $model->select(DB::raw($raw));
 
