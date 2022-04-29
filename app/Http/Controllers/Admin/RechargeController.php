@@ -143,7 +143,7 @@ class RechargeController extends BaseCurlIndexController
             [
                 'field' => 'device_system',
                 'minWidth' => 100,
-                'title' => '手机系统平台',
+                'title' => '手机系统',
                 'align' => 'center'
             ],
             [
@@ -166,13 +166,13 @@ class RechargeController extends BaseCurlIndexController
             ],
             [
                 'field' => 'register_at',
-                'width' => 150,
+                'width' => 175,
                 'title' => '会员注册时间',
                 'align' => 'center'
             ],
             [
                 'field' => 'created_at',
-                'minWidth' => 150,
+                'minWidth' => 175,
                 'title' => '创建时间',
                 'align' => 'center'
             ],
