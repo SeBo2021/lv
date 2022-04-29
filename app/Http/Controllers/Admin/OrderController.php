@@ -150,7 +150,7 @@ class OrderController extends BaseCurlController
         $item->status = UiService::switchTpl('status', $item,'','完成|未付');
         $channel_name = $item->channel_id>0 ? DB::table('channels')->where('id',$item->channel_id)->value('name') : '官方';
         $item->channel_id = $channel_name . '('.$item->channel_id.')';
-        $item->device_system = $this->deviceSystem[$item->device_system]['name'];
+        $item->device_system = $this->deviceSystem[intval($item->device_system)]['name'];
         $payChannels = $this->getPayChannels();
         $item->pay_method_name = $payChannels[$item->pay_method]??'-';
         return $item;
