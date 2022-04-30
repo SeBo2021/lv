@@ -98,7 +98,7 @@ class VipController extends \App\Http\Controllers\Controller
         $gold = DB::table('gold')
             ->where('status',1)
             ->orderBy('sort')
-            ->get(['id','money','zfb_action_id','wx_action_id'])->toArray();
+            ->get(['id','money','remark','zfb_action_id','wx_action_id'])->toArray();
        $rechargeData = $this->getRechargeChannel();
        $baseUrl =  env('APP_URL');
        foreach ($gold as $mcKey=>$mvItem) {
