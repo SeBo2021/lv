@@ -2,11 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\TraitClass\AdTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class AdsUpdate extends Command
 {
+    use AdTrait;
     /**
      * The name and signature of the console command.
      *
@@ -58,7 +60,9 @@ class AdsUpdate extends Command
             }
 
         }
-        $this->info('######广告状态更新成功######');
+        if(!empty($this->getConfigDataFromDb())){
+            $this->info('######广告状态更新成功######');
+        }
         return 0;
     }
 }
