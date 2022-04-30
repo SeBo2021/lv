@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MemberCard;
 use App\Models\Order;
 use App\Models\PayLog;
+use App\Models\User;
 use App\Models\Video;
 use App\TraitClass\ApiParamsTrait;
 use App\TraitClass\MemberCardTrait;
@@ -67,6 +68,7 @@ class OrderController extends PayBaseController
         $now = date('Y-m-d H:i:s', time());
         $user = $request->user();
         if($goodsMethod == 'getGoldInfo'){
+            $user = User::query()->find($user->id);
             if($goodsInfo['user_type']==1 && (!$this->isVip($user))){
                 return response()->json($this->format(-1, [], '无vip权限'));
             }
