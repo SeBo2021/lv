@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\PayLog;
 use App\Models\Video;
 use App\TraitClass\ApiParamsTrait;
+use App\TraitClass\MemberCardTrait;
 use App\TraitClass\PayTrait;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,8 +24,7 @@ use Illuminate\Validation\ValidationException;
 
 class OrderController extends PayBaseController
 {
-    use ApiParamsTrait;
-    use PayTrait;
+    use ApiParamsTrait,MemberCardTrait,PayTrait;
 
     /**
      * 订单创建接口
@@ -66,6 +66,11 @@ class OrderController extends PayBaseController
         $goodsInfo = $this->$goodsMethod($params['goods_id']);
         $now = date('Y-m-d H:i:s', time());
         $user = $request->user();
+        if($goodsMethod == 'getGoldInfo'){
+            if($goodsInfo['user_type']==1 && (!$this->isVip($user))){
+                return response()->json($this->format(-1, [], '无vip权限'));
+            }
+        }
         //是否有效打折
         $useRealValue = false;
         $realValue = $goodsInfo['real_value'] ?? 0;
