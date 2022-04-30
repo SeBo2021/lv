@@ -154,6 +154,11 @@ class GoldController extends BaseCurlController
                 'align' => 'center',
             ],
             [
+                'field' => 'remark',
+                'type' => 'text',
+                'name' => '备注信息',
+            ],
+            [
                 'field' => 'proportion',
                 'type' => 'text',
                 'name' => '充值比例',
