@@ -125,12 +125,12 @@ class SearchController extends Controller
     {
         if(isset($request->params)){
             $params = ApiParamsTrait::parse($request->params);
-            Validator::make($params,[
+            $validated = Validator::make($params,[
                 'cid' => 'required|integer',
                 'page' => 'required|integer',
-            ])->validate();
-            $cid = $params['cid'];
-            $page = $params['page'];
+            ])->validated();
+            $cid = $validated['cid'];
+            $page = $validated['page'];
 
             $redisKey = $this->apiRedisKey['search_cat'].$cid.'-'.$page;
             $redis = $this->redis();
@@ -152,7 +152,7 @@ class SearchController extends Controller
                         //Log::info('==CatList==',$res['list']);
                         $res['hasMorePages'] = $paginator->hasMorePages();
                         $redis->set($redisKey,json_encode($res,JSON_UNESCAPED_UNICODE));
-                        $redis->expire($redisKey,7200);
+                        $redis->expire($redisKey,3600);
                     }
                 }
 
@@ -174,12 +174,12 @@ class SearchController extends Controller
     {
         if(isset($request->params)){
             $params = ApiParamsTrait::parse($request->params);
-            Validator::make($params,[
+            $validated = Validator::make($params,[
                 'vid' => 'required|integer',
-            ])->validate();
-            $page = $params['page'] ?? 1;
+            ])->validated();
+            $page = $validated['page'] ?? 1;
             $perPage = 8;
-            $vid = $params['vid'];
+            $vid = $validated['vid'];
 //            $cat = Video::query()->where('id',$vid)->value('cat');
             $cat = $this->getVideoById($vid)->cat;
 
@@ -216,7 +216,7 @@ class SearchController extends Controller
                             $res['list'] = $this->insertAds($res['list'],'recommend',1);
                             $res['hasMorePages'] = false;
                             $redis->set($key,json_encode($res,JSON_UNESCAPED_UNICODE));
-                            $redis->expire($key,7200);
+                            $redis->expire($key,3600);
                             return response()->json([
                                 'state'=>0,
                                 'data'=>$res

@@ -166,7 +166,7 @@ class HomeController extends Controller
             $res['list'] = $this->insertAds($res['list'],'home_page',true,$page,$perPage);
             //存入redis
             $redis->set($sectionKey,json_encode($res,JSON_UNESCAPED_UNICODE));
-            //$redis->expire($sectionKey,$this->redisExpiredTime);
+            $redis->expire($sectionKey,3600);
         }else{
             $res = json_decode($res,true);
         }
