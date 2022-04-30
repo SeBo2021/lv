@@ -144,6 +144,7 @@ trait PayTrait
     private function buyGold($id,$uid): Model|Collection|Builder|array|null
     {
         $info = Gold::query()->find($id)?->toArray();
+        $info['money'] = $info['money'] * intval($info['proportion']);
         User::query()->find($uid)->update(
             ['gold' =>DB::raw("gold + {$info['money']}") ]
         );
@@ -223,7 +224,6 @@ trait PayTrait
             'status' => 1,
             'updated_at' => $nowData,
         ]);
-
 
         $orderInfo = $orderModel->first();
         //########渠道CPS日统计########

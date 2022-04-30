@@ -81,19 +81,20 @@ class OrderController extends PayBaseController
             }
             Log::info('===memberCard_diff_time==',[$user->created_at,$goodsInfo['hours']*3600,$validPeriodTime,time(),$useRealValue]);
         }
+
+        if ($params['method_id']??false) {
+            $amount = $goodsInfo[match ($params['method_id']) {
+                '1' => 'zfb_fee',
+                '2' => 'wx_fee',
+            }];
+        } else {
+            $amount = $goodsInfo[match ($params['type']) {
+                '1' => $useRealValue ? 'real_value' : 'value',
+                '2' => 'money',
+                '3' => 'gold',
+            }];
+        }
         try {
-            if ($params['method_id']??false) {
-                $amount = $goodsInfo[match ($params['method_id']) {
-                    '1' => 'zfb_fee',
-                    '2' => 'wx_fee',
-                }];
-            } else {
-                $amount = $goodsInfo[match ($params['type']) {
-                    '1' => $useRealValue ? 'real_value' : 'value',
-                    '2' => 'money',
-                    '3' => 'gold',
-                }];
-            }
             $number = self::getPayNumber();
             $createData = [
                 'remark' => json_encode($goodsInfo),
