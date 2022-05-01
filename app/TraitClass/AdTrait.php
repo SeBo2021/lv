@@ -25,7 +25,7 @@ trait AdTrait
             $res['send_sms_intervals'] = (int)$appConfig['send_sms_intervals'];
             //广告部分
             $ads = $this->weightGet('open_screen');
-            $activityAds = $this->weightGet('activity');
+            $activityAds = $this->weightGet('activity',true);
             $res['open_screen_ads'] = $ads;
             $res['activity_ads'] = $activityAds;
 
@@ -41,13 +41,25 @@ trait AdTrait
         return [];
     }
 
-    public function weightGet($flag=''): array
+    public function weightGet($flag='',$more=false): array
     {
         $ads = Ad::query()
             ->where('name',$flag)
             ->where('status',1)
             ->get(['id','name','weight','title','img','position','url','play_url','type','status','action_type','vid','end_at'])
             ->toArray();
+        $domain = VideoTrait::getDomain(env('SFTP_SYNC',1));
+        $_v = date('Ymd');
+
+        if($more){
+            foreach ($ads as &$item){
+                $item['img'] = $this->transferImgOut($item['img'],$domain,$_v,'auto');
+                $item['action_type'] = (string) $item['action_type'];
+                $item['vid'] = (string) $item['vid'];
+            }
+            return $ads;
+        }
+
         $one = [];
 
         foreach ($ads as $ad){
@@ -63,10 +75,7 @@ trait AdTrait
                 $key = array_rand($ads);
                 $one = $ads[$key];
             }
-            $domain = VideoTrait::getDomain(env('SFTP_SYNC',1));
-            //$one['img'] = $domain . $one['img'];
             //图片处理
-            $_v = date('Ymd');
             $one['img'] = $this->transferImgOut($one['img'],$domain,$_v,'auto');
             $one['action_type'] = (string) $one['action_type'];
             $one['vid'] = (string) $one['vid'];
