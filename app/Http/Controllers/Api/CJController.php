@@ -71,16 +71,7 @@ class CJController extends PayBaseController implements Pay
                 throw new Exception("订单不存在");
             }
             $mercId = $payEnv['CJ']['merchant_id'];
-            // $notifyUrl = env('APP_URL') . $payEnv['CJ']['notify_url'];
-            // $notifyUrl = 'https://qa.saoltv.com' . $payEnv['CJ']['notify_url'];
-            $notifyUrl = 'http://api.saolv200.com' . $payEnv['CJ']['notify_url'];
-            /*if ('zfbwap' == $params['type']) {
-                $params['type'] = 'zfbwap';
-            }*/
-            /*if ('wxwap' == $params['type']) {
-                $params['type'] = '202';
-                $orderInfo->amount -= 1;
-            }*/
+            $notifyUrl = 'http://' .$_SERVER['HTTP_HOST'] . $payEnv['CJ']['notify_url'];
             $oldMix = false;
             $rechargeChannel = $params['type'];
             if (in_array($params['type'],['1','2'])) {

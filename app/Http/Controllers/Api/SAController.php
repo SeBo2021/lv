@@ -74,11 +74,9 @@ class SAController extends PayBaseController implements Pay
         }
 
         $mercId = $payEnvInfo['merchant_id'];
-        // $notifyUrl = env('APP_URL') . $payInfo['notify_url'];
-        //$notifyUrl = 'https://qa.saoltv.com' . $payEnvInfo['notify_url'];
-        $notifyUrl = 'http://api.saolv300.com' . $payEnvInfo['notify_url'];
+        $notifyUrl = 'http://' .$_SERVER['HTTP_HOST'] . $payEnvInfo['notify_url'];
         $input = [
-            'channel' => 98,            //通道号
+            'channel' => $mercId,            //商户号/通道号
             'type' => $channelNo,            //通道类型
             'money' => intval($orderInfo->amount*100 ?? 0),              //订单金额,单位分
             'orderno' => strval($payInfo->number),           //订单号，值允许英文数字

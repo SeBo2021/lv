@@ -74,9 +74,7 @@ class TDController extends PayBaseController implements Pay
         }
 
         $mercId = $payEnvInfo['merchant_id'];
-        // $notifyUrl = env('APP_URL') . $payInfo['notify_url'];
-        //$notifyUrl = 'https://qa.saoltv.com' . $payEnvInfo['notify_url'];
-        $notifyUrl = 'http://api.saolv300.com' . $payEnvInfo['notify_url'];
+        $notifyUrl = 'http://' .$_SERVER['HTTP_HOST'] . $payEnvInfo['notify_url'];
         $input = [
             'mch_id' => $mercId,               //商户号
             'pass_code' => $channelNo,            //通道类型

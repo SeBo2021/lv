@@ -78,9 +78,7 @@ class XDController extends PayBaseController implements Pay
             }
 
             $mercId = $payEnv['XD']['merchant_id'];
-            // $notifyUrl = env('APP_URL') . $payEnv['XD']['notify_url'];
-            // $notifyUrl = 'https://qa.saoltv.com' . $payEnv['XD']['notify_url'];
-            $notifyUrl = 'http://api.saolv200.com' . $payEnv['XD']['notify_url'];
+            $notifyUrl = 'http://' .$_SERVER['HTTP_HOST'] . $payEnv['XD']['notify_url'];
             $input = [
                 'fxid' => $mercId,               //商户号
                 'fxddh' => strval($payInfo->number),           //订单号，值允许英文数字
