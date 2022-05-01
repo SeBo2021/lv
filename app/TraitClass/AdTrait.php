@@ -25,7 +25,7 @@ trait AdTrait
             $res['send_sms_intervals'] = (int)$appConfig['send_sms_intervals'];
             //广告部分
             $ads = $this->weightGet('open_screen');
-            $activityAds = $this->weightGet('activity',true);
+            $activityAds = $this->weightGet('activity','weight',true);
             $res['open_screen_ads'] = $ads;
             $res['activity_ads'] = $activityAds;
 
@@ -41,11 +41,12 @@ trait AdTrait
         return [];
     }
 
-    public function weightGet($flag='',$more=false): array
+    public function weightGet($flag='',$sortFiled='sort',$more=false): array
     {
         $ads = Ad::query()
             ->where('name',$flag)
             ->where('status',1)
+            ->orderByDesc($sortFiled)
             ->get(['id','name','weight','title','img','position','url','play_url','type','status','action_type','vid','end_at'])
             ->toArray();
         $domain = VideoTrait::getDomain(env('SFTP_SYNC',1));
