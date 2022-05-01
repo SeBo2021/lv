@@ -157,7 +157,9 @@ class DFController extends PayBaseController implements Pay
         foreach ($native as $key => $val) {
             $md5str = $md5str . $key . "=" . $val . "&";
         }
-        Log::debug('==callbackIp==',[$this->getRealIp()]);
+        //Log::debug('==callbackIp==',[$this->getRealIp()]);
+        Log::debug('==signAble==',[$md5str . "key=" . $md5Key]);
+        Log::debug('==signAbleRes==',[strtoupper(md5($md5str . "key=" . $md5Key))]);
         return strtoupper(md5($md5str . "key=" . $md5Key));
     }
 
@@ -170,12 +172,6 @@ class DFController extends PayBaseController implements Pay
      */
     function verify($data, $md5Key, $pubKey): bool
     {
-        Log::debug('==verifyData==',[(array)$data]);
-        if(isset($data['s'])){
-            unset($data['s']);
-        }
-        //$data = @json_decode($data,true);
-        Log::debug('==verifyDataArr==',[$data]);
         $sign = $this->sign($data,$md5Key);
         if ($sign == $pubKey) {
             return true;
