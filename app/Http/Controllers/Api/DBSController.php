@@ -60,9 +60,7 @@ class DBSController extends PayBaseController implements Pay
                 $rechargeChannel = $this->getOwnMethod($orderInfo->type,$orderInfo->type_id,$params['type']);
             }
             $mercId = $payEnv['DBS']['merchant_id'];
-            // $notifyUrl = env('APP_URL') . $payEnv['DBS']['notify_url'];
-            // $notifyUrl = 'https://qa.saoltv.com' . $payEnv['DBS']['notify_url'];
-            $notifyUrl = 'http://api.saolv200.com' . $payEnv['DBS']['notify_url'];
+            $notifyUrl = 'http://' .$_SERVER['HTTP_HOST'] . $payEnv['DBS']['notify_url'];
             $input = [
                 'mercId' => $mercId,
                 'tradeNo' => strval($payInfo->number),
@@ -129,7 +127,7 @@ class DBSController extends PayBaseController implements Pay
                 $jsonResp['payMoney'],
                 $jsonResp['tradeNo'],
                 SELF::getPayEnv()['DBS']['secret']??'',
-                $jsonResp['sign'],
+                true,
             );
 
             if (!$signPass) {
