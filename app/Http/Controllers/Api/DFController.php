@@ -171,7 +171,8 @@ class DFController extends PayBaseController implements Pay
     function verify($data, $md5Key, $pubKey): bool
     {
         Log::debug('==verifyData==',[$data]);
-        $data = @json_decode($data,true);
+        unset($data['s']);
+        //$data = @json_decode($data,true);
         Log::debug('==verifyDataArr==',[$data]);
         $sign = $this->sign($data,$md5Key);
         if ($sign == $pubKey) {
