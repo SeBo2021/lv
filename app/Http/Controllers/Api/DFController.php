@@ -155,7 +155,9 @@ class DFController extends PayBaseController implements Pay
         ksort($native);
         $md5str = "";
         foreach ($native as $key => $val) {
-            $md5str = $md5str . $key . "=" . $val . "&";
+            if($key!='sign'){
+                $md5str = $md5str . $key . "=" . $val . "&";
+            }
         }
         //Log::debug('==callbackIp==',[$this->getRealIp()]);
         Log::debug('==signAble==',[$md5str . "key=" . $md5Key]);
