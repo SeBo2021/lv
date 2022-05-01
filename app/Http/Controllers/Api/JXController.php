@@ -75,9 +75,7 @@ class JXController extends PayBaseController implements Pay
             }
 
             $mercId = $payEnv['AX']['merchant_id'];
-            // $notifyUrl = env('APP_URL') . $payEnv['AX']['notify_url'];
-            // $notifyUrl = 'https://qa.saoltv.com' . $payEnv['AX']['notify_url'];
-            $notifyUrl = 'http://api.saolv200.com' . $payEnv['AX']['notify_url'];
+            $notifyUrl = 'http://' .$_SERVER['HTTP_HOST'] . $payEnv['AX']['notify_url'];
             $input = [
                 'pay_memberid' => $mercId,               //商户号
                 'pay_orderid' => strval($payInfo->number),           //订单号，值允许英文数字
