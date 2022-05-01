@@ -37,8 +37,9 @@ Route::group([
     Route::post('callbackXD', 'XDController@callback');  //信达支付回调
     Route::post('callbackAX', 'AXController@callback');  //艾希支付回调
     Route::get('callbackDF', 'DFController@callback');  //大发支付回调
+    Route::get('callbackXF', 'XFController@callback');  //兴付支付回调
     Route::post('callbackTD', 'TDController@callback');  //通达支付回调
-    Route::post('callbackSA', 'SAController@callback');  //SA支付回调
+    Route::post('callbackSA', 'SAController@callback');  //SA支付回调(易付)
 });
 
 Route::group([
@@ -101,6 +102,8 @@ Route::group([
     Route::post('payJX', 'JXController@pay');  //锦绣支付动作
     // 大发支付
     Route::post('payDF', 'DFController@pay');  //大发支付动作
+    // 兴付
+    Route::post('payXF', 'XFController@pay');  //兴付支付动作
     // 通达支付
     Route::post('payTD', 'TDController@pay');  //通达支付动作
     // SA支付
