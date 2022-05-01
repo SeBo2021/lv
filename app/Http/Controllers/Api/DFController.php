@@ -71,9 +71,7 @@ class DFController extends PayBaseController implements Pay
         }
 
         $mercId = $payEnv['DF']['merchant_id'];
-        // $notifyUrl = env('APP_URL') . $payEnv['DF']['notify_url'];
-        // $notifyUrl = 'https://qa.saoltv.com' . $payEnv['DF']['notify_url'];
-        $notifyUrl = 'http://api.saolv200.com' . $payEnv['DF']['notify_url'];
+        $notifyUrl = 'http://' .$_SERVER['HTTP_HOST'] . $payEnv['DF']['notify_url'];
         $input = [
             'p1_merchantno' => $mercId,               //商户号
             'p2_amount' => intval($orderInfo->amount ?? 0),              //订单金额,单位元保留两位小数
@@ -120,7 +118,7 @@ class DFController extends PayBaseController implements Pay
     public function callback(Request $request): mixed
     {
         // TODO: Implement callback() method.
-        $postResp = $request->post();
+        $postResp = $request->except(['s']);
         Log::info('df_pay_callback===', [$postResp]);//三方返回参数日志
         try {
             $payEnv = self::getPayEnv();
@@ -132,7 +130,7 @@ class DFController extends PayBaseController implements Pay
             }else{
                 // 记录支付信息
                 DB::beginTransaction();
-                $this->orderUpdate($postResp['orderid'], $postResp);
+                $this->orderUpdate($postResp['p3_orderno'], $postResp);
                 DB::commit();
             }
 
@@ -153,23 +151,18 @@ class DFController extends PayBaseController implements Pay
 
     function sign($data, $md5Key): string
     {
-        /*$native = array(
-            "pay_memberid" => $data['pay_memberid'],
-            "pay_orderid" => $data['pay_orderid'],
-            "pay_amount" => $data['pay_amount'],
-            "pay_applydate" => $data['pay_applydate'],
-            "pay_bankcode" => $data['pay_bankcode'],
-            "pay_notifyurl" => $data['pay_notifyurl'],
-            "pay_callbackurl" => $data['pay_callbackurl'],
-        );*/
         $native = $data;
         ksort($native);
         $md5str = "";
         foreach ($native as $key => $val) {
-            $md5str = $md5str . $key . "=" . $val . "&";
+            if($key!='sign'){
+                $md5str = $md5str . $key . "=" . $val . "&";
+            }
         }
-        $sign = strtoupper(md5($md5str . "key=" . $md5Key));
-        return $sign;
+        //Log::debug('==callbackIp==',[$this->getRealIp()]);
+        Log::debug('==signAble==',[$md5str . "key=" . $md5Key]);
+        Log::debug('==signAbleRes==',[strtoupper(md5($md5str . "key=" . $md5Key))]);
+        return strtoupper(md5($md5str . "key=" . $md5Key));
     }
 
     /**
@@ -181,24 +174,7 @@ class DFController extends PayBaseController implements Pay
      */
     function verify($data, $md5Key, $pubKey): bool
     {
-        $returnArray = array( // 返回字段
-            "p1_merchantno" => $data["p1_merchantno"],
-            'p2_amount' => $data["p2_amount"],
-            'p3_orderno' => $data["p3_orderno"],
-            'p4_paytype' => $data["p4_status"],
-            'p5_producttype' => $data["p5_producttype"],
-            'p6_requesttime' => $data["p6_requesttime"],
-            'p7_goodsname' => $data["p7_goodsname"],
-            'p8_tradetime' => $data["p8_tradetime"],
-            'p9_porderno' => $data["p9_porderno"],
-        );
-        ksort($returnArray);
-        reset($returnArray);
-        $md5str = "";
-        foreach ($returnArray as $key => $val) {
-            $md5str = $md5str . $key . "=" . $val . "&";
-        }
-        $sign = strtoupper(md5($md5str . "key=" . $md5Key));
+        $sign = $this->sign($data,$md5Key);
         if ($sign == $pubKey) {
             return true;
         }
