@@ -157,7 +157,7 @@ class DFController extends PayBaseController implements Pay
         foreach ($native as $key => $val) {
             $md5str = $md5str . $key . "=" . $val . "&";
         }
-        Log::debug('==callbackSign==',[$md5str]);
+        Log::debug('==callbackIp==',[$this->getRealIp()]);
         return strtoupper(md5($md5str . "key=" . $md5Key));
     }
 
