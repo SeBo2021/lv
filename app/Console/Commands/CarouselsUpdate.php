@@ -2,11 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\TraitClass\PHPRedisTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class CarouselsUpdate extends Command
 {
+    use PHPRedisTrait;
     /**
      * The name and signature of the console command.
      *
@@ -58,6 +60,7 @@ class CarouselsUpdate extends Command
             }
 
         }
+        $this->redisBatchDel($this->redis()->keys('*api_carousel_*'));
         $this->info('######轮播图状态更新成功######');
         return 0;
     }
