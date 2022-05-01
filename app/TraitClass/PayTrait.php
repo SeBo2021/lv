@@ -31,7 +31,7 @@ trait PayTrait
     public static function getPayTypeCode()
     {
         $appConfig = config_cache('app');
-        $payChannel = $appConfig['pay_channel_codes']??[];
+        $payChannel = $appConfig['pay_channel_codes']??'';
         foreach (explode(',',$payChannel) as $v) {
             $data[$v] = [
                 'id' => $v,
