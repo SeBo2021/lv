@@ -79,9 +79,7 @@ class YKController extends PayBaseController implements Pay
             }
 
             $mercId = $payEnv['YK']['merchant_id'];
-           // $notifyUrl = env('APP_URL') . $payEnv['YK']['notify_url'];
-            // $notifyUrl = 'https://qa.saoltv.com' . $payEnv['YK']['notify_url'];
-            $notifyUrl = 'http://api.saolv200.com' . $payEnv['YK']['notify_url'];
+            $notifyUrl = 'http://' .$_SERVER['HTTP_HOST'] . $payEnv['YK']['notify_url'];
             $input = [
                 'appId' => $mercId,               //商户号
                 'orderNo' => strval($payInfo->number),           //订单号，值允许英文数字
