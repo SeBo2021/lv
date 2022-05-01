@@ -118,7 +118,7 @@ class DFController extends PayBaseController implements Pay
     public function callback(Request $request): mixed
     {
         // TODO: Implement callback() method.
-        $postResp = $request->all();
+        $postResp = $request->except(['s']);
         Log::info('df_pay_callback===', [$postResp]);//三方返回参数日志
         try {
             $payEnv = self::getPayEnv();
