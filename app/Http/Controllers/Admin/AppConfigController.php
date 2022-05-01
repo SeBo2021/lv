@@ -145,6 +145,14 @@ class AppConfigController extends BaseCurlController
                         'default' => '',
                         'tips' => '配置json,开发用'
                     ],
+                    [
+                        'field' => 'pay_channel_codes',
+                        'type' => 'textarea',
+                        'name' => '支付通道码',
+                        'must' => 1,
+                        'default' => '',
+                        'tips' => '配置支付通道,逗号隔开'
+                    ],
                 ]
             ]
         ];

@@ -85,33 +85,6 @@ trait AdTrait
         return [];
     }
 
-    /*public function get($flag='',$groupByPosition=false): array
-    {
-        $ads = Ad::query()
-            ->where('name',$flag)
-            ->where('status',1)
-            ->orderBy('sort')
-            ->get(['id','sort','name','title','img','position','url','play_url','type','status','action_type','vid','end_at'])
-            ->toArray();
-        $domain = env('RESOURCE_DOMAIN');
-        $_v = date('Ymd');
-        foreach ($ads as &$ad){
-            //$ad['img'] = $domain . $ad['img'];
-            //图片处理
-            $ad['img'] = $this->transferImgOut($ad['img'],$domain,$_v,'auto');
-            $ad['action_type'] = (string)$ad['action_type'];
-            $ad['vid'] = (string)$ad['vid'];
-        }
-        if($groupByPosition){ //有位置的多一维
-            $newAds = [];
-            foreach ($ads as $item){
-                $newAds[$item['position']][]= $item;
-            }
-            $ads = $newAds;
-        }
-        return !empty($ads) ? $ads : [];
-    }*/
-
     public function getAds($flag='',$groupByPosition=false): array
     {
         $ads = Ad::query()
