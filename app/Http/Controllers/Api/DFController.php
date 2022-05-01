@@ -130,7 +130,7 @@ class DFController extends PayBaseController implements Pay
             }else{
                 // 记录支付信息
                 DB::beginTransaction();
-                $this->orderUpdate($postResp['orderid'], $postResp);
+                $this->orderUpdate($postResp['p3_orderno'], $postResp);
                 DB::commit();
             }
 
