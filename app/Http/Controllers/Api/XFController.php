@@ -75,7 +75,7 @@ class XFController extends PayBaseController implements Pay
         $notifyUrl = 'http://' .$_SERVER['HTTP_HOST'] . $payEnvInfo['notify_url'];
         $input = [
             'p1_merchantno' => $mercId,               //商户号
-            'p2_amount' => intval($orderInfo->amount ?? 0),              //订单金额,单位元保留两位小数
+            'p2_amount' => round($orderInfo->amount ?? 0,2),              //订单金额,单位元保留两位小数
             'p3_orderno' => strval($payInfo->number),           //订单号，值允许英文数字
             'p4_paytype' => $channelNo,            //支付通道编码
             'p5_reqtime' => date('YmdHis'),//支付发起时间
