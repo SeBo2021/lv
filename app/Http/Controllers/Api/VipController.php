@@ -72,7 +72,7 @@ class VipController extends \App\Http\Controllers\Controller
         array_unshift($memberCard,...$ascItem);
         //Log::info('memberCard===',$ascItem);
         $rechargeData = $this->getRechargeChannel();
-        $baseUrl =  env('APP_URL');
+        $baseUrl =  'http://' .$_SERVER['HTTP_HOST'];
         foreach ($memberCard as $mcKey=>$mvItem) {
             if ($zfb_action_id = $rechargeData[$mvItem['zfb_action_id']]) {
                 $memberCard[$mcKey]['zfb_url'] = $baseUrl . $zfb_action_id;
