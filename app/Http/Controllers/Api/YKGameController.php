@@ -176,9 +176,9 @@ class YKGameController extends PayBaseController implements Pay
      * @param $pubKey
      * @return bool
      */
-    public function verify($data, $md5Key, $pubKey): bool
+    function verify($data, $md5Key, $pubKey): bool
     {
-        $sig_data = $this->sign($data,$md5Key);
+        $sig_data = strtolower(md5($md5Key . $data['orderNo'] . $data['appId'] . $data['amount']));
         if ($sig_data == $pubKey) {
             return true;
         }
