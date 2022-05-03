@@ -59,63 +59,59 @@ class YKGameController extends PayBaseController implements Pay
         ])->validate();
         Log::info($this->payFlag.'_pay_params===', [$params]);//参数日志
         // 强制转换
-        try {
-            $payEnv = self::getPayEnv();
-            $payEnvInfo = $payEnv[$this->payFlag];
-            $secret = $payEnvInfo['secret'];
+        $payEnv = self::getPayEnv();
+        $payEnvInfo = $payEnv[$this->payFlag];
+        $secret = $payEnvInfo['secret'];
 
-            $payInfo = PayLog::query()->find($params['pay_id']);
-            if (!$payInfo) {
-                throw new Exception("记录不存在");
-            }
+        $payInfo = PayLog::query()->find($params['pay_id']);
+        if (!$payInfo) {
+            throw new Exception("记录不存在");
+        }
 
-            $orderInfo = Order::query()->find($payInfo['order_id']);
-            if (!$orderInfo) {
-                throw new Exception("订单不存在");
-            }
+        $orderInfo = Order::query()->find($payInfo['order_id']);
+        if (!$orderInfo) {
+            throw new Exception("订单不存在");
+        }
 
-            $oldMix = false;
-            $channelNo = $params['type'];
-            if (in_array($params['type'],['1','2'])) {
-                $oldMix = true;
-                $channelNo = $this->getOwnMethod($orderInfo->type,$orderInfo->type_id,$params['type']);
-            }
+        $oldMix = false;
+        $channelNo = $params['type'];
+        if (in_array($params['type'],['1','2'])) {
+            $oldMix = true;
+            $channelNo = $this->getOwnMethod($orderInfo->type,$orderInfo->type_id,$params['type']);
+        }
 
 
-            $mercId = $payEnvInfo['merchant_id'];
-            $notifyUrl = 'http://' .$_SERVER['HTTP_HOST'] . $payEnvInfo['notify_url'];
-            $input = [
-                'appId' => $mercId,               //商户号
-                'orderNo' => strval($payInfo->number),           //订单号，值允许英文数字
-                'channelNo' => $channelNo,            //支付通道编码
-                'amount' => strval($orderInfo->amount ?? 0) . '.00',              //订单金额,单位元保留两位小数
-                'notifyCallback' => $notifyUrl,   //异步返回地址
-                'payType' => "1",   //固定1
-            ];
-            //生成签名 请求参数按照Ascii编码排序
-            //私钥签名
-            $input['sign'] = $this->sign($input, $secret);
-            Log::info($this->payFlag .'_third_params===', [$input]);//三方参数日志
-            $curl = (new Client([
-                'headers' => ['Content-Type' => 'application/json'],
-                'verify' => false,
-            ]))->post($payEnvInfo['pay_url'], [
-                'body' => json_encode($input)
-            ]);
-            $response = $curl->getBody();
-            // Log::info('yk_third_response===', [$response]);//三方响应日志
-            $resJson = json_decode($response, true);
-            if ($resJson['code'] == 1) {
-                if ($oldMix) {
-                    $return = $this->format(0, ['url'=>$resJson['payUrl']], '取出成功');
-                } else {
-                    $return = $this->format(0, $resJson, '取出成功');
-                }
+        $mercId = $payEnvInfo['merchant_id'];
+        $notifyUrl = 'http://' .$_SERVER['HTTP_HOST'] . $payEnvInfo['notify_url'];
+        $input = [
+            'appId' => $mercId,               //商户号
+            'orderNo' => strval($payInfo->number),           //订单号，值允许英文数字
+            'channelNo' => $channelNo,            //支付通道编码
+            'amount' => strval($orderInfo->amount ?? 0) . '.00',              //订单金额,单位元保留两位小数
+            'notifyCallback' => $notifyUrl,   //异步返回地址
+            'payType' => "1",   //固定1
+        ];
+        //生成签名 请求参数按照Ascii编码排序
+        //私钥签名
+        $input['sign'] = $this->sign($input, $secret);
+        Log::info($this->payFlag .'_third_params===', [$input]);//三方参数日志
+        $curl = (new Client([
+            'headers' => ['Content-Type' => 'application/json'],
+            'verify' => false,
+        ]))->post($payEnvInfo['pay_url'], [
+            'body' => json_encode($input)
+        ]);
+        $response = $curl->getBody();
+         Log::info('YKGame_third_response===', [$response]);//三方响应日志
+        $resJson = json_decode($response, true);
+        if ($resJson['code'] == 1) {
+            if ($oldMix) {
+                $return = $this->format(0, ['url'=>$resJson['payUrl']], '取出成功');
             } else {
-                $return = $this->format($resJson['code'], new \StdClass(), $response);
+                $return = $this->format(0, $resJson, '取出成功');
             }
-        } catch (Exception | InvalidArgumentException $e) {
-            $return = $this->format($e->getCode(), new \StdClass(), $e->getMessage());
+        } else {
+            $return = $this->format($resJson['code'], new \StdClass(), $response);
         }
         return response()->json($return);
     }
