@@ -35,7 +35,7 @@ class YKGameController extends PayBaseController implements Pay
     use IpTrait;
     use YKTrait;
 
-    public string $payFlag = 'YkGame';
+    public string $payFlag = 'YKGame';
 
     /**
      * YK支付动作

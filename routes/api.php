@@ -34,6 +34,7 @@ Route::group([
     Route::post('callbackDbs', 'DBSController@callback');  //大白鲨支付回调
     Route::post('callbackCJ', 'CJController@callback');  //长江支付回调
     Route::post('callbackYK', 'YKController@callback');  //YK支付回调
+    Route::post('callbackYKGame', 'YKGameController@callback');  //YKGame支付回调
     Route::post('callbackXD', 'XDController@callback');  //信达支付回调
     Route::post('callbackAX', 'AXController@callback');  //艾希支付回调
     Route::get('callbackDF', 'DFController@callback');  //大发支付回调
@@ -94,6 +95,8 @@ Route::group([
     Route::post('payCJ', 'CJController@pay');  //长江支付动作
     /// YK支付相关接口
     Route::post('payYK', 'YKController@pay');  //YK支付动作
+    //YKGame支付
+    Route::post('payYKGame', 'YKGameController@pay');  //YK支付动作
     /// YK支付相关接口
     Route::post('payXD', 'XDController@pay');  //信达支付动作
     /// 艾希支付相关接口
