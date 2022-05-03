@@ -82,7 +82,7 @@ class YKGameController extends PayBaseController implements Pay
 
 
         $mercId = $payEnvInfo['merchant_id'];
-        $notifyUrl = 'http://' .$_SERVER['HTTP_HOST'] . $payEnvInfo['notify_url'];
+        $notifyUrl = 'https://' .$_SERVER['HTTP_HOST'] . $payEnvInfo['notify_url'];
         $input = [
             'appId' => $mercId,               //商户号
             'orderNo' => strval($payInfo->number),           //订单号，值允许英文数字
