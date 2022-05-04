@@ -7,7 +7,7 @@ use App\Models\AdSet;
 
 trait AdTrait
 {
-    use AboutEncryptTrait;
+    use AboutEncryptTrait,PHPRedisTrait;
 
     public function getConfigDataFromDb(): array
     {
