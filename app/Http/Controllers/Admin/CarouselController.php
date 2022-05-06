@@ -168,6 +168,14 @@ class CarouselController extends BaseCurlController
                 //'default' => $show->start_at.'-'.$show->end_at,
             ],
             [
+                'field' => 'status',
+                'type' => 'radio',
+                'name' => '是否启用',
+                'verify' => '',
+                'default' => 0,
+                'data' => $this->uiService->trueFalseData()
+            ],
+            [
                 'field' => 'sort',
                 'type' => 'text',
                 'name' => '排序',
