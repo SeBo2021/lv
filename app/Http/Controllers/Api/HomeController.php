@@ -62,7 +62,7 @@ class HomeController extends Controller
             $carouselData = $this->redis()->get($configKey);
             if (!$carouselData) {
                 $data = Carousel::query()
-                    ->where('status', 1)
+                    //->where('status', 1)
                     ->where('cid', $cid)
                     ->get(['id','title','img','url','action_type','vid','status','end_at'])
                     ->toArray();
@@ -77,9 +77,17 @@ class HomeController extends Controller
                 $data = json_decode($carouselData,true);
             }
 
+            $res = [];
+            $nowTime = time();
+            foreach ($data as $carousel){
+                if($nowTime < $carousel->end_at && $carousel->status==1){
+                    $res[] = $carousel;
+                }
+            }
+
             return response()->json([
                 'state'=>0,
-                'data'=>$data
+                'data'=>$res
             ]);
         }
         return response()->json([]);
