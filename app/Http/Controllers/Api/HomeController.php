@@ -62,7 +62,7 @@ class HomeController extends Controller
             $carouselData = $this->redis()->get($configKey);
             if (!$carouselData) {
                 $data = Carousel::query()
-                    //->where('status', 1)
+                    ->where('status', 1)
                     ->where('cid', $cid)
                     ->get(['id','title','img','url','action_type','vid','status','end_at'])
                     ->toArray();
@@ -80,7 +80,7 @@ class HomeController extends Controller
             $res = [];
             $nowTime = time();
             foreach ($data as $carousel){
-                if(!$carousel['end_at'] && $carousel['status']==1){
+                if(!$carousel['end_at']){
                     $res[] = $carousel;
                 } elseif ($nowTime < strtotime($carousel['end_at'])){
                     $res[] = $carousel;

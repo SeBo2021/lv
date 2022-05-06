@@ -217,7 +217,10 @@ class CarouselController extends BaseCurlController
             ->orderBy('sort')
             ->get(['id']);
         foreach ($cats as $cat){
-            $carousel = Carousel::query()->where('cid', $cat->id)->get(['id','title','img','url','action_type','vid','status','end_at'])->toArray();
+            $carousel = Carousel::query()
+                ->where('status', 1)
+                ->where('cid', $cat->id)
+                ->get(['id','title','img','url','action_type','vid','status','end_at'])->toArray();
             $domain = self::getDomain(env('SFTP_SYNC',1));
             foreach ($carousel as &$item){
                 $item['img'] = $this->transferImgOut($item['img'],$domain,date('Ymd'),'auto');
@@ -231,7 +234,7 @@ class CarouselController extends BaseCurlController
     public function setListOutputItemExtend($item)
     {
         $item->category_name = $item->category['name'] ?? '';
-        $item->status = UiService::switchTpl('status', $item,'');
+        $item->status = $item->status==1 ? '启用' : '关闭';
         return $item;
     }
 
