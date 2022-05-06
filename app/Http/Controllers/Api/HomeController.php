@@ -80,7 +80,9 @@ class HomeController extends Controller
             $res = [];
             $nowTime = time();
             foreach ($data as $carousel){
-                if($nowTime < $carousel->end_at && $carousel->status==1){
+                if(!$carousel->end_at && $carousel->status==1){
+                    $res[] = $carousel;
+                } elseif ($nowTime < $carousel->end_at){
                     $res[] = $carousel;
                 }
             }
