@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 
 class CarouselController extends BaseCurlController
 {
-    use CatTrait, AboutEncryptTrait, PHPRedisTrait;
+    use CatTrait, AboutEncryptTrait, PHPRedisTrait,VideoTrait;
 
     public $pageName = '轮播图管理';
 
@@ -168,6 +168,14 @@ class CarouselController extends BaseCurlController
                 //'default' => $show->start_at.'-'.$show->end_at,
             ],
             [
+                'field' => 'status',
+                'type' => 'radio',
+                'name' => '是否启用',
+                'verify' => '',
+                'default' => 0,
+                'data' => $this->uiService->trueFalseData()
+            ],
+            [
                 'field' => 'sort',
                 'type' => 'text',
                 'name' => '排序',
@@ -200,14 +208,33 @@ class CarouselController extends BaseCurlController
         $model->img = $coverImg;
         $model->save();
         $this->syncUpload($model->img);
-        $api_carousel_keys = $this->redis()->keys('api_carousel_*');
-        $this->redisBatchDel($api_carousel_keys);
+
+        /*$api_carousel_keys = $this->redis()->keys('api_carousel_*');
+        $this->redisBatchDel($api_carousel_keys);*/
+        $cats = Category::query()
+            ->where('is_checked',1)
+            ->where('parent_id',2)
+            ->orderBy('sort')
+            ->get(['id']);
+        foreach ($cats as $cat){
+            $carousel = Carousel::query()
+                ->where('status', 1)
+                ->where('cid', $cat->id)
+                ->get(['id','title','img','url','action_type','vid','status','end_at'])->toArray();
+            $domain = self::getDomain(env('SFTP_SYNC',1));
+            foreach ($carousel as &$item){
+                $item['img'] = $this->transferImgOut($item['img'],$domain,date('Ymd'),'auto');
+                $item['action_type'] = (string) $item['action_type'];
+                $item['vid'] = (string) $item['vid'];
+            }
+            $this->redis()->set('api_carousel_'.$cat->id,json_encode($carousel,JSON_UNESCAPED_UNICODE));
+        }
     }
 
     public function setListOutputItemExtend($item)
     {
         $item->category_name = $item->category['name'] ?? '';
-        $item->status = UiService::switchTpl('status', $item,'');
+        $item->status = $item->status==1 ? '启用' : '关闭';
         return $item;
     }
 
