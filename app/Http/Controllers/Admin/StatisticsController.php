@@ -184,7 +184,10 @@ class StatisticsController extends BaseCurlController
                 }
                 break;
             case 'IPDistribution':
-                /* $queryBuild = DB::table('login_log');
+                $queryBuild = DB::table('login_log');
+                $queryBuild = $queryBuild
+                    ->where('at_time','>=',strtotime($startDate))
+                    ->where('at_time','<=',strtotime($endDate));
                 if($channelId!==null){
                     $queryBuild = $queryBuild
                         ->select('area','ip','users.channel_id','login_log.device_system',DB::raw('count(distinct ip) as ips'),DB::raw('json_extract(area,"$[1]") as province'))
@@ -212,7 +215,7 @@ class StatisticsController extends BaseCurlController
                     }
                 }
                 $json['min'] = !empty($ips) ? min($ips) : 0;
-                $json['max'] = !empty($ips) ? max($ips) : 0; */
+                $json['max'] = !empty($ips) ? max($ips) : 0;
                 break;
         }
         return response()->json($json);
