@@ -60,18 +60,13 @@ class HomeController extends Controller
 
             $configKey = 'api_carousel_'.$cid;
             $carouselData = $this->redis()->get($configKey);
+            $domain = self::getDomain(env('SFTP_SYNC',1));
             if (!$carouselData) {
                 $data = Carousel::query()
                     ->where('status', 1)
                     ->where('cid', $cid)
                     ->get(['id','title','img','url','action_type','vid','status','end_at'])
                     ->toArray();
-                $domain = self::getDomain(env('SFTP_SYNC',1));
-                foreach ($data as &$item){
-                    $item['img'] = $this->transferImgOut($item['img'],$domain,date('Ymd'),'auto');
-                    $item['action_type'] = (string) $item['action_type'];
-                    $item['vid'] = (string) $item['vid'];
-                }
                 $this->redis()->set($configKey,json_encode($data,JSON_UNESCAPED_UNICODE));
             } else {
                 $data = json_decode($carouselData,true);
@@ -80,11 +75,15 @@ class HomeController extends Controller
             $res = [];
             $nowTime = time();
             foreach ($data as $carousel){
+                $carousel['img'] = $this->transferImgOut($carousel['img'],$domain,date('Ymd'),'auto');
+                $carousel['action_type'] = (string) $carousel['action_type'];
+                $carousel['vid'] = (string) $carousel['vid'];
                 if(!$carousel['end_at']){
                     $res[] = $carousel;
                 } elseif ($nowTime < strtotime($carousel['end_at'])){
                     $res[] = $carousel;
                 }
+
             }
 
             return response()->json([
