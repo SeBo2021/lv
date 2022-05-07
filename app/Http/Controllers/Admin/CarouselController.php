@@ -221,12 +221,6 @@ class CarouselController extends BaseCurlController
                 ->where('status', 1)
                 ->where('cid', $cat->id)
                 ->get(['id','title','img','url','action_type','vid','status','end_at'])->toArray();
-            $domain = self::getDomain(env('SFTP_SYNC',1));
-            foreach ($carousel as &$item){
-                $item['img'] = $this->transferImgOut($item['img'],$domain,date('Ymd'),'auto');
-                $item['action_type'] = (string) $item['action_type'];
-                $item['vid'] = (string) $item['vid'];
-            }
             $this->redis()->set('api_carousel_'.$cat->id,json_encode($carousel,JSON_UNESCAPED_UNICODE));
         }
     }
