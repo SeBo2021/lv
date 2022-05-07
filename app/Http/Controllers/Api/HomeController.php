@@ -101,7 +101,7 @@ class HomeController extends Controller
     {
         $user = $request->user();
         if(isset($request->params)){
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $validated = Validator::make($params,[
                 'cid' => 'required|integer',
                 'page' => 'required|integer',
@@ -175,7 +175,7 @@ class HomeController extends Controller
             $res['list'] = $this->insertAds($res['list'],'home_page',true,$page,$perPage);
             //存入redis
             $redis->set($sectionKey,json_encode($res,JSON_UNESCAPED_UNICODE));
-            $redis->expire($sectionKey,3600);
+            $redis->expire($sectionKey,7200);
         }else{
             $res = json_decode($res,true);
         }
