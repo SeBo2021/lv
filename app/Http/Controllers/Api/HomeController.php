@@ -21,7 +21,7 @@ use Illuminate\Validation\ValidationException;
 
 class HomeController extends Controller
 {
-    use PHPRedisTrait, GoldTrait, VideoTrait, AdTrait, MemberCardTrait;
+    use PHPRedisTrait, GoldTrait, VideoTrait, AdTrait, MemberCardTrait,ApiParamsTrait;
 
     public function category(Request $request)
     {
@@ -51,7 +51,7 @@ class HomeController extends Controller
     public function carousel(Request $request): \Illuminate\Http\JsonResponse
     {
         if(isset($request->params)){
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $validated = Validator::make($params,[
                 'cid' => 'required|integer'
             ])->validated();
