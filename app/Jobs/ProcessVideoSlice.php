@@ -9,6 +9,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -48,14 +49,18 @@ class ProcessVideoSlice implements ShouldQueue
     }
 
     /**
-     * Execute the job.
      *
+     * Execute the job.
      * @return void
      * @throws FileNotFoundException
      * @throws \Exception
      */
+    /*
+     *
+     */
     public function handle()
     {
+        //
         $file_name = pathinfo($this->row->url,PATHINFO_FILENAME);
         $mp4_path = $this->transcodeMp4($this->mp4Path,$file_name);
         //自动截图封面

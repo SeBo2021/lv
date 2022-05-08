@@ -50,6 +50,7 @@ return [
         // 通过将头文件的文件系统由本地硬盘改为Redis，提高头文件读写效率。
         'redis' => [
             'driver' => 'redis',
+            'connection' => env('QUEUE_REDIS_CONNECTION', 'default'),
             'disable_asserts'=>true,
         ],
 
@@ -71,7 +72,7 @@ return [
         ],
 
         'sftp' => [
-            'driver' => 'sftp',
+            'driver' => 'ftp',
             'host' => env('SFTP_HOST',''),
             'username' => env('SFTP_USERNAME',''),
             'password' => env('SFTP_PASSWORD',''),
@@ -81,7 +82,7 @@ return [
             // 'password' => 'encryption-password',
 
             // Optional SFTP Settings...
-             'port' => 22,
+            // 'port' => 22,
             // 'root' => '',
             'timeout' => 3600,
             'visibility' => 'public',
@@ -98,7 +99,7 @@ return [
             ],
         ],
         'sftp1' => [
-            'driver' => 'sftp',
+            'driver' => 'ftp',
             'host' => env('SFTP_HOST1',''),
             'username' => env('SFTP_USERNAME',''),
             'password' => env('SFTP_PASSWORD',''),
@@ -108,7 +109,7 @@ return [
             // 'password' => 'encryption-password',
 
             // Optional SFTP Settings...
-             'port' => 22,
+            // 'port' => 22,
             // 'root' => '',
             'timeout' => 3600,
             'visibility' => 'public',
