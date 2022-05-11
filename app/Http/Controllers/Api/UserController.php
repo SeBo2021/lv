@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 
 
 use App\Http\Controllers\Controller;
-use App\Jobs\ProcessStatistic;
+use App\Jobs\ProcessResetRedisVideo;
 use App\Models\User;
 use App\TraitClass\ApiParamsTrait;
 use App\TraitClass\IpTrait;

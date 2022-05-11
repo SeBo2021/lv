@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Jobs\ProcessPreviewVideo;
+use App\Jobs\ProcessResetRedisVideo;
 use App\Jobs\ProcessSyncMiddleSectionTable;
 use App\Jobs\ProcessSyncMiddleTable;
 use App\Jobs\ProcessSyncMiddleTagTable;
@@ -402,6 +403,8 @@ class VideoController extends BaseCurlController
         }
 
         //清除缓存
+        $handleCacheJob = new ProcessResetRedisVideo($model);
+        $this->dispatch($handleCacheJob->onQueue('high'));
         //$this->redisBatchDel($this->redis()->keys('api_more_cid-page:*')); //更多页
         //Cache::forget('cachedVideoById.'.$model->id);
         return $model;
