@@ -52,7 +52,7 @@ class SearchController extends Controller
             // $tags = ApiParamsTrait::parse($validated['tag']??[]);
             $vIds = $this->getAllVid($cats,$bids);
             $page = $validated['page'];
-            $order = $this->getOrderColumn($validated['sort']??-1);
+            $order = $this->getOrderColumn(isset($validated['sort']) ? (string)$validated['sort'] : -1);
             $type = $validated['type']??-1;
             $words = $validated['words']??false;
             $model = Video::search($words?:"*")->where('status', 1);
@@ -64,17 +64,18 @@ class SearchController extends Controller
             if ($type != -1) {
                 $model->where('restricted',$type);
             }
-
             // 排序
             if ($order) {
-                $model->orderBy($order,'desc');
+                $model->orderBy($order,$type);
             }
+
             // 标签 预留
             $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
             $paginatorArr = $paginator->toArray()['data'];
 
             //$client = ClientBuilder::create()->build();
             $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
+
             $res['hasMorePages'] = $paginator->hasMorePages();
             if ($words) {
                 UpdateKeyWords::dispatchAfterResponse($validated['words']);
@@ -285,18 +286,15 @@ class SearchController extends Controller
      * @param string $sort
      * @return string
      */
-    private function getOrderColumn($sort = 'id'): string
+    private function getOrderColumn(string $sort): string
     {
-        if ($sort = $validated['page']??'id') {
-            return match ($sort) {
-                '0' => 'views',
-                '1' => 'id',
-                '2' => 'favor',
-                '3' => 'likes',
-                default => '',
-            };
-        }
-        return '';
+        return match ($sort) {
+            '0' => 'views',
+            '1' => 'id',
+            '2' => 'collects',
+            '3' => 'likes',
+            default => '',
+        };
     }
 
     /**
