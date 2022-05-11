@@ -52,7 +52,7 @@ class SearchController extends Controller
             // $tags = ApiParamsTrait::parse($validated['tag']??[]);
             $vIds = $this->getAllVid($cats,$bids);
             $page = $validated['page'];
-            $order = $this->getOrderColumn($request->sort??-1);
+            $order = $this->getOrderColumn($validated['sort']??-1);
             $type = $validated['type']??-1;
             $words = $validated['words']??false;
             $model = Video::search($words?:"*")->where('status', 1);

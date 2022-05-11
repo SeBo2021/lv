@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 
 
 use App\Http\Controllers\Controller;
-use App\Jobs\ProcessStatistic;
 use App\Models\User;
 use App\TraitClass\ApiParamsTrait;
 use App\TraitClass\IpTrait;
@@ -474,7 +473,6 @@ class UserController extends Controller
             DB::table('users')->where('id',$user->id)->update(['phone_number'=>$validated['phone'],'area_number'=>$smsCode->area_number]);
             DB::commit();
             //统计注册量
-            //ProcessStatistic::dispatchAfterResponse($user);
             Cache::forget("cachedUser.{$user->id}");
             return response()->json(['state'=>0, 'msg'=>'绑定成功']);
         }
