@@ -397,17 +397,13 @@ class VideoController extends BaseCurlController
     protected function afterSaveSuccessEvent($model, $id = '')
     {
         if( isset($_REQUEST['callback_upload']) && ($_REQUEST['callback_upload']==1)){
-            try {
-                $job = new ProcessVideoSlice($model);
-                $this->dispatch($job->onQueue('high'));
-            }catch (\Exception $e){
-                Log::error($e->getMessage());
-            }
+            $job = new ProcessVideoSlice($model);
+            $this->dispatch($job->onQueue('high'));
         }
 
         //清除缓存
-        $this->redisBatchDel($this->redis()->keys('api_more_cid-page:*')); //更多页
-        Cache::forget('cachedVideoById.'.$model->id);
+        //$this->redisBatchDel($this->redis()->keys('api_more_cid-page:*')); //更多页
+        //Cache::forget('cachedVideoById.'.$model->id);
         return $model;
     }
 
