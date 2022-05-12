@@ -454,7 +454,7 @@ class MemberController extends BaseCurlController
 
     public function afterSaveSuccessEvent($model, $id)
     {
-        Cache::forget("cachedUser.{$id}");
+        Cache::forget('cachedUser.'.$id);
         return $model;
     }
 
