@@ -466,7 +466,7 @@ trait VideoTrait
                 $list['gold'] = $list['gold'] / $this->goldUnit;
                 $list['views'] = $list['views'] > 0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5, 9));
                 //$list['hls_url'] = $domainSync . $list['hls_url'];
-                $list['preview_hls_url'] = $this->getPreviewPlayUrl($list['hls_url']);
+                $list['preview_hls_url'] = $this->getPreviewPlayUrl($list['hls_url']??'');
                 //$list['dash_url'] = $domainSync . $list['dash_url'];
                 //$list['preview_dash_url'] = $this->getPreviewPlayUrl($list['dash_url'], 'dash');
                 if(isset($list['time_at']) && ($list['time_at']>0)){
