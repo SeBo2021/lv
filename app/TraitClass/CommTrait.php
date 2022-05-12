@@ -88,7 +88,7 @@ trait CommTrait
                         $videoBuild = $videoBuild->orderByRaw('video.sort DESC,video.updated_at DESC,video.id DESC');
                     }
                     $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
-                    $videoList = $videoBuild->limit($limit)->get($this->videoFields)->toArray();
+                    $videoList = $videoBuild->limit($limit)->get(['video.id','video.is_top','name','gold','cat','sync','title','dash_url','hls_url','duration','type','restricted','cover_img','views','updated_at'])->toArray();
                     $item['small_video_list'] = $videoList;
                 }
             }
