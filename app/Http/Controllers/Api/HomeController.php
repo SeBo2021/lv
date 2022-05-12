@@ -155,7 +155,7 @@ class HomeController extends Controller
         }else{
             $res = json_decode($res,true);
             if(Cache::get('updateHomePage')){
-                foreach ($res as &$r){
+                foreach ($res['list'] as &$r){
                     if(!empty($r['small_video_list'])){
                         $r['small_video_list'] = $this->handleVideoItems($r['small_video_list'],false,$user->id);
                     }

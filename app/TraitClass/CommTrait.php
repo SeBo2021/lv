@@ -77,9 +77,9 @@ trait CommTrait
                 ->simplePaginate($perPage,['id','name','seo_title as title','is_rand','is_free','limit_display_num','group_type as style','group_bg_img as bg_img','local_bg_img','sort'],'',$page);
             $sectionKey = ($this->apiRedisKey['home_lists']).$homeCat->id.'-'.$page;
             if(!$paginator->hasMorePages()){
-                $blockCat['list'] = [];
-                $blockCat['hasMorePages'] = false;
-                $redis->set($sectionKey,json_encode($blockCat,JSON_UNESCAPED_UNICODE));
+                $data['list'] = [];
+                $data['hasMorePages'] = false;
+                $redis->set($sectionKey,json_encode($data,JSON_UNESCAPED_UNICODE));
                 break;
             }
             $blockCat = $paginator->toArray()['data'];
@@ -102,10 +102,10 @@ trait CommTrait
             //广告
             $blockCat = $this->insertAds($blockCat,'home_page',true,$page,$perPage);
             //存入redis
-            $blockCat['list'] = $blockCat;
-            $blockCat['hasMorePages'] = true;
+            $data['list'] = $blockCat;
+            $data['hasMorePages'] = true;
             ++$page;
-            $redis->set($sectionKey,json_encode($blockCat,JSON_UNESCAPED_UNICODE));
+            $redis->set($sectionKey,json_encode($data,JSON_UNESCAPED_UNICODE));
             $redis->expire($sectionKey,7200);
         }
         Cache::put('updateHomePage',1);
