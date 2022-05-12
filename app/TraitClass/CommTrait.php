@@ -70,13 +70,12 @@ trait CommTrait
         foreach ($homeCats as $homeCat){
             $perPage = 4;
             $page = 1;
-            $data['hasMorePages'] = true;
-            while ($data['hasMorePages']){
+            do {
                 $paginator = Category::query()
                     ->where('parent_id',$homeCat->id)
                     ->where('is_checked',1)
                     ->orderBy('sort')
-                    ->simplePaginate($perPage,['id','name','seo_title as title','is_rand','is_free','limit_display_num','group_type as style','group_bg_img as bg_img','local_bg_img','sort'],'',$page);
+                    ->simplePaginate($perPage,['id','name','seo_title as title','is_rand','is_free','limit_display_num','group_type as style','group_bg_img as bg_img','local_bg_img','sort'],'homeContent',$page);
                 $sectionKey = ($this->apiRedisKey['home_lists']).$homeCat->id.'-'.$page;
                 $data['hasMorePages'] = $paginator->hasMorePages();
                 $blockCat = $paginator->toArray()['data'];
@@ -103,7 +102,7 @@ trait CommTrait
                 $redis->set($sectionKey,json_encode($data,JSON_UNESCAPED_UNICODE));
                 ++$page;
 
-            }
+            } while ($data['hasMorePages']);
         }
         Cache::put('updateHomePage',1);
     }
