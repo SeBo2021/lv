@@ -77,7 +77,7 @@ trait CommTrait
             if(!$paginator->hasMorePages()){
                 break;
             }
-            $blockCat = $paginator['data'];
+            $blockCat = $paginator->toArray()['data'];
             foreach ($blockCat as &$item){
                 //获取模块数据
                 $ids = $redis->sMembers('catForVideo:'.$item['id']);
