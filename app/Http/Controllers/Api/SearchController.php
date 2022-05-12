@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Models\CidVid;
+use Illuminate\Support\Str;
+
 class SearchController extends Controller
 {
     use VideoTrait,PHPRedisTrait,AdTrait;
@@ -55,7 +57,13 @@ class SearchController extends Controller
             $order = $this->getOrderColumn(isset($validated['sort']) ? (string)$validated['sort'] : -1);
             $type = $validated['type']??-1;
             $words = $validated['words']??false;
-            $model = Video::search($words?:"*")->where('status', 1);
+            // 排序
+            if ($order) {
+                $model = Video::search($words?:"*")->where('status', 1)->orderBy($order,$type);
+            }else{
+                $words = $words?:Str::random(2);
+                $model = Video::search($words)->where('status', 1);
+            }
             // 分类
             if (!empty($vIds)) {
                 $model->whereIn('id',$vIds);
@@ -63,10 +71,6 @@ class SearchController extends Controller
             // 类别
             if ($type != -1) {
                 $model->where('restricted',$type);
-            }
-            // 排序
-            if ($order) {
-                $model->orderBy($order,$type);
             }
 
             // 标签 预留
