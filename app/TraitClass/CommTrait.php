@@ -64,7 +64,7 @@ trait CommTrait
 
     public function resetHomeRedisData()
     {
-        $homeCats = $this->getHomeCategory()->toArray();
+        $homeCats = $this->getHomeCategory();
         $redis = $this->redis();
         $perPage = 4;
         $page = 1;
