@@ -485,7 +485,7 @@ trait VideoTrait
             }
             //hls播放地址处理
             if(isset($list['hls_url'])){
-                $list['hls_url'] = $domainSync . $this->transferHlsUrl($list['hls_url']);
+                $list['hls_url'] = $domainSync . $this->transferHlsUrl($list['hls_url']??'');
             }
             $list['preview_hls_url'] = $domainSync . $list['preview_hls_url'];
             /*$previewHlsInfo = pathinfo($list['preview_hls_url']);
@@ -501,6 +501,7 @@ trait VideoTrait
 
     public function generateRandViews($views): string
     {
+        $views = intval($views);
         $views *= 20;
         $length = strlen($views);
         if($length > 8){
