@@ -26,7 +26,7 @@ use Illuminate\Support\Str;
 
 class SearchController extends Controller
 {
-    use VideoTrait,PHPRedisTrait,AdTrait;
+    use VideoTrait,PHPRedisTrait,AdTrait,ApiParamsTrait;
 
     /**
      * 搜索功能
@@ -37,8 +37,7 @@ class SearchController extends Controller
     public function index(Request $request)
     {
         if (isset($request->params)) {
-            $perPage = 16;
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $validated = Validator::make($params, [
                 'words' => 'nullable',
                 'page' => 'required|integer',
@@ -48,22 +47,16 @@ class SearchController extends Controller
                 "type" => 'nullable', // 类型
                 "sort" => 'nullable', // 排序
             ])->validate();
-            $params = ApiParamsTrait::parse($request->params);
+            $perPage = 16;
             $cats =$params['cid']??[];
             $bids = $params['bid']??[];
-            // $tags = ApiParamsTrait::parse($validated['tag']??[]);
             $vIds = $this->getAllVid($cats,$bids);
             $page = $validated['page'];
             $order = $this->getOrderColumn(isset($validated['sort']) ? (string)$validated['sort'] : -1);
             $type = $validated['type']??-1;
             $words = $validated['words']??false;
-            // 排序
-            if ($order) {
-                $model = Video::search($words?:"*")->where('status', 1)->orderBy($order,$type);
-            }else{
-                $keyWords = $words?:Str::random(2);
-                $model = Video::search($keyWords)->where('status', 1);
-            }
+
+            $model = Video::search($words?:"*")->where('status', 1);
             // 分类
             if (!empty($vIds)) {
                 $model->whereIn('id',$vIds);
@@ -72,7 +65,10 @@ class SearchController extends Controller
             if ($type != -1) {
                 $model->where('restricted',$type);
             }
-
+            // 排序
+            if ($order) {
+                $model->orderBy($order,'desc');
+            }
             // 标签 预留
             $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
             $paginatorArr = $paginator->toArray()['data'];
