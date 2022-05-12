@@ -106,7 +106,7 @@ trait CommTrait
             $data['hasMorePages'] = true;
             ++$page;
             $redis->set($sectionKey,json_encode($data,JSON_UNESCAPED_UNICODE));
-            $redis->expire($sectionKey,7200);
+            //$redis->expire($sectionKey,7200);
         }
         Cache::put('updateHomePage',1);
     }
