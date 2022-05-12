@@ -70,44 +70,38 @@ trait CommTrait
         foreach ($homeCats as $homeCat){
             $perPage = 4;
             $page = 1;
-            while ($page){
+            $data['hasMorePages'] = true;
+            while ($data['hasMorePages']){
                 $paginator = Category::query()
                     ->where('parent_id',$homeCat->id)
                     ->where('is_checked',1)
                     ->orderBy('sort')
                     ->simplePaginate($perPage,['id','name','seo_title as title','is_rand','is_free','limit_display_num','group_type as style','group_bg_img as bg_img','local_bg_img','sort'],'',$page);
                 $sectionKey = ($this->apiRedisKey['home_lists']).$homeCat->id.'-'.$page;
-                if(!$paginator->hasMorePages()){
-                    $data['list'] = [];
-                    $data['hasMorePages'] = false;
-                    $redis->set($sectionKey,json_encode($data,JSON_UNESCAPED_UNICODE));
-                    $page = false;
-                }else{
-                    $blockCat = $paginator->toArray()['data'];
-                    foreach ($blockCat as &$item){
-                        //获取模块数据
-                        $ids = $redis->sMembers('catForVideo:'.$item['id']);
-                        if(!empty($ids)){
-                            $videoBuild = DB::table('video')->where('status',1)->whereIn('id',$ids);
-                            if($item['is_rand']==1){
-                                $videoBuild = $videoBuild->inRandomOrder();
-                            }else{
-                                $videoBuild = $videoBuild->orderByRaw('video.sort DESC,video.updated_at DESC,video.id DESC');
-                            }
-                            $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
-                            $videoList = $videoBuild->limit($limit)->get(['video.id','video.is_top','name','gold','cat','sync','title','dash_url','hls_url','duration','type','restricted','cover_img','views','updated_at'])->toArray();
-                            $item['small_video_list'] = $videoList;
+                $data['hasMorePages'] = $paginator->hasMorePages();
+                $blockCat = $paginator->toArray()['data'];
+                foreach ($blockCat as &$item){
+                    //获取模块数据
+                    $ids = $redis->sMembers('catForVideo:'.$item['id']);
+                    if(!empty($ids)){
+                        $videoBuild = DB::table('video')->where('status',1)->whereIn('id',$ids);
+                        if($item['is_rand']==1){
+                            $videoBuild = $videoBuild->inRandomOrder();
+                        }else{
+                            $videoBuild = $videoBuild->orderByRaw('video.sort DESC,video.updated_at DESC,video.id DESC');
                         }
+                        $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
+                        $videoList = $videoBuild->limit($limit)->get(['video.id','video.is_top','name','gold','cat','sync','title','dash_url','hls_url','duration','type','restricted','cover_img','views','updated_at'])->toArray();
+                        $item['small_video_list'] = $videoList;
                     }
-
-                    //广告
-                    $blockCat = $this->insertAds($blockCat,'home_page',true,$page,$perPage);
-                    //存入redis
-                    $data['list'] = $blockCat;
-                    $data['hasMorePages'] = true;
-                    ++$page;
-                    $redis->set($sectionKey,json_encode($data,JSON_UNESCAPED_UNICODE));
                 }
+
+                //广告
+                $blockCat = $this->insertAds($blockCat,'home_page',true,$page,$perPage);
+                //存入redis
+                $data['list'] = $blockCat;
+                $redis->set($sectionKey,json_encode($data,JSON_UNESCAPED_UNICODE));
+                ++$page;
 
             }
         }
