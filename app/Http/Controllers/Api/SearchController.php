@@ -61,8 +61,8 @@ class SearchController extends Controller
             if ($order) {
                 $model = Video::search($words?:"*")->where('status', 1)->orderBy($order,$type);
             }else{
-                $words = $words?:Str::random(2);
-                $model = Video::search($words)->where('status', 1);
+                $keyWords = $words?:Str::random(2);
+                $model = Video::search($keyWords)->where('status', 1);
             }
             // 分类
             if (!empty($vIds)) {
