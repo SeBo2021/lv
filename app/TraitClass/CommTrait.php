@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 trait CommTrait
 {
-    use PHPRedisTrait;
+    use PHPRedisTrait,AdTrait;
     public function getCommCate()
     {
         $raw = $this->redis()->get('common_cate');
