@@ -93,7 +93,7 @@ class SearchController extends Controller
     {
         if(isset($request->params)){
             $perPage = 16;
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             if (isset($params['pageSize']) && ($params['pageSize'] < $perPage)) {
                 $perPage = $params['pageSize'];
             }
@@ -125,7 +125,7 @@ class SearchController extends Controller
     public function cat(Request $request): JsonResponse|array
     {
         if(isset($request->params)){
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $validated = Validator::make($params,[
                 'cid' => 'required|integer',
                 'page' => 'required|integer',
@@ -174,7 +174,7 @@ class SearchController extends Controller
     public function recommend(Request $request): JsonResponse|array
     {
         if(isset($request->params)){
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $validated = Validator::make($params,[
                 'vid' => 'required|integer',
             ])->validated();
