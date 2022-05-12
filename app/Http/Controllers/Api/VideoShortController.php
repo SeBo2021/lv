@@ -26,11 +26,7 @@ use Illuminate\Validation\Rule;
 
 class VideoShortController extends Controller
 {
-    use VideoTrait;
-    use PHPRedisTrait;
-    use VipRights;
-    use StatisticTrait;
-    use MemberCardTrait;
+    use VideoTrait,PHPRedisTrait,VipRights,StatisticTrait,MemberCardTrait,ApiParamsTrait;
 
     private array $mainCateAlias = [
         'short_hot',
@@ -209,10 +205,8 @@ class VideoShortController extends Controller
     public function lists(Request $request): JsonResponse
     {
         // 业务逻辑
-        try {
-            $user = $request->user();
-            $params = ApiParamsTrait::parse($request->params);
-
+        if (isset($request->params)) {
+            $params = self::parse($request->params);
             $validated = Validator::make($params, [
                 'start_id' => 'nullable',
                 'keyword' => 'nullable',
@@ -225,19 +219,19 @@ class VideoShortController extends Controller
                     Rule::in(['1', '0']),
                 ],
             ])->validated();
-
+            $user = $request->user();
             $page = $params['page'] ?? 1;
             $cateId = $params['cate_id'] ?? "";
             $tagId = $params['tag_id'] ?? "";
             $starId = $validated['start_id'] ?? '0';
             //关键词搜索
             $words = $params['keyword'] ?? '';
-            if(!empty($words)){
+            if (!empty($words)) {
                 $cateId = "";
                 $tagId = "";
                 $starId = '0';
             }
-            $res = $this->items($page, $user, $starId,$cateId,$tagId,$words);
+            $res = $this->items($page, $user, $starId, $cateId, $tagId, $words);
             //Log::info('==ShortVideo==',[$params,$user->id,$res]);
             //统计激活视频人数===============
             // $this->saveUsersDay($user->id, $user->channel_id, $user->device_system);
@@ -246,7 +240,9 @@ class VideoShortController extends Controller
                 'state' => 0,
                 'data' => $res
             ]);
-
+        }
+        return response()->json(['state'=>-1, 'msg'=>'参数错误']);
+        /*try {
         } catch (Exception $exception) {
             $msg = $exception->getMessage();
             Log::error("shortLists", [$msg]);
@@ -254,7 +250,7 @@ class VideoShortController extends Controller
                 'state' => -1,
                 'data' => $msg
             ]);
-        }
+        }*/
     }
 
     /**
@@ -266,7 +262,7 @@ class VideoShortController extends Controller
     {
         try {
             $user = $request->user();
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $rules = [
                 'id' => 'required|integer',
                 'like' => 'required|integer',
@@ -314,7 +310,7 @@ class VideoShortController extends Controller
         }
         try {
             $userInfo = $request->user();
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $rules = [
                 'id' => 'required|integer',
                 'collect' => 'required|integer',

@@ -22,9 +22,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Models\CidVid;
+use Illuminate\Support\Str;
+
 class SearchController extends Controller
 {
-    use VideoTrait,PHPRedisTrait,AdTrait;
+    use VideoTrait,PHPRedisTrait,AdTrait,ApiParamsTrait;
 
     /**
      * 搜索功能
@@ -35,8 +37,7 @@ class SearchController extends Controller
     public function index(Request $request)
     {
         if (isset($request->params)) {
-            $perPage = 16;
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $validated = Validator::make($params, [
                 'words' => 'nullable',
                 'page' => 'required|integer',
@@ -46,15 +47,15 @@ class SearchController extends Controller
                 "type" => 'nullable', // 类型
                 "sort" => 'nullable', // 排序
             ])->validate();
-            $params = ApiParamsTrait::parse($request->params);
+            $perPage = 16;
             $cats =$params['cid']??[];
             $bids = $params['bid']??[];
-            // $tags = ApiParamsTrait::parse($validated['tag']??[]);
             $vIds = $this->getAllVid($cats,$bids);
             $page = $validated['page'];
             $order = $this->getOrderColumn(isset($validated['sort']) ? (string)$validated['sort'] : -1);
             $type = $validated['type']??-1;
             $words = $validated['words']??false;
+
             $model = Video::search($words?:"*")->where('status', 1);
             // 分类
             if (!empty($vIds)) {
@@ -66,9 +67,8 @@ class SearchController extends Controller
             }
             // 排序
             if ($order) {
-                $model->orderBy($order,$type);
+                $model->orderBy($order,'desc');
             }
-
             // 标签 预留
             $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
             $paginatorArr = $paginator->toArray()['data'];
@@ -93,7 +93,7 @@ class SearchController extends Controller
     {
         if(isset($request->params)){
             $perPage = 16;
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             if (isset($params['pageSize']) && ($params['pageSize'] < $perPage)) {
                 $perPage = $params['pageSize'];
             }
@@ -125,7 +125,7 @@ class SearchController extends Controller
     public function cat(Request $request): JsonResponse|array
     {
         if(isset($request->params)){
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $validated = Validator::make($params,[
                 'cid' => 'required|integer',
                 'page' => 'required|integer',
@@ -174,7 +174,7 @@ class SearchController extends Controller
     public function recommend(Request $request): JsonResponse|array
     {
         if(isset($request->params)){
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $validated = Validator::make($params,[
                 'vid' => 'required|integer',
             ])->validated();
