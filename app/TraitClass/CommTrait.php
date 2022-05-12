@@ -69,14 +69,15 @@ trait CommTrait
         $perPage = 4;
         $page = 1;
         foreach ($homeCats as $homeCat){
-            $blockCat = Category::query()
+            $paginator = Category::query()
                 ->where('parent_id',$homeCat->id)
                 ->where('is_checked',1)
                 ->orderBy('sort')
                 ->simplePaginate($perPage,['id','name','seo_title as title','is_rand','is_free','limit_display_num','group_type as style','group_bg_img as bg_img','local_bg_img','sort'],'',$page);
-            if(!$blockCat->hasMorePages()){
+            if(!$paginator->hasMorePages()){
                 break;
             }
+            $blockCat = $paginator['data'];
             foreach ($blockCat as &$item){
                 //获取模块数据
                 $ids = $redis->sMembers('catForVideo:'.$item['id']);
