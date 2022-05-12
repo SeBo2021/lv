@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\TraitClass\CommTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
 use Illuminate\Bus\Queueable;
@@ -13,7 +14,7 @@ use Illuminate\Queue\SerializesModels;
 
 class ProcessSyncMiddleTagTable implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, VideoTrait, PHPRedisTrait;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, VideoTrait, PHPRedisTrait, CommTrait;
 
     /**
      * Create a new job instance.
@@ -34,6 +35,6 @@ class ProcessSyncMiddleTagTable implements ShouldQueue
     {
         $this->syncMiddleTagTable();
         //清除缓存
-        $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
+        $this->resetHomeRedisData();
     }
 }

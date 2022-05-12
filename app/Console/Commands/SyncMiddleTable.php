@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\TraitClass\CommTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
 use Illuminate\Console\Command;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 
 class SyncMiddleTable extends Command
 {
-    use PHPRedisTrait, VideoTrait;
+    use PHPRedisTrait, VideoTrait,CommTrait;
     /**
      * The name and signature of the console command.
      *
@@ -46,8 +47,7 @@ class SyncMiddleTable extends Command
         $this->syncMiddleSectionTable();
         //同步标签中间表
         $this->syncMiddleTagTable();
-        //清除缓存
-        $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
+        $this->resetHomeRedisData();
         $this->info('######视频中间表同步成功######');
         return 0;
     }

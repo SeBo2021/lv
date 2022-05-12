@@ -9,6 +9,7 @@ use App\Models\AdSet;
 use App\Services\UiService;
 use App\TraitClass\AboutEncryptTrait;
 use App\TraitClass\AdTrait;
+use App\TraitClass\CommTrait;
 use App\TraitClass\MemberCardTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Storage;
 
 class AdController extends BaseCurlController
 {
-    use PHPRedisTrait,AboutEncryptTrait,MemberCardTrait,AdTrait;
+    use PHPRedisTrait,AboutEncryptTrait,MemberCardTrait,AdTrait,CommTrait;
 
     public $pageName = '广告';
 
@@ -304,7 +305,7 @@ class AdController extends BaseCurlController
         $model->save();
         $this->syncUpload($model->img);
         //清除首页列表缓存
-        $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
+        $this->resetHomeRedisData();
         //清除推荐缓存
         $this->redisBatchDel($this->redis()->keys('*searchRecommend*'));
         //清除更多页缓存

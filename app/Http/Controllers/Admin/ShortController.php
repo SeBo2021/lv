@@ -605,8 +605,6 @@ class ShortController extends BaseCurlController
 
             if ($r) {
                 $this->insertLog($this->getPageName() . lang('短视频-成功修改ids') . '：' . implode(',', $id_arr));
-                //清除缓存
-                $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
             } else {
                 $this->insertLog($this->getPageName() . lang('短视频-失败ids') . '：' . implode(',', $id_arr));
             }
