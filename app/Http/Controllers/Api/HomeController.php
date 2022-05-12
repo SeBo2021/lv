@@ -153,13 +153,15 @@ class HomeController extends Controller
             $redis->set($sectionKey,json_encode($res,JSON_UNESCAPED_UNICODE));
             $redis->expire($sectionKey,7200);
         }else{
-            $res = json_decode($res,true);
             if(Cache::get('updateHomePage')){
+                $res = $res->toArray();
                 foreach ($res['list'] as &$r){
                     if(!empty($r['small_video_list'])){
                         $r['small_video_list'] = $this->handleVideoItems($r['small_video_list'],false,$user->id);
                     }
                 }
+            }else{
+                $res = json_decode($res,true);
             }
         }
         return response()->json([
