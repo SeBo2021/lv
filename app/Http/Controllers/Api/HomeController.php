@@ -14,6 +14,7 @@ use App\TraitClass\MemberCardTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -25,10 +26,9 @@ class HomeController extends Controller
 
     public function category(Request $request)
     {
-        $categoryApiKey = 'api_category';
-        $cacheData = $this->redis()->get($categoryApiKey);
+        $cacheData = Cache::get('api_home_category');
         if($cacheData){
-            $data = json_decode($cacheData,true);
+            $data = $cacheData->toArray();
         }else{
             $data = Category::query()
                 ->where('parent_id',2)
@@ -131,32 +131,8 @@ class HomeController extends Controller
             foreach ($data as &$item)
             {
                 //获取模块数据
-                /**/
                 $ids = $redis->sMembers('catForVideo:'.$item['id']);
                 if(!empty($ids)){
-                    /*$queryBuild = $queryBuild->whereIn('id',$ids);
-                    $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
-                    $videoList = $queryBuild->get()->toArray();
-//                    $videoList = $queryBuild->simplePaginate($limit, 'searchPage', 1)->toArray()['data'];
-                    if($item['is_rand']==1){
-                        shuffle($videoList);
-                    }else{
-                        arrayDataMultiSort($videoList,[
-                            'sort' => 'desc',
-                            'updated_at' => 'desc',
-                            'id' => 'desc',
-                        ]);
-                    }
-                    $videoList = array_slice($videoList,0,$limit);
-                    //Log::info('===TestSmallVideoList2==',$videoList);
-                    $videoList = $this->handleVideoItems($videoList,false,$user->id);
-                    $item['small_video_list'] = $videoList;
-
-                    if(!empty($item['bg_img'])){
-                        $item['bg_img'] = env('APP_URL').$item['bg_img'];
-                    }*/
-                    //$queryBuild = Video::search()->where('status',1)->whereIn('id',$ids);
-//                    $queryBuild = Video::search()->where('status',1)->whereIn('id',$ids);
                     $queryBuild = DB::table('video')->where('status',1)->whereIn('id',$ids);
                     if($item['is_rand']==1){
                         $queryBuild = $queryBuild->inRandomOrder();
@@ -178,6 +154,11 @@ class HomeController extends Controller
             $redis->expire($sectionKey,7200);
         }else{
             $res = json_decode($res,true);
+            foreach ($res['list'] as &$r){
+                if(!empty($r['small_video_list'])){
+                    $r['small_video_list'] = $this->handleVideoItems($r['small_video_list'],false,$user->id);
+                }
+            }
         }
         return response()->json([
             'state'=>0,
