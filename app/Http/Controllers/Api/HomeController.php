@@ -154,9 +154,11 @@ class HomeController extends Controller
             $redis->expire($sectionKey,7200);
         }else{
             $res = json_decode($res,true);
-            foreach ($res['list'] as &$r){
-                if(!empty($r['small_video_list'])){
-                    $r['small_video_list'] = $this->handleVideoItems($r['small_video_list'],false,$user->id);
+            if(Cache::get('updateHomePage')){
+                foreach ($res['list'] as &$r){
+                    if(!empty($r['small_video_list'])){
+                        $r['small_video_list'] = $this->handleVideoItems($r['small_video_list'],false,$user->id);
+                    }
                 }
             }
         }

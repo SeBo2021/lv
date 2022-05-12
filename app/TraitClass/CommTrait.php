@@ -101,6 +101,6 @@ trait CommTrait
             $redis->expire($sectionKey,7200);
             ++$page;
         }
-
+        Cache::put('updateHomePage',1);
     }
 }
