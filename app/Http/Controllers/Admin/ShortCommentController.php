@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\ShortComment;
+use App\Models\VideoShort;
 use App\Services\UiService;
+use Illuminate\Http\Request;
 
 class ShortCommentController extends BaseCurlIndexController
 {
@@ -113,7 +115,87 @@ class ShortCommentController extends BaseCurlIndexController
                     'data-type' => "allDel"
                 ]
             ];
+            $data[] = [
+                'class' => 'layui-btn-dark',
+                'name' => '审核',
+                'id' => 'btn-audit',
+                'data'=>[
+                    'data-type' => "handle",
+                    'data-title' => "确定批量操作吗",
+                    'data-field' => "audit",
+                    'data-value' => 0,
+                ]
+            ];
         }
         $this->uiBlade['btn'] = $data;
+    }
+
+    public function editTable(Request $request)
+    {
+        $this->rq = $request;
+        $ids = $request->input('ids'); // 修改的表主键id批量分割字符串
+        //分割ids
+        $id_arr = explode(',', $ids);
+
+        $id_arr = is_array($id_arr) ? $id_arr : [$id_arr];
+
+        if (empty($id_arr)) {
+            return $this->returnFailApi(lang('没有选择数据'));
+        }
+        //表格编辑过滤IDS
+        $id_arr = $this->editTableFilterIds($id_arr);
+
+        $field = $request->input('field'); // 修改哪个字段
+        $value = $request->input('field_value'); // 修改字段值
+        $id = 'id'; // 表主键id值
+
+        $type_r = $this->editTableTypeEvent($id_arr, $field, $value);
+
+        if ($type_r) {
+            return $type_r;
+        } else {
+            switch ($field){
+                case 'audit':
+                    $updateIdArr = [];
+                    foreach ($id_arr as $commentId){
+                        $commentItem = ShortComment::query()->find($commentId);
+                        if($commentItem->status==0){
+                            if($commentItem->reply_cid>0){
+                                ShortComment::query()->where('id',$commentItem->reply_cid)->increment('replies');
+                            }else{
+                                VideoShort::query()->where('id',$commentItem->vid)->increment('comments');
+                            }
+                            $updateIdArr[] = $commentId;
+                        }
+                    }
+                    $this->editTableAddWhere()->whereIn($id, $updateIdArr)->update(['status' => 1]);
+                    $r = true;
+                    break;
+                case 'status':
+                    if($value == 0){
+                        return $this->returnFailApi(lang('已审核,若不符请删除'));
+                    }
+                    foreach ($id_arr as $commentId){
+                        $commentItem = ShortComment::query()->find($commentId);
+                        if($commentItem->reply_cid>0){
+                            ShortComment::query()->where('id',$commentItem->reply_cid)->increment('replies');
+                        }else{
+                            VideoShort::query()->where('id',$commentItem->vid)->increment('comments');
+                        }
+                    }
+                    $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update(['status' => $value]);
+                    break;
+                default:
+                    $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update([$field => $value]);
+                    break;
+            }
+
+            if ($r) {
+                $this->insertLog($this->getPageName() . lang('成功修改ids') . '：' . implode(',', $id_arr));
+            } else {
+                $this->insertLog($this->getPageName() . lang('失败ids') . '：' . implode(',', $id_arr));
+            }
+            return $this->editTablePutLog($r, $field, $id_arr);
+        }
     }
 }
