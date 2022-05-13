@@ -204,7 +204,7 @@ class CarouselController extends BaseCurlController
      */
     public function afterSaveSuccessEvent($model, $id = '')
     {
-        $coverImg = str_replace(VideoTrait::getDomain(env('SFTP_SYNC',1)),"",$model->img);
+        $coverImg = str_replace(self::getDomain(env('SFTP_SYNC',1)),"",$model->img);
         $model->img = $coverImg;
         $model->save();
         $this->syncUpload($model->img);
@@ -228,7 +228,8 @@ class CarouselController extends BaseCurlController
     public function setListOutputItemExtend($item)
     {
         $item->category_name = $item->category['name'] ?? '';
-        $item->status = $item->status==1 ? '启用' : '关闭';
+        $endAtTime = $item->end_at ? strtotime($item->end_at) : 0;
+        $item->status = ($item->status!=1 || ($item->end_at && $endAtTime<time())) ? '关闭': '启用';
         return $item;
     }
 
