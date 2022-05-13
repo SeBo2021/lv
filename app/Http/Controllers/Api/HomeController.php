@@ -119,9 +119,9 @@ class HomeController extends Controller
                     $r['small_video_list'] = $this->handleVideoItems($r['small_video_list'],false,$user->id);
                 }
             }
-            return response()->json(['state'=>0, 'data'=>$res]);
+            return response()->json(['state'=>0, 'data'=>$res], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
         }
-        return response()->json(['state' => -1, 'msg' => "参数错误"], 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
+        return response()->json(['state' => -1, 'msg' => "参数错误"], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
     }
 
 }
