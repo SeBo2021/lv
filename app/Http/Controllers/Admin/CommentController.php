@@ -17,9 +17,9 @@ class CommentController extends BaseCurlController
         return $this->model = new Comment();
     }
 
-    public function indexCols()
+    public function indexCols(): array
     {
-        $cols = [
+        return [
             [
                 'type' => 'checkbox'
             ],
@@ -75,8 +75,6 @@ class CommentController extends BaseCurlController
                 'align' => 'center'
             ]
         ];
-
-        return $cols;
     }
 
     public function setOutputHandleBtnTpl($shareData)
@@ -97,6 +95,17 @@ class CommentController extends BaseCurlController
                 'name' => '删除',
                 'data' => [
                     'data-type' => "allDel"
+                ]
+            ];
+            $data[] = [
+                'class' => 'layui-btn-dark',
+                'name' => '审核',
+                'id' => 'btn-audit',
+                'data'=>[
+                    'data-type' => "handle",
+                    'data-title' => "确定批量操作吗",
+                    'data-field' => "audit",
+                    'data-value' => 0,
                 ]
             ];
         }
@@ -134,20 +143,42 @@ class CommentController extends BaseCurlController
         if ($type_r) {
             return $type_r;
         } else {
-            if($field=='status'){
-                if($value == 0){
-                    return $this->returnFailApi(lang('已审核,若不符请删除'));
-                }
-                foreach ($id_arr as $commentId){
-                    $commentItem = Comment::query()->find($commentId);
-                    if($commentItem->reply_cid>0){
-                        Comment::query()->where('id',$commentItem->reply_cid)->increment('replies');
-                    }else{
-                        Video::query()->where('id',$commentItem->vid)->increment('comments');
+            switch ($field){
+                case 'audit':
+                    $updateIdArr = [];
+                    foreach ($id_arr as $commentId){
+                        $commentItem = Comment::query()->find($commentId);
+                        if($commentItem->status==0){
+                            if($commentItem->reply_cid>0){
+                                Comment::query()->where('id',$commentItem->reply_cid)->increment('replies');
+                            }else{
+                                Video::query()->where('id',$commentItem->vid)->increment('comments');
+                            }
+                            $updateIdArr[] = $commentId;
+                        }
                     }
-                }
+                    $this->editTableAddWhere()->whereIn($id, $updateIdArr)->update(['status' => 1]);
+                    $r = true;
+                    break;
+                case 'status':
+                    if($value == 0){
+                        return $this->returnFailApi(lang('已审核,若不符请删除'));
+                    }
+                    foreach ($id_arr as $commentId){
+                        $commentItem = Comment::query()->find($commentId);
+                        if($commentItem->reply_cid>0){
+                            Comment::query()->where('id',$commentItem->reply_cid)->increment('replies');
+                        }else{
+                            Video::query()->where('id',$commentItem->vid)->increment('comments');
+                        }
+                    }
+                    $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update(['status' => $value]);
+                    break;
+                default:
+                    $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update([$field => $value]);
+                    break;
             }
-            $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update([$field => $value]);
+
             if ($r) {
                 $this->insertLog($this->getPageName() . lang('成功修改ids') . '：' . implode(',', $id_arr));
             } else {
