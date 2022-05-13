@@ -228,7 +228,8 @@ class CarouselController extends BaseCurlController
     public function setListOutputItemExtend($item)
     {
         $item->category_name = $item->category['name'] ?? '';
-        $item->status = ($item->status!=1 || ($item->end_at && strtotime($item->end_at)>time())) ? '关闭' : '启用';
+        $endAtTime = $item->end_at ? strtotime($item->end_at) : 0;
+        $item->status = ($item->status!=1 || ($item->end_at && $endAtTime<time())) ? '关闭': '启用';
         return $item;
     }
 
