@@ -242,7 +242,7 @@ class SearchController extends Controller
                 'data'=>['list'=>[], 'hasMorePages'=>false]
             ]);
         }
-        return [];
+        return response()->json(['state' => -1, 'msg' => "参数错误"]);
     }
 
     public function hotWords(): JsonResponse

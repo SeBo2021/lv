@@ -149,7 +149,7 @@ class FakeLiveShortController extends Controller
             return response()->json([
                 'state' => -1,
                 'data' => $msg
-            ], 200, ['Content-Type' => 'application/json;charset=UTF-8']);
+            ], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
         }
     }
 
