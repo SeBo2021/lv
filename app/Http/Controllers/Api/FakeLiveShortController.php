@@ -142,14 +142,14 @@ class FakeLiveShortController extends Controller
             return response()->json([
                 'state' => 0,
                 'data' => $res
-            ], 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
+            ]);
         } catch (Exception $exception) {
             $msg = $exception->getMessage();
             Log::error("liveLists", [$msg]);
             return response()->json([
                 'state' => -1,
                 'data' => $msg
-            ], 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
+            ], 200, ['Content-Type' => 'application/json;charset=UTF-8'], JSON_UNESCAPED_UNICODE);
         }
     }
 

@@ -233,11 +233,11 @@ class VideoShortController extends Controller
             }
             try {
                 $res = $this->items($page, $user, $starId, $cateId, $tagId, $words);
-                return response()->json(['state' => 0, 'data' => $res], 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
+                return response()->json(['state' => 0, 'data' => $res]);
             } catch (Exception $exception) {
                 $msg = $exception->getMessage();
                 Log::error("shortLists", [$msg]);
-                return response()->json(['state' => -1, 'data' => $msg], 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'], JSON_UNESCAPED_UNICODE);
+                return response()->json(['state' => -1, 'data' => $msg], 200, ['Content-Type' => 'application/json;charset=UTF-8'], JSON_UNESCAPED_UNICODE);
             }
         }
         return response()->json(['state'=>-1, 'msg'=>'参数错误']);
