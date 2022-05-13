@@ -108,62 +108,20 @@ class HomeController extends Controller
             ])->validated();
             $cid = $validated['cid'];
             $page = $validated['page'];
-        }else{
-            return response()->json([]);
-        }
-        $redis = $this->redis();
-        $sectionKey = ($this->apiRedisKey['home_lists']).$cid.'-'.$page;
+            $redis = $this->redis();
+            $sectionKey = ($this->apiRedisKey['home_lists']).$cid.'-'.$page;
 
-        //二级分类列表
-        $res = $redis->get($sectionKey);
-        $perPage = 4;
-        if(!$res){
-            $paginator = Category::query()
-                ->where('parent_id',$cid)
-                ->where('is_checked',1)
-                ->orderBy('sort')
-                ->simplePaginate($perPage,['id','name','seo_title as title','is_rand','is_free','limit_display_num','group_type as style','group_bg_img as bg_img','local_bg_img','sort'],'',$page);
-            $secondCateList = $paginator->toArray();
-            $data = $secondCateList['data'];
-
-            //加入视频列表
-            //$queryBuild = Video::search('*')->where('status',1);
-            foreach ($data as &$item)
-            {
-                //获取模块数据
-                $ids = $redis->sMembers('catForVideo:'.$item['id']);
-                if(!empty($ids)){
-                    $queryBuild = DB::table('video')->where('status',1)->whereIn('id',$ids);
-                    if($item['is_rand']==1){
-                        $queryBuild = $queryBuild->inRandomOrder();
-                    }else{
-                        $queryBuild = $queryBuild->orderByRaw('video.sort DESC,video.updated_at DESC,video.id DESC');
-                    }
-                    $limit = $item['limit_display_num']>0 ? $item['limit_display_num'] : 8;
-                    $videoList = $queryBuild->limit($limit)->get($this->videoFields)->toArray();
-                    $videoList = $this->handleVideoItems($videoList,false,$user->id);
-                    $item['small_video_list'] = $videoList;
-                }
-            }
-            $res['hasMorePages'] = $paginator->hasMorePages();
-            $res['list'] = $data;
-            //广告
-            $res['list'] = $this->insertAds($res['list'],'home_page',true,$page,$perPage);
-            //存入redis
-            $redis->set($sectionKey,json_encode($res,JSON_UNESCAPED_UNICODE));
-            $redis->expire($sectionKey,7200);
-        }else{
+            //二级分类列表
+            $res = $redis->get($sectionKey);
             $res = json_decode($res,true);
             foreach ($res['list'] as &$r){
                 if(!empty($r['small_video_list'])){
                     $r['small_video_list'] = $this->handleVideoItems($r['small_video_list'],false,$user->id);
                 }
             }
+            return response()->json(['state'=>0, 'data'=>$res]);
         }
-        return response()->json([
-            'state'=>0,
-            'data'=>$res
-        ]);
+        return response()->json(['state' => -1, 'msg' => "参数错误",]);
     }
 
 }
