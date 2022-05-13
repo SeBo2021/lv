@@ -104,6 +104,6 @@ trait CommTrait
 
             } while ($data['hasMorePages']);
         }
-        Cache::put('updateHomePage',1);
+        //Cache::put('updateHomePage',1);
     }
 }
