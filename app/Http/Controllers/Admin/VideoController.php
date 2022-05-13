@@ -16,6 +16,7 @@ use App\Models\Tag;
 use App\Models\Video;
 use App\Services\UiService;
 use App\TraitClass\CatTrait;
+use App\TraitClass\CommTrait;
 use App\TraitClass\GoldTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\TagTrait;
@@ -27,7 +28,7 @@ use Illuminate\Support\Facades\Log;
 
 class VideoController extends BaseCurlController
 {
-    use VideoTrait,CatTrait,TagTrait,GoldTrait,PHPRedisTrait;
+    use VideoTrait,CatTrait,TagTrait,GoldTrait,PHPRedisTrait,CommTrait;
 
     public $pageName = '视频管理';
 
@@ -460,8 +461,7 @@ class VideoController extends BaseCurlController
         }
         $this->resetRedisCatVideo($cats,$model->id);
         $this->resetRedisTagVideo($tagArr??$tags,$model->id);
-        //清除缓存
-        $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
+        $this->resetHomeRedisData();
 
     }
 
@@ -835,7 +835,7 @@ class VideoController extends BaseCurlController
             if ($r) {
                 $this->insertLog($this->getPageName() . lang('成功修改ids') . '：' . implode(',', $id_arr));
                 //清除缓存
-                $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
+                $this->resetHomeRedisData();
             } else {
                 $this->insertLog($this->getPageName() . lang('失败ids') . '：' . implode(',', $id_arr));
             }

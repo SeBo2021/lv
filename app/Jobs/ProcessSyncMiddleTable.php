@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\TraitClass\CommTrait;
 use App\TraitClass\PHPRedisTrait;
 use App\TraitClass\VideoTrait;
 use Illuminate\Bus\Queueable;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Log;
 
 class ProcessSyncMiddleTable implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, VideoTrait, PHPRedisTrait;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, VideoTrait, PHPRedisTrait,CommTrait;
 
     public $flag;
 
@@ -36,15 +37,13 @@ class ProcessSyncMiddleTable implements ShouldQueue
      */
     public function handle()
     {
-        switch ($this->flag){
-            case 'video':
-                //同步版块中间表
-                $this->syncMiddleSectionTable();
-                //同步标签中间表
-                $this->syncMiddleTagTable();
-                //清除缓存
-                $this->redisBatchDel($this->redis()->keys($this->apiRedisKey['home_lists'] . '*'));
-                break;
+        //同步版块中间表
+        if ($this->flag == 'video') {
+            $this->syncMiddleSectionTable();
+            //同步标签中间表
+            $this->syncMiddleTagTable();
+            //清除缓存
+            $this->resetHomeRedisData();
         }
 
     }

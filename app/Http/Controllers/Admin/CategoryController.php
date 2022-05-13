@@ -14,13 +14,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Category;
 use App\Services\UiService;
+use App\TraitClass\CommTrait;
 use App\TraitClass\PHPRedisTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class CategoryController extends BaseCurlController
 {
-    use PHPRedisTrait;
+    use PHPRedisTrait,CommTrait;
     //那些页面不共享，需要单独设置的方法
     //设置页面的名称
     public $pageName = '分类栏目';
@@ -427,11 +428,12 @@ class CategoryController extends BaseCurlController
             $model->path_level = $next . $model->id;
             //清除缓存
             if($model->parent_id==2){
-                $keys = $redis->keys(($this->apiRedisKey['home_lists']).$model->id.'-*');
+                $this->resetHomeCategory();
+                $this->resetHomeRedisData();
             }else{
                 $keys = $redis->keys(($this->apiRedisKey['home_lists']).$parent->id.'-*');
+                $this->redisBatchDel($keys,$redis);
             }
-            $this->redisBatchDel($keys,$redis);
         } else {
             $model->path_level = $model->id;
         }

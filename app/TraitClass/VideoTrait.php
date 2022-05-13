@@ -466,7 +466,7 @@ trait VideoTrait
                 $list['gold'] = $list['gold'] / $this->goldUnit;
                 $list['views'] = $list['views'] > 0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5, 9));
                 //$list['hls_url'] = $domainSync . $list['hls_url'];
-                $list['preview_hls_url'] = $this->getPreviewPlayUrl($list['hls_url']);
+                $list['preview_hls_url'] = $this->getPreviewPlayUrl($list['hls_url']??'');
                 //$list['dash_url'] = $domainSync . $list['dash_url'];
                 //$list['preview_dash_url'] = $this->getPreviewPlayUrl($list['dash_url'], 'dash');
                 if(isset($list['time_at']) && ($list['time_at']>0)){
@@ -485,7 +485,7 @@ trait VideoTrait
             }
             //hls播放地址处理
             if(isset($list['hls_url'])){
-                $list['hls_url'] = $domainSync . $this->transferHlsUrl($list['hls_url']);
+                $list['hls_url'] = $domainSync . $this->transferHlsUrl($list['hls_url']??'');
             }
             $list['preview_hls_url'] = $domainSync . $list['preview_hls_url'];
             /*$previewHlsInfo = pathinfo($list['preview_hls_url']);
@@ -501,6 +501,7 @@ trait VideoTrait
 
     public function generateRandViews($views): string
     {
+        $views = intval($views);
         $views *= 20;
         $length = strlen($views);
         if($length > 8){
