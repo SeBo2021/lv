@@ -117,6 +117,8 @@ class VideoShortController extends Controller
         if ($startId) {
             $model = $model->where('id','<=',$startId)->orderBy('id','desc');
         }
+
+        $items = [];
         if(!empty($words)){
             $model = VideoShort::search($words)->where('status', 1);
             $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
