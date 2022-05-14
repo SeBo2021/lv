@@ -109,13 +109,13 @@ class VideoShortController extends Controller
             if(!empty($tagInfo)){
                 $tagWord = sprintf('"%s"',$tagInfo['id']);
 //                $model = $model->where('tag','like',"%{$tagWord}%");
-                $model = VideoShort::search($tagWord)->where('status',1);
+                $model = VideoShort::search('"'.$tagWord.'"')->where('status',1);
             }
         }else{
             if ($cateId) {
                 $cateWord = sprintf('"%s"',$cateId);
 //                $model = $model->where('cat','like',"%{$cateWord}%");
-                $model = VideoShort::search($cateWord)->where('status',1);
+                $model = VideoShort::search('"'.$cateWord.'"')->where('status',1);
             }
         }
         if ($startId) {
