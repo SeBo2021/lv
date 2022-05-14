@@ -107,15 +107,13 @@ class VideoShortController extends Controller
         if ($tagId) {
             $tagInfo = Tag::query()->where(['mask'=>$this->cateMapAlias[$tagId]])->firstOrFail()?->toArray();
             if(!empty($tagInfo)){
-                $tagWord = sprintf('"%s"',$tagInfo['id']);
 //                $model = $model->where('tag','like',"%{$tagWord}%");
-                $model = VideoShort::search('"'.$tagWord.'"')->where('status',1);
+                $model = VideoShort::search('"'.$tagInfo['id'].'"')->where('status',1);
             }
         }else{
             if ($cateId) {
-                $cateWord = sprintf('"%s"',$cateId);
 //                $model = $model->where('cat','like',"%{$cateWord}%");
-                $model = VideoShort::search('"'.$cateWord.'"')->where('status',1);
+                $model = VideoShort::search('"'.$cateId.'"')->where('status',1);
             }
         }
         if ($startId) {
@@ -144,7 +142,7 @@ class VideoShortController extends Controller
                     $more = true;
                 }
             } else {
-                $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
+                $paginator = $model->simplePaginate($perPage, 'shortLists', $page);
                 $items = $paginator->items();
                 $more = $paginator->hasMorePages();
             }
