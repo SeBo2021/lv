@@ -57,28 +57,24 @@ class ShortVideoMergeRedis extends Command
 
     public function processCache($page, $perNum, &$ids,&$cateIds)
     {
-        try {
-            $start = ($page - 1) * $perNum;
-            $video = DB::table('video_short')
-                ->select(['id', 'name', 'cid', 'cat', 'tag', 'restricted', 'sync', 'title', 'url', 'dash_url', 'hls_url', 'gold', 'duration', 'type', 'views', 'likes', 'comments', 'cover_img', 'updated_at'])
-                ->where('status', 1)
-                ->offset($start)->limit($perNum)->get();
+        $start = ($page - 1) * $perNum;
+        $video = DB::table('video_short')
+            ->select(['id', 'name', 'cid', 'cat', 'tag', 'restricted', 'sync', 'title', 'url', 'dash_url', 'hls_url', 'gold', 'duration', 'type', 'views', 'likes', 'comments', 'cover_img', 'updated_at'])
+            ->where('status', 1)
+            ->offset($start)->limit($perNum)->get();
 
-            foreach ($video as $item) {
-                $mapNum = $item->id % 300;
-                $cacheKey = "short_video_$mapNum";
-                $this->redis()->hSet($cacheKey, $item->id, json_encode($item));
+        foreach ($video as $item) {
+            $mapNum = $item->id % 300;
+            $cacheKey = "short_video_$mapNum";
+            $this->redis()->hSet($cacheKey, $item->id, json_encode($item));
 
-                $ids[] = $item->id;
-                foreach (json_decode($item->cat,true) as $v) {
-                    $cateIds["{$v}"][] = $item->id;
-                }
+            $ids[] = $item->id;
+            foreach (json_decode($item->cat,true) as $v) {
+                $cateIds["{$v}"][] = $item->id;
             }
-            if (count($video) == $perNum) {
-                $this->processCache($page+1, $perNum,$ids,$cateIds);
-            }
-        } catch (Exception $e) {
-            Log::error('执行过程出错===' . $e->getMessage());
+        }
+        if (count($video) == $perNum) {
+            $this->processCache($page+1, $perNum,$ids,$cateIds);
         }
 
     }
