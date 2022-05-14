@@ -13,12 +13,18 @@ class VideoShort extends BaseModel
 
     protected $table = 'video_short';
 
-    protected $mapping = [
+    protected array $mapping = [
         'properties' => [
             'name' => [
                 'type' => 'text',
             ],
             'title' => [
+                'type' => 'text',
+            ],
+            'tag' => [
+                'type' => 'text',
+            ],
+            'cat' => [
                 'type' => 'text',
             ],
         ]
