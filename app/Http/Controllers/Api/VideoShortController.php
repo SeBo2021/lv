@@ -84,6 +84,7 @@ class VideoShortController extends Controller
      */
     private function items($page, $user, $startId,$cateId,$tagId,$words): array
     {
+        $redis = $this->redis();
         if ($page == 1) {
             if ($cateId) {
                 $ids = $this->redis()->get("shortVideoCateIds_{$cateId}")?:'';
@@ -94,30 +95,30 @@ class VideoShortController extends Controller
             $redisIds = explode(',',$ids);
             shuffle($redisIds);
             $newIds = implode(',',$redisIds);
-            $this->redis()->set("newShortVideoByUid_{$cateId}_{$user->id}",$newIds);
+            $redis->set("newShortVideoByUid_{$cateId}_{$user->id}",$newIds);
         } else {
-            $newIds = $this->redis()->get("newShortVideoByUid_{$cateId}_{$user->id}");
+            $newIds = $redis->get("newShortVideoByUid_{$cateId}_{$user->id}");
         }
         $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'dash_url', 'hls_url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
         $perPage = 8;
-        $model = VideoShort::query()->where('status',1);
-//        $model = VideoShort::search("*")->where('status',1);
+        //$model = VideoShort::query()->where('status',1);
+        $model = VideoShort::search("*")->where('status',1);
 
         if ($tagId) {
             $tagInfo = Tag::query()->where(['mask'=>$this->cateMapAlias[$tagId]])->firstOrFail()?->toArray();
             if(!empty($tagInfo)){
-                $tagWord = sprintf('"%s"',$tagInfo['id']);
-                $model = $model->where('tag','like',"%{$tagWord}%");
+                $model = VideoShort::search('"'.$tagInfo['id'].'"')->where('status',1);
             }
         }else{
             if ($cateId) {
-                $cateWord = sprintf('"%s"',$cateId);
-                $model = $model->where('cat','like',"%{$cateWord}%");
+                $model = VideoShort::search('"'.$cateId.'"')->where('status',1);
             }
         }
         if ($startId) {
             $model = $model->where('id','<=',$startId)->orderBy('id','desc');
         }
+
+        $items = [];
         if(!empty($words)){
             $model = VideoShort::search($words)->where('status', 1);
             $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
@@ -141,7 +142,7 @@ class VideoShortController extends Controller
                     $more = true;
                 }
             } else {
-                $paginator = $model->simplePaginate($perPage, $videoField, 'shortLists', $page);
+                $paginator = $model->simplePaginate($perPage, 'shortLists', $page);
                 $items = $paginator->items();
                 $more = $paginator->hasMorePages();
             }
@@ -156,12 +157,12 @@ class VideoShortController extends Controller
                 $one['limit'] = 1;
             }
             $viewRecord = $this->isShortLoveOrCollect($user->id, $one['id']);
-            $one['is_love'] = intval($viewRecord['is_love']) ?? 0;
+            $one['is_love'] = intval($viewRecord['is_love']??0);
             $sync = $one['sync'] ?? 2;
             $sync = $sync>0 ? $sync : 2;
             $resourceDomain = self::getDomain($sync);
             //是否收藏
-            $one['is_collect'] = intval($viewRecord['is_collect']) ?? 0;
+            $one['is_collect'] = intval($viewRecord['is_collect']??0);
             $one['url'] = $resourceDomain  .$one['url'];
             $one['dash_url'] = $resourceDomain  .$one['dash_url'];
             $one['cover_img'] = $this->transferImgOut($one['cover_img'],$resourceDomain,$_v);
