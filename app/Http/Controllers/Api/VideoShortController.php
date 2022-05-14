@@ -157,12 +157,12 @@ class VideoShortController extends Controller
                 $one['limit'] = 1;
             }
             $viewRecord = $this->isShortLoveOrCollect($user->id, $one['id']);
-            $one['is_love'] = intval($viewRecord['is_love']??0);
+            $one['is_love'] = isset($viewRecord['is_love']) ? $viewRecord['is_love']+=0 : 0;
             $sync = $one['sync'] ?? 2;
             $sync = $sync>0 ? $sync : 2;
             $resourceDomain = self::getDomain($sync);
             //是否收藏
-            $one['is_collect'] = intval($viewRecord['is_collect']??0);
+            $one['is_collect'] = isset($viewRecord['is_collect']) ? $viewRecord['is_collect']+=0 : 0;
             $one['url'] = $resourceDomain  .$one['url'];
             $one['dash_url'] = $resourceDomain  .$one['dash_url'];
             $one['cover_img'] = $this->transferImgOut($one['cover_img'],$resourceDomain,$_v);
