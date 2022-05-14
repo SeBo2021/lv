@@ -99,9 +99,7 @@ class VideoShortController extends Controller
         } else {
             $newIds = $redis->get("newShortVideoByUid_{$cateId}_{$user->id}");
         }
-        $videoField = ['id', 'name', 'cid', 'cat','tag', 'restricted', 'sync', 'title', 'url', 'dash_url', 'hls_url', 'gold', 'duration', 'type',  'views', 'likes', 'comments', 'cover_img', 'updated_at'];
         $perPage = 8;
-        //$model = VideoShort::query()->where('status',1);
         $model = VideoShort::search("*")->where('status',1);
 
         if ($tagId) {
@@ -151,26 +149,27 @@ class VideoShortController extends Controller
         $data = [];
         $_v = date('Ymd');
         $isVip = $this->isVip($user);
-        foreach ($items as $one) {
-            $one['limit'] = 0;
-            if ($one['restricted'] == 1  && (!$isVip)) {
-                $one['limit'] = 1;
+        if(!empty($items)){
+            foreach ($items as $one) {
+                $one['limit'] = 0;
+                if ($one['restricted'] == 1  && (!$isVip)) {
+                    $one['limit'] = 1;
+                }
+                $viewRecord = $this->isShortLoveOrCollect($user->id, $one['id']);
+                $one['is_love'] = $viewRecord['is_love'];
+                $sync = $one['sync'] ?? 2;
+                $sync = $sync>0 ? $sync : 2;
+                $resourceDomain = self::getDomain($sync);
+                //是否收藏
+                $one['is_collect'] = $viewRecord['is_collect'];
+                $one['url'] = $resourceDomain  .$one['url'];
+                $one['dash_url'] = $resourceDomain  .$one['dash_url'];
+                $one['cover_img'] = $this->transferImgOut($one['cover_img'],$resourceDomain,$_v);
+                //hls处理
+                $one['hls_url'] = $resourceDomain .$this->transferHlsUrl($one['hls_url'],$one['id'],$_v);
+                $data[] = $one;
             }
-            $viewRecord = $this->isShortLoveOrCollect($user->id, $one['id']);
-            $one['is_love'] = isset($viewRecord['is_love']) ? $viewRecord['is_love']+=0 : 0;
-            $sync = $one['sync'] ?? 2;
-            $sync = $sync>0 ? $sync : 2;
-            $resourceDomain = self::getDomain($sync);
-            //是否收藏
-            $one['is_collect'] = isset($viewRecord['is_collect']) ? $viewRecord['is_collect']+=0 : 0;
-            $one['url'] = $resourceDomain  .$one['url'];
-            $one['dash_url'] = $resourceDomain  .$one['dash_url'];
-            $one['cover_img'] = $this->transferImgOut($one['cover_img'],$resourceDomain,$_v);
-            //hls处理
-            $one['hls_url'] = $resourceDomain .$this->transferHlsUrl($one['hls_url'],$one['id'],$_v);
-            $data[] = $one;
         }
-
         return [
             'list' => $data,
             'hasMorePages' => $more,
@@ -341,15 +340,15 @@ class VideoShortController extends Controller
     /**
      * 判断是否收藏或喜欢
      * @param int $uid
-     * @param $vid
+     * @param int $vid
      * @return int[]
      */
-    public function isShortLoveOrCollect($uid = 0, $vid = 0): array
+    public function isShortLoveOrCollect(int $uid = 0, int $vid = 0): array
     {
         $redis = $this->redis();
-        $one['is_love'] = $redis->get("short_is_love_{$uid}_{$vid}") ?: 0;
+        $one['is_love'] = $redis->exists("short_is_love_{$uid}_{$vid}") ? (int)$redis->get("short_is_love_{$uid}_{$vid}") : 0;
         //是否收藏
-        $one['is_collect'] = $redis->get("short_is_collect_{$uid}_{$vid}") ?: 0;
+        $one['is_collect'] = $redis->exists("short_is_collect_{$uid}_{$vid}") ? (int)$redis->get("short_is_collect_{$uid}_{$vid}"): 0;
         return $one;
     }
 
