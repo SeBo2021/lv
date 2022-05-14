@@ -107,12 +107,10 @@ class VideoShortController extends Controller
         if ($tagId) {
             $tagInfo = Tag::query()->where(['mask'=>$this->cateMapAlias[$tagId]])->firstOrFail()?->toArray();
             if(!empty($tagInfo)){
-//                $model = $model->where('tag','like',"%{$tagWord}%");
                 $model = VideoShort::search('"'.$tagInfo['id'].'"')->where('status',1);
             }
         }else{
             if ($cateId) {
-//                $model = $model->where('cat','like',"%{$cateWord}%");
                 $model = VideoShort::search('"'.$cateId.'"')->where('status',1);
             }
         }
