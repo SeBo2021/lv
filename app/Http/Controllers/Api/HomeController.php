@@ -54,17 +54,7 @@ class HomeController extends Controller
                 $carouselData = $redis->get($configKey);
                 if($carouselData){
                     $data = json_decode($carouselData,true);
-                    $res = [];
-                    $nowTime = time();
-                    foreach ($data as $carousel){
-                        if($carousel['status']==1){
-                            if(!$carousel['end_at']){
-                                $res[] = $carousel;
-                            } elseif ($nowTime < strtotime($carousel['end_at'])){
-                                $res[] = $carousel;
-                            }
-                        }
-                    }
+                    $res = $this->frontFilterAd($data);
                     return response()->json([
                         'state'=>0,
                         'data'=>$res

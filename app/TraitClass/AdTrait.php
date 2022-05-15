@@ -161,4 +161,21 @@ trait AdTrait
         return $res;
     }
 
+    public function frontFilterAd(&$Items): array
+    {
+        $ads = [];
+        $nowTime = time();
+        foreach ($Items as $ad){
+            if($ad['status']==1){
+                if(!$ad['end_at']){
+                    $ads[] = $ad;
+                } elseif ($nowTime < strtotime($ad['end_at'])){
+                    $ads[] = $ad;
+                }
+            }
+        }
+        $Items = $ads;
+        return $ads;
+    }
+
 }
