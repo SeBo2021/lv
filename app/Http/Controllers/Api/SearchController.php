@@ -187,7 +187,8 @@ class SearchController extends Controller
                 $redis = $this->redis();
                 $redisJsonData = $redis->get($key);
                 if(!$redisJsonData){
-                    $paginator = Video::search('"'.$cat.'"')->where('status',1)->orderBy('updated_at','desc')->simplePaginate($perPage,'searchCat',$page);
+                    $keyWords = (string)@json_decode($cat);
+                    $paginator = Video::search($keyWords)->where('status',1)->orderBy('updated_at','desc')->simplePaginate($perPage,'searchCat',$page);
                     $paginatorArr = $paginator->toArray()['data'];
                     if(!empty($paginatorArr)){
                         $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
