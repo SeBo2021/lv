@@ -215,11 +215,17 @@ class CarouselController extends BaseCurlController
             ->orderBy('sort')
             ->get(['id']);
         foreach ($cats as $cat){
-            $carousel = Carousel::query()
+            $carousels = Carousel::query()
                 ->where('status', 1)
                 ->where('cid', $cat->id)
                 ->get(['id','title','img','url','action_type','vid','status','end_at'])->toArray();
-            $this->redis()->set('api_carousel_'.$cat->id,json_encode($carousel,JSON_UNESCAPED_UNICODE));
+            $domain = env('API_RESOURCE_DOMAIN2');
+            foreach ($carousels as &$carousel){
+                $carousel['img'] = $this->transferImgOut($carousel['img'],$domain,date('Ymd'),'auto');
+                $carousel['action_type'] = (string) $carousel['action_type'];
+                $carousel['vid'] = (string) $carousel['vid'];
+            }
+            $this->redis()->set('api_carousel_'.$cat->id,json_encode($carousels,JSON_UNESCAPED_UNICODE));
         }
     }
 
