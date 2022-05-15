@@ -165,7 +165,6 @@ class CarouselController extends BaseCurlController
                 'type' => 'datetime',
                 'attr' => 'data-range=~',//需要特殊分割
                 'name' => '选择投放时间',
-                'default' => $show->start_at ? $show->start_at.'-'.$show->end_at : null,
             ],
             [
                 'field' => 'status',
