@@ -209,7 +209,7 @@ class CarouselController extends BaseCurlController
         $model->save();
         $this->syncUpload($model->img);
 
-        $cats = Category::query()
+        /*$cats = Category::query()
             ->where('is_checked',1)
             ->where('parent_id',2)
             ->orderBy('sort')
@@ -226,7 +226,18 @@ class CarouselController extends BaseCurlController
                 $carousel['vid'] = (string) $carousel['vid'];
             }
             $this->redis()->set('api_carousel_'.$cat->id,json_encode($carousels,JSON_UNESCAPED_UNICODE));
+        }*/
+        $carousels = Carousel::query()
+            ->where('status', 1)
+            ->where('cid', $model->cid)
+            ->get(['id','title','img','url','action_type','vid','status','end_at'])->toArray();
+        $domain = env('API_RESOURCE_DOMAIN2');
+        foreach ($carousels as &$carousel){
+            $carousel['img'] = $this->transferImgOut($carousel['img'],$domain,date('Ymd'),'auto');
+            $carousel['action_type'] = (string) $carousel['action_type'];
+            $carousel['vid'] = (string) $carousel['vid'];
         }
+        $this->redis()->set('api_carousel_'.$model->cid,json_encode($carousels,JSON_UNESCAPED_UNICODE));
     }
 
     public function setListOutputItemExtend($item)
