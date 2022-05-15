@@ -50,48 +50,46 @@ class HomeController extends Controller
      */
     public function carousel(Request $request): \Illuminate\Http\JsonResponse
     {
-        if(isset($request->params)){
-            $params = self::parse($request->params);
-            $validated = Validator::make($params,[
-                'cid' => 'required|integer'
-            ])->validated();
-            $cid = $validated['cid'];
-            // Log::info('==carouselLog===',[$validated]);
+        try {
+            if(isset($request->params)){
+                $params = self::parse($request->params);
+                $validated = Validator::make($params,[
+                    'cid' => 'required|integer'
+                ])->validated();
+                $cid = $validated['cid'];
+                // Log::info('==carouselLog===',[$validated]);
+                $configKey = 'api_carousel_'.$cid;
+                $redis = $this->redis();
+                if($redis->exists($configKey)){
+                    $carouselData = $this->redis()->get($configKey);
+                    $domain = self::getDomain(env('SFTP_SYNC',1));
+                    $data = json_decode($carouselData,true);
+                    $res = [];
+                    $nowTime = time();
+                    foreach ($data as $carousel){
+                        $carousel['img'] = $this->transferImgOut($carousel['img'],$domain,date('Ymd'),'auto');
+                        $carousel['action_type'] = (string) $carousel['action_type'];
+                        $carousel['vid'] = (string) $carousel['vid'];
+                        if(!$carousel['end_at']){
+                            $res[] = $carousel;
+                        } elseif ($nowTime < strtotime($carousel['end_at'])){
+                            $res[] = $carousel;
+                        }
 
-            $configKey = 'api_carousel_'.$cid;
-            $carouselData = $this->redis()->get($configKey);
-            $domain = self::getDomain(env('SFTP_SYNC',1));
-            if (!$carouselData) {
-                $data = Carousel::query()
-                    ->where('status', 1)
-                    ->where('cid', $cid)
-                    ->get(['id','title','img','url','action_type','vid','status','end_at'])
-                    ->toArray();
-                $this->redis()->set($configKey,json_encode($data,JSON_UNESCAPED_UNICODE));
-            } else {
-                $data = json_decode($carouselData,true);
-            }
-
-            $res = [];
-            $nowTime = time();
-            foreach ($data as $carousel){
-                $carousel['img'] = $this->transferImgOut($carousel['img'],$domain,date('Ymd'),'auto');
-                $carousel['action_type'] = (string) $carousel['action_type'];
-                $carousel['vid'] = (string) $carousel['vid'];
-                if(!$carousel['end_at']){
-                    $res[] = $carousel;
-                } elseif ($nowTime < strtotime($carousel['end_at'])){
-                    $res[] = $carousel;
+                    }
+                    return response()->json([
+                        'state'=>0,
+                        'data'=>$res
+                    ]);
                 }
-
             }
-
-            return response()->json([
-                'state'=>0,
-                'data'=>$res
-            ]);
+        }catch (\Exception $exception){
+            $msg = $exception->getMessage();
+            Log::error("api/carousel", [$msg]);
+            return response()->json(['state' => -1, 'data' => $msg], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
         }
-        return response()->json([]);
+
+        return response()->json(['state' => -1, 'msg' => "参数错误"], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
     }
 
     /**
