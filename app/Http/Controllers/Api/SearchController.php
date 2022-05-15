@@ -140,11 +140,14 @@ class SearchController extends Controller
                 $perPage = 16;
                 $ids = $redis->sMembers('catForVideo:'.$cid);
                 if(!empty($ids)){
-                    $paginator = DB::table('video')
+                    /*$paginator = DB::table('video')
                         ->where('status',1)
                         ->whereIn('id',$ids)
                         ->orderByDesc('updated_at')
-                        ->simplePaginate($perPage,$this->videoFields,'cat',$page);
+                        ->simplePaginate($perPage,$this->videoFields,'cat',$page);*/
+
+                    $paginator = Video::search('"'.$cid.'"')->where('status',1)->simplePaginate($perPage,'searchCat',$page);
+
                     $paginatorArr = $paginator->toArray()['data'];
                     if(!empty($paginatorArr)){
                         $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);

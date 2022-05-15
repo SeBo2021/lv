@@ -23,6 +23,12 @@ class Video extends BaseModel
             'title' => [
                 'type' => 'text',
             ],
+            'tag' => [
+                'type' => 'text',
+            ],
+            'cat' => [
+                'type' => 'text',
+            ],
         ]
     ];
 
