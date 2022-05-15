@@ -89,7 +89,7 @@ class SearchController extends Controller
     }
 
     //标签
-    public function tag(Request $request)
+    public function tag(Request $request): JsonResponse
     {
         if(isset($request->params)){
             $perPage = 16;
@@ -114,7 +114,7 @@ class SearchController extends Controller
             ]);
 
         }
-        return [];
+        return response()->json([]);
     }
 
     //更多
@@ -122,7 +122,7 @@ class SearchController extends Controller
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function cat(Request $request): JsonResponse|array
+    public function cat(Request $request): JsonResponse
     {
         if(isset($request->params)){
             $params = self::parse($request->params);
@@ -153,16 +153,24 @@ class SearchController extends Controller
             }else{
                 $res = json_decode($res,true);
             }
-            return response()->json([
-                'state'=>0,
-                'data'=>$res
-            ]);
+            if(isset($res['list']) && !empty($res['list'])){
+                foreach ($res['list'] as $d){
+                    if(!empty($d['ad_list'])){
+                        $this->frontFilterAd($d['ad_list']);
+                    }
+                }
+            }
+            return response()->json(['state'=>0, 'data'=>$res]);
         }
         return response()->json([]);
     }
 
     //推荐
-    public function recommend(Request $request): JsonResponse|array
+
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function recommend(Request $request): JsonResponse
     {
         if(isset($request->params)){
             $params = self::parse($request->params);
@@ -172,66 +180,36 @@ class SearchController extends Controller
             $page = $validated['page'] ?? 1;
             $perPage = 8;
             $vid = $validated['vid'];
-//            $cat = Video::query()->where('id',$vid)->value('cat');
             $cat = $this->getVideoById($vid)->cat;
-
+            $res = ['list'=>[], 'hasMorePages'=>false];
             if(!empty($cat)){
-                /* $paginator = Video::query()->where('status',1)
-                    ->where('cat','like',"%{$cat}%")
-                    ->simplePaginate($perPage,$this->videoFields,'recommend',$page); */
                 $key = 'searchRecommend:'.$cat.':'.$page;
                 $redis = $this->redis();
                 $redisJsonData = $redis->get($key);
                 if(!$redisJsonData){
-                    $cidArr = @json_decode($cat,true);
-                    $ids = [];
-                    foreach ($cidArr as $item){
-                        $ids += array_flip(($redis->sMembers('catForVideo:'.$item)??[]));
+                    $paginator = Video::search($cat)->where('status',1)->orderBy('updated_at','desc')->simplePaginate($perPage,'searchCat',$page);
+                    $paginatorArr = $paginator->toArray()['data'];
+                    if(!empty($paginatorArr)){
+                        $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
+                        //广告
+                        $res['list'] = $this->insertAds($res['list'],'more_page',true, $page, $perPage);
+                        $res['hasMorePages'] = false;
+                        $redis->set($key,json_encode($res,JSON_UNESCAPED_UNICODE));
+                        $redis->expire($key,3600);
                     }
-                    //去掉当前的;
-                    if(isset($ids[$vid])){
-                        unset($ids[$vid]);
-                    }
-                    $ids = array_keys($ids);
-                    if(!empty($ids)){
-                        shuffle($ids);
-                        if(count($ids)>8){
-                            $ids = array_slice($ids,0,$perPage);
-                        }
-                        $paginator = DB::table('video')
-                            ->where('status',1)
-                            ->whereIn('id',$ids)->get($this->videoFields);
-                        $paginatorArr = $paginator->toArray();
-                        if(!empty($paginatorArr)){
-                            $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
-                            //广告
-                            $res['list'] = $this->insertAds($res['list'],'recommend',1);
-                            $res['hasMorePages'] = false;
-                            $redis->set($key,json_encode($res,JSON_UNESCAPED_UNICODE));
-                            $redis->expire($key,3600);
-                            return response()->json([
-                                'state'=>0,
-                                'data'=>$res
-                            ]);
-                        }
-                    }
-
-                    //$paginatorArr = $paginator->items();
-                    //Log::info('==Recommend===',$paginatorArr);
 
                 }else{
                     $res = json_decode($redisJsonData,true);
-                    return response()->json([
-                        'state'=>0,
-                        'data'=>$res
-                    ]);
                 }
-                    
+                if(isset($res['list']) && !empty($res['list'])){
+                    foreach ($res['list'] as $d){
+                        if(!empty($d['ad_list'])){
+                            $this->frontFilterAd($d['ad_list']);
+                        }
+                    }
+                }
             }
-            return response()->json([
-                'state'=>0,
-                'data'=>['list'=>[], 'hasMorePages'=>false]
-            ]);
+            return response()->json(['state'=>0, 'data'=>$res]);
         }
         return response()->json(['state' => -1, 'msg' => "参数错误"]);
     }
