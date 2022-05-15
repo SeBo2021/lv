@@ -124,8 +124,7 @@ trait CommTrait
             ->orderBy('sort', 'desc')
             ->select('id', 'name')
             ->get();
-        $data = json_decode($raw, true);
-        $this->redis()->set('short_category',json_encode($data));
+        $this->redis()->set('short_category',json_encode($raw->toArray(),JSON_UNESCAPED_UNICODE));
     }
 
 }
