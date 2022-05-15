@@ -92,21 +92,23 @@ trait AdTrait
         $ads = $getAds ? $getAds->toArray() : [];
         $domain = VideoTrait::getDomain(env('SFTP_SYNC',1));
         $_v = date('YmdH');
+        $filterAds = [];
         foreach ($ads as &$ad){
-            //$ad['img'] = $domain . $ad['img'];
-            //图片处理
-            $ad['img'] = $this->transferImgOut($ad['img'],$domain,$_v,'auto');
-            $ad['action_type'] = (string)$ad['action_type'];
-            $ad['vid'] = (string)$ad['vid'];
+            if($ad->status==1){
+                $ad['img'] = $this->transferImgOut($ad['img'],$domain,$_v,'auto');
+                $ad['action_type'] = (string)$ad['action_type'];
+                $ad['vid'] = (string)$ad['vid'];
+                $filterAds[] = $ad;
+            }
         }
         if($groupByPosition){ //有位置的多一维
             $newAds = [];
-            foreach ($ads as $item){
+            foreach ($filterAds as $item){
                 $newAds[$item['position']][]= $item;
             }
-            $ads = $newAds;
+            $filterAds = $newAds;
         }
-        return !empty($ads) ? $ads : [];
+        return !empty($filterAds) ? $filterAds : [];
     }
 
     public function insertAds($data, $flag='', $usePage=false, $page=1, $perPage=6): array
