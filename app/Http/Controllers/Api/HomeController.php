@@ -60,8 +60,8 @@ class HomeController extends Controller
                 // Log::info('==carouselLog===',[$validated]);
                 $configKey = 'api_carousel_'.$cid;
                 $redis = $this->redis();
-                if($redis->exists($configKey)){
-                    $carouselData = $this->redis()->get($configKey);
+                $carouselData = $redis->get($configKey);
+                if($carouselData){
                     $domain = self::getDomain(env('SFTP_SYNC',1));
                     $data = json_decode($carouselData,true);
                     $res = [];
@@ -86,10 +86,10 @@ class HomeController extends Controller
         }catch (\Exception $exception){
             $msg = $exception->getMessage();
             Log::error("api/carousel", [$msg]);
-            return response()->json(['state' => -1, 'data' => $msg], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
+            return response()->json(['state' => -1, 'msg' => $msg,'data'=>[]], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
         }
 
-        return response()->json(['state' => -1, 'msg' => "参数错误"], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
+        return response()->json(['state' => -1, 'msg' => "参数错误",'data'=>[]], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
     }
 
     /**
