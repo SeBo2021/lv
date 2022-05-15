@@ -66,12 +66,13 @@ class HomeController extends Controller
                     $res = [];
                     $nowTime = time();
                     foreach ($data as $carousel){
-                        if(!$carousel['end_at']){
-                            $res[] = $carousel;
-                        } elseif ($nowTime < strtotime($carousel['end_at'])){
-                            $res[] = $carousel;
+                        if($carousel['status']==1){
+                            if(!$carousel['end_at']){
+                                $res[] = $carousel;
+                            } elseif ($nowTime < strtotime($carousel['end_at'])){
+                                $res[] = $carousel;
+                            }
                         }
-
                     }
                     return response()->json([
                         'state'=>0,
