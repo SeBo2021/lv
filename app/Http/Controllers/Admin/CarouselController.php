@@ -165,7 +165,7 @@ class CarouselController extends BaseCurlController
                 'type' => 'datetime',
                 'attr' => 'data-range=~',//需要特殊分割
                 'name' => '选择投放时间',
-                //'default' => $show->start_at.'-'.$show->end_at,
+                'default' => $show->start_at ? $show->start_at.'-'.$show->end_at : null,
             ],
             [
                 'field' => 'status',
@@ -228,7 +228,6 @@ class CarouselController extends BaseCurlController
             $this->redis()->set('api_carousel_'.$cat->id,json_encode($carousels,JSON_UNESCAPED_UNICODE));
         }*/
         $carousels = Carousel::query()
-            ->where('status', 1)
             ->where('cid', $model->cid)
             ->get(['id','title','img','url','action_type','vid','status','end_at'])->toArray();
         $domain = env('API_RESOURCE_DOMAIN2');
