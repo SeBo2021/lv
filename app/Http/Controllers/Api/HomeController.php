@@ -107,7 +107,7 @@ class HomeController extends Controller
             return response()->json(['state' => -1, 'msg' => "参数错误"]);
         }catch (\Exception $exception){
             $msg = $exception->getMessage();
-            Log::error("api/searchCat", [$msg]);
+            Log::error("api/Lists", [$msg]);
             return response()->json(['state' => -1, 'msg' => $msg,'data'=>[]]);
         }
 

@@ -62,51 +62,54 @@ class UserController extends Controller
 
     public function extendInfo(Request $request): JsonResponse
     {
-        $user = $request->user();
-        if(!empty($user)){
-            $types = explode(',',$user->member_card_type);
-            $memberCardTypeId = !empty($types) ? $types[0] : 0;
-            $member_card = [
-                'name' => '未开通',
-                'expired_time' => '',
-                'is_vip' => 0,
-                'vip_expired' => '',
-            ];
-            if($memberCardTypeId>0){
-                $expired_time = '';
-                $memberCardName = '';
-                $calc = ($user->vip_expired?:0) - (time()-($user->vip_start_last?:time()));
-                $vipDay = ceil((($calc>0)?$calc:0)/(24*60*60));
-                $isVip = 0;
-                if ($calc >= 0) {
-                    $isVip = 1;
-                }
-                
-                if($this->isForeverCard($memberCardTypeId)){
-                    $vipDay = -1;
-                    $isVip = 1;
-                }
-
+        try {
+            $user = $request->user();
+            if(!empty($user)){
+                $types = explode(',',$user->member_card_type);
+                $memberCardTypeId = !empty($types) ? $types[0] : 0;
                 $member_card = [
-                    'name' => $memberCardName,
-                    'expired_time' => $expired_time,
-                    'is_vip' => $isVip,
-                    'vip_expired' => date('Y-m-d',time() + $calc),
-                    'vip_day' => $vipDay,
+                    'name' => '未开通',
+                    'expired_time' => '',
+                    'is_vip' => 0,
+                    'vip_expired' => '',
                 ];
-            }
+                if($memberCardTypeId>0){
+                    $expired_time = '';
+                    $memberCardName = '';
+                    $calc = ($user->vip_expired?:0) - (time()-($user->vip_start_last?:time()));
+                    $vipDay = ceil((($calc>0)?$calc:0)/(24*60*60));
+                    $isVip = 0;
+                    if ($calc >= 0) {
+                        $isVip = 1;
+                    }
 
-            $res=[
-                'member_card' => $member_card,
-                'saol_gold' => $user->gold ?:0,
-                'video_times' => $user->long_vedio_times ??0,
-            ] ;
-            return response()->json([
-                'state'=>0,
-                'data'=>$res
-            ]);
+                    if($this->isForeverCard($memberCardTypeId)){
+                        $vipDay = -1;
+                        $isVip = 1;
+                    }
+
+                    $member_card = [
+                        'name' => $memberCardName,
+                        'expired_time' => $expired_time,
+                        'is_vip' => $isVip,
+                        'vip_expired' => date('Y-m-d',time() + $calc),
+                        'vip_day' => $vipDay,
+                    ];
+                }
+
+                $res=[
+                    'member_card' => $member_card,
+                    'saol_gold' => $user->gold ?:0,
+                    'video_times' => $user->long_vedio_times ??0,
+                ] ;
+                return response()->json(['state'=>0, 'data'=>$res]);
+            }
+            return response()->json([]);
+        }catch (\Exception $exception){
+            $msg = $exception->getMessage();
+            Log::error("api/extendInfo", [$msg]);
+            return response()->json(['state' => -1, 'msg' => $msg,'data'=>[]]);
         }
-        return response()->json([]);
     }
 
     /*public function videoList(Request $request)

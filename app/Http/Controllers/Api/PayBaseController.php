@@ -96,7 +96,6 @@ class PayBaseController extends Controller
             $memberCardData = json_decode($cacheData, true);
         } else {
             $memberCardInfo = MemberCard::query()
-                // ->where('status', 1)
                 ->select(['zfb_channel', 'wx_channel','zfb_action_id','wx_action_id', 'id'])
                 ->get()
                 ->toArray();

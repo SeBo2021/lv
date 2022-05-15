@@ -339,7 +339,12 @@ class MemberCardController extends BaseCurlController
     protected function afterSaveSuccessEvent($model, $id = '')
     {
         //清除缓存
-        $this->redis()->del('api_recharge_member_card');
+        $memberCardInfo = MemberCard::query()
+            ->select(['zfb_channel', 'wx_channel','zfb_action_id','wx_action_id', 'id'])
+            ->get()
+            ->toArray();
+        $memberCardData = array_column($memberCardInfo, null, 'id');
+        $this->redis()->set("api_recharge_member_card", json_encode($memberCardData, JSON_UNESCAPED_UNICODE));
         return $model;
     }
 
