@@ -54,7 +54,7 @@ trait CommTrait
 
     public function resetAdsData($flag): void
     {
-        Cache::forever('ads_key',Ad::query()
+        Cache::forever('ads_key_'.$flag,Ad::query()
             ->where('name',$flag)
             ->where('status',1)
             ->orderBy('sort')

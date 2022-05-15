@@ -88,7 +88,7 @@ trait AdTrait
 
     public function getAds($flag='',$groupByPosition=false): array
     {
-        $getAds = Cache::get('ads_key');
+        $getAds = Cache::get('ads_key_'.$flag);
         $ads = $getAds ? $getAds->toArray() : [];
         $domain = VideoTrait::getDomain(env('SFTP_SYNC',1));
         $_v = date('YmdH');
