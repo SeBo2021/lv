@@ -308,8 +308,8 @@ class AdController extends BaseCurlController
         $this->resetHomeRedisData();
         //清除推荐缓存
         $this->redisBatchDel($this->redis()->keys('*searchRecommend*'));
-        //清除更多页缓存
-        $this->redisBatchDel($this->redis()->keys('*api_more_cid-page:*'));
+        //广告缓存
+        $this->resetAdsData($model->name);
         //清除配置缓存
         $this->redisBatchDel($this->redis()->keys('*api_config*'));
     }

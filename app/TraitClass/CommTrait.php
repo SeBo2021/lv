@@ -2,6 +2,7 @@
 
 namespace App\TraitClass;
 
+use App\Models\Ad;
 use App\Models\Category;
 use App\Models\CommCate;
 use Illuminate\Support\Facades\Cache;
@@ -49,6 +50,15 @@ trait CommTrait
             ->where('is_checked',1)
             ->orderBy('sort')
             ->get(['id','name','sort']));
+    }
+
+    public function resetAdsData($flag): void
+    {
+        Cache::forever('ads_key',Ad::query()
+            ->where('name',$flag)
+            ->where('status',1)
+            ->orderBy('sort')
+            ->get(['id','sort','name','title','img','position','url','play_url','type','status','action_type','vid','end_at']));
     }
 
     public function getHomeCategory()

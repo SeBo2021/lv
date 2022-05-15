@@ -4,6 +4,7 @@ namespace App\TraitClass;
 
 use App\Models\Ad;
 use App\Models\AdSet;
+use Illuminate\Support\Facades\Cache;
 
 trait AdTrait
 {
@@ -87,12 +88,8 @@ trait AdTrait
 
     public function getAds($flag='',$groupByPosition=false): array
     {
-        $ads = Ad::query()
-            ->where('name',$flag)
-            ->where('status',1)
-            ->orderBy('sort')
-            ->get(['id','sort','name','title','img','position','url','play_url','type','status','action_type','vid','end_at'])
-            ->toArray();
+        $getAds = Cache::get('ads_key');
+        $ads = $getAds ? $getAds->toArray() : [];
         $domain = VideoTrait::getDomain(env('SFTP_SYNC',1));
         $_v = date('YmdH');
         foreach ($ads as &$ad){
@@ -116,8 +113,7 @@ trait AdTrait
     {
         $adSet = cache()->get('ad_set');
         if (!$adSet) {
-            $adSet = array_column(AdSet::get()->toArray(),null,'flag');
-            cache()->set('ad_set',$adSet);
+            return $data;
         }
         $res = $data;
         $rawPos = $adSet[$flag]['position'];

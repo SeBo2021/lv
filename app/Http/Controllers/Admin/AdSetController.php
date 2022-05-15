@@ -11,14 +11,14 @@ class AdSetController extends BaseCurlController
 
     public $pageName = '广告设置';
 
-    public function setModel()
+    public function setModel(): AdSet
     {
         return $this->model = new AdSet();
     }
 
-    public function indexCols()
+    public function indexCols(): array
     {
-        $cols = [
+        return [
             [
                 'type' => 'checkbox'
             ],
@@ -67,7 +67,6 @@ class AdSetController extends BaseCurlController
                 'align' => 'center'
             ]
         ];
-        return $cols;
     }
 
     public function setListOutputItemExtend($item)
@@ -148,8 +147,9 @@ class AdSetController extends BaseCurlController
      */
     protected function afterSaveSuccessEvent($model, $id = '')
     {
-        //清除缓存
-        cache()->delete('ad_set');
+        //写入缓存
+        $adSet = array_column(AdSet::get()->toArray(),null,'flag');
+        cache()->set('ad_set',$adSet);
         return $model;
     }
 
