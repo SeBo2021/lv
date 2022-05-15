@@ -57,6 +57,10 @@ class HomeController extends Controller
                     'cid' => 'required|integer'
                 ])->validated();
                 $cid = $validated['cid'];
+                return response()->json([
+                    'state'=>0,
+                    'data'=>[]
+                ]);
                 // Log::info('==carouselLog===',[$validated]);
                 $configKey = 'api_carousel_'.$cid;
                 $redis = $this->redis();
@@ -70,6 +74,7 @@ class HomeController extends Controller
                         $carousel['img'] = $this->transferImgOut($carousel['img'],$domain,date('Ymd'),'auto');
                         $carousel['action_type'] = (string) $carousel['action_type'];
                         $carousel['vid'] = (string) $carousel['vid'];
+                        $res[] = $carousel;
                         if(!$carousel['end_at']){
                             $res[] = $carousel;
                         } elseif ($nowTime < strtotime($carousel['end_at'])){
