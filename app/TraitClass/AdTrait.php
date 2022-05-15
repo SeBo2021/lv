@@ -94,7 +94,7 @@ trait AdTrait
         $_v = date('YmdH');
         $filterAds = [];
         foreach ($ads as &$ad){
-            if($ad->status==1){
+            if($ad['status']==1){
                 $ad['img'] = $this->transferImgOut($ad['img'],$domain,$_v,'auto');
                 $ad['action_type'] = (string)$ad['action_type'];
                 $ad['vid'] = (string)$ad['vid'];
