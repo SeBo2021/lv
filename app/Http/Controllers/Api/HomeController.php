@@ -75,35 +75,42 @@ class HomeController extends Controller
      */
     public function lists(Request $request): \Illuminate\Http\JsonResponse
     {
-        $user = $request->user();
-        if(isset($request->params)){
-            $params = self::parse($request->params);
-            $validated = Validator::make($params,[
-                'cid' => 'required|integer',
-                'page' => 'required|integer',
-            ])->validated();
-            $cid = $validated['cid'];
-            $page = $validated['page'];
-            $redis = $this->redis();
-            $sectionKey = ($this->apiRedisKey['home_lists']).$cid.'-'.$page;
+        try {
+            if(isset($request->params)){
+                $user = $request->user();
+                $params = self::parse($request->params);
+                $validated = Validator::make($params,[
+                    'cid' => 'required|integer',
+                    'page' => 'required|integer',
+                ])->validated();
+                $cid = $validated['cid'];
+                $page = $validated['page'];
+                $redis = $this->redis();
+                $sectionKey = ($this->apiRedisKey['home_lists']).$cid.'-'.$page;
 
-            //二级分类列表
-            $res = $redis->get($sectionKey);
-            $res = json_decode($res,true);
-            if(isset($res['list'])){
-                foreach ($res['list'] as &$r){
-                    if(!empty($r['ad_list'])){
-                        $this->frontFilterAd($r['ad_list']);
+                //二级分类列表
+                $res = $redis->get($sectionKey);
+                $res = json_decode($res,true);
+                if(isset($res['list'])){
+                    foreach ($res['list'] as &$r){
+                        if(!empty($r['ad_list'])){
+                            $this->frontFilterAd($r['ad_list']);
+                        }
+                        if(!empty($r['small_video_list'])){
+                            $r['small_video_list'] = $this->handleVideoItems($r['small_video_list'],false,$user->id);
+                        }
                     }
-                    if(!empty($r['small_video_list'])){
-                        $r['small_video_list'] = $this->handleVideoItems($r['small_video_list'],false,$user->id);
-                    }
+                    return response()->json(['state'=>0, 'data'=>$res]);
                 }
-                return response()->json(['state'=>0, 'data'=>$res]);
+                return response()->json(['state'=>0, 'data'=>[]]);
             }
-            return response()->json(['state'=>0, 'data'=>[]]);
+            return response()->json(['state' => -1, 'msg' => "参数错误"]);
+        }catch (\Exception $exception){
+            $msg = $exception->getMessage();
+            Log::error("api/searchCat", [$msg]);
+            return response()->json(['state' => -1, 'msg' => $msg,'data'=>[]]);
         }
-        return response()->json(['state' => -1, 'msg' => "参数错误"], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
+
     }
 
 }

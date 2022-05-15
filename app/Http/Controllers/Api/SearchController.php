@@ -124,43 +124,49 @@ class SearchController extends Controller
      */
     public function cat(Request $request): JsonResponse
     {
-        if(isset($request->params)){
-            $params = self::parse($request->params);
-            $validated = Validator::make($params,[
-                'cid' => 'required|integer',
-                'page' => 'required|integer',
-            ])->validated();
-            $cid = $validated['cid'];
-            $page = $validated['page'];
+        try {
+            if(isset($request->params)){
+                $params = self::parse($request->params);
+                $validated = Validator::make($params,[
+                    'cid' => 'required|integer',
+                    'page' => 'required|integer',
+                ])->validated();
+                $cid = $validated['cid'];
+                $page = $validated['page'];
 
-            $redisKey = $this->apiRedisKey['search_cat'].$cid.'-'.$page;
-            $redis = $this->redis();
-            $res = $redis->get($redisKey);
-            if(!$res){
-                $perPage = 16;
-                $paginator = Video::search('"'.$cid.'"')->where('status',1)->simplePaginate($perPage,'searchCat',$page);
+                $redisKey = $this->apiRedisKey['search_cat'].$cid.'-'.$page;
+                $redis = $this->redis();
+                $res = $redis->get($redisKey);
+                if(!$res){
+                    $perPage = 16;
+                    $paginator = Video::search('"'.$cid.'"')->where('status',1)->simplePaginate($perPage,'searchCat',$page);
 
-                $paginatorArr = $paginator->toArray()['data'];
-                if(!empty($paginatorArr)){
-                    $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
-                    //广告
-                    $res['list'] = $this->insertAds($res['list'],'more_page',true, $page, $perPage);
-                    //Log::info('==CatList==',$res['list']);
-                    $res['hasMorePages'] = $paginator->hasMorePages();
-                    $redis->set($redisKey,json_encode($res,JSON_UNESCAPED_UNICODE));
-                    $redis->expire($redisKey,3600);
+                    $paginatorArr = $paginator->toArray()['data'];
+                    if(!empty($paginatorArr)){
+                        $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
+                        //广告
+                        $res['list'] = $this->insertAds($res['list'],'more_page',true, $page, $perPage);
+                        //Log::info('==CatList==',$res['list']);
+                        $res['hasMorePages'] = $paginator->hasMorePages();
+                        $redis->set($redisKey,json_encode($res,JSON_UNESCAPED_UNICODE));
+                        $redis->expire($redisKey,3600);
+                    }
+                }else{
+                    $res = json_decode($res,true);
                 }
-            }else{
-                $res = json_decode($res,true);
-            }
-            if(isset($res['list']) && !empty($res['list'])){
-                foreach ($res['list'] as $d){
-                    if(!empty($d['ad_list'])){
-                        $this->frontFilterAd($d['ad_list']);
+                if(isset($res['list']) && !empty($res['list'])){
+                    foreach ($res['list'] as $d){
+                        if(!empty($d['ad_list'])){
+                            $this->frontFilterAd($d['ad_list']);
+                        }
                     }
                 }
+                return response()->json(['state'=>0, 'data'=>$res]);
             }
-            return response()->json(['state'=>0, 'data'=>$res]);
+        }catch (\Exception $exception){
+            $msg = $exception->getMessage();
+            Log::error("api/searchCat", [$msg]);
+            return response()->json(['state' => -1, 'msg' => $msg,'data'=>[]]);
         }
         return response()->json([]);
     }
@@ -172,48 +178,55 @@ class SearchController extends Controller
      */
     public function recommend(Request $request): JsonResponse
     {
-        if(isset($request->params)){
-            $params = self::parse($request->params);
-            $validated = Validator::make($params,[
-                'vid' => 'required|integer',
-            ])->validated();
-            $page = $validated['page'] ?? 1;
-            $perPage = 8;
-            $vid = $validated['vid'];
-            $cat = $this->getVideoById($vid)->cat;
-            $res = ['list'=>[], 'hasMorePages'=>false];
-            if(!empty($cat)){
-                $key = 'searchRecommend:'.$cat.':'.$page;
-                $redis = $this->redis();
-                $redisJsonData = $redis->get($key);
-                if(!$redisJsonData){
-                    $keyWordsArr = @json_decode($cat);
-                    $keyWords = implode(',',$keyWordsArr);
-                    $paginator = Video::search($keyWords)->where('status',1)->simplePaginate($perPage,'searchCat',$page);
-                    $paginatorArr = $paginator->toArray()['data'];
-                    if(!empty($paginatorArr)){
-                        $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
-                        //广告
-                        $res['list'] = $this->insertAds($res['list'],'more_page',true, $page, $perPage);
-                        $res['hasMorePages'] = false;
-                        $redis->set($key,json_encode($res,JSON_UNESCAPED_UNICODE));
-                        $redis->expire($key,3600);
-                    }
+        try {
+            if(isset($request->params)){
+                $params = self::parse($request->params);
+                $validated = Validator::make($params,[
+                    'vid' => 'required|integer',
+                ])->validated();
+                $page = $validated['page'] ?? 1;
+                $perPage = 8;
+                $vid = $validated['vid'];
+                $cat = $this->getVideoById($vid)->cat;
+                $res = ['list'=>[], 'hasMorePages'=>false];
+                if(!empty($cat)){
+                    $key = 'searchRecommend:'.$cat.':'.$page;
+                    $redis = $this->redis();
+                    $redisJsonData = $redis->get($key);
+                    if(!$redisJsonData){
+                        $keyWordsArr = @json_decode($cat);
+                        $keyWords = implode(',',$keyWordsArr);
+                        $paginator = Video::search($keyWords)->where('status',1)->simplePaginate($perPage,'searchCat',$page);
+                        $paginatorArr = $paginator->toArray()['data'];
+                        if(!empty($paginatorArr)){
+                            $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
+                            //广告
+                            $res['list'] = $this->insertAds($res['list'],'more_page',true, $page, $perPage);
+                            $res['hasMorePages'] = false;
+                            $redis->set($key,json_encode($res,JSON_UNESCAPED_UNICODE));
+                            $redis->expire($key,3600);
+                        }
 
-                }else{
-                    $res = json_decode($redisJsonData,true);
-                }
-                if(isset($res['list']) && !empty($res['list'])){
-                    foreach ($res['list'] as $d){
-                        if(!empty($d['ad_list'])){
-                            $this->frontFilterAd($d['ad_list']);
+                    }else{
+                        $res = json_decode($redisJsonData,true);
+                    }
+                    if(isset($res['list']) && !empty($res['list'])){
+                        foreach ($res['list'] as $d){
+                            if(!empty($d['ad_list'])){
+                                $this->frontFilterAd($d['ad_list']);
+                            }
                         }
                     }
                 }
+                return response()->json(['state'=>0, 'data'=>$res]);
             }
-            return response()->json(['state'=>0, 'data'=>$res]);
+            return response()->json(['state' => -1, 'msg' => "参数错误"]);
+        }catch (\Exception $exception){
+            $msg = $exception->getMessage();
+            Log::error("api/searchRecommend", [$msg]);
+            return response()->json(['state' => -1, 'msg' => $msg,'data'=>[]]);
         }
-        return response()->json(['state' => -1, 'msg' => "参数错误"]);
+
     }
 
     public function hotWords(): JsonResponse
