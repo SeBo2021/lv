@@ -296,14 +296,14 @@ class CarouselController extends BaseCurlController
 
         $type_r = $this->editTableTypeEvent($id_arr, $field, $value);
 
-        $api_carousel_keys = $this->redis()->keys('api_carousel_*');
+        //$api_carousel_keys = $this->redis()->keys('api_carousel_*');
 
         if ($type_r) {
-            $this->redisBatchDel($api_carousel_keys);
+            //$this->redisBatchDel($api_carousel_keys);
             return $type_r;
         } else {
             $r = $this->editTableAddWhere()->whereIn($id, $id_arr)->update([$field => $value]);
-            $this->redisBatchDel($api_carousel_keys);
+            //$this->redisBatchDel($api_carousel_keys);
             if ($r) {
                 $this->insertLog($this->getPageName() . lang('成功修改ids') . '：' . implode(',', $id_arr));
             } else {
