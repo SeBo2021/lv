@@ -192,43 +192,42 @@ class VideoShortController extends Controller
      */
     public function lists(Request $request): JsonResponse
     {
-        // 业务逻辑
-        if (isset($request->params)) {
-            $params = self::parse($request->params);
-            $validated = Validator::make($params, [
-                'start_id' => 'nullable',
-                'keyword' => 'nullable',
-                'cate_id' => 'nullable',
-                'tag_id' => 'nullable',
-                'sort' => 'nullable',
-                'use_gold' => [
-                    'nullable',
-                    'string',
-                    Rule::in(['1', '0']),
-                ],
-            ])->validated();
-            $user = $request->user();
-            $page = $params['page'] ?? 1;
-            $cateId = $params['cate_id'] ?? "";
-            $tagId = $params['tag_id'] ?? "";
-            $starId = $validated['start_id'] ?? '0';
-            //关键词搜索
-            $words = $params['keyword'] ?? '';
-            if (!empty($words)) {
-                $cateId = "";
-                $tagId = "";
-                $starId = '0';
-            }
-            try {
+        try {
+            if (isset($request->params)) {
+                $params = self::parse($request->params);
+                $validated = Validator::make($params, [
+                    'start_id' => 'nullable',
+                    'keyword' => 'nullable',
+                    'cate_id' => 'nullable',
+                    'tag_id' => 'nullable',
+                    'sort' => 'nullable',
+                    'use_gold' => [
+                        'nullable',
+                        'string',
+                        Rule::in(['1', '0']),
+                    ],
+                ])->validated();
+                $user = $request->user();
+                $page = $params['page'] ?? 1;
+                $cateId = $params['cate_id'] ?? "";
+                $tagId = $params['tag_id'] ?? "";
+                $starId = $validated['start_id'] ?? '0';
+                //关键词搜索
+                $words = $params['keyword'] ?? '';
+                if (!empty($words)) {
+                    $cateId = "";
+                    $tagId = "";
+                    $starId = '0';
+                }
                 $res = $this->items($page, $user, $starId, $cateId, $tagId, $words);
-                return response()->json(['state' => 0, 'data' => $res], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
-            } catch (Exception $exception) {
-                $msg = $exception->getMessage();
-                Log::error("shortLists", [$msg]);
-                return response()->json(['state' => -1, 'msg' => $msg,'data'=>[]], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
+                return response()->json(['state' => 0, 'data' => $res]);
             }
+            return response()->json(['state'=>-1, 'msg'=>'参数错误']);
+        } catch (Exception $exception) {
+            $msg = $exception->getMessage();
+            Log::error("shortLists", [$msg]);
+            return response()->json(['state' => -1, 'msg' => $msg,'data'=>[]], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
         }
-        return response()->json(['state'=>-1, 'msg'=>'参数错误'],200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
 
     }
 
