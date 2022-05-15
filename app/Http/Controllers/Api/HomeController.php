@@ -92,6 +92,9 @@ class HomeController extends Controller
             $res = json_decode($res,true);
             if(isset($res['list'])){
                 foreach ($res['list'] as &$r){
+                    if(!empty($r['ad_list'])){
+                        $this->frontFilterAd($r['ad_list']);
+                    }
                     if(!empty($r['small_video_list'])){
                         $r['small_video_list'] = $this->handleVideoItems($r['small_video_list'],false,$user->id);
                     }
