@@ -138,30 +138,18 @@ class SearchController extends Controller
             $res = $redis->get($redisKey);
             if(!$res){
                 $perPage = 16;
-                $ids = $redis->sMembers('catForVideo:'.$cid);
-                if(!empty($ids)){
-                    /*$paginator = DB::table('video')
-                        ->where('status',1)
-                        ->whereIn('id',$ids)
-                        ->orderByDesc('updated_at')
-                        ->simplePaginate($perPage,$this->videoFields,'cat',$page);*/
+                $paginator = Video::search('"'.$cid.'"')->where('status',1)->simplePaginate($perPage,'searchCat',$page);
 
-                    $paginator = Video::search('"'.$cid.'"')->where('status',1)->simplePaginate($perPage,'searchCat',$page);
-
-                    $paginatorArr = $paginator->toArray()['data'];
-                    if(!empty($paginatorArr)){
-                        $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
-                        //广告
-                        $res['list'] = $this->insertAds($res['list'],'more_page',true, $page, $perPage);
-                        //Log::info('==CatList==',$res['list']);
-                        $res['hasMorePages'] = $paginator->hasMorePages();
-                        $redis->set($redisKey,json_encode($res,JSON_UNESCAPED_UNICODE));
-                        $redis->expire($redisKey,3600);
-                    }
+                $paginatorArr = $paginator->toArray()['data'];
+                if(!empty($paginatorArr)){
+                    $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
+                    //广告
+                    $res['list'] = $this->insertAds($res['list'],'more_page',true, $page, $perPage);
+                    //Log::info('==CatList==',$res['list']);
+                    $res['hasMorePages'] = $paginator->hasMorePages();
+                    $redis->set($redisKey,json_encode($res,JSON_UNESCAPED_UNICODE));
+                    $redis->expire($redisKey,3600);
                 }
-
-                //$client = ClientBuilder::create()->build();
-
             }else{
                 $res = json_decode($res,true);
             }

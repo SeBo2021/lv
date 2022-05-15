@@ -461,14 +461,9 @@ trait VideoTrait
                     $list['likes'] = $list['vs_comments'] ;
                 }
             } else {
-                //$list['cover_img'] = $domainSync . $list['cover_img'];
-                //Log::info('===testHandleVideoItem==',[$list,(isset($list['gold'])? $list['gold'] :'none')]);
                 $list['gold'] = $list['gold'] / $this->goldUnit;
                 $list['views'] = $list['views'] > 0 ? $this->generateRandViews($list['views']) : $this->generateRandViews(rand(5, 9));
-                //$list['hls_url'] = $domainSync . $list['hls_url'];
                 $list['preview_hls_url'] = $this->getPreviewPlayUrl($list['hls_url']??'');
-                //$list['dash_url'] = $domainSync . $list['dash_url'];
-                //$list['preview_dash_url'] = $this->getPreviewPlayUrl($list['dash_url'], 'dash');
                 if(isset($list['time_at']) && ($list['time_at']>0)){
                     $list['updated_at'] = date('Y-m-d H:i:s',$list['time_at']);
                 }
@@ -477,7 +472,7 @@ trait VideoTrait
                     unset($list['dash_url']);
                 }
             }
-            $domainSync = VideoTrait::getDomain($list['sync']);
+            $domainSync = self::getDomain($list['sync']);
             //封面图处理
             $list['cover_img'] = $this->transferImgOut($list['cover_img'],$domainSync,$_v);
             if ($list['usage']??false) {
@@ -488,8 +483,6 @@ trait VideoTrait
                 $list['hls_url'] = $domainSync . $this->transferHlsUrl($list['hls_url']??'');
             }
             $list['preview_hls_url'] = $domainSync . $list['preview_hls_url'];
-            /*$previewHlsInfo = pathinfo($list['preview_hls_url']);
-            $list['preview_hls_url'] = $previewHlsInfo['dirname'].'/'.$previewHlsInfo['filename'].'.vid?id='.$list['id'].'&_v='.$_v;*/
             //是否点赞
             $viewRecord = $this->isLoveOrCollect($uid,$list['id']);
             $list['is_love'] = $viewRecord['is_love'] ?? 0;
