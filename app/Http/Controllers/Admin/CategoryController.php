@@ -437,7 +437,7 @@ class CategoryController extends BaseCurlController
         } else {
             $model->path_level = $model->id;
         }
-        $this->redis()->del('short_category');
+        $this->resetShortCate();
         $model->save();
 
         return $model;

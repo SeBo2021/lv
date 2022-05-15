@@ -24,19 +24,10 @@ class HomeController extends Controller
 {
     use PHPRedisTrait, GoldTrait, VideoTrait, AdTrait, MemberCardTrait,ApiParamsTrait;
 
-    public function category(Request $request)
+    public function category(Request $request): \Illuminate\Http\JsonResponse
     {
         $cacheData = Cache::get('api_home_category');
-        if($cacheData){
-            $data = $cacheData->toArray();
-        }else{
-            $data = Category::query()
-                ->where('parent_id',2)
-                ->where('is_checked',1)
-                ->orderBy('sort')
-                ->get(['id','name','sort'])
-                ->toArray();
-        }
+        $data = $cacheData ? $cacheData->toArray() : [];
         return response()->json([
             'state'=>0,
             'data'=>$data
