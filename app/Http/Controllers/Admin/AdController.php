@@ -304,12 +304,12 @@ class AdController extends BaseCurlController
         $model->img = $coverImg;
         $model->save();
         $this->syncUpload($model->img);
+        //广告缓存
+        $this->resetAdsData($model->name);
         //清除首页列表缓存
         $this->resetHomeRedisData();
         //清除推荐缓存
         $this->redisBatchDel($this->redis()->keys('*searchRecommend*'));
-        //广告缓存
-        $this->resetAdsData($model->name);
         //清除配置缓存
         $this->redisBatchDel($this->redis()->keys('*api_config*'));
     }
