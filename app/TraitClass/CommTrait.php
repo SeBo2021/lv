@@ -62,7 +62,7 @@ trait CommTrait
         });
     }
 
-    public function resetHomeRedisData()
+    public function resetHomeRedisData(): void
     {
         $homeCats = $this->getHomeCategory();
         $redis = $this->redis();
@@ -106,4 +106,15 @@ trait CommTrait
         }
         //Cache::put('updateHomePage',1);
     }
+
+    public function resetShortCate(): void
+    {
+        $raw = Category::query()->where('parent_id', 10000)
+            ->where('is_checked',1)
+            ->orderBy('sort', 'desc')
+            ->select('id', 'name')
+            ->get();
+        $this->redis()->set('short_category',json_encode($raw->toArray(),JSON_UNESCAPED_UNICODE));
+    }
+
 }

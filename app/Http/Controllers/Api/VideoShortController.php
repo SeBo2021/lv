@@ -46,26 +46,14 @@ class VideoShortController extends Controller
     ];
 
     /**
-     * 视频分类
+     * 短视频分类
      * @param Request $request
      * @return JsonResponse
      */
     public function cate(Request $request): JsonResponse
     {
-        $cacheKey = 'short_category';
-        $cacheData = $this->redis()->get($cacheKey);
-        if($cacheData){
-            $data = json_decode($cacheData,true);
-        }else{
-            $raw = Category::whereIn('mask', $this->mainCateAlias)
-                ->where('is_checked',1)
-                ->orderBy('sort', 'desc')
-                ->select('id', 'name')
-                ->get();
-            $data = json_decode($raw, true);
-            $this->redis()->set($cacheKey,json_encode($data));
-        }
-
+        $cacheData = $this->redis()->get('short_category');
+        $data = $cacheData ? json_decode($cacheData,true) : [];
         return response()->json([
             'state' => 0,
             'data' => $data
