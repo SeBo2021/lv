@@ -62,14 +62,10 @@ class HomeController extends Controller
                 $redis = $this->redis();
                 $carouselData = $redis->get($configKey);
                 if($carouselData){
-                    $domain = self::getDomain(env('SFTP_SYNC',1));
                     $data = json_decode($carouselData,true);
                     $res = [];
                     $nowTime = time();
                     foreach ($data as $carousel){
-                        $carousel['img'] = $this->transferImgOut($carousel['img'],$domain,date('Ymd'),'auto');
-                        $carousel['action_type'] = (string) $carousel['action_type'];
-                        $carousel['vid'] = (string) $carousel['vid'];
                         if(!$carousel['end_at']){
                             $res[] = $carousel;
                         } elseif ($nowTime < strtotime($carousel['end_at'])){
