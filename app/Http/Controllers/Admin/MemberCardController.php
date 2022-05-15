@@ -8,6 +8,8 @@ use App\Services\UiService;
 use App\TraitClass\MemberCardTrait;
 use App\TraitClass\PayTrait;
 use App\TraitClass\PHPRedisTrait;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class MemberCardController extends BaseCurlController
 {
@@ -338,6 +340,8 @@ class MemberCardController extends BaseCurlController
      */
     protected function afterSaveSuccessEvent($model, $id = '')
     {
+        //写入缓存
+        Cache::forever('member_card_key',MemberCard::query()->get(['id','name','value','expired_hours']));
         //清除缓存
         $memberCardInfo = MemberCard::query()
             ->select(['zfb_channel', 'wx_channel','zfb_action_id','wx_action_id', 'id'])

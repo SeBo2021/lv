@@ -2,6 +2,7 @@
 
 namespace App\TraitClass;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 trait MemberCardTrait
@@ -143,7 +144,7 @@ trait MemberCardTrait
 
     public function isForeverCard($memberCardTypeId): bool
     {
-        $hasMemberCards = DB::table('member_card')->get(['id','name','value','expired_hours']);
+        $hasMemberCards = Cache::get('member_card_key') ?? [];
         $forever = false;
         foreach ($hasMemberCards as $memberCard){
             if($memberCard->id == $memberCardTypeId){
