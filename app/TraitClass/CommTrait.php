@@ -109,17 +109,7 @@ trait CommTrait
 
     public function resetShortCate(): void
     {
-        $cateMapAlias = [
-            '-1' => 'sub_cat_1',
-            '-2' => 'sub_cat_2',
-            '-3' => 'sub_cat_3',
-            '-4' => 'sub_cat_4',
-            '-5' => 'sub_cat_5',
-            '-6' => 'sub_cat_6',
-            '-7' => 'sub_cat_7',
-            '-8' => 'sub_cat_8',
-        ];
-        $raw = Category::query()->whereIn('mask', $cateMapAlias)
+        $raw = Category::query()->where('parent_id', 10000)
             ->where('is_checked',1)
             ->orderBy('sort', 'desc')
             ->select('id', 'name')

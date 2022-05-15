@@ -52,8 +52,7 @@ class VideoShortController extends Controller
      */
     public function cate(Request $request): JsonResponse
     {
-        $cacheKey = 'short_category';
-        $cacheData = $this->redis()->get($cacheKey);
+        $cacheData = $this->redis()->get('short_category');
         $data = $cacheData ? json_decode($cacheData,true) : [];
         return response()->json([
             'state' => 0,
