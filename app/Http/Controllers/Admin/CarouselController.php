@@ -209,8 +209,6 @@ class CarouselController extends BaseCurlController
         $model->save();
         $this->syncUpload($model->img);
 
-        /*$api_carousel_keys = $this->redis()->keys('api_carousel_*');
-        $this->redisBatchDel($api_carousel_keys);*/
         $cats = Category::query()
             ->where('is_checked',1)
             ->where('parent_id',2)
