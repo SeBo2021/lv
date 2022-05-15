@@ -237,7 +237,7 @@ class VideoShortController extends Controller
             } catch (Exception $exception) {
                 $msg = $exception->getMessage();
                 Log::error("shortLists", [$msg]);
-                return response()->json(['state' => -1, 'data' => $msg], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
+                return response()->json(['state' => -1, 'msg' => $msg,'data'=>[]], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
             }
         }
         return response()->json(['state'=>-1, 'msg'=>'参数错误'],200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
