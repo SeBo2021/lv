@@ -363,16 +363,14 @@ class CommBbsController extends BaseCurlController
         }
         // 更新缓存
         $redis = $this->redis();
-        /*$list = CommBbs::query()
+        $listKey = 'communityBbsList:'.$model->id;
+        $list = CommBbs::query()
             ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
             ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
             ->where('community_bbs.id', $model->id)
-            ->orderBy('updated_at', 'desc')->get();
-        $result = $this->proProcessData($uid, $list,$user);
-        $result[0]['category_id'] = $list[0]['category_id'];
-        $result[0]['user_id'] = $list[0]['user_id'];
-        $redis->set($listKey,json_encode($result,JSON_UNESCAPED_UNICODE));
-        $redis->expire($listKey,7200);*/
+            ->orderBy('updated_at', 'desc')->get()->toArray();
+
+        $redis->set($listKey,json_encode($list,JSON_UNESCAPED_UNICODE));
         $redis->del("comm_home_cache_{$model->author_id}");
         $redis->del("comm_other_cache_{$model->category_id}");
         return $model;
