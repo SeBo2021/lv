@@ -19,6 +19,7 @@ use App\Models\CommBbs;
 use App\Models\CommCate;
 use App\Models\User;
 use App\Services\UiService;
+use App\TraitClass\BbsTrait;
 use App\TraitClass\VideoTrait;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Http\Request;
@@ -26,7 +27,7 @@ use Illuminate\Support\Facades\Log;
 
 class CommBbsController extends BaseCurlController
 {
-    use VideoTrait;
+    use VideoTrait,BbsTrait;
     //那些页面不共享，需要单独设置的方法
     //public $denyCommonBladePathActionName = ['create'];
     //设置页面的名称
@@ -361,8 +362,19 @@ class CommBbsController extends BaseCurlController
             Log::error($e->getMessage());
         }
         // 更新缓存
-        $this->redis()->del("comm_home_cache_{$model->author_id}");
-        $this->redis()->del("comm_other_cache_{$model->category_id}");
+        $redis = $this->redis();
+        /*$list = CommBbs::query()
+            ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
+            ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
+            ->where('community_bbs.id', $model->id)
+            ->orderBy('updated_at', 'desc')->get();
+        $result = $this->proProcessData($uid, $list,$user);
+        $result[0]['category_id'] = $list[0]['category_id'];
+        $result[0]['user_id'] = $list[0]['user_id'];
+        $redis->set($listKey,json_encode($result,JSON_UNESCAPED_UNICODE));
+        $redis->expire($listKey,7200);*/
+        $redis->del("comm_home_cache_{$model->author_id}");
+        $redis->del("comm_other_cache_{$model->category_id}");
         return $model;
     }
 }

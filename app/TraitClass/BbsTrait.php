@@ -18,9 +18,10 @@ trait BbsTrait
     private function proProcessData($uid, $list, $user=null): array
     {
         $_v = date('Ymd');
+        $redis = $this->redis();
         foreach ($list as $k => $re) {
             $domainSync = self::getDomain($re['sync']??2);
-            if ($this->redis()->get("focus_{$uid}_{$re['uid']}") == 1) {
+            if ($redis->get("focus_{$uid}_{$re['uid']}") == 1) {
                 $list[$k]['is_focus'] = 1;
             } else {
                 $list[$k]['is_focus'] = 0;
@@ -30,7 +31,7 @@ trait BbsTrait
             } else {
                 $list[$k]['video_picture'] = [$domainSync . (json_decode($re['video_picture'],true)[0]??'')];
             }
-            if ($this->redis()->get("comm_like_{$uid}_{$re['id']}") == 1) {
+            if ($redis->get("comm_like_{$uid}_{$re['id']}") == 1) {
                 $list[$k]['is_love'] = 1;
             } else {
                 $list[$k]['is_love'] = 0;

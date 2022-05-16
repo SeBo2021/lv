@@ -211,7 +211,7 @@ class CommContentController extends Controller
             }else{
                 $result = json_decode($listFromRedis,true);
             }
-
+            //$result = json_decode($listFromRedis,true);
             // 增加点击数
             CommBbs::query()->where('community_bbs.id', $id)->increment('views');
             //Log::info('==userLocationName1==',[$user]);
@@ -225,10 +225,7 @@ class CommContentController extends Controller
                 $keyMe = "status_me_{$mask}_$uid";
             }
             $redis->del($keyMe);
-            return response()->json([
-                'state' => 0,
-                'data' => $result[0] ?? []
-            ]);
+            return response()->json(['state' => 0, 'data' => $result[0] ?? []]);
         } catch (Exception $exception) {
             return $this->returnExceptionContent($exception->getMessage());
         }
