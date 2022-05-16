@@ -166,7 +166,7 @@ class SearchController extends Controller
         }catch (\Exception $exception){
             $msg = $exception->getMessage();
             Log::error("api/searchCat", [$msg]);
-            return response()->json(['state' => -1, 'msg' => $msg,'data'=>[]]);
+            return response()->json(['state' => -1, 'msg' => '操作频繁或网络异常','data'=>[]]);
         }
         return response()->json([]);
     }
@@ -224,7 +224,7 @@ class SearchController extends Controller
         }catch (\Exception $exception){
             $msg = $exception->getMessage();
             Log::error("api/searchRecommend", [$msg]);
-            return response()->json(['state' => -1, 'msg' => $msg,'data'=>[]]);
+            return response()->json(['state' => -1, 'msg' => '操作频繁或网络异常','data'=>[]]);
         }
 
     }
