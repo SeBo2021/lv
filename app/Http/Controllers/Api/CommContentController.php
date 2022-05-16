@@ -21,9 +21,7 @@ use Illuminate\Support\Facades\Validator;
 
 class CommContentController extends Controller
 {
-    use PHPRedisTrait;
-    use BbsTrait;
-    use UserTrait;
+    use PHPRedisTrait,BbsTrait,UserTrait,ApiParamsTrait;
 
     /**
      * 文章发表
@@ -34,7 +32,10 @@ class CommContentController extends Controller
     {
         DB::beginTransaction();
         try {
-            $params = ApiParamsTrait::parse($request->params);
+            if(!isset($request->params)){
+                return response()->json([]);
+            }
+            $params = self::parse($request->params);
             Validator::make($params, [
                 'content' => 'nullable',
                 'thumbs' => 'nullable',
@@ -106,44 +107,43 @@ class CommContentController extends Controller
      */
     public function lists(Request $request): JsonResponse|array
     {
-        $params = ApiParamsTrait::parse($request->params);
-        Log::info('===COMMLIST===',[$params]);
-        Validator::make($params, [
-            'cid_1' => 'nullable',
-            'cid_2' => 'nullable',
-            'location_name' => 'nullable',
-            'page' => 'nullable',
-        ])->validate();
-        // 一二级分类
-        $cid1 = $params['cid_1'] ?? 0;
-        $page = $params['page'] ?? 1;
-        $locationName = $params['location_name'] ?? '';
-        $cid2 = $params['cid_2'] ?? 0;
-        //Log::info('===COMMLIST-params==',[$params]);
-        // 得到一级分类help
-        $help = $this->redis()->hGet('common_cate_help', "c_{$cid1}");
-        $uid = $request->user()->id;
-        if (in_array($help, ['focus', 'hot'])) {
-            $res = $this->$help($uid, $locationName, 6, $page);
-        } else {
-            $res = $this->other($uid, $locationName, $cid1, $cid2, 6, $page);
-        }
-        if(isset($res['bbs_list']) && !empty($res['bbs_list'])){
-            //Log::info('===CommContent===',[$res['bbs_list']]);
-            $this->processArea($res['bbs_list']);
-        }
-        return response()->json([
-            'state' => 0,
-            'data' => $res
-        ]);
-        /*try {
-
-        } catch (Exception $e) {
+        try {
+            if(!isset($request->params)){
+                return response()->json([]);
+            }
+            $params = self::parse($request->params);
+            Log::info('===COMMLIST===',[$params]);
+            Validator::make($params, [
+                'cid_1' => 'nullable',
+                'cid_2' => 'nullable',
+                'location_name' => 'nullable',
+                'page' => 'nullable',
+            ])->validate();
+            // 一二级分类
+            $cid1 = $params['cid_1'] ?? 0;
+            $page = $params['page'] ?? 1;
+            $locationName = $params['location_name'] ?? '';
+            $cid2 = $params['cid_2'] ?? 0;
+            //Log::info('===COMMLIST-params==',[$params]);
+            // 得到一级分类help
+            $help = $this->redis()->hGet('common_cate_help', "c_{$cid1}");
+            $uid = $request->user()->id;
+            if (in_array($help, ['focus', 'hot'])) {
+                $res = $this->$help($uid, $locationName, 6, $page);
+            } else {
+                $res = $this->other($uid, $locationName, $cid1, $cid2, 6, $page);
+            }
+            if(isset($res['bbs_list']) && !empty($res['bbs_list'])){
+                //Log::info('===CommContent===',[$res['bbs_list']]);
+                $this->processArea($res['bbs_list']);
+            }
             return response()->json([
-                'state' => -1,
-                'msg' => $e->getMessage()
+                'state' => 0,
+                'data' => $res
             ]);
-        }*/
+        } catch (Exception $exception) {
+            return $this->returnExceptionContent($exception->getMessage());
+        }
     }
 
     /**
@@ -181,58 +181,57 @@ class CommContentController extends Controller
      */
     public function detail(Request $request): JsonResponse|array
     {
-        $params = ApiParamsTrait::parse($request->params);
-        Validator::make($params, [
-            'id' => 'integer',
-        ])->validate();
-        $id = $params['id'] ?? 0;
-        $redis = $this->redis();
+        try {
+            if(!isset($request->params)){
+                return response()->json([]);
+            }
+            $params = self::parse($request->params);
+            Validator::make($params, [
+                'id' => 'integer',
+            ])->validate();
+            $id = $params['id'] ?? 0;
+            $redis = $this->redis();
 
-        $listKey = 'communityBbsList:'.$id;
-        $listFromRedis= $redis->get($listKey);
-        $user = $request->user();
-        $uid = $user->id;
+            $listKey = 'communityBbsList:'.$id;
+            $listFromRedis= $redis->get($listKey);
+            $user = $request->user();
+            $uid = $user->id;
 
-        if(!$listFromRedis){
-            $list = CommBbs::query()
-            ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
-            ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
-            ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get();
-            Log::info('==CommBBSdetail==',[$list]);
-            $result = $this->proProcessData($uid, $list,$user);
-            $result[0]['category_id'] = $list[0]['category_id'];
-            $result[0]['user_id'] = $list[0]['user_id'];
-            $redis->set($listKey,json_encode($result,JSON_UNESCAPED_UNICODE));
-            $redis->expire($listKey,7200);
-        }else{
-            $result = json_decode($listFromRedis,true);
-        } 
-        
-        // 增加点击数
-        CommBbs::query()->where('community_bbs.id', $id)->increment('views');
-        //Log::info('==userLocationName1==',[$user]);
-        //$result = $this->proProcessData($uid, $list,$user);
-        // 处理新文章通知
+            if(!$listFromRedis){
+                $list = CommBbs::query()
+                    ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
+                    ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
+                    ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get();
+                Log::info('==CommBBSdetail==',[$list]);
+                $result = $this->proProcessData($uid, $list,$user);
+                $result[0]['category_id'] = $list[0]['category_id'];
+                $result[0]['user_id'] = $list[0]['user_id'];
+                $redis->set($listKey,json_encode($result,JSON_UNESCAPED_UNICODE));
+                $redis->expire($listKey,7200);
+            }else{
+                $result = json_decode($listFromRedis,true);
+            }
 
-        $mask = $redis->get("c_{$result[0]['category_id']}");
-        if ($mask == 'focus') {
-            $keyMe = "status_me_focus_{$result[0]['user_id']}";
-        } else {
-            $keyMe = "status_me_{$mask}_$uid";
-        }
-        $redis->del($keyMe);
-        return response()->json([
-            'state' => 0,
-            'data' => $result[0] ?? []
-        ]);
-        /*try {
+            // 增加点击数
+            CommBbs::query()->where('community_bbs.id', $id)->increment('views');
+            //Log::info('==userLocationName1==',[$user]);
+            //$result = $this->proProcessData($uid, $list,$user);
+            // 处理新文章通知
 
-        } catch (Exception $e) {
+            $mask = $redis->get("c_{$result[0]['category_id']}");
+            if ($mask == 'focus') {
+                $keyMe = "status_me_focus_{$result[0]['user_id']}";
+            } else {
+                $keyMe = "status_me_{$mask}_$uid";
+            }
+            $redis->del($keyMe);
             return response()->json([
-                'state' => -1,
-                'msg' => $e->getMessage()
+                'state' => 0,
+                'data' => $result[0] ?? []
             ]);
-        }*/
+        } catch (Exception $exception) {
+            return $this->returnExceptionContent($exception->getMessage());
+        }
     }
 
     /**

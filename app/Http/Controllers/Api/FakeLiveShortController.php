@@ -141,9 +141,7 @@ class FakeLiveShortController extends Controller
             $res = $this->items($page, $uid, $starId,$cateId,$tagId);
             return response()->json(['state' => 0, 'data' => $res]);
         } catch (Exception $exception) {
-            $msg = $exception->getMessage();
-            Log::error("liveLists", [$msg]);
-            return response()->json(['state' => -1, 'msg' => '操作频繁或网络异常', 'data' => []]);
+            return $this->returnExceptionContent($exception->getMessage());
         }
     }
 

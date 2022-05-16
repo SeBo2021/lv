@@ -25,7 +25,7 @@ use \App\TraitClass\PHPRedisTrait;
 
 class UserController extends Controller
 {
-    use MemberCardTrait,SmsTrait,LoginTrait,VideoTrait,PHPRedisTrait,IpTrait;
+    use MemberCardTrait,SmsTrait,LoginTrait,VideoTrait,PHPRedisTrait,IpTrait,ApiParamsTrait;
 
     public function set(Request $request): JsonResponse|array
     {
@@ -106,9 +106,7 @@ class UserController extends Controller
             }
             return response()->json([]);
         }catch (\Exception $exception){
-            $msg = $exception->getMessage();
-            Log::error("api/extendInfo", [$msg]);
-            return response()->json(['state' => -1, 'msg' => '操作频繁或网络异常','data'=>[]]);
+            return $this->returnExceptionContent($exception->getMessage());
         }
     }
 

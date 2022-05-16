@@ -49,4 +49,10 @@ trait ApiParamsTrait
             'msg' => $message,
         ];
     }
+
+    public function returnExceptionContent($msg): \Illuminate\Http\JsonResponse
+    {
+        Log::error("api_exception", [$msg]);
+        return response()->json(['state' => -1, 'msg' => '请检查网络可能出现异常','data'=>[]]);
+    }
 }
