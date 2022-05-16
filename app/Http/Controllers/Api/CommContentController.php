@@ -177,9 +177,9 @@ class CommContentController extends Controller
     /**
      * 详情
      * @param Request $request
-     * @return array|JsonResponse
+     * @return JsonResponse
      */
-    public function detail(Request $request): JsonResponse|array
+    public function detail(Request $request): JsonResponse
     {
         try {
             if(!isset($request->params)){
@@ -202,7 +202,7 @@ class CommContentController extends Controller
                     ->leftJoin('users', 'community_bbs.author_id', '=', 'users.id')
                     ->select('community_bbs.id', 'content', 'thumbs', 'likes', 'comments', 'rewards', 'users.location_name', 'community_bbs.updated_at', 'nickname', 'sex', 'is_office', 'video', 'users.id as uid', 'users.avatar', 'users.level', 'users.vip as vipLevel')
                     ->where('community_bbs.id', $id)->orderBy('updated_at', 'desc')->get();
-                Log::info('==CommBBSdetail==',[$list]);
+                //Log::info('==CommBBSdetail==',[$list]);
                 $result = $this->proProcessData($uid, $list,$user);
                 $result[0]['category_id'] = $list[0]['category_id'];
                 $result[0]['user_id'] = $list[0]['user_id'];
