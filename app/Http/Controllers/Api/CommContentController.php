@@ -181,43 +181,44 @@ class CommContentController extends Controller
      */
     public function detail(Request $request): JsonResponse
     {
-        try {
-            if(!isset($request->params)){
-                return response()->json([]);
-            }
-            $params = self::parse($request->params);
-            Validator::make($params, [
-//                'id' => 'integer',
-                'id' => 'nullable',
-            ])->validate();
-            $id = $params['id'] ?? 0;
-            $redis = $this->redis();
+        if(!isset($request->params)){
+            return response()->json([]);
+        }
+        $params = self::parse($request->params);
+        Validator::make($params, [
+            'id' => 'integer',
+        ])->validate();
+        $id = $params['id'] ?? 0;
+        $redis = $this->redis();
 
-            $listKey = 'communityBbsList:'.$id;
-            $listFromRedis= $redis->get($listKey);
-            $user = $request->user();
-            $uid = $user->id;
-            $communityBbsList = @json_decode($listFromRedis??'{}',true);
-            $result = $this->proProcessData($uid, $communityBbsList,$user);
-            $result[0]['category_id'] = $communityBbsList[0]['category_id'];
-            $result[0]['user_id'] = $communityBbsList[0]['user_id'];
-            // 增加点击数
-            CommBbs::query()->where('community_bbs.id', $id)->increment('views');
-            //Log::info('==userLocationName1==',[$user]);
-            //$result = $this->proProcessData($uid, $list,$user);
-            // 处理新文章通知
+        $listKey = 'communityBbsList:'.$id;
+        $listFromRedis= $redis->get($listKey);
+        $user = $request->user();
+        $uid = $user->id;
+        $communityBbsList = @json_decode($listFromRedis??'{}',true);
+        $result = $this->proProcessData($uid, $communityBbsList,$user);
+        $result[0]['category_id'] = $communityBbsList[0]['category_id'];
+        $result[0]['user_id'] = $communityBbsList[0]['user_id'];
+        // 增加点击数
+        CommBbs::query()->where('community_bbs.id', $id)->increment('views');
+        //Log::info('==userLocationName1==',[$user]);
+        //$result = $this->proProcessData($uid, $list,$user);
+        // 处理新文章通知
 
-            $mask = $redis->get("c_{$result[0]['category_id']}");
-            if ($mask == 'focus') {
-                $keyMe = "status_me_focus_{$result[0]['user_id']}";
-            } else {
-                $keyMe = "status_me_{$mask}_$uid";
-            }
-            $redis->del($keyMe);
-            return response()->json(['state' => 0, 'data' => $result[0] ?? []]);
+        $mask = $redis->get("c_{$result[0]['category_id']}");
+        if ($mask == 'focus') {
+            $keyMe = "status_me_focus_{$result[0]['user_id']}";
+        } else {
+            $keyMe = "status_me_{$mask}_$uid";
+        }
+        $redis->del($keyMe);
+        Log::info('TestLog',[$result]);
+        return response()->json(['state' => 0, 'data' => $result[0] ?? []]);
+        /*try {
+
         } catch (Exception $exception) {
             return $this->returnExceptionContent($exception->getMessage());
-        }
+        }*/
     }
 
     /**
