@@ -10,10 +10,10 @@ trait AdTrait
 {
     use AboutEncryptTrait,PHPRedisTrait;
 
-    public function getConfigDataFromDb(): array
+    public function getConfigDataFromDb($force=false): array
     {
         $appConfig = config_cache('app');
-        if(!empty($appConfig)){
+        if(!empty($appConfig) || $force){
             //Log::info('==ConfigAnnouncement==',[$appConfig['announcement']]);
             $res['announcement'] = stripslashes(addslashes($appConfig['announcement']));
             $res['anActionType'] = $appConfig['announcement_action_type'];
