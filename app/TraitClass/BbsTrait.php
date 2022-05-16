@@ -26,10 +26,10 @@ trait BbsTrait
             } else {
                 $list[$k]['is_focus'] = 0;
             }
-            if (isset($re['video_picture']) && !$re['video_picture']) {
-                $list[$k]['video_picture'] = [];
+            if (isset($re['video_picture'])) {
+                !$re['video_picture'] ? $list[$k]['video_picture'] = [] : $list[$k]['video_picture'] = [$domainSync . (json_decode($re['video_picture'],true)[0]??'')];
             } else {
-                $list[$k]['video_picture'] = [$domainSync . (json_decode($re['video_picture'],true)[0]??'')];
+                $list[$k]['video_picture'] = [];
             }
             if ($redis->get("comm_like_{$uid}_{$re['id']}") == 1) {
                 $list[$k]['is_love'] = 1;
