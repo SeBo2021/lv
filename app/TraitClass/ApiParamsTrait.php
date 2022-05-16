@@ -4,6 +4,7 @@ namespace App\TraitClass;
 
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
+use JetBrains\PhpStorm\ArrayShape;
 
 trait ApiParamsTrait
 {
@@ -12,7 +13,7 @@ trait ApiParamsTrait
      * @param false $combine 是否合并成字符串
      * @return array|mixed|string
      */
-    public static function parse($params,$combine = false)
+    public static function parse($params, bool $combine = false): mixed
     {
         if(\Illuminate\Support\Env::get('MIDDLEWARE_SECRET')) {
             $p = Crypt::decryptString($params);
@@ -40,7 +41,7 @@ trait ApiParamsTrait
      * @param string $message
      * @return array
      */
-    public function format($status = 0,$data = [],$message = ''): array
+    #[ArrayShape(['state' => "int", 'data' => "array", 'msg' => "string"])] public function format(int $status = 0, array $data = [], string $message = ''): array
     {
         return [
             'state' => $status,
