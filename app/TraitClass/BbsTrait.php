@@ -26,7 +26,7 @@ trait BbsTrait
             } else {
                 $list[$k]['is_focus'] = 0;
             }
-            if (!$re['video_picture']) {
+            if (isset($re['video_picture']) && !$re['video_picture']) {
                 $list[$k]['video_picture'] = [];
             } else {
                 $list[$k]['video_picture'] = [$domainSync . (json_decode($re['video_picture'],true)[0]??'')];
