@@ -25,10 +25,7 @@ use Illuminate\Validation\Rule;
 
 class FakeLiveShortController extends Controller
 {
-    use VideoTrait;
-    use PHPRedisTrait;
-    use StatisticTrait;
-    use MemberCardTrait;
+    use VideoTrait,PHPRedisTrait,StatisticTrait,MemberCardTrait,ApiParamsTrait;
 
     /**
      * 读取数据
@@ -116,12 +113,15 @@ class FakeLiveShortController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function lists(Request $request)
+    public function lists(Request $request): JsonResponse
     {
         // 业务逻辑
         try {
             $uid = $request->user()->id;
-            $params = ApiParamsTrait::parse($request->params);
+            if(!isset($request->params)){
+                return response()->json(['state' => -1,'msg'=>'', 'data' => []]);
+            }
+            $params = self::parse($request->params);
             $validated = Validator::make($params, [
                 'start_id' => 'nullable',
                 'keyword' => 'nullable',
@@ -139,17 +139,11 @@ class FakeLiveShortController extends Controller
             $tagId = $params['tag_id'] ?? "";
             $starId = $validated['start_id'] ?? '0';
             $res = $this->items($page, $uid, $starId,$cateId,$tagId);
-            return response()->json([
-                'state' => 0,
-                'data' => $res
-            ], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
+            return response()->json(['state' => 0, 'data' => $res]);
         } catch (Exception $exception) {
             $msg = $exception->getMessage();
             Log::error("liveLists", [$msg]);
-            return response()->json([
-                'state' => -1,
-                'data' => $msg
-            ], 200, ['Content-Type' => 'application/json;charset=UTF-8','Charset' => 'utf-8']);
+            return response()->json(['state' => -1, 'msg' => $msg, 'data' => []]);
         }
     }
 
@@ -188,7 +182,7 @@ class FakeLiveShortController extends Controller
     {
         $user = $request->user();
         $uid = $user->id;
-        $params = ApiParamsTrait::parse($request->params);
+        $params = self::parse($request->params);
         Validator::make($params, [
             'duration_seconds' => 'nullable',
             'time' => 'nullable',
