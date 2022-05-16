@@ -197,8 +197,8 @@ class CommContentController extends Controller
         $uid = $user->id;
         $communityBbsList = @json_decode($listFromRedis??'{}',true);
         $result = $this->proProcessData($uid, $communityBbsList,$user);
-        $result[0]['category_id'] = $communityBbsList[0]['category_id'];
-        $result[0]['user_id'] = $communityBbsList[0]['user_id'];
+        $result[0]['category_id'] = $communityBbsList[0]['category_id'] ?? 0;
+        $result[0]['user_id'] = $communityBbsList[0]['user_id'] ?? 0;
         // 增加点击数
         CommBbs::query()->where('community_bbs.id', $id)->increment('views');
         //Log::info('==userLocationName1==',[$user]);
