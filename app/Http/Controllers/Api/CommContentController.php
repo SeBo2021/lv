@@ -187,7 +187,8 @@ class CommContentController extends Controller
             }
             $params = self::parse($request->params);
             Validator::make($params, [
-                'id' => 'integer',
+//                'id' => 'integer',
+                'id' => 'nullable',
             ])->validate();
             $id = $params['id'] ?? 0;
             $redis = $this->redis();
