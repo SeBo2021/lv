@@ -4,7 +4,6 @@
 namespace App\Http\Controllers\Api;
 
 
-use App\ExtendClass\CacheUser;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\TraitClass\ApiParamsTrait;
@@ -65,7 +64,6 @@ class UserController extends Controller
     {
         try {
             $user = $request->user();
-            $user = CacheUser::user($user->id);
             if(!empty($user)){
                 $types = explode(',',$user->member_card_type);
                 $memberCardTypeId = !empty($types) ? $types[0] : 0;

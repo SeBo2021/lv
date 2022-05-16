@@ -71,7 +71,6 @@ class VideoController extends Controller
                                 $buy = $this->useGold($one, $user);
                                 $buy && ($one['limit'] = 0);
                             }
-                            return response()->json(['state' => 0, 'data' => $one]);
                         }
                     }
                 }
