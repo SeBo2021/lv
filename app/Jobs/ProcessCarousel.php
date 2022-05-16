@@ -16,7 +16,9 @@ class ProcessCarousel implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, AboutEncryptTrait, PHPRedisTrait;
 
-    public $carousel;
+    public Carousel $carousel;
+
+    public int $timeout = 7200;
 
     /**
      * Create a new job instance.
@@ -40,7 +42,7 @@ class ProcessCarousel implements ShouldQueue
         //
         $model = $this->carousel;
         $carousels = Carousel::query()
-            ->where('cid', $model->cid)
+            ->where('cid', $model->cid??0)
             ->get(['id','title','img','url','action_type','vid','status','end_at'])->toArray();
         $domain = env('API_RESOURCE_DOMAIN2');
         foreach ($carousels as &$carousel){
