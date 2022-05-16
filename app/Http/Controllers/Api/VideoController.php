@@ -30,91 +30,83 @@ class VideoController extends Controller
     use VideoTrait,PHPRedisTrait,VipRights,MemberCardTrait,StatisticTrait,ApiParamsTrait;
 
     //播放
-
-    /**
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function actionView(Request $request): \Illuminate\Http\JsonResponse
     {
-        if (isset($request->params)) {
-            $user = $request->user();
-            $viewLongVideoTimes = $user->long_vedio_times; //观看次数
-            // 业务逻辑
-            $params = self::parse($request->params);
-            $validated = Validator::make($params, [
-                'id' => 'required|integer|min:1',
-                'use_gold' => [
-                    'nullable',
-                    'string',
-                    Rule::in(['1', '0']),
-                ],
-            ])->validated();
-            // 增加冗错机制
-            $id = $validated['id']??false;
-            if (!$id) {
+        try {
+            if (isset($request->params)) {
+                $user = $request->user();
+                $viewLongVideoTimes = $user->long_vedio_times; //观看次数
+                // 业务逻辑
+                $params = self::parse($request->params);
+                $validated = Validator::make($params, [
+                    'id' => 'required|integer|min:1',
+                    'use_gold' => [
+                        'nullable',
+                        'string',
+                        Rule::in(['1', '0']),
+                    ],
+                ])->validated();
+                // 增加冗错机制
+                $id = $validated['id']??false;
+                if (!$id) {
+                    return response()->json([
+                        'state' => -1,
+                        'msg' => "参数错误",
+                    ]);
+                }
+                $useGold = $validated['use_gold'] ?? "1";
+                $one = (array)$this->getVideoById($id);
+                if (!empty($one)) {
+                    $one = $this->handleVideoItems([$one], true,$user->id)[0];
+                    $one['limit'] = 0;
+                    //
+                    if($user->long_vedio_times>0){//统计激活
+                        $configData = config_cache('app');
+                        $setTimes = $configData['free_view_long_video_times'] ?? 0;
+                        if(($user->long_vedio_times==$setTimes) && (date('Y-m-d')==date('Y-m-d',strtotime($user->created_at)))){
+                            $this->saveStatisticByDay('active_view_users',$user->channel_id,$user->device_system);
+                        }
+                        //
+                        DB::table('users')->where('id',$user->id)->where('long_vedio_times','>',0)->decrement('long_vedio_times'); //当日观看次数减一
+                    }
+                    ProcessViewVideo::dispatchAfterResponse($user, $one);
+                    /*$job = new ProcessViewVideo($user, $one);
+                    $this->dispatchSync($job);*/
+
+                    //观看限制
+                    if ($one['restricted'] != 0) {
+                        //是否有观看次数
+                        $one['restricted'] += 0;
+                        if (($viewLongVideoTimes <= 0) || ($one['restricted']!=1)) {
+                            /*if ($user->phone_number > 0) {*/
+                            // unset($one['preview_hls_url'], $one['preview_dash_url']);
+                            $one = $this->vipOrGold($one, $user);
+                            if ($useGold && $one['limit'] == 2) {
+                                // 如果金币则尝试购买
+                                $buy = $this->useGold($one, $user);
+                                $buy && ($one['limit'] = 0);
+                            }
+                            return response()->json([
+                                'state' => 0,
+                                'data' => $one
+                            ]);
+
+                        }
+                    }
+                }
+                Cache::forget("cachedUser.{$user->id}");
                 return response()->json([
-                    'state' => -1,
-                    'msg' => "参数错误",
+                    'state' => 0,
+                    'data' => $one
                 ]);
             }
-            $useGold = $validated['use_gold'] ?? "1";
-            $one = (array)$this->getVideoById($id);
-            if (!empty($one)) {
-                $one = $this->handleVideoItems([$one], true,$user->id)[0];
-                $one['limit'] = 0;
-                //
-                if($user->long_vedio_times>0){//统计激活
-                    $configData = config_cache('app');
-                    $setTimes = $configData['free_view_long_video_times'] ?? 0;
-                    if(($user->long_vedio_times==$setTimes) && (date('Y-m-d')==date('Y-m-d',strtotime($user->created_at)))){
-                        $this->saveStatisticByDay('active_view_users',$user->channel_id,$user->device_system);
-                    }
-                    //
-                    DB::table('users')->where('id',$user->id)->where('long_vedio_times','>',0)->decrement('long_vedio_times'); //当日观看次数减一
-                }
-                ProcessViewVideo::dispatchAfterResponse($user, $one);
-                /*$job = new ProcessViewVideo($user, $one);
-                $this->dispatchSync($job);*/
-
-                //观看限制
-                if ($one['restricted'] != 0) {
-                    //是否有观看次数
-                    $one['restricted'] += 0;
-                    if (($viewLongVideoTimes <= 0) || ($one['restricted']!=1)) {
-                        /*if ($user->phone_number > 0) {*/
-                        // unset($one['preview_hls_url'], $one['preview_dash_url']);
-                        $one = $this->vipOrGold($one, $user);
-                        if ($useGold && $one['limit'] == 2) {
-                            // 如果金币则尝试购买
-                            $buy = $this->useGold($one, $user);
-                            $buy && ($one['limit'] = 0);
-                        }
-                        return response()->json([
-                            'state' => 0,
-                            'data' => $one
-                        ]);
-
-                    }
-                }
-            }
-            Cache::forget("cachedUser.{$user->id}");
-            return response()->json([
-                'state' => 0,
-                'data' => $one
-            ]);
-        }
-        return response()->json([
-            'state' => -1,
-            'msg' => "参数错误",
-        ]);
-
-        /*try {
-
+            return response()->json(['state' => -1, 'msg' => "参数错误",'data'=>[]]);
         } catch (Exception $exception) {
             $msg = $exception->getMessage();
             Log::error("actionView", [$msg]);
+            return response()->json(['state' => -1, 'msg' => $msg,'data'=>[]]);
         }
-        */
+
     }
 
     //点赞
