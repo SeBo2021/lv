@@ -213,7 +213,6 @@ class CommContentController extends Controller
                 $keyMe = "status_me_{$mask}_$uid";
             }
             $redis->del($keyMe);
-            Log::info('TestLog',[$result]);
             return response()->json(['state' => 0, 'data' => $result[0] ?? []]);
         } catch (Exception $exception) {
             return $this->returnExceptionContent($exception->getMessage());
