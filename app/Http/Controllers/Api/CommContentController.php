@@ -196,7 +196,7 @@ class CommContentController extends Controller
             $listFromRedis= $redis->get($listKey);
             $user = $request->user();
             $uid = $user->id;
-            $communityBbsList = @json_decode($listFromRedis??[],true);
+            $communityBbsList = @json_decode($listFromRedis??'{}',true);
             $result = $this->proProcessData($uid, $communityBbsList,$user);
             $result[0]['category_id'] = $communityBbsList[0]['category_id'];
             $result[0]['user_id'] = $communityBbsList[0]['user_id'];
