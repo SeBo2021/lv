@@ -207,7 +207,6 @@ class CarouselController extends BaseCurlController
         $coverImg = str_replace(self::getDomain(env('SFTP_SYNC',1)),"",$model->img);
         $model->img = $coverImg;
         $model->save();
-        $this->syncUpload($model->img);
         $job = new ProcessCarousel($model);
         $this->dispatch($job->onQueue('high'));
     }
