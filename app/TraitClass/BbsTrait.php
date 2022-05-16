@@ -8,19 +8,18 @@ use Illuminate\Support\Facades\Log;
 
 trait BbsTrait
 {
-    use UserTrait,AboutEncryptTrait;
+    use UserTrait,AboutEncryptTrait,VideoTrait;
     /**
      * @param $uid
      * @param $list
      * @param $user
-     * @return mixed
+     * @return array
      */
-    private function proProcessData($uid, $list, $user=null)
+    private function proProcessData($uid, $list, $user=null): array
     {
-        //Log::info('==userLocationName==',[$user]);
         $_v = date('Ymd');
         foreach ($list as $k => $re) {
-            $domainSync = VideoTrait::getDomain($re['sync']??2);
+            $domainSync = self::getDomain($re['sync']??2);
             if ($this->redis()->get("focus_{$uid}_{$re['uid']}") == 1) {
                 $list[$k]['is_focus'] = 1;
             } else {
@@ -29,7 +28,7 @@ trait BbsTrait
             if (!$re['video_picture']) {
                 $list[$k]['video_picture'] = [];
             } else {
-                $list[$k]['video_picture']  = [$domainSync . (json_decode($re['video_picture'],true)[0]??'')];
+                $list[$k]['video_picture'] = [$domainSync . (json_decode($re['video_picture'],true)[0]??'')];
             }
             if ($this->redis()->get("comm_like_{$uid}_{$re['id']}") == 1) {
                 $list[$k]['is_love'] = 1;
@@ -46,7 +45,7 @@ trait BbsTrait
             $thumbsRaw = json_decode($re['thumbs'],true);
             $thumbs = [];
             foreach ($thumbsRaw as $itemP) {
-                $thumbs[] =$this->transferImgOut($itemP,$domainSync,$_v,'auto');
+                $thumbs[] =$this->transferImgOut($itemP,$domainSync,$_v);
             }
             $list[$k]['thumbs']  = $thumbs;
 
