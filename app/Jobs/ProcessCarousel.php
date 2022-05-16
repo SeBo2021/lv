@@ -33,6 +33,7 @@ class ProcessCarousel implements ShouldQueue
      * Execute the job.
      *
      * @return void
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function handle(): void
     {
@@ -48,5 +49,6 @@ class ProcessCarousel implements ShouldQueue
             $carousel['vid'] = (string) $carousel['vid'];
         }
         $this->redis()->set('api_carousel_'.$model->cid,json_encode($carousels,JSON_UNESCAPED_UNICODE));
+        $this->syncUpload($model->img);
     }
 }
