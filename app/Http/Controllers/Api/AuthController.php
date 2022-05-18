@@ -22,7 +22,7 @@ use Laravel\Passport\Token;
 
 class AuthController extends Controller
 {
-    use LoginTrait, PHPRedisTrait, IpTrait;
+    use LoginTrait, PHPRedisTrait, IpTrait, ApiParamsTrait;
     /**
      * Create user
      *
@@ -65,7 +65,7 @@ class AuthController extends Controller
      */
     public function login(Request $request): \Illuminate\Http\JsonResponse
     {
-        $params = ApiParamsTrait::parse($request->params);
+        $params = self::parse($request->params);
         //Log::debug('login_request_params_info===',[$params]);//参数日志
         $validated = Validator::make($params,$this->loginRules)->validated();
         //短时间内禁止同一设备注册多个账号
@@ -136,7 +136,7 @@ class AuthController extends Controller
                     DB::commit();
                 }catch (\Exception $e){
                     DB::rollBack();
-                    Log::error('createUser===' . $e->getMessage());
+                    return $this->returnExceptionContent($e->getMessage());
                 }
 
                 $login_info = $user->only($this->loginUserFields);
@@ -170,7 +170,7 @@ class AuthController extends Controller
             'source_info'=> $_SERVER['HTTP_USER_AGENT'],
             'device_system'=> $login_info['device_system'] ?? 0,
         ];
-        Log::debug('login_log_data===',[$login_log_data]);
+        //Log::debug('login_log_data===',[$login_log_data]);
 
         ProcessLogin::dispatchAfterResponse($login_log_data);
         /*$job = new ProcessLogin($login_log_data);
@@ -185,7 +185,7 @@ class AuthController extends Controller
         $token->expires_at = !$test ? Carbon::now()->addDays() : Carbon::now()->addMinutes(3);
         $token->save();
 
-        Log::debug('login_result_info===',[$login_info]);
+        //Log::debug('login_result_info===',[$login_info]);
         //返回的token信息
         $login_info['token'] = $tokenResult->accessToken;
         $login_info['token_type'] = 'Bearer';

@@ -421,124 +421,126 @@ class UserController extends Controller
         return response()->json([]);
     }
 
-    /**
-     * @throws ValidationException
-     */
-    public function bindPhone(Request $request): JsonResponse|array
+    public function bindPhone(Request $request): JsonResponse
     {
-        if(isset($request->params)){
-            $params = self::parse($request->params);
-            $validated = Validator::make($params, [
-                'phone' => 'required|integer',
-                'code' => 'required|integer',
-            ])->validated();
-            $phoneUserId = User::query()->where('phone_number',$validated['phone'])->value('id');
-            if($phoneUserId > 0){
-                return response()->json(['state'=>-1, 'msg'=>'该手机号已绑定过']);
+        try {
+            if(isset($request->params)){
+                $params = self::parse($request->params);
+                $validated = Validator::make($params, [
+                    'phone' => 'required|integer',
+                    'code' => 'required|integer',
+                ])->validated();
+                $phoneUserId = User::query()->where('phone_number',$validated['phone'])->value('id');
+                if($phoneUserId > 0){
+                    return response()->json(['state'=>-1, 'msg'=>'该手机号已绑定过']);
+                }
+                $smsCode = $this->validateSmsCode($validated['phone'],$validated['code']);
+                if(!$smsCode){
+                    return response()->json(['state'=>-1, 'msg'=>'短信验证码不正确']);
+                }
+                $user = $request->user();
+                DB::beginTransaction();
+                DB::table('sms_codes')->where('id',$smsCode->id)->update(['status'=>1]);
+                DB::table('users')->where('id',$user->id)->update(['phone_number'=>$validated['phone'],'area_number'=>$smsCode->area_number]);
+                DB::commit();
+                //统计注册量
+                Cache::forget("cachedUser.{$user->id}");
+                return response()->json(['state'=>0, 'msg'=>'绑定成功']);
             }
-            $smsCode = $this->validateSmsCode($validated['phone'],$validated['code']);
-            Log::debug('bindPhone===',[$validated]);
-            Log::debug('validateSmsCode===',[$smsCode]);
-            if(!$smsCode){
-                return response()->json(['state'=>-1, 'msg'=>'短信验证码不正确']);
-            }
-            $user = $request->user();
-            DB::beginTransaction();
-            DB::table('sms_codes')->where('id',$smsCode->id)->update(['status'=>1]);
-            DB::table('users')->where('id',$user->id)->update(['phone_number'=>$validated['phone'],'area_number'=>$smsCode->area_number]);
-            DB::commit();
-            //统计注册量
-            Cache::forget("cachedUser.{$user->id}");
-            return response()->json(['state'=>0, 'msg'=>'绑定成功']);
+            return response()->json([]);
+        }catch (\Exception $exception){
+            return $this->returnExceptionContent($exception->getMessage());
         }
-        return [];
+
     }
 
     public function findADByPhone(Request $request): JsonResponse
     {
-        if(isset($request->params)){
-            $params = self::parse($request->params);
-            $validated = Validator::make($params, [
-                'phone' => 'required|integer',
-                'code' => 'required|integer',
-            ])->validated();
+        try {
+            if(isset($request->params)){
+                $params = self::parse($request->params);
+                $validated = Validator::make($params, [
+                    'phone' => 'required|integer',
+                    'code' => 'required|integer',
+                ])->validated();
 
-            //====
-            $smsCode = $this->validateSmsCode($validated['phone'],$validated['code']);
-            Log::debug('findADByPhone===',[$validated]);
-            Log::debug('validateSmsCode===',[$smsCode]);
-            if(!$smsCode){
-                return response()->json(['state'=>-1, 'msg'=>'短信验证码不正确']);
-            }
-            DB::table('sms_codes')->where('id',$smsCode->id)->update(['status'=>1]);
-            //====
-            $requestUser = $request->user();
-            $userModel = User::query()
-                ->where('phone_number',$validated['phone'])
-                ->where('status',1)
-                ->where('area_number',$smsCode->area_number);
-            $user = $userModel->first();
-            if(!$user){
-                return response()->json(['state'=>-1, 'msg'=>'该手机没有绑定过帐号,无法找回']);
-            }
-            //同一账号的情况
-            if($requestUser->account == $user->account){
-                return response()->json(['state'=>-1, 'msg'=>'找回账号与此账号是同一账号']);
-            }
-            $requestUser->status = 1;
-            $requestUser->vip_start_last = $user->vip_start_last;
-            $requestUser->vip_expired = $user->vip_expired;
-            $requestUser->vip = $user->vip;
-            $requestUser->gold = $user->gold;
-            $requestUser->avatar = $user->avatar;
-            $requestUser->promotion_code = $user->promotion_code;
-            $requestUser->member_card_type = $user->member_card_type;
-            $requestUser->balance = $user->balance;
-            $requestUser->phone_number = $user->phone_number;
-            $requestUser->area_number = $user->area_number;
-            $requestUser->channel_id = $user->channel_id;
-            $requestUser->save();
-            //清除原来用户token和账号禁用
-            //Token::query()->where('name',$user->account)->delete();
-            //User::query()->where('id',$user->id)->update(['status' => 1,'did'=>$user->did.$user->id]);
+                //====
+                $smsCode = $this->validateSmsCode($validated['phone'],$validated['code']);
+                Log::debug('findADByPhone===',[$validated]);
+                Log::debug('validateSmsCode===',[$smsCode]);
+                if(!$smsCode){
+                    return response()->json(['state'=>-1, 'msg'=>'短信验证码不正确']);
+                }
+                DB::table('sms_codes')->where('id',$smsCode->id)->update(['status'=>1]);
+                //====
+                $requestUser = $request->user();
+                $userModel = User::query()
+                    ->where('phone_number',$validated['phone'])
+                    ->where('status',1)
+                    ->where('area_number',$smsCode->area_number);
+                $user = $userModel->first();
+                if(!$user){
+                    return response()->json(['state'=>-1, 'msg'=>'该手机没有绑定过帐号,无法找回']);
+                }
+                //同一账号的情况
+                if($requestUser->account == $user->account){
+                    return response()->json(['state'=>-1, 'msg'=>'找回账号与此账号是同一账号']);
+                }
+                $requestUser->status = 1;
+                $requestUser->vip_start_last = $user->vip_start_last;
+                $requestUser->vip_expired = $user->vip_expired;
+                $requestUser->vip = $user->vip;
+                $requestUser->gold = $user->gold;
+                $requestUser->avatar = $user->avatar;
+                $requestUser->promotion_code = $user->promotion_code;
+                $requestUser->member_card_type = $user->member_card_type;
+                $requestUser->balance = $user->balance;
+                $requestUser->phone_number = $user->phone_number;
+                $requestUser->area_number = $user->area_number;
+                $requestUser->channel_id = $user->channel_id;
+                $requestUser->save();
 
-            $tokenResult = $requestUser->createToken($requestUser->account,['check-user']);
-            $token = $tokenResult->token;
-            $token->expires_at = Carbon::now()->addDays();
-            $token->save();
-            $requestUser = $requestUser->only($this->loginUserFields);
-            if(isset($requestUser['avatar'])){
-                $requestUser['avatar'] += 0;
+                $tokenResult = $requestUser->createToken($requestUser->account,['check-user']);
+                $token = $tokenResult->token;
+                $token->expires_at = Carbon::now()->addDays();
+                $token->save();
+                $requestUser = $requestUser->only($this->loginUserFields);
+                if(isset($requestUser['avatar'])){
+                    $requestUser['avatar'] += 0;
+                }
+                $requestUser['token'] = $tokenResult->accessToken;
+                $requestUser['token_type'] = 'Bearer';
+                $requestUser['expires_at'] = Carbon::parse(
+                    $tokenResult->token->expires_at
+                )->toDateTimeString();
+                $requestUser['expires_at_timestamp'] = strtotime($requestUser['expires_at']);
+                //生成用户专有的客服链接
+                $requestUser = $this->generateChatUrl($requestUser);
+                User::query()->where('id',$user->id)->update([
+                    'vip'=>0,
+                    'member_card_type'=>'',
+                    'status'=>0,
+                    'did'=>$user->did.'o',
+                    'phone_number'=>0,
+                    'area_number'=>0,
+                    'gold'=>0
+                ]);
+                $redisHashKey = $this->apiRedisKey['user_gold_video'] . $user->id;
+                $tokenId = Token::query()->where('name',$user->account)->value('id');
+                $tokenKey = $this->apiRedisKey['passport_token'].$tokenId;
+                $this->redis()->del($redisHashKey);
+                $this->redis()->del($tokenKey);
+                Cache::forget("cachedUser.{$user->id}");
+                Cache::forget("cachedUser.".$requestUser['id']);
+                Token::query()->where('name',$user->account)->delete();
+                Token::query()->where('id',$tokenId)->delete();
+                return response()->json(['state'=>0, 'data'=>$requestUser, 'msg'=>'账号找回成功']);
             }
-            $requestUser['token'] = $tokenResult->accessToken;
-            $requestUser['token_type'] = 'Bearer';
-            $requestUser['expires_at'] = Carbon::parse(
-                $tokenResult->token->expires_at
-            )->toDateTimeString();
-            $requestUser['expires_at_timestamp'] = strtotime($requestUser['expires_at']);
-            //生成用户专有的客服链接
-            $requestUser = $this->generateChatUrl($requestUser);
-            User::query()->where('id',$user->id)->update([
-                'vip'=>0,
-                'member_card_type'=>'',
-                'status'=>0,
-                'did'=>$user->did.'o',
-                'phone_number'=>0,
-                'area_number'=>0,
-                'gold'=>0
-            ]);
-            $redisHashKey = $this->apiRedisKey['user_gold_video'] . $user->id;
-            $tokenId = Token::query()->where('name',$user->account)->value('id');
-            $tokenKey = $this->apiRedisKey['passport_token'].$tokenId;
-            $this->redis()->del($redisHashKey);
-            $this->redis()->del($tokenKey);
-            Cache::forget("cachedUser.{$user->id}");
-            Cache::forget("cachedUser.".$requestUser['id']);
-            Token::query()->where('name',$user->account)->delete();
-            Token::query()->where('id',$tokenId)->delete();
-            return response()->json(['state'=>0, 'data'=>$requestUser, 'msg'=>'账号找回成功']);
+            return response()->json([]);
+        } catch (\Exception $exception){
+            return $this->returnExceptionContent($exception->getMessage());
         }
-        return response()->json([]);
+
     }
 
 }
