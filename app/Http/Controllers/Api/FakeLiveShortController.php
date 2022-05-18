@@ -5,12 +5,6 @@ namespace App\Http\Controllers\Api;
 
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
-use App\Models\Live;
-use App\Models\Tag;
-use App\Models\Video;
-use App\Models\VideoShort;
-use App\Models\ViewRecord;
 use App\TraitClass\ApiParamsTrait;
 use App\TraitClass\MemberCardTrait;
 use App\TraitClass\PHPRedisTrait;
@@ -85,7 +79,7 @@ class FakeLiveShortController extends Controller
             $one['start_second'] = $dSeconds - ($dSeconds - (time() % $dSeconds));
 
 
-            $domainSync = VideoTrait::getDomain($one['sync']);
+            $domainSync = self::getDomain($one['sync']);
             //$one['cover_img'] = $domainSync . $one['cover_img'];
             $fileInfo = pathinfo($one['cover_img']);
             $one['cover_img'] = $domainSync . $fileInfo['dirname'].'/'.$fileInfo['filename'].'.htm?ext=jpg&_v='.$_v;
