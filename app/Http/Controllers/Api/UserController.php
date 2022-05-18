@@ -30,7 +30,7 @@ class UserController extends Controller
     public function set(Request $request): JsonResponse|array
     {
         if(isset($request->params)){
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $onlyFields = ['nickname','email','sex','phone_number','avatar'];
             $setData = [];
             foreach ($params as $key=>$value){
@@ -110,41 +110,10 @@ class UserController extends Controller
         }
     }
 
-    /*public function videoList(Request $request)
-    {
-
-        $res = [];
-        $state = -1;
-        $msg = '缺少参数';
-        if(isset($request->params)){
-            $params = Crypt::decryptString($request->params);
-            $params = json_decode($params,true);
-            $page = $params['page'];
-            $state = 0;
-            $onlyFields = ['id','name','cid','uid','title','url','gold','duration','hls_url','dash_url','type','cover_img','views','updated_at'];
-            $user = $request->user();
-            $paginator = UserVideo::query()
-                ->where('uid',$user->id)
-                ->where('status',1)
-                ->orderBy('updated_at','desc')
-                ->simplePaginate(10,$onlyFields,'userVideo',$page);
-            $paginatorArr = $paginator->toArray();
-            if(!empty($paginatorArr)){
-                $res['list'] = $paginatorArr['data'];
-                $res['domain'] = env('APP_URL');
-                $res['hasMorePages'] = $paginator->hasMorePages();
-            }
-        }
-        return response()->json([
-            'state'=>$state,
-            'msg'=>$msg,
-            'data'=>$res
-        ]);
-    }*/
-    public function billing(Request $request): JsonResponse|array
+    public function billing(Request $request): JsonResponse
     {
         if(isset($request->params)) {
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $page = $params['page'] ?? 1;
             $perPage = 16;
             $fields = ['id','type','type_id','amount','updated_at'];
@@ -172,7 +141,7 @@ class UserController extends Controller
                 'data'=>$res
             ]);
         }
-        return [];
+        return response()->json([]);
     }
 
     public function billingClear(Request $request): JsonResponse
@@ -185,10 +154,10 @@ class UserController extends Controller
         ]);
     }
 
-    public function myShare(Request $request): JsonResponse|array
+    public function myShare(Request $request): JsonResponse
     {
         if(isset($request->params)){
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $page = $params['page'] ?? 1;
             $perPage = 10;
             if(isset($params['pageSize']) && ($params['pageSize']<10)){
@@ -213,7 +182,7 @@ class UserController extends Controller
                 'data'=>$res
             ]);
         }
-        return [];
+        return response()->json([]);
     }
 
     public function myCollect(Request $request): JsonResponse|array
@@ -221,7 +190,7 @@ class UserController extends Controller
         if(isset($request->params)){
             $perPage = 10;
             $res = [];
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             if(isset($params['delete']) && $params['delete']==1){
                 $vid = $params['vid'] ?? [];
                 if(!empty($vid)){
@@ -251,11 +220,6 @@ class UserController extends Controller
                 $perPage = $params['pageSize'];
             }
             $user = $request->user();
-            /*$paginator = DB::table('video')
-                ->join('view_record','video.id','=','view_record.vid')
-                ->where('view_record.uid',$user->id)
-                ->where('view_record.is_collect',1)
-                ->simplePaginate($perPage,$this->videoFields,'myCollect',$page);*/
             // 暂时放在一起
             $paginator = DB::table('view_record')
                 ->leftJoin('video','view_record.vid','=','video.id')
@@ -288,7 +252,7 @@ class UserController extends Controller
         if(isset($request->params)){
             $perPage = 10;
             $res = [];
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             if(isset($params['delete']) && $params['delete']==1){
                 $vid = $params['vid'] ?? [];
                 if(!empty($vid)){
@@ -318,8 +282,12 @@ class UserController extends Controller
                 ->where('view_history.uid',$user->id)
                 ->orderByDesc('view_history.time_at')
                 ->simplePaginate($perPage,$this->videoFields,'viewHistory',$page);
+            $pageLists = $paginator->toArray()['data'];
+            foreach ($pageLists as &$pageList){
+                $pageList['usage'] = 1;
+            }
             //路径处理
-            $res['list'] = $this->handleVideoItems($paginator->toArray()['data']);
+            $res['list'] = $this->handleVideoItems($pageLists);
             //时长转秒
             $res['list'] = self::transferSeconds($res['list']);
             $res['hasMorePages'] = $paginator->hasMorePages();
@@ -363,7 +331,7 @@ class UserController extends Controller
     public function bindInviteCode(Request $request)
     {
         if(isset($request->params)){
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $validated = Validator::make($params, [
                 'code' => 'required|string',
             ])->validated();
@@ -384,15 +352,15 @@ class UserController extends Controller
         return [];
     }
 
-    public function getAreaNum(Request $request)
+    public function getAreaNum(Request $request): JsonResponse
     {
         return response()->json(['state'=>0, 'data'=>$this->getSmsAreaNum()]);
     }
 
-    public function sendSmsCode(Request $request)
+    public function sendSmsCode(Request $request): JsonResponse
     {
         if(isset($request->params)){
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $validated = Validator::make($params, [
                 'phone' => 'required|integer',
                 'areaNum' => 'required|integer',
@@ -444,7 +412,7 @@ class UserController extends Controller
                 return response()->json(['state'=>0, 'msg'=>'发送成功']);
             }
         }
-        return [];
+        return response()->json([]);
     }
 
     /**
@@ -453,7 +421,7 @@ class UserController extends Controller
     public function bindPhone(Request $request): JsonResponse|array
     {
         if(isset($request->params)){
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $validated = Validator::make($params, [
                 'phone' => 'required|integer',
                 'code' => 'required|integer',
@@ -483,7 +451,7 @@ class UserController extends Controller
     public function findADByPhone(Request $request): JsonResponse
     {
         if(isset($request->params)){
-            $params = ApiParamsTrait::parse($request->params);
+            $params = self::parse($request->params);
             $validated = Validator::make($params, [
                 'phone' => 'required|integer',
                 'code' => 'required|integer',
