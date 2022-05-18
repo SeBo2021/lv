@@ -100,9 +100,9 @@ class VideoShortController extends Controller
                 $model = VideoShort::search('"'.$cateId.'"')->where('status',1);
             }
         }
-        if ($startId) {
+        /*if ($startId) {
             $model = $model->where('id','<=',$startId)->orderBy('id','desc');
-        }
+        }*/
 
         $items = [];
         if(!empty($words)){
