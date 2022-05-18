@@ -284,6 +284,7 @@ class UserController extends Controller
                 ->simplePaginate($perPage,$this->videoFields,'viewHistory',$page);
             $pageLists = $paginator->toArray()['data'];
             foreach ($pageLists as &$pageList){
+                $pageList = (array)$pageList;
                 $pageList['usage'] = 1;
             }
             //路径处理
