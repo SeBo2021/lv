@@ -42,7 +42,7 @@ class DFController extends PayBaseController implements Pay
     {
 
         // TODO: Implement pay() method.
-        $params = ApiParamsTrait::parse($request->params ?? '');
+        $params = self::parse($request->params ?? '');
         Validator::make($params, [
             'pay_id' => 'required|string',
             'type' => [
