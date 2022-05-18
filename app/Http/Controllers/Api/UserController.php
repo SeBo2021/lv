@@ -249,55 +249,60 @@ class UserController extends Controller
 
     public function viewHistory(Request $request): JsonResponse
     {
-        if(isset($request->params)){
-            $perPage = 10;
-            $res = [];
-            $params = self::parse($request->params);
-            if(isset($params['delete']) && $params['delete']==1){
-                $vid = $params['vid'] ?? [];
-                if(!empty($vid)){
-                    $user = $request->user();
-                    $collectIds = DB::table('view_history')
-                        ->where('uid',$user->id)
-                        ->whereIn('vid',$vid)
-                        ->pluck('id')
-                        ->all();
-                    if(!empty($collectIds)){
-                        DB::table('view_history')->whereIn('id',$collectIds)->delete();
+        try {
+            if(isset($request->params)){
+                $perPage = 10;
+                $res = [];
+                $params = self::parse($request->params);
+                if(isset($params['delete']) && $params['delete']==1){
+                    $vid = $params['vid'] ?? [];
+                    if(!empty($vid)){
+                        $user = $request->user();
+                        $collectIds = DB::table('view_history')
+                            ->where('uid',$user->id)
+                            ->whereIn('vid',$vid)
+                            ->pluck('id')
+                            ->all();
+                        if(!empty($collectIds)){
+                            DB::table('view_history')->whereIn('id',$collectIds)->delete();
+                        }
                     }
+                    return response()->json([
+                        'state'=>0,
+                        'msg' => '删除成功',
+                        'data'=>[]
+                    ]);
                 }
+                $page = $params['page'] ?? 1;
+                if(isset($params['pageSize']) && ($params['pageSize']<10)){
+                    $perPage = $params['pageSize'];
+                }
+                $user = $request->user();
+                $paginator = DB::table('video')
+                    ->join('view_history','video.id','=','view_history.vid')
+                    ->where('view_history.uid',$user->id)
+                    ->orderByDesc('view_history.time_at')
+                    ->simplePaginate($perPage,$this->videoFields,'viewHistory',$page);
+                $pageLists = $paginator->toArray()['data'];
+                foreach ($pageLists as &$pageList){
+                    $pageList = (array)$pageList;
+                    $pageList['usage'] = 1;
+                }
+                //路径处理
+                $res['list'] = $this->handleVideoItems($pageLists);
+                //时长转秒
+                $res['list'] = self::transferSeconds($res['list']);
+                $res['hasMorePages'] = $paginator->hasMorePages();
                 return response()->json([
                     'state'=>0,
-                    'msg' => '删除成功',
-                    'data'=>[]
+                    'data'=>$res
                 ]);
             }
-            $page = $params['page'] ?? 1;
-            if(isset($params['pageSize']) && ($params['pageSize']<10)){
-                $perPage = $params['pageSize'];
-            }
-            $user = $request->user();
-            $paginator = DB::table('video')
-                ->join('view_history','video.id','=','view_history.vid')
-                ->where('view_history.uid',$user->id)
-                ->orderByDesc('view_history.time_at')
-                ->simplePaginate($perPage,$this->videoFields,'viewHistory',$page);
-            $pageLists = $paginator->toArray()['data'];
-            foreach ($pageLists as &$pageList){
-                $pageList = (array)$pageList;
-                $pageList['usage'] = 1;
-            }
-            //路径处理
-            $res['list'] = $this->handleVideoItems($pageLists);
-            //时长转秒
-            $res['list'] = self::transferSeconds($res['list']);
-            $res['hasMorePages'] = $paginator->hasMorePages();
-            return response()->json([
-                'state'=>0,
-                'data'=>$res
-            ]);
+            return response()->json([]);
+        }catch (\Exception $exception){
+            return $this->returnExceptionContent($exception->getMessage());
         }
-        return response()->json([]);
+
     }
 
     public static function transferSeconds($lists)
