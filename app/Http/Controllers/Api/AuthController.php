@@ -85,7 +85,7 @@ class AuthController extends Controller
         $test = $validated['test'] ?? false;
 
         $user = new User();
-        $member = $user::query()->where('did',$validated['did'])->where('status',1)->first($this->loginUserFields);
+        $member = $user::query()->where('did',$validated['did'])->first($this->loginUserFields);
         $loginType = !$member ? 1 : 2;
         $login_info = [];
         switch ($loginType){
@@ -98,15 +98,16 @@ class AuthController extends Controller
                 $user->gold = 0;
                 $user->balance = 0;
                 $user->sex = 0;
+                $user->status = 1;
                 $user->member_card_type = 0;
                 $user->vip_start_last = '';
                 //分配默认相关设置
                 $configData = config_cache('app');
                 $user->long_vedio_times = $configData['free_view_long_video_times'] ?? 0;
                 $user->avatar = rand(1,13);
-                if(!isset($_SERVER['HTTP_USER_AGENT'])){
+                /*if(!isset($_SERVER['HTTP_USER_AGENT'])){
                     return response()->json(['state' => -1, 'msg' => '非法设备!']);
-                }
+                }*/
 
                 $user->device_system = 0;
                 if(strpos($deviceInfo.'', 'androidId')){
@@ -141,7 +142,7 @@ class AuthController extends Controller
                 //Log::debug('===login_info===',$login_info);
                 break;
             case 2: //再次登录
-                if(!$member){
+                if(!$member || $member->status!=1){
                     return response()->json(['state' => -1, 'msg' => '用户不存在或被禁用!']);
                 }
                 //授权登录验证用户名密码
@@ -165,7 +166,7 @@ class AuthController extends Controller
             'channel_id'=>$login_info['channel_id']??'0',
             'device_info'=> $deviceInfo,
             'clipboard'=> $validated['clipboard'] ?? '',
-            'source_info'=> $_SERVER['HTTP_USER_AGENT'],
+            'source_info'=> $_SERVER['HTTP_USER_AGENT']??'',
             'device_system'=> $login_info['device_system'] ?? 0,
         ];
         //Log::debug('login_log_data===',[$login_log_data]);
