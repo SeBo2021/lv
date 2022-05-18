@@ -44,7 +44,7 @@ trait SmsTrait
         $responseBody = (string) $response->getBody();
         $getBody = json_decode($responseBody, true);
         if($getBody['error_code'] > 0){
-            Log::debug('==send_sms_code==',$getBody);
+            Log::debug('==send_China_sms_code==',$getBody);
         }
         /*
          * 成功返回以下结果
@@ -78,7 +78,7 @@ trait SmsTrait
         $responseBody = (string) $response->getBody();
         $getBody = json_decode($responseBody, true);
         if($getBody['error_code'] > 0){
-            Log::debug('==send_sms_code==',$getBody);
+            Log::debug('==send_International_sms_code==',$getBody);
         }
         /*
          * 成功返回以下结果
