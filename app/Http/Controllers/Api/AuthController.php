@@ -66,7 +66,7 @@ class AuthController extends Controller
         $params = self::parse($request->params);
         Log::debug('login_request_params_info===',[$params['did']??'none did']);//参数日志
         $validated = Validator::make($params,$this->loginRules)->validated();
-        //短时间内禁止同一设备注册多次
+        //短时间内禁止同一设备注册多个账号
         $key = $this->apiRedisKey['register_did'].$validated['did'];
 
         $deviceInfo = !is_string($validated['dev']) ? json_encode($validated['dev']) : $validated['dev'] ;
@@ -85,7 +85,7 @@ class AuthController extends Controller
         $test = $validated['test'] ?? false;
 
         $user = new User();
-        $member = $user::query()->where('did',$validated['did'])->first($this->loginUserFields);
+        $member = $user::query()->where('did',$validated['did'])->where('status',1)->first($this->loginUserFields);
         $loginType = !$member ? 1 : 2;
         $login_info = [];
         switch ($loginType){
@@ -141,7 +141,7 @@ class AuthController extends Controller
                 //Log::debug('===login_info===',$login_info);
                 break;
             case 2: //再次登录
-                if(!$member || $member->status!=1){
+                if(!$member){
                     return response()->json(['state' => -1, 'msg' => '用户不存在或被禁用!']);
                 }
                 //授权登录验证用户名密码
