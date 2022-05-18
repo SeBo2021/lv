@@ -197,7 +197,7 @@ class SearchController extends Controller
                         $paginator = Video::search($keyWords)->where('status',1)->simplePaginate($perPage,'searchCat',$page);
                         $paginatorArr = $paginator->toArray()['data'];
                         foreach ($paginatorArr as $key=>$value){
-                            if($value->id==$vid){
+                            if($value['id']==$vid){
                                 unset($paginatorArr[$key]);
                             }
                         }
