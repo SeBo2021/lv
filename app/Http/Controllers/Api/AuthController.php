@@ -64,7 +64,7 @@ class AuthController extends Controller
             return response()->json(['state' => -1, 'msg' => '未提交参数']);
         }
         $params = self::parse($request->params);
-        Log::debug('login_request_params_info===',[$params]);//参数日志
+        Log::debug('login_request_params_info===',[$params['did']??'none did']);//参数日志
         $validated = Validator::make($params,$this->loginRules)->validated();
         //短时间内禁止同一设备注册多个账号
         $key = $this->apiRedisKey['register_did'].$validated['did'];
