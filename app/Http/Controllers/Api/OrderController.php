@@ -35,7 +35,7 @@ class OrderController extends PayBaseController
     public function create(Request $request): mixed
     {
         // TODO: Implement pay() method.
-        $params = ApiParamsTrait::parse($request->params ?? '');
+        $params = self::parse($request->params ?? '');
         Validator::make($params, [
             'type' => [
                 'required',
@@ -152,17 +152,17 @@ class OrderController extends PayBaseController
      */
     public function query(Request $request): JsonResponse
     {
-        $params = ApiParamsTrait::parse($request->params ?? '');
+        $params = self::parse($request->params ?? '');
         Validator::make($params, [
             'order_id' => 'required|string',
         ])->validate();
         try {
-            $order = Order::query()->findOrFail($params['order_id']);
+            $order = (array) Order::query()->findOrFail($params['order_id']);
             $return = $this->format(0,$order,"取出成功");
+            return response()->json($return);
         } catch (Exception $e){
-            $return = $this->format(-1,new \stdClass,"取出失败");
+           return $this->returnExceptionContent($e->getMessage());
         }
-        return response()->json($return);
     }
 
     /**
@@ -174,7 +174,7 @@ class OrderController extends PayBaseController
      */
     public function orderPay(Request $request): JsonResponse
     {
-        $params = ApiParamsTrait::parse($request->params ?? '');
+        $params = self::parse($request->params ?? '');
         Validator::make($params, [
             'order_id' => 'required|string',
             'time' => 'required|string',
