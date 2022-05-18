@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Laravel\Passport\Token;
 
 class AuthController extends Controller
@@ -62,9 +63,13 @@ class AuthController extends Controller
      * @return [string] access_token
      * @return [string] token_type
      * @return [string] expires_at
+     * @throws ValidationException
      */
     public function login(Request $request): \Illuminate\Http\JsonResponse
     {
+        if(!isset($request->params)){
+            return response()->json(['state' => -1, 'msg' => '未提交参数']);
+        }
         $params = self::parse($request->params);
         Log::debug('login_request_params_info===',[$params]);//参数日志
         $validated = Validator::make($params,$this->loginRules)->validated();
