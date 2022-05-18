@@ -520,7 +520,6 @@ class UserController extends Controller
                     'vip'=>0,
                     'member_card_type'=>'',
                     'status'=>0,
-                    'did'=>$user->did,
                     'phone_number'=>0,
                     'area_number'=>0,
                     'long_vedio_times'=>0,
