@@ -112,7 +112,6 @@ class CommContentController extends Controller
                 return response()->json([]);
             }
             $params = self::parse($request->params);
-            Log::info('===COMMLIST===',[$params]);
             Validator::make($params, [
                 'cid_1' => 'nullable',
                 'cid_2' => 'nullable',
