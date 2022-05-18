@@ -66,6 +66,7 @@ class FakeLiveShortController extends Controller
 
         $data = [];
         $_v = date('Ymd');
+        $items = $items ?? [];
         foreach ($items as $one) {
             //  $one = $this->handleShortVideoItems([$one], true)[0];
             $one['limit'] = 0;

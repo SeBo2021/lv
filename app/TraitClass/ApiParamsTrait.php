@@ -52,7 +52,7 @@ trait ApiParamsTrait
 
     public function returnExceptionContent($msg): \Illuminate\Http\JsonResponse
     {
-        Log::error('api_exception'.request()->route()->getActionName(), [$msg]);
+        Log::error('api_exception_'.request()->route()->getActionName(), [$msg]);
         return response()->json(['state' => -1, 'msg' => '请检查网络可能出现异常','data'=>[]]);
     }
 }
