@@ -183,7 +183,7 @@ class SearchController extends Controller
                     'vid' => 'required|integer',
                 ])->validated();
                 $page = $validated['page'] ?? 1;
-                $perPage = 8;
+                $perPage = 9;
                 $vid = $validated['vid'];
                 $cat = $this->getVideoById($vid)->cat;
                 $res = ['list'=>[], 'hasMorePages'=>false];
@@ -196,6 +196,11 @@ class SearchController extends Controller
                         $keyWords = implode(',',$keyWordsArr);
                         $paginator = Video::search($keyWords)->where('status',1)->simplePaginate($perPage,'searchCat',$page);
                         $paginatorArr = $paginator->toArray()['data'];
+                        foreach ($paginatorArr as $key=>$value){
+                            if($value->id==$vid){
+                                unset($paginatorArr[$key]);
+                            }
+                        }
                         if(!empty($paginatorArr)){
                             $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
                             //广告
