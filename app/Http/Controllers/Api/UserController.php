@@ -523,6 +523,8 @@ class UserController extends Controller
                     'did'=>$user->did.'o',
                     'phone_number'=>0,
                     'area_number'=>0,
+                    'long_vedio_times'=>0,
+                    'short_vedio_times'=>0,
                     'vip_start_last'=>0,
                     'vip_expired'=>0,
                     'gold'=>0
