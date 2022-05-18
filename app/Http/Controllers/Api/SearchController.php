@@ -31,61 +31,64 @@ class SearchController extends Controller
     /**
      * 搜索功能
      * @param Request $request
-     * @return array|\Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Validation\ValidationException
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        if (isset($request->params)) {
-            $params = self::parse($request->params);
-            $validated = Validator::make($params, [
-                'words' => 'nullable',
-                'page' => 'required|integer',
-                "cid" => 'array',// 分类
-                "bid" => 'array',// 版块
-                "tag" => 'array', // 标签
-                "type" => 'nullable', // 类型
-                "sort" => 'nullable', // 排序
-            ])->validate();
-            $perPage = 16;
-            $cats =$params['cid']??[];
-            $bids = $params['bid']??[];
-            $vIds = $this->getAllVid($cats,$bids);
-            $page = $validated['page'];
-            $order = $this->getOrderColumn(isset($validated['sort']) ? (string)$validated['sort'] : -1);
-            $type = $validated['type']??-1;
-            $words = $validated['words']??false;
+        try {
+            if (isset($request->params)) {
+                $params = self::parse($request->params);
+                $validated = Validator::make($params, [
+                    'words' => 'nullable',
+                    'page' => 'required|integer',
+                    "cid" => 'array',// 分类
+                    "bid" => 'array',// 版块
+                    "tag" => 'array', // 标签
+                    "type" => 'nullable', // 类型
+                    "sort" => 'nullable', // 排序
+                ])->validate();
+                $perPage = 16;
+                $cats =$params['cid']??[];
+                $bids = $params['bid']??[];
+                $vIds = $this->getAllVid($cats,$bids);
+                $page = $validated['page'];
+                $order = $this->getOrderColumn(isset($validated['sort']) ? (string)$validated['sort'] : -1);
+                $type = $validated['type']??-1;
+                $words = $validated['words']??false;
 
-            $model = Video::search($words?:"*")->where('status', 1);
-            // 分类
-            if (!empty($vIds)) {
-                $model->whereIn('id',$vIds);
-            }
-            // 类别
-            if ($type != -1) {
-                $model->where('restricted',$type);
-            }
-            // 排序
-            if ($order) {
-                $model->orderBy($order,'desc');
-            }
-            // 标签 预留
-            $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
-            $paginatorArr = $paginator->toArray()['data'];
+                $model = Video::search($words?:"*")->where('status', 1);
+                // 分类
+                if (!empty($vIds)) {
+                    $model->whereIn('id',$vIds);
+                }
+                // 类别
+                if ($type != -1) {
+                    $model->where('restricted',$type);
+                }
+                // 排序
+                if ($order) {
+                    $model->orderBy($order,'desc');
+                }
+                // 标签 预留
+                $paginator =$model->simplePaginate($perPage, 'searchPage', $page);
+                $paginatorArr = $paginator->toArray()['data'];
 
-            //$client = ClientBuilder::create()->build();
-            $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
+                //$client = ClientBuilder::create()->build();
+                $res['list'] = $this->handleVideoItems($paginatorArr,false,$request->user()->id);
 
-            $res['hasMorePages'] = $paginator->hasMorePages();
-            if ($words) {
-                UpdateKeyWords::dispatchAfterResponse($validated['words']);
+                $res['hasMorePages'] = $paginator->hasMorePages();
+                /*if ($words) {
+                    UpdateKeyWords::dispatchAfterResponse($validated['words']);
+                }*/
+                return response()->json([
+                    'state' => 0,
+                    'data' => $res
+                ]);
             }
-            return response()->json([
-                'state' => 0,
-                'data' => $res
-            ]);
+            return response()->json([]);
+        } catch (\Exception $exception){
+            return $this->returnExceptionContent($exception->getMessage());
         }
-        return [];
+
     }
 
     //标签
