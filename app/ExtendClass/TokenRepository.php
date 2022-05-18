@@ -6,6 +6,7 @@ use App\TraitClass\PHPRedisTrait;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Laravel\Passport\Passport;
+use Laravel\Passport\Token;
 
 class TokenRepository extends \Laravel\Passport\TokenRepository
 {
@@ -15,19 +16,13 @@ class TokenRepository extends \Laravel\Passport\TokenRepository
      * Get a token by the given ID.
      *
      * @param  string  $id
-     * @return \Laravel\Passport\Token
+     * @return Token
      */
-    public function find($id): \Laravel\Passport\Token
+    public function find($id): Token
     {
         $key = $this->apiRedisKey['passport_token'].$id;
-        $redis = $this->redis();
-        if($redis->exists($key)){
-            $res = unserialize($redis->get($key));
-        }else{
-            $res = Passport::token()->where('id', $id)->first();
-            $redis->set($key,serialize($res));
-            $redis->expire($key,7200);
-        }
-        return $res;
+        return Cache::remember($key, 7200, function() use($id) {
+            return Passport::token()->where('id', $id)->first();
+        });
     }
 }
