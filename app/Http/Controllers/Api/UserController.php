@@ -523,6 +523,8 @@ class UserController extends Controller
                     'did'=>$user->did.'o',
                     'phone_number'=>0,
                     'area_number'=>0,
+                    'vip_start_last'=>0,
+                    'vip_expired'=>0,
                     'gold'=>0
                 ]);
                 $redisHashKey = $this->apiRedisKey['user_gold_video'] . $user->id;
