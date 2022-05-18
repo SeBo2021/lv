@@ -16,9 +16,8 @@ class TokenRepository extends \Laravel\Passport\TokenRepository
      * Get a token by the given ID.
      *
      * @param  string  $id
-     * @return Token
      */
-    public function find($id): Token
+    public function find($id)
     {
         $key = $this->apiRedisKey['passport_token'].$id;
         return Cache::remember($key, 7200, function() use($id) {
