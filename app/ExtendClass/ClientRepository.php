@@ -18,23 +18,12 @@ class ClientRepository extends \Laravel\Passport\ClientRepository
      */
     public function find($id)
     {
-        //Log::info('==ClientRepository==',[$id]);
         $key = $this->apiRedisKey['passport_client'].$id;
-        $redis = $this->redis();
-        if($redis->exists($key)){
-            $res = unserialize($redis->get($key));
-        }else{
-            $client = Passport::client();
-            $res = $client->where($client->getKeyName(), $id)->first();
-            $redis->set($key,serialize($res));
-            $this->redis()->expire($key,7200);
-        }
-        return $res;
-        /*return Cache::remember("passport:client:{$id}", 86400,
+        return Cache::remember($key, 86400,
             function () use ($id) {
                 $client = Passport::client();
                 return $client->where($client->getKeyName(), $id)->first();
             }
-        );*/
+        );
     }
 }
